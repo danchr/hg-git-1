@@ -10,16 +10,20 @@ Hg-Git would clone the repository and convert it to an Hg repository for
 you. There are a number of different protocols that can be used for Git
 repositories. Examples of Git repository URLs include::
 
-  https://github.com/schacon/hg-git.git
-  http://code.google.com/p/guava-libraries
-  ssh://git@github.com:schacon/hg-git.git
-  git://github.com/schacon/hg-git.git
+  git+https://github.com/hg-git/hg-git.git
+  git+http://github.com/hg-git/hg-git.git
+  git+ssh://git@github.com/hg-git/hg-git.git
+  git://github.com/hg-git/hg-git.git
+  file:///path/to/hg-git
   ../hg-git (local file path)
 
-For the HTTP, HTTPS, and SSH protocols, it isn't clear based solely on
-the URL whether the remote repository should be treated as a Mercurial
-repository or a Git repository.  Thus, to specify that a URL should
-use Git, prepend the URL with "git+". For example, an HTTPS URL would
+These also work::
+
+  git+ssh://git@github.com:hg-git/hg-git.git
+  git@github.com:hg-git/hg-git.git
+
+Please note that you need to prepend HTTP, HTTPS, and SSH URLs with "git+"
+in order differentiate them from Hg URLs. For example, an HTTPS URL would
 start with "git+https://". Also, note that Git doesn't require the
 specification of the protocol for SSH, but Mercurial does.  Hg-Git
 automatically detects whether file paths should be treated as Git repositories
@@ -43,7 +47,7 @@ all equivalent::
 
  $ hg pull
  $ hg pull default
- $ hg pull git://github.com/schacon/hg-git.git
+ $ hg pull git://github.com/hg-git/hg-git.git
 
 Git branches are exposed in Hg as bookmarks, while Git remotes are exposed
 as Hg local tags.  See `hg help bookmarks` and `hg help tags` for further
