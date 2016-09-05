@@ -80,6 +80,27 @@ Make sure that a deleted .hgsubstate does not confuse hg-git
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg --cwd hgrepo-c status
 
+test shared repositories
+
+  $ hg clone gitrepo hgrepo-base
+  importing git objects into hg
+  updating to branch default
+  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg  --config extensions.share= share hgrepo-base hgrepo-shared
+  updating working directory
+  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg -R hgrepo-shared pull gitrepo
+  pulling from gitrepo
+  no changes found
+  $ hg -R hgrepo-shared push gitrepo
+  pushing to gitrepo
+  searching for changes
+  no changes found
+  [1]
+  $ ls hgrepo-shared/.hg | grep git
+  [1]
+  $ rm -rf hgrepo-base hgrepo-shared
+
 clone empty repo
   $ git init empty
   Initialized empty Git repository in $TESTTMP/empty/.git/
