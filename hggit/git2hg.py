@@ -16,7 +16,7 @@ def find_incoming(git_object_store, git_map, refs):
     # sort by commit date
     def commitdate(sha):
         obj = git_object_store[sha]
-        return obj.commit_time-obj.commit_timezone
+        return obj.commit_time - obj.commit_timezone
 
     # get a list of all the head shas
     def get_heads(refs):

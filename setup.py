@@ -34,7 +34,7 @@ project that is in Git.  A bridger of worlds, this plugin be.
     keywords='hg git mercurial',
     license='GPLv2',
     packages=['hggit'],
-    package_data={ 'hggit': ['help/git.rst'] },
+    package_data={'hggit': ['help/git.rst']},
     include_package_data=True,
     install_requires=['dulwich>=0.9.7'] + extra_req,
 )
