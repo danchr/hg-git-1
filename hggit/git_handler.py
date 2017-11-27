@@ -239,7 +239,7 @@ class GitHandler(object):
         paths = self.paths
         # if paths are set, we should still check 'default'
         if not paths:
-            paths = [('default', None),]
+            paths = (('default', None),)
 
         # we avoid using dulwich's refs method because it is incredibly slow;
         # on a repo with a few hundred branches and a few thousand tags,
