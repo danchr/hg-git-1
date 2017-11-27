@@ -681,7 +681,7 @@ class GitHandler(object):
         if a:
             name = self.get_valid_git_username_email(a.group(1))
             email = self.get_valid_git_username_email(a.group(2))
-            if a.group(3) != None and len(a.group(3)) != 0:
+            if a.group(3) is not None and len(a.group(3)) != 0:
                 name += ' ext:(' + urllib.quote(a.group(3)) + ')'
             author = '%s <%s>' \
                      % (self.get_valid_git_username_email(name),
