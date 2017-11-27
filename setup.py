@@ -4,7 +4,6 @@ except:
     from distutils.core import setup
 
 try:
-    from collections import OrderedDict
     extra_req = []
 except ImportError:
     extra_req = ['ordereddict>=1.1']
