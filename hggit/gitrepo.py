@@ -49,11 +49,11 @@ class gitrepo(peerrepository):
         elif namespace == 'bookmarks':
             if self.localrepo is not None:
                 handler = self.localrepo.githandler
-                refs = handler.fetch_pack(self.path, heads=[])
+                result = handler.fetch_pack(self.path, heads=[])
                 # map any git shas that exist in hg to hg shas
                 stripped_refs = {
                     ref[11:]: handler.map_hg_get(val) or val
-                    for ref, val in refs.iteritems()
+                    for ref, val in result.refs.iteritems()
                     if ref.startswith('refs/heads/')
                 }
                 return stripped_refs

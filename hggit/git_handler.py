@@ -268,7 +268,7 @@ class GitHandler(object):
         self.save_map(self.map_file)
 
     def fetch(self, remote, heads):
-        refs = self.fetch_pack(remote, heads)
+        result = self.fetch_pack(remote, heads)
         remote_name = self.remote_name(remote)
 
         # if remote returns a symref for HEAD, then let's store that
@@ -276,18 +276,19 @@ class GitHandler(object):
         rnode = None
         oldheads = self.repo.changelog.heads()
         imported = 0
-        if refs:
-            filteredrefs = self.filter_min_date(self.filter_refs(refs, heads))
+        if result.refs:
+            filteredrefs = self.filter_min_date(self.filter_refs(result.refs,
+                                                                 heads))
             imported = self.import_git_objects(remote_name, filteredrefs)
-            self.import_tags(refs)
-            self.update_hg_bookmarks(refs)
+            self.import_tags(result.refs)
+            self.update_hg_bookmarks(result.refs)
 
             try:
-                symref = refs['HEAD']
+                symref = result.symrefs['HEAD']
                 if symref.startswith('refs/heads'):
                     rhead = symref.replace('refs/heads/', '')
 
-                rnode = refs['refs/heads/%s' % rhead]
+                rnode = result.refs['refs/heads/%s' % rhead]
                 rnode = self._map_git[rnode]
                 rnode = self.repo[rnode].node()
             except KeyError:
@@ -296,10 +297,10 @@ class GitHandler(object):
                 rnode = None
 
             if remote_name:
-                self.update_remote_branches(remote_name, refs)
+                self.update_remote_branches(remote_name, result.refs)
             elif not self.paths:
                 # intial cloning
-                self.update_remote_branches('default', refs)
+                self.update_remote_branches('default', result.refs)
 
                 # "Activate" a tipmost bookmark.
                 bms = self.repo['tip'].bookmarks()
@@ -449,21 +450,21 @@ class GitHandler(object):
     # incoming support
     def getremotechanges(self, remote, revs):
         self.export_commits()
-        refs = self.fetch_pack(remote.path, revs)
+        result = self.fetch_pack(remote.path, revs)
 
         # refs contains all remote refs. Prune to only those requested.
         if revs:
             reqrefs = {}
             for rev in revs:
                 for n in ('refs/heads/' + rev, 'refs/tags/' + rev):
-                    if n in refs:
-                        reqrefs[n] = refs[n]
+                    if n in result.refs:
+                        reqrefs[n] = result.refs[n]
         else:
-            reqrefs = refs
+            reqrefs = result.refs
 
         commits = [bin(c) for c in self.get_git_incoming(reqrefs).commits]
 
-        b = overlayrepo(self, commits, refs)
+        b = overlayrepo(self, commits, result.refs)
 
         return (b, commits, lambda: None)
 
@@ -1227,8 +1228,7 @@ class GitHandler(object):
             progress = GitProgress(self.ui)
             f = StringIO.StringIO()
 
-            # monkey patch dulwich's read_pkt_refs so that we can determine on
-            # clone which bookmark to activate
+            # only newer versions (0.18) of dulwich have symref support
             client.read_pkt_refs = compat.read_pkt_refs
             ret = localclient.fetch_pack(path, determine_wants, graphwalker,
                                          f.write, progress.progress)
@@ -1240,7 +1240,22 @@ class GitHandler(object):
             # For empty repos dulwich gives us None, but since later
             # we want to iterate over this, we really want an empty
             # iterable
-            return ret if ret else {}
+            if ret is None:
+                ret = {}
+
+            # for older dulwich, the return type was a dict, meaning we're
+            # running our monkey patch read_pkt_refs
+            if isinstance(ret, dict):
+                head = ret.get("HEAD")
+                symrefs = {}
+                # we want to raise a KeyError if HEAD is not a key
+                if head:
+                    symrefs["HEAD"] = head
+                # use FetchPackResult as upstream now does
+                ret = compat.FetchPackResult(ret,
+                                             symrefs,
+                                             client.default_user_agent_string())
+            return ret
         except (HangupException, GitProtocolError), e:
             raise hgutil.Abort(_("git remote error: ") + str(e))
 
