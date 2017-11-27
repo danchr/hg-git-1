@@ -442,7 +442,7 @@ class overlayrepo(object):
 
     def _constructmanifest(self):
         return overlaymanifestrevlog(self,
-                self.handler.repo._constructmanifest())
+                                     self.handler.repo._constructmanifest())
 
     def __getitem__(self, n):
         if n not in self.revmap:

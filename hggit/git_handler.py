@@ -476,7 +476,7 @@ class GitHandler(object):
 
         nodes = (clnode(n) for n in repo)
         to_export = (repo[node] for node in nodes if not hex(node) in
-                  self._map_hg)
+                     self._map_hg)
 
         todo_total = len(repo) - len(self._map_hg)
         topic = 'find commits to export'
@@ -519,7 +519,7 @@ class GitHandler(object):
             self.repo, pctx, self.git.object_store, gitcommit)
 
         mapsavefreq = compat.config(self.ui, 'int', 'hggit',
-                                          'mapsavefrequency')
+                                    'mapsavefrequency')
         for i, ctx in enumerate(export):
             self.ui.progress('exporting', i, total=total)
             self.export_hg_commit(ctx.node(), exporter)
@@ -811,7 +811,7 @@ class GitHandler(object):
             self.ui.status(_("no changes found\n"))
 
         mapsavefreq = compat.config(self.ui, 'int', 'hggit',
-                                          'mapsavefrequency')
+                                    'mapsavefrequency')
         for i, csha in enumerate(commits):
             self.ui.progress('importing', i, total=total, unit='commits')
             commit = commit_cache[csha]

@@ -128,7 +128,7 @@ class gitdirstate(dirstate.dirstate):
                     self._ui.warn("%s: %s\n" % (fn, warning))
                 patterns.extend(pats)
         return gignore(self._root, files, self._ui.warn,
-                             extrapatterns=patterns)
+                       extrapatterns=patterns)
 
     def _finddotgitignores(self):
         """A copy of dirstate.walk. This is called from the new _ignore method,
