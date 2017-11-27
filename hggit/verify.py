@@ -14,6 +14,7 @@ from mercurial.i18n import _
 from dulwich import diff_tree
 from dulwich.objects import Commit, S_IFGITLINK
 
+
 def verify(ui, repo, hgctx):
     '''verify that a Mercurial rev matches the corresponding Git rev
 

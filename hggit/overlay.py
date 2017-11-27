@@ -14,10 +14,12 @@ from mercurial import (
 )
 from mercurial.node import bin, hex, nullid
 
+
 def _maybehex(n):
     if len(n) == 20:
         return hex(n)
     return n
+
 
 class overlaymanifest(object):
     def __init__(self, repo, sha):
@@ -147,6 +149,7 @@ class overlaymanifest(object):
     def __delitem__(self, path):
         del self._map[path]
 
+
 def wrapmanifestdictdiff(orig, self, m2, match=None, clean=False):
     '''avoid calling into lazymanifest code if m2 is an overlaymanifest'''
     # Older mercurial clients used diff(m2, clean=False). If a caller failed
@@ -171,6 +174,7 @@ def wrapmanifestdictdiff(orig, self, m2, match=None, clean=False):
         return diff
     else:
         return orig(self, m2, **kwargs)
+
 
 class overlayfilectx(object):
     def __init__(self, repo, path, fileid=None):
@@ -203,6 +207,7 @@ class overlayfilectx(object):
 
     def isbinary(self):
         return util.binary(self.data())
+
 
 class overlaychangectx(context.changectx):
     def __init__(self, repo, sha):
@@ -287,6 +292,7 @@ class overlaychangectx(context.changectx):
         return (self.commit.tree, self.user(), self.date(), self.files(),
                 self.description(), self.extra())
 
+
 class overlayrevlog(object):
     def __init__(self, repo, base):
         self.repo = repo
@@ -345,6 +351,7 @@ class overlayrevlog(object):
     def __len__(self):
         return len(self.repo.handler.repo) + len(self.repo.revmap)
 
+
 class overlayoldmanifestlog(overlayrevlog):
     def read(self, sha):
         if sha == nullid:
@@ -354,8 +361,10 @@ class overlayoldmanifestlog(overlayrevlog):
     def __getitem__(self, sha):
         return overlaymanifestctx(self.repo, sha)
 
+
 class overlaymanifestrevlog(overlayrevlog):
     pass
+
 
 class overlaymanifestctx(object):
     def __init__(self, repo, node):
@@ -364,6 +373,7 @@ class overlaymanifestctx(object):
 
     def read(self):
         return overlaymanifest(self._repo, self._node)
+
 
 try:
     class overlaymanifestlog(manifest.manifestlog):
@@ -384,6 +394,7 @@ try:
 except AttributeError:
     # manifestlog did not exist prior to 4.0
     pass
+
 
 class overlaychangelog(overlayrevlog):
     def read(self, sha):
@@ -406,6 +417,7 @@ class overlaychangelog(overlayrevlog):
             description=values[4],
             extra=values[5],
         )
+
 
 class overlayrepo(object):
     def __init__(self, handler, commits, refs):

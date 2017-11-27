@@ -112,6 +112,7 @@ except AttributeError:
         def localpath(self):
             return self.p
 
+
 def _isgitdir(path):
     """True if the given file path is a git repo."""
     if os.path.exists(os.path.join(path, '.hg')):
@@ -129,6 +130,7 @@ def _isgitdir(path):
 
     return False
 
+
 def _local(path):
     p = urlcls(path).localpath()
     if _isgitdir(p):
@@ -138,7 +140,9 @@ def _local(path):
         return gitrepo
     return _oldlocal(path)
 
+
 hg.schemes['file'] = _local
+
 
 # we need to wrap this so that git-like ssh paths are not prepended with a
 # local filesystem path. ugh.
@@ -157,6 +161,7 @@ def _url(orig, path, **kwargs):
         return orig(gituri, **kwargs)
     return orig(path, **kwargs)
 
+
 extensions.wrapfunction(hgutil, 'url', _url)
 
 
@@ -172,10 +177,12 @@ def _httpgitwrapper(orig):
 
     return httpgitscheme
 
+
 hg.schemes['https'] = _httpgitwrapper(hg.schemes['https'])
 hg.schemes['http'] = _httpgitwrapper(hg.schemes['http'])
-
 hgdefaultdest = hg.defaultdest
+
+
 def defaultdest(source):
     for scheme in util.gitschemes:
         if source.startswith('%s://' % scheme) and source.endswith('.git'):
@@ -185,7 +192,10 @@ def defaultdest(source):
         return hgdefaultdest(source[:-4])
 
     return hgdefaultdest(source)
+
+
 hg.defaultdest = defaultdest
+
 
 def getversion():
     """return version with dependencies for hg --version -v"""
@@ -193,14 +203,18 @@ def getversion():
     dulver = '.'.join(str(i) for i in dulwich.__version__)
     return __version__ + (" (dulwich %s)" % dulver)
 
+
 # defend against tracebacks if we specify -r in 'hg pull'
 def safebranchrevs(orig, lrepo, repo, branches, revs):
     revs, co = orig(lrepo, repo, branches, revs)
     if hgutil.safehasattr(lrepo, 'changelog') and co not in lrepo.changelog:
         co = None
     return revs, co
+
+
 if getattr(hg, 'addbranchrevs', False):
     extensions.wrapfunction(hg, 'addbranchrevs', safebranchrevs)
+
 
 def extsetup(ui):
     templatekw.keywords.update({'gitnode': gitnodekw})
@@ -212,6 +226,7 @@ def extsetup(ui):
              # Mercurial >= 3.6: doc(ui)
              lambda *args: open(os.path.join(helpdir, 'git.rst')).read())
     insort(help.helptable, entry)
+
 
 def reposetup(ui, repo):
     if not isinstance(repo, gitrepo.gitrepo):
@@ -231,20 +246,24 @@ def reposetup(ui, repo):
         klass = hgrepo.generate_repo_subclass(repo.__class__)
         repo.__class__ = klass
 
+
 if hgutil.safehasattr(manifest, '_lazymanifest'):
     # Mercurial >= 3.4
     extensions.wrapfunction(manifest.manifestdict, 'diff',
                             overlay.wrapmanifestdictdiff)
+
 
 @command('gimport')
 def gimport(ui, repo, remote_name=None):
     '''import commits from Git to Mercurial'''
     repo.githandler.import_commits(remote_name)
 
+
 @command('gexport')
 def gexport(ui, repo):
     '''export commits from Mercurial to Git'''
     repo.githandler.export_commits()
+
 
 @command('gclear')
 def gclear(ui, repo):
@@ -257,6 +276,7 @@ def gclear(ui, repo):
     '''
     repo.ui.status(_("clearing out the git cache data\n"))
     repo.githandler.clear()
+
 
 @command('gverify',
          [('r', 'rev', '', _('revision to verify'), _('REV'))],
@@ -271,6 +291,7 @@ def gverify(ui, repo, **opts):
     '''
     ctx = scmutil.revsingle(repo, opts.get('rev'), '.')
     return verify.verify(ui, repo, ctx)
+
 
 @command('git-cleanup')
 def git_cleanup(ui, repo):
@@ -289,6 +310,7 @@ def git_cleanup(ui, repo):
         wlock.release()
     ui.status(_('git commit map cleaned\n'))
 
+
 def findcommonoutgoing(orig, repo, other, *args, **kwargs):
     if isinstance(other, gitrepo.gitrepo):
         heads = repo.githandler.get_refs(other.path)[0]
@@ -305,7 +327,10 @@ def findcommonoutgoing(orig, repo, other, *args, **kwargs):
             kw['commoninc'] = commoninc
         return orig(repo, other, **kw)
     return orig(repo, other, *args, **kwargs)
+
+
 extensions.wrapfunction(discovery, 'findcommonoutgoing', findcommonoutgoing)
+
 
 def getremotechanges(orig, ui, repo, other, *args, **opts):
     if isinstance(other, gitrepo.gitrepo):
@@ -319,7 +344,10 @@ def getremotechanges(orig, ui, repo, other, *args, **opts):
             cleanup = None
         return r, c, cleanup
     return orig(ui, repo, other, *args, **opts)
+
+
 extensions.wrapfunction(bundlerepo, 'getremotechanges', getremotechanges)
+
 
 def peer(orig, uiorrepo, *args, **opts):
     newpeer = orig(uiorrepo, *args, **opts)
@@ -327,13 +355,19 @@ def peer(orig, uiorrepo, *args, **opts):
         if isinstance(uiorrepo, localrepo.localrepository):
             newpeer.localrepo = uiorrepo
     return newpeer
+
+
 extensions.wrapfunction(hg, 'peer', peer)
+
 
 def isvalidlocalpath(orig, self, path):
     return orig(self, path) or _isgitdir(path)
+
+
 if (hgutil.safehasattr(hgui, 'path') and
     hgutil.safehasattr(hgui.path, '_isvalidlocalpath')):
     extensions.wrapfunction(hgui.path, '_isvalidlocalpath', isvalidlocalpath)
+
 
 @util.transform_notgit
 def exchangepull(orig, repo, remote, heads=None, force=False, bookmarks=(),
@@ -366,9 +400,12 @@ def exchangepull(orig, repo, remote, heads=None, force=False, bookmarks=(),
             wlock.release()
     else:
         return orig(repo, remote, heads, force, bookmarks=bookmarks, **kwargs)
+
+
 if not hgutil.safehasattr(localrepo.localrepository, 'pull'):
     # Mercurial >= 3.2
     extensions.wrapfunction(exchange, 'pull', exchangepull)
+
 
 # TODO figure out something useful to do with the newbranch param
 @util.transform_notgit
@@ -386,9 +423,12 @@ def exchangepush(orig, repo, remote, force=False, revs=None, newbranch=False,
     else:
         return orig(repo, remote, force, revs, newbranch, bookmarks=bookmarks,
                     **kwargs)
+
+
 if not hgutil.safehasattr(localrepo.localrepository, 'push'):
     # Mercurial >= 3.2
     extensions.wrapfunction(exchange, 'push', exchangepush)
+
 
 def revset_fromgit(repo, subset, x):
     '''``fromgit()``
@@ -399,6 +439,7 @@ def revset_fromgit(repo, subset, x):
     node = repo.changelog.node
     return baseset(r for r in subset
                    if git.map_git_get(hex(node(r))) is not None)
+
 
 def revset_gitnode(repo, subset, x):
     '''``gitnode(hash)``
@@ -421,6 +462,7 @@ def revset_gitnode(repo, subset, x):
     if 0 <= len(result) < 2:
         return result
     raise LookupError(rev, git.map_file, _('ambiguous identifier'))
+
 
 def gitnodekw(**args):
     """:gitnode: String.  The Git changeset identification hash, as a 40 hexadecimal digit string."""

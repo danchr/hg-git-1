@@ -18,6 +18,7 @@ from mercurial import (
 
 gitschemes = ('git', 'git+ssh', 'git+http', 'git+https')
 
+
 def parse_hgsub(lines):
     """Fills OrderedDict with hgsub file content passed as list of lines"""
     rv = OrderedDict()
@@ -29,9 +30,11 @@ def parse_hgsub(lines):
         rv[name.strip()] = value.strip()
     return rv
 
+
 def serialize_hgsub(data):
     """Produces a string from OrderedDict hgsub content"""
     return ''.join(['%s = %s\n' % (n, v) for n, v in data.iteritems()])
+
 
 def parse_hgsubstate(lines):
     """Fills OrderedDict with hgsubtate file content passed as list of lines"""
@@ -44,9 +47,11 @@ def parse_hgsubstate(lines):
         rv[name.strip()] = value.strip()
     return rv
 
+
 def serialize_hgsubstate(data):
     """Produces a string from OrderedDict hgsubstate content"""
     return ''.join(['%s %s\n' % (data[n], n) for n in sorted(data)])
+
 
 def transform_notgit(f):
     '''use as a decorator around functions that call into dulwich'''
@@ -56,6 +61,7 @@ def transform_notgit(f):
         except errors.NotGitRepository:
             raise hgutil.Abort('not a git repository')
     return inner
+
 
 def isgitsshuri(uri):
     """Method that returns True if a uri looks like git-style uri
@@ -97,6 +103,7 @@ def isgitsshuri(uri):
             return True
     return False
 
+
 def updatebookmarks(repo, changes, name='git_handler'):
     """abstract writing bookmarks for backwards compatibility"""
     bms = repo._bookmarks
@@ -122,6 +129,7 @@ def updatebookmarks(repo, changes, name='git_handler'):
         tr.close()
     finally:
         lockmod.release(tr, lock, wlock)
+
 
 def checksafessh(host):
     """check if a hostname is a potentially unsafe ssh exploit (SEC)

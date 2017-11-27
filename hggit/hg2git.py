@@ -13,6 +13,7 @@ from mercurial import (
 import compat
 import util
 
+
 def parse_subrepos(ctx):
     sub = util.OrderedDict()
     if '.hgsub' in ctx:

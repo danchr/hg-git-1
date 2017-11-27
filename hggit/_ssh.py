@@ -5,6 +5,7 @@ from mercurial import (
     util,
 )
 
+
 class SSHVendor(object):
     """Parent class for ui-linked Vendor classes."""
 

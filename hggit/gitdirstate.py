@@ -25,6 +25,7 @@ except (AttributeError, ImportError):
     pathutil = scmutil
 from mercurial.i18n import _
 
+
 def gignorepats(orig, lines, root=None):
     '''parse lines (iterable) of .gitignore text, returning a tuple of
     (patterns, parse errors). These patterns should be given to compile()
@@ -70,6 +71,7 @@ def gignorepats(orig, lines, root=None):
 
     return patterns, warnings
 
+
 def gignore(root, files, warn, extrapatterns=None):
     allpats = []
     pats = []
@@ -102,6 +104,7 @@ def gignore(root, files, warn, extrapatterns=None):
             except util.Abort, inst:
                 raise util.Abort('%s: %s' % ('extra patterns', inst[0]))
     return ignorefunc
+
 
 class gitdirstate(dirstate.dirstate):
     @dirstate.rootcache('.hgignore')

@@ -9,6 +9,7 @@ try:
 except ImportError:
     from mercurial.peer import peerrepository
 
+
 class gitrepo(peerrepository):
     def __init__(self, ui, path, create):
         if create:  # pragma: no cover
@@ -93,7 +94,9 @@ class gitrepo(peerrepository):
         def unbundle(self):
             raise NotImplementedError
 
+
 instance = gitrepo
+
 
 def islocal(path):
     if isgitsshuri(path):

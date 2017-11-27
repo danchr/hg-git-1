@@ -37,6 +37,7 @@ except ImportError:
     from mercurial import scmutil
     hgvfs = scmutil.vfs
 
+
 def gitvfs(repo):
     """return a vfs suitable to read git related data"""
     # Mercurial >= 3.3:  repo.shared()
@@ -44,6 +45,7 @@ def gitvfs(repo):
         return hgvfs(repo.sharedpath)
     else:
         return repo.vfs
+
 
 def passwordmgr(ui):
     try:
@@ -139,12 +141,14 @@ CONFIG_DEFAULTS = {
 
 hasconfigitems = False
 
+
 def registerconfigs(configitem):
     global hasconfigitems
     hasconfigitems = True
     for section, items in CONFIG_DEFAULTS.iteritems():
         for item, default in items.iteritems():
             configitem(section, item, default=default)
+
 
 def config(ui, subtype, section, item):
     if subtype == 'string':

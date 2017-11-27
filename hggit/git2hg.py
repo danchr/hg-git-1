@@ -3,6 +3,7 @@
 import urllib
 from dulwich.objects import Commit, Tag
 
+
 def find_incoming(git_object_store, git_map, refs):
     '''find what commits need to be imported
 
@@ -73,11 +74,13 @@ def find_incoming(git_object_store, git_map, refs):
 
     return GitIncomingResult(commits, commit_cache)
 
+
 class GitIncomingResult(object):
     '''struct to store result from find_incoming'''
     def __init__(self, commits, commit_cache):
         self.commits = commits
         self.commit_cache = commit_cache
+
 
 def extract_hg_metadata(message, git_extra):
     split = message.split("\n--HG--\n", 1)

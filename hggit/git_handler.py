@@ -56,6 +56,7 @@ RE_AUTHOR_FILE = re.compile('\s*=\s*')
 
 CALLBACK_BUFFER = ''
 
+
 class GitProgress(object):
     """convert git server progress strings into mercurial progress"""
     def __init__(self, ui):
@@ -95,6 +96,7 @@ class GitProgress(object):
         self.lasttopic = None
         if msg:
             self.ui.note(msg + '\n')
+
 
 class GitHandler(object):
     map_file = 'git-mapfile'
