@@ -63,7 +63,17 @@ except (AttributeError, ImportError):
     from dulwich.errors import GitProtocolError
     from dulwich.protocol import extract_capabilities
 
+    class FetchPackResult(object):
+        """Result of a fetch-pack operation.
+        :var refs: Dictionary with all remote refs
+        :var symrefs: Dictionary with remote symrefs
+        :var agent: User agent string
+        """
 
+        def __init__(self, refs, symrefs, agent):
+            self.refs = refs
+            self.symrefs = symrefs
+            self.agent = agent
 
     def read_pkt_refs(proto):
         server_capabilities = None
