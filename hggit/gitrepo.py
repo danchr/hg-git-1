@@ -51,10 +51,11 @@ class gitrepo(peerrepository):
                 handler = self.localrepo.githandler
                 refs = handler.fetch_pack(self.path, heads=[])
                 # map any git shas that exist in hg to hg shas
-                stripped_refs = dict([
-                    (ref[11:], handler.map_hg_get(refs[ref]) or refs[ref])
-                    for ref in refs.keys() if ref.startswith('refs/heads/')
-                ])
+                stripped_refs = {
+                    ref[11:]: handler.map_hg_get(val) or val
+                    for ref, val in refs.iteritems()
+                    if ref.startswith('refs/heads/')
+                }
                 return stripped_refs
         return {}
 
