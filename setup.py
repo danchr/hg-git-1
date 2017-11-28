@@ -1,3 +1,5 @@
+from os.path import dirname, join
+
 try:
     from setuptools import setup
 except:
@@ -9,7 +11,6 @@ except ImportError:
     extra_req = ['ordereddict>=1.1']
 
 
-from os.path import dirname, join
 def get_version(relpath):
     root = dirname(__file__)
     for line in open(join(root, relpath), 'rb'):
