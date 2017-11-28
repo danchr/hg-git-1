@@ -649,8 +649,10 @@ class GitHandler(object):
 
         >>> from collections import namedtuple
         >>> from mercurial.ui import ui
-        >>> mockrepo = namedtuple('localrepo', ['vfs'])
+        >>> mockrepo = namedtuple('localrepo', ['vfs', 'sharedpath', 'path'])
         >>> mockrepo.vfs = ''
+        >>> mockrepo.sharedpath = ''
+        >>> mockrepo.path = ''
         >>> g = GitHandler(mockrepo, ui()).get_valid_git_username_email
         >>> g('John Doe')
         'John Doe'
@@ -1694,8 +1696,10 @@ class GitHandler(object):
         >>> from collections import namedtuple
         >>> from dulwich.client import HttpGitClient, SSHGitClient
         >>> from mercurial.ui import ui
-        >>> mockrepo = namedtuple('localrepo', ['vfs'])
+        >>> mockrepo = namedtuple('localrepo', ['vfs', 'sharedpath', 'path'])
         >>> mockrepo.vfs = ''
+        >>> mockrepo.sharedpath = ''
+        >>> mockrepo.path = ''
         >>> g = GitHandler(mockrepo, ui())
         >>> client, url = g.get_transport_and_path('http://fqdn.com/test.git')
         >>> print isinstance(client, HttpGitClient)
