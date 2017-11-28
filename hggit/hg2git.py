@@ -35,12 +35,14 @@ def audit_git_path(ui, path):
     ...         print s
     >>> u = fakeui()
     >>> audit_git_path(u, 'foo/git~100/wat')
-    warning: path 'foo/git~100/wat' contains a potentially dangerous path component.
+    ... # doctest: +ELLIPSIS
+    warning: path 'foo/git~100/wat' contains a potentially dangerous ...
     It may not be legal to check out in Git.
     It may also be rejected by some git server configurations.
     <BLANKLINE>
     >>> audit_git_path(u, u'foo/.gi\u200ct'.encode('utf-8'))
-    warning: path 'foo/.gi\xe2\x80\x8ct' contains a potentially dangerous path component.
+    ... # doctest: +ELLIPSIS
+    warning: path 'foo/.gi\xe2\x80\x8ct' contains a potentially dangerous ...
     It may not be legal to check out in Git.
     It may also be rejected by some git server configurations.
     <BLANKLINE>

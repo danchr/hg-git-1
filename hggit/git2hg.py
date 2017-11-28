@@ -7,9 +7,12 @@ from dulwich.objects import Commit, Tag
 def find_incoming(git_object_store, git_map, refs):
     '''find what commits need to be imported
 
-    git_object_store is a dulwich object store.
-    git_map is a map with keys being Git commits that have already been imported
-    refs is a map of refs to SHAs that we're interested in.'''
+    git_object_store: is a dulwich object store.
+    git_map: is a map with keys being Git commits that have already been
+             imported
+    refs: is a map of refs to SHAs that we're interested in.
+
+    '''
 
     done = set()
     commit_cache = {}
@@ -88,13 +91,16 @@ def extract_hg_metadata(message, git_extra):
     # commits that originated in Git we'd like to optionally infer rename
     # information to store in Mercurial, but for commits that originated in
     # Mercurial we'd like to disable this. How do we tell whether the commit
-    # originated in Mercurial or in Git? We rely on the presence of extra hg-git
-    # fields in the Git commit.
-    # - Commits exported by hg-git versions past 0.7.0 always store at least one
-    #   hg-git field.
+    # originated in Mercurial or in Git? We rely on the presence of extra
+    # hg-git fields in the Git commit.
+    #
+    # - Commits exported by hg-git versions past 0.7.0 always store at least
+    #   one hg-git field.
+    #
     # - For commits exported by hg-git versions before 0.7.0, this becomes a
-    #   heuristic: if the commit has any extra hg fields, it definitely originated
-    #   in Mercurial. If the commit doesn't, we aren't really sure.
+    #   heuristic: if the commit has any extra hg fields, it definitely
+    #   originated in Mercurial. If the commit doesn't, we aren't really sure.
+    #
     # If we think the commit originated in Mercurial, we set renames to a
     # dict. If we don't, we set renames to None. Callers can then determine
     # whether to infer rename information.

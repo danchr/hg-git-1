@@ -1211,10 +1211,10 @@ class GitHandler(object):
         localclient, path = self.get_transport_and_path(remote_name)
 
         # The dulwich default walk only checks refs/heads/. We also want to
-        # consider remotes when doing discovery, so we build our own list.  We
+        # consider remotes when doing discovery, so we build our own list. We
         # can't just do 'refs/' here because the tag class doesn't have a
-        # parents function for walking, and older versions of dulwich don't like
-        # that.
+        # parents function for walking, and older versions of dulwich don't
+        # like that.
         haveheads = self.git.refs.as_dict('refs/remotes/').values()
         haveheads.extend(self.git.refs.as_dict('refs/heads/').values())
         graphwalker = self.git.get_graph_walker(heads=haveheads)
@@ -1253,9 +1253,8 @@ class GitHandler(object):
                 if head:
                     symrefs["HEAD"] = head
                 # use FetchPackResult as upstream now does
-                ret = compat.FetchPackResult(ret,
-                                             symrefs,
-                                             client.default_user_agent_string())
+                agent = client.default_user_agent_string()
+                ret = compat.FetchPackResult(ret, symrefs, agent)
             return ret
         except (HangupException, GitProtocolError), e:
             raise hgutil.Abort(_("git remote error: ") + str(e))
@@ -1700,12 +1699,13 @@ class GitHandler(object):
         >>> mockrepo.sharedpath = ''
         >>> mockrepo.path = ''
         >>> g = GitHandler(mockrepo, ui())
-        >>> client, url = g.get_transport_and_path('http://fqdn.com/test.git')
+        >>> tp = g.get_transport_and_path
+        >>> client, url = tp('http://fqdn.com/test.git')
         >>> print isinstance(client, HttpGitClient)
         True
         >>> print url
         http://fqdn.com/test.git
-        >>> client, url = g.get_transport_and_path('git@fqdn.com:user/repo.git')
+        >>> client, url = tp('git@fqdn.com:user/repo.git')
         >>> print isinstance(client, SSHGitClient)
         True
         >>> print url

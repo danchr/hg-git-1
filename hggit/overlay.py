@@ -103,8 +103,9 @@ class overlaymanifest(object):
         return self._map.get(path, default)
 
     def diff(self, m2, match=None, clean=False):
-        # Older mercurial clients used diff(m2, clean=False). If a caller failed
-        # to specify clean as a keyword arg, it might get passed as match here.
+        # Older mercurial clients used diff(m2, clean=False). If a caller
+        # failed to specify clean as a keyword arg, it might get passed as
+        # match here.
         if isinstance(match, bool):
             clean = match
             match = None
@@ -161,8 +162,8 @@ def wrapmanifestdictdiff(orig, self, m2, match=None, clean=False):
     kwargs = {
         'clean': clean
     }
-    # Older versions of mercurial don't support the match arg, so only add it if
-    # it exists.
+    # Older versions of mercurial don't support the match arg, so only add it
+    # if it exists.
     if match is not None:
         kwargs['match'] = match
     if isinstance(m2, overlaymanifest):

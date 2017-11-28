@@ -18,9 +18,9 @@ from dulwich.objects import Commit, S_IFGITLINK
 def verify(ui, repo, hgctx):
     '''verify that a Mercurial rev matches the corresponding Git rev
 
-    Given a Mercurial revision that has a corresponding Git revision in the map,
-    this attempts to answer whether that revision has the same contents as the
-    corresponding Git revision.
+    Given a Mercurial revision that has a corresponding Git revision in the
+    map, this attempts to answer whether that revision has the same contents as
+    the corresponding Git revision.
 
     '''
     handler = repo.githandler

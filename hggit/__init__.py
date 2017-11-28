@@ -284,9 +284,9 @@ def gclear(ui, repo):
 def gverify(ui, repo, **opts):
     '''verify that a Mercurial rev matches the corresponding Git rev
 
-    Given a Mercurial revision that has a corresponding Git revision in the map,
-    this attempts to answer whether that revision has the same contents as the
-    corresponding Git revision.
+    Given a Mercurial revision that has a corresponding Git revision in the
+    map, this attempts to answer whether that revision has the same contents as
+    the corresponding Git revision.
 
     '''
     ctx = scmutil.revsingle(repo, opts.get('rev'), '.')
@@ -465,7 +465,8 @@ def revset_gitnode(repo, subset, x):
 
 
 def gitnodekw(**args):
-    """:gitnode: String.  The Git changeset identification hash, as a 40 hexadecimal digit string."""
+    """:gitnode: String. The Git changeset identification hash, as a 40 hexadecimal
+digit string."""
     node = args['ctx']
     repo = args['repo']
     gitnode = repo.githandler.map_git_get(node.hex())
