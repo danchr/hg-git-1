@@ -304,10 +304,11 @@ replace subrepo with symlink
   verifying rev 87bae50d72cb against git commit 88171163bf4795b5570924e51d5f8ede33f8bc28
 
 (replace symlink with subrepo)
-  $ hg cat -r 7 .hgsub .hgsubstate
+  $ hg cat -r 7 .hgsub
   subrepo2 = [git]../gitsubrepo
   alpha = [git]../gitsubrepo
   foolink = [git]../gitsubrepo
+  $ hg cat -r 7 .hgsubstate
   6e4ad8da50204560c00fa25e4987eb2e239029ba alpha
   6e4ad8da50204560c00fa25e4987eb2e239029ba foolink
   6e4ad8da50204560c00fa25e4987eb2e239029ba subrepo2
