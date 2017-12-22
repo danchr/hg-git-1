@@ -10,7 +10,6 @@ help:
 all: help
 
 tests:
-	$(PYTHON) -m doctest hggit/*.py contrib/*.py
 	cd tests && $(PYTHON) run-tests.py --with-hg=`which hg` $(TESTFLAGS)
 
 test-%:
@@ -20,7 +19,6 @@ tests-%:
 	@echo "Path to crew repo is $(CREW) - set this with CREW= if needed."
 	hg -R $(CREW) checkout $$(echo $@ | sed s/tests-//) && \
 	(cd $(CREW) ; $(MAKE) clean local) && \
-	PYTHONPATH=$(CREW) $(PYTHON) -m doctest hggit/*.py contrib/*.py && \
 	cd tests && $(PYTHON) $(CREW)/tests/run-tests.py $(TESTFLAGS)
 
 # This is intended to be the authoritative list of Hg versions that this
