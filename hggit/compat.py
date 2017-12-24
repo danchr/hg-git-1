@@ -28,6 +28,22 @@ except AttributeError:
                 s = s.replace(c, '')
         return s
 
+try:
+    from mercurial import vfs as vfsmod
+    hgvfs = vfsmod.vfs
+except ImportError:
+    # vfsmod was extracted in hg 4.2
+    from mercurial import scmutil
+    hgvfs = scmutil.vfs
+
+def gitvfs(repo):
+    """return a vfs suitable to read git related data"""
+    # Mercurial >= 3.3:  repo.shared()
+    if repo.sharedpath != repo.path:
+        return hgvfs(repo.sharedpath)
+    else:
+        return repo.vfs
+
 def passwordmgr(ui):
     try:
         realm = hgutil.urlreq.httppasswordmgrwithdefaultrealm()

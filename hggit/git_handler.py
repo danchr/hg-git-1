@@ -25,7 +25,6 @@ from mercurial import (
     phases,
     util as hgutil,
     url,
-    vfs as vfsmod,
 )
 
 import _ssh
@@ -110,7 +109,7 @@ class GitHandler(object):
 
         # Mercurial >= 3.3:  repo.shared()
         if dest_repo.sharedpath != dest_repo.path:
-            self.vfs = vfsmod.vfs(dest_repo.sharedpath)
+            self.vfs = compat.hgvfs(dest_repo.sharedpath)
         if compat.config(ui, 'bool', 'git', 'intree'):
             self.gitdir = self.repo.wvfs.join('.git')
         else:

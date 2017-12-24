@@ -49,7 +49,6 @@ from mercurial import (
     revset,
     scmutil,
     templatekw,
-    vfs as vfsmod,
 )
 
 try:
@@ -73,7 +72,6 @@ try:
 except AttributeError:
     # baseset was added in hg 3.0
     pass
-
 
 demandimport.ignore.extend([
     'collections',
@@ -215,21 +213,13 @@ def extsetup(ui):
              lambda *args: open(os.path.join(helpdir, 'git.rst')).read())
     insort(help.helptable, entry)
 
-def _gitvfs(repo):
-    """return a vfs suitable to read git related data"""
-    # Mercurial >= 3.3:  repo.shared()
-    if repo.sharedpath != repo.path:
-        return vfsmod.vfs(repo.sharedpath)
-    else:
-        return repo.vfs
-
 def reposetup(ui, repo):
     if not isinstance(repo, gitrepo.gitrepo):
 
         if (getattr(dirstate, 'rootcache', False) and
             (not ignoremod or getattr(ignore, 'readpats', False)) and
             hgutil.safehasattr(repo, 'vfs') and
-            os.path.exists(_gitvfs(repo).join('git'))):
+            os.path.exists(compat.gitvfs(repo).join('git'))):
             # only install our dirstate wrapper if it has a hope of working
             import gitdirstate
             if ignoremod:
@@ -286,7 +276,7 @@ def gverify(ui, repo, **opts):
 def git_cleanup(ui, repo):
     '''clean up Git commit map after history editing'''
     new_map = []
-    vfs = _gitvfs(repo)
+    vfs = compat.gitvfs(repo)
     for line in vfs(GitHandler.map_file):
         gitsha, hgsha = line.strip().split(' ', 1)
         if hgsha in repo:
