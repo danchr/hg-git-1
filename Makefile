@@ -19,7 +19,7 @@ tests-%:
 	@echo "Path to crew repo is $(CREW) - set this with CREW= if needed."
 	hg -R $(CREW) checkout $$(echo $@ | sed s/tests-//) && \
 	(cd $(CREW) ; $(MAKE) clean local) && \
-	cd tests && $(PYTHON) $(CREW)/tests/run-tests.py $(TESTFLAGS)
+	cd tests && $(PYTHON) run-tests.py $(TESTFLAGS)
 
 # This is intended to be the authoritative list of Hg versions that this
 # extension is tested with.  Versions prior to the version that ships in the
