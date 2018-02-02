@@ -1154,13 +1154,8 @@ class GitHandler(object):
                     if 'capabilities^{}' in new_refs:
                         del new_refs['capabilities^{}']
                     tip = hex(tip)
-                    # COMPAT: hg 1.8 - bookmarks extension moved to core
-                    try:
-                        commands.bookmark(self.ui, self.repo, 'master',
-                                          rev=tip, force=True)
-                    except NameError:
-                        bookmarks.bookmark(self.ui, self.repo, 'master',
-                                           rev=tip, force=True)
+                    commands.bookmark(self.ui, self.repo, 'master',
+                                      rev=tip, force=True)
                     # COMPAT: hg 3.5 - bookmarks.setcurrent renamed to activate
                     try:
                         bookmarks.activate(self.repo, 'master')
