@@ -11,14 +11,15 @@ from mercurial import (
     util,
 )
 
+# COMPAT: hg 3.5 - ignore module was removed
 try:
     from mercurial import ignore
     ignore.readpats
     ignoremod = True
 except (AttributeError, ImportError):
-    # ignore module was removed in Mercurial 3.5
     ignoremod = False
-# pathauditor moved to pathutil in 2.9
+
+# COMPAT: hg 2.9 - pathauditor moved to pathutil
 try:
     from mercurial import pathutil
     pathutil.pathauditor
@@ -163,7 +164,7 @@ class gitdirstate(dirstate.dirstate):
         matchalways = match.always()
         matchtdir = match.traversedir
         dmap = self._map
-        # osutil moved in hg 4.3, but util re-exports listdir
+        # COMPAT: hg 4.3 - osutil moved, but util re-exports listdir
         try:
             listdir = util.listdir
         except AttributeError:
@@ -192,8 +193,8 @@ class gitdirstate(dirstate.dirstate):
         results, work, dirsnotfound = self._walkexplicit(match, subrepos)
 
         skipstep3 = skipstep3 and not (work or dirsnotfound)
+        # COMPAT: hg 3.3.3 - work is now a list of tuples
         if work and isinstance(work[0], tuple):
-            # Mercurial >= 3.3.3
             work = [nd for nd, d in work if not dirignore(d)]
         else:
             work = [d for d in work if not dirignore(d)]

@@ -51,6 +51,7 @@ from mercurial import (
     templatekw,
 )
 
+# COMPAT: hg 3.2 - exchange module was introduced
 try:
     from mercurial import exchange
     exchange.push  # existed in first iteration of this file
@@ -58,19 +59,19 @@ except (AttributeError, ImportError):
     # We only *use* the exchange module in hg 3.2+, so this is safe
     pass
 
+# COMPAT: hg 3.5 - ignore module was removed
 try:
     from mercurial import ignore
     ignore.readpats
     ignoremod = True
 except (AttributeError, ImportError):
-    # The ignore module disappeared in Mercurial 3.5
     ignoremod = False
 
+# COMPAT: hg 3.0 - revset.baseset was added
 baseset = set
 try:
     baseset = revset.baseset
 except AttributeError:
-    # baseset was added in hg 3.0
     pass
 
 try:
@@ -105,6 +106,7 @@ for _scheme in util.gitschemes:
 # support for `hg clone localgitrepo`
 _oldlocal = hg.schemes['file']
 
+# COMPAT: hg 1.9 - url.url class moved into util module
 try:
     urlcls = hgutil.url
 except AttributeError:
@@ -215,6 +217,7 @@ def safebranchrevs(orig, lrepo, repo, branches, revs):
     return revs, co
 
 
+# COMPAT: hg 1.4 - this is no longer needed
 if getattr(hg, 'addbranchrevs', False):
     extensions.wrapfunction(hg, 'addbranchrevs', safebranchrevs)
 
@@ -226,7 +229,8 @@ def extsetup(ui):
     })
     helpdir = os.path.join(os.path.dirname(__file__), 'help')
     entry = (['git'], _("Working with Git Repositories"),
-             # Mercurial >= 3.6: doc(ui)
+             # COMPAT: hg 3.6 - help table expects a delayed loader (see
+             # help.loaddoc())
              lambda *args: open(os.path.join(helpdir, 'git.rst')).read())
     insort(help.helptable, entry)
 

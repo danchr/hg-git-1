@@ -324,10 +324,10 @@ class GitHandler(object):
                     bms = [rhead + suffix]
 
                 if bms:
+                    # COMPAT: hg 3.5 - bookmarks.setcurrent renamed to activate
                     try:
                         bookmarks.activate(self.repo, bms[0])
                     except AttributeError:
-                        # hg < 3.5
                         bookmarks.setcurrent(self.repo, bms[0])
 
         self.save_map(self.map_file)
@@ -342,11 +342,11 @@ class GitHandler(object):
             lock = self.repo.lock()
             try:
                 tr = self.repo.transaction("phase")
+                # COMPAT: hg 3.2 - advanceboundary uses transaction
                 try:
                     phases.advanceboundary(self.repo, tr, phases.public,
                                            blist)
                 except TypeError:
-                    # hg < 3.2
                     phases.advanceboundary(self.repo, phases.public,
                                            blist)
                 tr.close()
@@ -970,6 +970,8 @@ class GitHandler(object):
                 # it's a file reported as modified from Git
                 delete, mode, sha = info
                 if delete:
+                    # COMPAT: hg 3.2 - expects this function to return
+                    # None for missing files
                     if getattr(memctx, '_returnnoneformissingfiles', False):
                         return None
                     else:  # Mercurial < 3.2
@@ -1152,16 +1154,17 @@ class GitHandler(object):
                     if 'capabilities^{}' in new_refs:
                         del new_refs['capabilities^{}']
                     tip = hex(tip)
+                    # COMPAT: hg 1.8 - bookmarks extension moved to core
                     try:
                         commands.bookmark(self.ui, self.repo, 'master',
                                           rev=tip, force=True)
                     except NameError:
                         bookmarks.bookmark(self.ui, self.repo, 'master',
                                            rev=tip, force=True)
+                    # COMPAT: hg 3.5 - bookmarks.setcurrent renamed to activate
                     try:
                         bookmarks.activate(self.repo, 'master')
                     except AttributeError:
-                        # hg < 3.5
                         bookmarks.setcurrent(self.repo, 'master')
                     new_refs['refs/heads/master'] = self.map_git_get(tip)
 
