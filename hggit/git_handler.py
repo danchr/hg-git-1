@@ -298,7 +298,7 @@ class GitHandler(object):
 
             if remote_name:
                 self.update_remote_branches(remote_name, result.refs)
-            elif not self.paths:
+            elif not self.git.refs.as_dict('refs/remotes/'):
                 # intial cloning
                 self.update_remote_branches('default', result.refs)
 
