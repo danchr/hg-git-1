@@ -985,16 +985,22 @@ class GitHandler(object):
                 if copied:
                     copied_path = copied[0]
 
-            try:
-                return context.memfilectx(self.repo, f, data,
-                                          islink='l' in e,
-                                          isexec='x' in e,
-                                          copied=copied_path)
-            except TypeError:
-                return context.memfilectx(f, data,
-                                          islink='l' in e,
-                                          isexec='x' in e,
-                                          copied=copied_path)
+            # Different versions of mercurial have different parameters to
+            # memfilectx.  Try them from newest to oldest.
+            args_to_try = (
+                (self.repo, memctx, f, data),   # hg 4.5+
+                (self.repo, f, data),           # hg 3.1 - 4.5
+                (f, data),                      # hg < 3.1
+            )
+            for args in args_to_try:
+                try:
+                    return context.memfilectx(*args,
+                                              islink='l' in e,
+                                              isexec='x' in e,
+                                              copied=copied_path)
+                except TypeError as ex:
+                    last_ex = ex
+            raise last_ex
 
         p1, p2 = (nullid, nullid)
         octopus = False
