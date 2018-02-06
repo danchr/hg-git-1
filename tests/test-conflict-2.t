@@ -19,7 +19,7 @@ Load commonly used test logic
   $ hg merge -r1 2>&1 | sed 's/-C ./-C/' | egrep -v '^merging afile' | sed 's/incomplete.*/failed!/'
   warning: conflicts.* (re)
   0 files updated, 0 files merged, 0 files removed, 1 files unresolved
-  use 'hg resolve' to retry unresolved file merges or 'hg update -C' to abandon
+  use 'hg resolve' to retry unresolved file merges or 'hg *' to abandon (glob)
 resolve using second parent
   $ echo B > afile
   $ hg resolve -m afile | egrep -v 'no more unresolved files' || true
