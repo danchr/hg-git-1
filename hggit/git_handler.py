@@ -596,6 +596,8 @@ class GitHandler(object):
 
         if 'encoding' in extra:
             commit.encoding = extra['encoding']
+        if 'gpgsig' in extra:
+            commit.gpgsig = extra['gpgsig']
 
         for obj, nodeid in exporter.update_changeset(ctx):
             if obj.id not in self.git.object_store:
@@ -1028,6 +1030,8 @@ class GitHandler(object):
 
         if commit.encoding:
             extra['encoding'] = commit.encoding
+        if commit.gpgsig:
+            extra['gpgsig'] = commit.gpgsig
 
         if octopus:
             extra['hg-git'] = 'octopus-done'
