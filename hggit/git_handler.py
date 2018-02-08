@@ -18,7 +18,6 @@ from dulwich import diff_tree
 from mercurial.i18n import _
 from mercurial.node import hex, bin, nullid
 from mercurial import (
-    bookmarks,
     commands,
     context,
     encoding,
@@ -324,11 +323,7 @@ class GitHandler(object):
                     bms = [rhead + suffix]
 
                 if bms:
-                    # COMPAT: hg 3.5 - bookmarks.setcurrent renamed to activate
-                    try:
-                        bookmarks.activate(self.repo, bms[0])
-                    except AttributeError:
-                        bookmarks.setcurrent(self.repo, bms[0])
+                    compat.activatebookmark(self.repo, bms[0])
 
         self.save_map(self.map_file)
 
@@ -1156,11 +1151,7 @@ class GitHandler(object):
                     tip = hex(tip)
                     commands.bookmark(self.ui, self.repo, 'master',
                                       rev=tip, force=True)
-                    # COMPAT: hg 3.5 - bookmarks.setcurrent renamed to activate
-                    try:
-                        bookmarks.activate(self.repo, 'master')
-                    except AttributeError:
-                        bookmarks.setcurrent(self.repo, 'master')
+                    compat.activatebookmark(self.repo, 'master')
                     new_refs['refs/heads/master'] = self.map_git_get(tip)
 
         # mapped nodes might be hidden
