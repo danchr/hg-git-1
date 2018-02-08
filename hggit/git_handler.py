@@ -337,13 +337,8 @@ class GitHandler(object):
             lock = self.repo.lock()
             try:
                 tr = self.repo.transaction("phase")
-                # COMPAT: hg 3.2 - advanceboundary uses transaction
-                try:
-                    phases.advanceboundary(self.repo, tr, phases.public,
-                                           blist)
-                except TypeError:
-                    phases.advanceboundary(self.repo, phases.public,
-                                           blist)
+                compat.advancephaseboundary(self.repo, tr, phases.public,
+                                            blist)
                 tr.close()
             finally:
                 if tr is not None:

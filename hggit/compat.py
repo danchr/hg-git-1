@@ -1,6 +1,7 @@
 from mercurial import (
     bookmarks,
     context,
+    phases,
     url,
     util as hgutil,
 )
@@ -74,6 +75,13 @@ if hgutil.safehasattr(bookmarks, 'activate'):
     activatebookmark = bookmarks.activate
 else:
     activatebookmark = bookmarks.setcurrent
+
+def advancephaseboundary(repo, tr, targetphase, nodes):
+    # hg 3.2 - advanceboundary uses transaction
+    try:
+        phases.advanceboundary(repo, tr, targetphase, nodes)
+    except TypeError:
+        phases.advanceboundary(repo, targetphase, nodes)
 
 
 try:
