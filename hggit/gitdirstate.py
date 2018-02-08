@@ -11,6 +11,8 @@ from mercurial import (
     util,
 )
 
+import compat
+
 # COMPAT: hg 3.5 - ignore module was removed
 try:
     from mercurial import ignore
@@ -164,12 +166,6 @@ class gitdirstate(dirstate.dirstate):
         matchalways = match.always()
         matchtdir = match.traversedir
         dmap = self._map
-        # COMPAT: hg 4.3 - osutil moved, but util re-exports listdir
-        try:
-            listdir = util.listdir
-        except AttributeError:
-            from mercurial import osutil
-            listdir = osutil.listdir
         lstat = os.lstat
         dirkind = stat.S_IFDIR
         regkind = stat.S_IFREG
@@ -209,7 +205,7 @@ class gitdirstate(dirstate.dirstate):
             else:
                 skip = '.hg'
             try:
-                entries = listdir(join(nd), stat=True, skip=skip)
+                entries = compat.listdir(join(nd), stat=True, skip=skip)
             except OSError, inst:
                 if inst.errno in (errno.EACCES, errno.ENOENT):
                     fwarn(nd, inst.strerror)

@@ -83,6 +83,13 @@ def advancephaseboundary(repo, tr, targetphase, nodes):
     except TypeError:
         phases.advanceboundary(repo, targetphase, nodes)
 
+# hg 4.3 - osutil moved, but mercurial.util re-exports listdir
+if hgutil.safehasattr(hgutil, 'listdir'):
+    listdir = hgutil.listdir
+else:
+    from mercurial import osutil
+    listdir = osutil.listdir
+
 
 try:
     import dulwich.client
