@@ -106,18 +106,6 @@ for _scheme in util.gitschemes:
 # support for `hg clone localgitrepo`
 _oldlocal = hg.schemes['file']
 
-# COMPAT: hg 1.9 - url.url class moved into util module
-try:
-    urlcls = hgutil.url
-except AttributeError:
-    class urlcls(object):
-        def __init__(self, path):
-            self.p = hgutil.drop_scheme('file', path)
-
-        def localpath(self):
-            return self.p
-
-
 def _isgitdir(path):
     """True if the given file path is a git repo."""
     if os.path.exists(os.path.join(path, '.hg')):
@@ -137,7 +125,7 @@ def _isgitdir(path):
 
 
 def _local(path):
-    p = urlcls(path).localpath()
+    p = hgutil.url(path).localpath()
     if _isgitdir(p):
         return gitrepo
     # detect git ssh urls (which mercurial thinks is a file-like path)
