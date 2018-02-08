@@ -215,11 +215,7 @@ def safebranchrevs(orig, lrepo, repo, branches, revs):
     if hgutil.safehasattr(lrepo, 'changelog') and co not in lrepo.changelog:
         co = None
     return revs, co
-
-
-# COMPAT: hg 1.4 - this is no longer needed
-if getattr(hg, 'addbranchrevs', False):
-    extensions.wrapfunction(hg, 'addbranchrevs', safebranchrevs)
+extensions.wrapfunction(hg, 'addbranchrevs', safebranchrevs)
 
 
 def extsetup(ui):
