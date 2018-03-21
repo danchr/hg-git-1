@@ -54,6 +54,13 @@ RE_GIT_PROGRESS = re.compile('\((\d+)/(\d+)\)')
 
 RE_AUTHOR_FILE = re.compile('\s*=\s*')
 
+# mercurial.utils.dateutil functions were in mercurial.util in Mercurial < 4.6
+try:
+    from mercurial.utils import dateutil
+    dateutil.parsedate
+except ImportError:
+    dateutil = hgutil
+
 CALLBACK_BUFFER = ''
 
 
@@ -1312,7 +1319,7 @@ class GitHandler(object):
             return refs
 
         # filter refs older than min_timestamp
-        min_timestamp, min_offset = hgutil.parsedate(min_date)
+        min_timestamp, min_offset = dateutil.parsedate(min_date)
 
         def check_min_time(obj):
             if isinstance(obj, Tag):
