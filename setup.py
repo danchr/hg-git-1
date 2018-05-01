@@ -37,5 +37,5 @@ project that is in Git.  A bridger of worlds, this plugin be.
     packages=['hggit'],
     package_data={'hggit': ['help/git.rst']},
     include_package_data=True,
-    install_requires=['dulwich>=0.9.7'] + extra_req,
+    install_requires=['dulwich>=0.19.0'] + extra_req,
 )
