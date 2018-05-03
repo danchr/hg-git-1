@@ -7,7 +7,7 @@ import stat
 
 import dulwich.objects as dulobjs
 from mercurial import (
-    util as hgutil,
+    error,
 )
 
 import compat
@@ -60,7 +60,7 @@ def audit_git_path(ui, path):
                 break
     if dangerous:
         if compat.config(ui, 'bool', 'git', 'blockdotgit'):
-            raise hgutil.Abort(
+            raise error.Abort(
                 ('Refusing to export likely-dangerous path %r' % path),
                 hint=("If you need to continue, read about CVE-2014-9390 and "
                       "then set '[git] blockdotgit = false' in your hgrc."))

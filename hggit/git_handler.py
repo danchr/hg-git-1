@@ -22,6 +22,7 @@ from mercurial import (
     commands,
     context,
     encoding,
+    error,
     phases,
     util as hgutil,
 )
@@ -405,7 +406,7 @@ class GitHandler(object):
 
             return old, new
         except (HangupException, GitProtocolError), e:
-            raise hgutil.Abort(_("git remote error: ") + str(e))
+            raise error.Abort(_("git remote error: ") + str(e))
 
     def push(self, remote, revs, force):
         self.export_commits()
@@ -521,8 +522,8 @@ class GitHandler(object):
             try:
                 gitcommit = self.git[gitsha]
             except KeyError:
-                raise hgutil.Abort(_('Parent SHA-1 not present in Git'
-                                     'repo: %s' % gitsha))
+                raise error.Abort(_('Parent SHA-1 not present in Git'
+                                    'repo: %s' % gitsha))
 
         exporter = hg2git.IncrementalChangesetExporter(
             self.repo, pctx, self.git.object_store, gitcommit)
@@ -594,8 +595,8 @@ class GitHandler(object):
             git_sha = self.map_git_get(hgsha)
             if git_sha:
                 if git_sha not in self.git.object_store:
-                    raise hgutil.Abort(_('Parent SHA-1 not present in Git'
-                                         'repo: %s' % git_sha))
+                    raise error.Abort(_('Parent SHA-1 not present in Git'
+                                        'repo: %s' % git_sha))
 
                 commit.parents.append(git_sha)
 
@@ -614,8 +615,8 @@ class GitHandler(object):
         tree_sha = exporter.root_tree_sha
 
         if tree_sha not in self.git.object_store:
-            raise hgutil.Abort(_('Tree SHA-1 not present in Git repo: %s' %
-                                 tree_sha))
+            raise error.Abort(_('Tree SHA-1 not present in Git repo: %s' %
+                                tree_sha))
 
         commit.tree = tree_sha
 
@@ -854,8 +855,8 @@ class GitHandler(object):
 
         for parent in gparents:
             if parent not in self.repo:
-                raise hgutil.Abort(_('you appear to have run strip - '
-                                     'please run hg git-cleanup'))
+                raise error.Abort(_('you appear to have run strip - '
+                                    'please run hg git-cleanup'))
 
         # get a list of the changed, added, removed files and gitlinks
         files, gitlinks, git_renames = self.get_files_changed(commit,
@@ -1080,9 +1081,9 @@ class GitHandler(object):
                 exportable = {}
                 for rev in (hex(r) for r in revs):
                     if rev not in all_exportable:
-                        raise hgutil.Abort("revision %s cannot be pushed since"
-                                           " it doesn't have a bookmark" %
-                                           self.repo[rev])
+                        raise error.Abort("revision %s cannot be pushed since"
+                                          " it doesn't have a bookmark" %
+                                          self.repo[rev])
                     exportable[rev] = all_exportable[rev]
             return self.get_changed_refs(refs, exportable, force)
 
@@ -1132,7 +1133,7 @@ class GitHandler(object):
                                 change_totals.get(Blob, 0)))
             return old_refs, new_refs
         except (HangupException, GitProtocolError), e:
-            raise hgutil.Abort(_("git remote error: ") + str(e))
+            raise error.Abort(_("git remote error: ") + str(e))
 
     def get_changed_refs(self, refs, exportable, force):
         new_refs = refs.copy()
@@ -1169,8 +1170,8 @@ class GitHandler(object):
         for rev, rev_refs in exportable.iteritems():
             ctx = self.repo[rev]
             if not rev_refs:
-                raise hgutil.Abort("revision %s cannot be pushed since"
-                                   " it doesn't have a bookmark" % ctx)
+                raise error.Abort("revision %s cannot be pushed since"
+                                  " it doesn't have a bookmark" % ctx)
 
             # Check if the tags the server is advertising are annotated tags,
             # by attempting to retrieve it from the our git repo, and building
@@ -1203,13 +1204,13 @@ class GitHandler(object):
                     if rctx.ancestor(ctx) == rctx or force:
                         new_refs[ref] = self.map_git_get(ctx.hex())
                     else:
-                        raise hgutil.Abort("pushing %s overwrites %s"
-                                           % (ref, ctx))
+                        raise error.Abort("pushing %s overwrites %s"
+                                          % (ref, ctx))
                 elif ref in uptodate_annotated_tags:
                     # we already have the annotated tag.
                     pass
                 else:
-                    raise hgutil.Abort(
+                    raise error.Abort(
                         "branch '%s' changed on the server, "
                         "please pull and merge before pushing" % ref)
 
@@ -1265,7 +1266,7 @@ class GitHandler(object):
                 ret = compat.FetchPackResult(ret, symrefs, agent)
             return ret
         except (HangupException, GitProtocolError), e:
-            raise hgutil.Abort(_("git remote error: ") + str(e))
+            raise error.Abort(_("git remote error: ") + str(e))
 
     # REFERENCES HANDLING
 
@@ -1290,13 +1291,13 @@ class GitHandler(object):
                 else:
                     r = [pair[0] for pair in stripped_refs if pair[1] == h]
                     if not r:
-                        raise hgutil.Abort("ref %s not found on remote server"
-                                           % h)
+                        raise error.Abort("ref %s not found on remote server"
+                                          % h)
                     elif len(r) == 1:
                         filteredrefs.append(r[0])
                     else:
-                        raise hgutil.Abort("ambiguous reference %s: %r"
-                                           % (h, r))
+                        raise error.Abort("ambiguous reference %s: %r"
+                                          % (h, r))
         else:
             for ref, sha in refs.iteritems():
                 if (not ref.endswith('^{}') and
@@ -1601,14 +1602,14 @@ class GitHandler(object):
         # disabled by default to avoid surprises
         similarity = compat.config(self.ui, 'int', 'git', 'similarity')
         if similarity < 0 or similarity > 100:
-            raise hgutil.Abort(_('git.similarity must be between 0 and 100'))
+            raise error.Abort(_('git.similarity must be between 0 and 100'))
         if similarity == 0:
             return None
 
         # default is borrowed from Git
         max_files = compat.config(self.ui, 'int', 'git', 'renamelimit')
         if max_files < 0:
-            raise hgutil.Abort(_('git.renamelimit must be non-negative'))
+            raise error.Abort(_('git.renamelimit must be non-negative'))
         if max_files == 0:
             max_files = None
 
@@ -1661,7 +1662,7 @@ class GitHandler(object):
     def audit_hg_path(self, path):
         if '.hg' in path.split(os.path.sep):
             if compat.config(self.ui, 'bool', 'git', 'blockdothg'):
-                raise hgutil.Abort(
+                raise error.Abort(
                     ('Refusing to import problematic path %r' % path),
                     hint=("Mercurial cannot check out paths inside nested " +
                           "repositories; if you need to continue, then set " +

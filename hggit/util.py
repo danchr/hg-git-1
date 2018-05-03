@@ -59,7 +59,7 @@ def transform_notgit(f):
         try:
             return f(*args, **kwargs)
         except errors.NotGitRepository:
-            raise hgutil.Abort('not a git repository')
+            raise error.Abort('not a git repository')
     return inner
 
 

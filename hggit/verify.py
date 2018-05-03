@@ -8,7 +8,6 @@
 import stat
 
 from mercurial import error
-from mercurial import util as hgutil
 from mercurial.i18n import _
 
 from dulwich import diff_tree
@@ -28,18 +27,18 @@ def verify(ui, repo, hgctx):
     gitsha = handler.map_git_get(hgctx.hex())
     if not gitsha:
         # TODO deal better with commits in the middle of octopus merges
-        raise hgutil.Abort(_('no git commit found for rev %s') % hgctx,
-                           hint=_('if this is an octopus merge, '
-                                  'verify against the last rev'))
+        raise error.Abort(_('no git commit found for rev %s') % hgctx,
+                          hint=_('if this is an octopus merge, '
+                                 'verify against the last rev'))
 
     try:
         gitcommit = handler.git.get_object(gitsha)
     except KeyError:
-        raise hgutil.Abort(_('git equivalent %s for rev %s not found!') %
-                           (gitsha, hgctx))
+        raise error.Abort(_('git equivalent %s for rev %s not found!') %
+                          (gitsha, hgctx))
     if not isinstance(gitcommit, Commit):
-        raise hgutil.Abort(_('git equivalent %s for rev %s is not a commit!') %
-                           (gitsha, hgctx))
+        raise error.Abort(_('git equivalent %s for rev %s is not a commit!') %
+                          (gitsha, hgctx))
 
     ui.status(_('verifying rev %s against git commit %s\n') % (hgctx, gitsha))
     failed = False

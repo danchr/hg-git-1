@@ -5,6 +5,7 @@ import errno
 
 from mercurial import (
     dirstate,
+    error,
     match as matchmod,
     scmutil,
     util,
@@ -88,21 +89,21 @@ def gignore(root, files, warn, extrapatterns=None):
         return util.never
     try:
         ignorefunc = matchmod.match(root, '', [], allpats)
-    except util.Abort:
+    except error.Abort:
         for f, patlist in pats:
             try:
                 matchmod.match(root, '', [], patlist)
-            except util.Abort, inst:
+            except error.Abort, inst:
                 if not ignoremod:
                     # in this case, patlist is ['include: FILE'], and
                     # inst[0] should already include FILE
                     raise
-                raise util.Abort('%s: %s' % (f, inst[0]))
+                raise error.Abort('%s: %s' % (f, inst[0]))
         if extrapatterns:
             try:
                 matchmod.match(root, '', [], extrapatterns)
-            except util.Abort, inst:
-                raise util.Abort('%s: %s' % ('extra patterns', inst[0]))
+            except error.Abort, inst:
+                raise error.Abort('%s: %s' % ('extra patterns', inst[0]))
     return ignorefunc
 
 
