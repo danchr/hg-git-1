@@ -550,7 +550,7 @@ class GitHandler(object):
 
         oldenc = self.swap_out_encoding()
 
-        ctx = self.repo.changectx(rev)
+        ctx = self.repo[rev]
         extra = ctx.extra()
 
         commit = Commit()
@@ -874,7 +874,7 @@ class GitHandler(object):
             self.git_file_readlines(git_commit_tree, '.hgsubstate'))
         parentsubdata = ''
         if gparents:
-            p1ctx = self.repo.changectx(gparents[0])
+            p1ctx = self.repo[gparents[0]]
             if '.hgsubstate' in p1ctx:
                 parentsubdata = p1ctx.filectx('.hgsubstate').data()
                 parentsubdata = parentsubdata.splitlines()
@@ -958,8 +958,8 @@ class GitHandler(object):
             # begin with).
             if p2 == nullid:
                 return []
-            manifest1 = self.repo.changectx(p1).manifest()
-            manifest2 = self.repo.changectx(p2).manifest()
+            manifest1 = self.repo[p1].manifest()
+            manifest2 = self.repo[p2].manifest()
             return [path for path, node1 in manifest1.iteritems() if path not
                     in files and manifest2.get(path, node1) != node1]
 
