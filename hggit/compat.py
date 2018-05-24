@@ -37,6 +37,19 @@ except ImportError:
     from mercurial import scmutil
     hgvfs = scmutil.vfs
 
+try:
+    from mercurial.utils import procutil, stringutil
+    sshargs = procutil.sshargs
+    shellquote = procutil.shellquote
+    quotecommand = procutil.quotecommand
+    binary = stringutil.binary
+except ImportError:
+    # these were moved in 4.6
+    sshargs = hgutil.sshargs
+    shellquote = hgutil.shellquote
+    quotecommand = hgutil.quotecommand
+    binary = hgutil.binary
+
 
 def gitvfs(repo):
     """return a vfs suitable to read git related data"""

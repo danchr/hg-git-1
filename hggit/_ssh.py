@@ -1,9 +1,6 @@
 from dulwich.client import SubprocessWrapper
 import subprocess
-
-from mercurial import (
-    util,
-)
+import compat
 
 
 class SSHVendor(object):
@@ -27,11 +24,11 @@ def generate_ssh_vendor(ui):
                 # expects (e.g. "command 'arg1 arg2'")
                 command = ["%s '%s'" % (command[0], ' '.join(command[1:]))]
             sshcmd = ui.config("ui", "ssh", "ssh")
-            args = util.sshargs(sshcmd, host, username, port)
+            args = compat.sshargs(sshcmd, host, username, port)
             cmd = '%s %s %s' % (sshcmd, args,
-                                util.shellquote(' '.join(command)))
+                                compat.shellquote(' '.join(command)))
             ui.debug('calling ssh: %s\n' % cmd)
-            proc = subprocess.Popen(util.quotecommand(cmd), shell=True,
+            proc = subprocess.Popen(compat.quotecommand(cmd), shell=True,
                                     stdin=subprocess.PIPE,
                                     stdout=subprocess.PIPE)
             return SubprocessWrapper(proc)
