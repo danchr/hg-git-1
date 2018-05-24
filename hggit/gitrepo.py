@@ -96,6 +96,9 @@ class gitrepo(peerrepository):
         def unbundle(self):
             raise NotImplementedError
 
+    def commandexecutor(self):
+        from mercurial.wireprotov1peer import peerexecutor
+        return peerexecutor(self)
 
 instance = gitrepo
 
