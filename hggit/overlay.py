@@ -213,8 +213,11 @@ class overlayfilectx(object):
 
 class overlaychangectx(context.changectx):
     def __init__(self, repo, sha):
-        # Can't store this in self._repo because the base class uses that field
-        self._hgrepo = repo
+        # we need to keep the repo around in a variable that isn't overridden
+        # by self._repo but we also need to assign this to self._repo so that
+        # self.obsolete() (and friends) keep working since they access _repo
+        # directly.
+        self._hgrepo = self._repo = repo
         if not isinstance(sha, basestring):
             sha = sha.hex()
         self.commit = repo.handler.git.get_object(_maybehex(sha))
