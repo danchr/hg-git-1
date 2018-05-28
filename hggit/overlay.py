@@ -213,16 +213,21 @@ class overlayfilectx(object):
 
 class overlaychangectx(context.changectx):
     def __init__(self, repo, sha):
-        # we need to keep the repo around in a variable that isn't overridden
-        # by self._repo but we also need to assign this to self._repo so that
-        # self.obsolete() (and friends) keep working since they access _repo
-        # directly.
-        self._hgrepo = self._repo = repo
+        # Can't store this in self._repo because the base class uses that field
+        self._hgrepo = repo
         if not isinstance(sha, basestring):
             sha = sha.hex()
         self.commit = repo.handler.git.get_object(_maybehex(sha))
         self._overlay = getattr(repo, 'gitoverlay', repo)
         self._rev = self._overlay.rev(bin(self.commit.id))
+
+    def __getattr__(self, name):
+        # Since hg 4.6, context.changectx doesn't define self._repo,
+        # but it is still used by self.obsolete() (and friends)
+        # So, if the attribute wasn't found, fallback to _hgrepo
+        if name == '_repo':
+            return self._hgrepo
+        return super(overlaychangectx, self).__getattr__(name)
 
     def repo(self):
         return self._hgrepo
