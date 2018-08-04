@@ -259,6 +259,12 @@ def gclear(ui, repo):
     repo.githandler.clear()
 
 
+@command(b'debuggitdir')
+def gitdir(ui, repo):
+    '''get the root of the git repository'''
+    repo.ui.write(os.path.normpath(repo.githandler.gitdir), b'\n')
+
+
 @command(b'gverify',
          [(b'r', b'rev', b'', _(b'revision to verify'), _(b'REV'))],
          _(b'[-r REV]'))

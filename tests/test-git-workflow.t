@@ -3,6 +3,8 @@ Load commonly used test logic
 
   $ hg init hgrepo
   $ cd hgrepo
+  $ hg debuggitdir
+  $TESTTMP/hgrepo/.hg/git
   $ echo alpha > alpha
   $ hg add alpha
   $ fn_hg_commit -m "add alpha"
@@ -33,6 +35,8 @@ configure for use from git
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
   $ echo "[git]" >> .hg/hgrc
   $ echo "intree = True" >> .hg/hgrc
+  $ hg debuggitdir
+  $TESTTMP/gitrepo/.git
   $ hg gexport
 
 do some work
