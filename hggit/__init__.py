@@ -73,9 +73,12 @@ except AttributeError:
     # baseset was added in hg 3.0
     pass
 
-demandimport.ignore.extend([
-    'collections',
-])
+try:
+    demandimport.IGNORES.add('collections')
+except AttributeError as e:  # pre 4.7 API
+    demandimport.ignore.extend([
+        'collections',
+    ])
 
 __version__ = '0.8.11'
 
