@@ -34,4 +34,7 @@ all-version-tests: tests-2.8.2 tests-2.9.2 tests-3.0.2 tests-3.1.2 tests-3.2.4 \
   tests-3.9.2 tests-4.0.2 tests-4.1.3 tests-4.2.3 tests-4.3.3 tests-4.4.2 \
   tests-4.5.3 tests-4.6.2 tests-4.7.2 tests-@
 
+release:
+	$(PYTHON) setup.py sdist
+
 .PHONY: tests all-version-tests
