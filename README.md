@@ -40,6 +40,17 @@ That will enable the Hg-Git extension for you.
 
 See the Makefile for a list of compatible Mercurial versions.
 
+Contributing
+============
+
+Patches preferred via e-mail to the
+[hg-git Google Group](https://groups.google.com/forum/#!forum/hg-git),
+[hg-git@googlegroups.com](mailto:hg-git@googlegroups.com). We use a
+variant of Mercurial's own contribution
+system. https://www.mercurial-scm.org/wiki/ContributingChanges contains
+their full guidelines. See the [CONTRIBUTING](CONTRIBUTING) file in the
+source for more details.
+
 Usage
 =====
 
