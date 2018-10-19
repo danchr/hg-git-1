@@ -27,6 +27,19 @@ system.  The only dependencies are Mercurial and Dulwich. See the
 Makefile for information about which versions of Mercurial are
 known to work, and setup.py for which versions of Dulwich are required.
 
+Installing
+==========
+
+Clone this repository somewhere and make the 'extensions' section in
+your `~/.hgrc` file look something like this:
+
+    [extensions]
+    hggit = [path-to]/hg-git/hggit
+
+That will enable the Hg-Git extension for you.
+
+See the Makefile for a list of compatible Mercurial versions.
+
 Usage
 =====
 
@@ -74,6 +87,9 @@ repository, you can fetch updates with `hg pull`.
 That will pull down any commits that have been pushed to the server in
 the meantime and give you a new head that you can merge in.
 
+Hg-Git pushes your bookmarks up to the Git server as branches and will
+pull Git branches down and set them up as bookmarks.
+
 Hg-Git can also be used to convert a Mercurial repository to Git.  You can use
 a local repository or a remote repository accessed via SSH, HTTP or HTTPS.  Use
 the following commands to convert the repository (it assumes you're running this
@@ -101,25 +117,6 @@ Commands
 ========
 
 See `hg help -e hggit`.
-
-Hg Bookmarks Integration
-========================
-
-Hg-Git pushes your bookmarks up to the Git server as branches and will
-pull Git branches down and set them up as bookmarks.
-
-Installing
-==========
-
-Clone this repository somewhere and make the 'extensions' section in
-your `~/.hgrc` file look something like this:
-
-    [extensions]
-    hggit = [path-to]/hg-git/hggit
-
-That will enable the Hg-Git extension for you.
-
-See the Makefile for a list of compatible Mercurial versions.
 
 Configuration
 =============
