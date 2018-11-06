@@ -23,8 +23,8 @@ setup(
     name='hg-git',
     version=get_version('hggit/__init__.py'),
     author='The hg-git Authors',
-    maintainer='Augie Fackler',
-    maintainer_email='durin42@gmail.com',
+    maintainer='Kevin Bullock',
+    maintainer_email='kbullock+mercurial@ringworld.org',
     url='https://hg-git.github.io/',
     description='push to and pull from a Git repository using Mercurial',
     long_description="""
