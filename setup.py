@@ -25,7 +25,7 @@ setup(
     author='The hg-git Authors',
     maintainer='Augie Fackler',
     maintainer_email='durin42@gmail.com',
-    url='http://hg-git.github.com/',
+    url='https://hg-git.github.io/',
     description='push to and pull from a Git repository using Mercurial',
     long_description="""
 This extension lets you communicate (push and pull) with a Git server.

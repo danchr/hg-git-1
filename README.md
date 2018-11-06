@@ -1,7 +1,7 @@
 Hg-Git Mercurial Plugin
 =======================
 
-* Homepage: http://hg-git.github.com/
+* Homepage: https://hg-git.github.io/
 * https://bitbucket.org/durin42/hg-git (primary)
 * https://github.com/schacon/hg-git (mirror)
 
