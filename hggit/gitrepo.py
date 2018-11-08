@@ -13,7 +13,7 @@ except ImportError:
 
 
 class gitrepo(peerrepository):
-    def __init__(self, ui, path, create, intents=None):
+    def __init__(self, ui, path, create, intents=None, **kwargs):
         if create:  # pragma: no cover
             raise error.Abort('Cannot create a git repository.')
         self._ui = ui
