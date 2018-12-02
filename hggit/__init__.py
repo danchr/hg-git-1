@@ -94,9 +94,11 @@ try:
     command = registrar.command(cmdtable)
     configitem = registrar.configitem(configtable)
     compat.registerconfigs(configitem)
+    templatekeyword = registrar.templatekeyword()
 
 except (ImportError, AttributeError):
     command = cmdutil.command(cmdtable)
+    templatekeyword = compat.templatekeyword()
 
 # support for `hg clone git://github.com/defunkt/facebox.git`
 # also hg clone git+ssh://git@github.com/schacon/simplegit.git
@@ -207,7 +209,6 @@ extensions.wrapfunction(hg, 'addbranchrevs', safebranchrevs)
 
 
 def extsetup(ui):
-    templatekw.keywords.update({'gitnode': gitnodekw})
     revset.symbols.update({
         'fromgit': revset_fromgit, 'gitnode': revset_gitnode
     })
@@ -455,12 +456,30 @@ def revset_gitnode(repo, subset, x):
     raise LookupError(rev, git.map_file, _('ambiguous identifier'))
 
 
-def gitnodekw(**args):
-    """:gitnode: String. The Git changeset identification hash, as a 40 hexadecimal
-digit string."""
-    node = args['ctx']
-    repo = args['repo']
+def _gitnodekw(node, repo):
     gitnode = repo.githandler.map_git_get(node.hex())
     if gitnode is None:
         gitnode = ''
     return gitnode
+
+
+if (hgutil.safehasattr(templatekw, 'templatekeyword') and
+        hgutil.safehasattr(templatekw.templatekeyword._table['node'],
+                           '_requires')):
+    @templatekeyword('gitnode', requires={'ctx', 'repo'})
+    def gitnodekw(context, mapping):
+        """:gitnode: String. The Git changeset identification hash, as a
+        40 hexadecimal digit string."""
+        node = context.resource(mapping, 'ctx')
+        repo = context.resource(mapping, 'repo')
+        return _gitnodekw(node, repo)
+
+else:
+    # COMPAT: hg < 4.6 - templatekeyword API changed
+    @templatekeyword('gitnode')
+    def gitnodekw(**args):
+        """:gitnode: String. The Git changeset identification hash, as a
+        40 hexadecimal digit string."""
+        node = args['ctx']
+        repo = args['repo']
+        return _gitnodekw(node, repo)

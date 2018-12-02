@@ -2,6 +2,7 @@ from mercurial import (
     bookmarks,
     context,
     phases,
+    templatekw,
     url,
     util as hgutil,
 )
@@ -192,3 +193,14 @@ def config(ui, subtype, section, item):
     if hasconfigitems:
         return getconfig(section, item)
     return getconfig(section, item, CONFIG_DEFAULTS[section][item])
+
+
+class templatekeyword(object):
+    def __init__(self):
+        self._table = {}
+
+    def __call__(self, name):
+        def decorate(func):
+            templatekw.keywords.update({name: func})
+            return func
+        return decorate
