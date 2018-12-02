@@ -64,7 +64,7 @@ Load commonly used test logic
   checking manifests
   crosschecking files in changesets and manifests
   checking files
-  1 files, 1 changesets, 1 total revisions
+  *1 changesets* (glob)
   pushing to test-1
   searching for changes
   adding changesets
@@ -75,7 +75,7 @@ Load commonly used test logic
   checking manifests
   crosschecking files in changesets and manifests
   checking files
-  1 files, 2 changesets, 2 total revisions
+  *2 changesets* (glob)
   pushing to test-2
   searching for changes
   adding changesets
@@ -86,7 +86,7 @@ Load commonly used test logic
   checking manifests
   crosschecking files in changesets and manifests
   checking files
-  1 files, 3 changesets, 3 total revisions
+  *3 changesets* (glob)
   pushing to test-3
   searching for changes
   adding changesets
@@ -97,7 +97,7 @@ Load commonly used test logic
   checking manifests
   crosschecking files in changesets and manifests
   checking files
-  1 files, 4 changesets, 4 total revisions
+  *4 changesets* (glob)
   pushing to test-4
   searching for changes
   adding changesets
@@ -108,7 +108,7 @@ Load commonly used test logic
   checking manifests
   crosschecking files in changesets and manifests
   checking files
-  1 files, 2 changesets, 2 total revisions
+  *2 changesets* (glob)
   pushing to test-5
   searching for changes
   adding changesets
@@ -119,7 +119,7 @@ Load commonly used test logic
   checking manifests
   crosschecking files in changesets and manifests
   checking files
-  1 files, 3 changesets, 3 total revisions
+  *3 changesets* (glob)
   pushing to test-6
   searching for changes
   adding changesets
@@ -130,7 +130,7 @@ Load commonly used test logic
   checking manifests
   crosschecking files in changesets and manifests
   checking files
-  2 files, 4 changesets, 5 total revisions
+  *4 changesets* (glob)
   pushing to test-7
   searching for changes
   adding changesets
@@ -141,7 +141,7 @@ Load commonly used test logic
   checking manifests
   crosschecking files in changesets and manifests
   checking files
-  3 files, 5 changesets, 6 total revisions
+  *5 changesets* (glob)
   pushing to test-8
   searching for changes
   adding changesets
@@ -152,7 +152,7 @@ Load commonly used test logic
   checking manifests
   crosschecking files in changesets and manifests
   checking files
-  2 files, 5 changesets, 5 total revisions
+  *5 changesets* (glob)
   $ cd test-8
   $ hg pull ../test-7
   pulling from ../test-7
@@ -168,4 +168,4 @@ Load commonly used test logic
   checking manifests
   crosschecking files in changesets and manifests
   checking files
-  4 files, 9 changesets, 7 total revisions
+  *9 changesets* (glob)
