@@ -69,7 +69,7 @@ class GitProgress(object):
     def __init__(self, ui):
         self.ui = ui
 
-        self.lasttopic = None
+        self._progress = None
         self.msgbuf = ''
 
     def progress(self, msg):
@@ -88,19 +88,21 @@ class GitProgress(object):
 
             m = RE_GIT_PROGRESS.search(data)
             if m:
-                if self.lasttopic and self.lasttopic != topic:
+                if self._progress and self._progress.topic != topic:
                     self.flush()
-                self.lasttopic = topic
+                if not self._progress:
+                    self._progress = compat.makeprogress(self.ui, topic)
 
                 pos, total = map(int, m.group(1, 2))
-                self.ui.progress(topic, pos, total=total)
+                self._progress.update(pos, total=total)
             else:
                 self.flush(msg)
 
     def flush(self, msg=None):
-        if self.lasttopic:
-            self.ui.progress(self.lasttopic, None)
-        self.lasttopic = None
+        if self._progress is None:
+            return
+        self._progress.complete()
+        self._progress = None
         if msg:
             self.ui.note(msg + '\n')
 
