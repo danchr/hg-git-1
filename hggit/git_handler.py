@@ -482,20 +482,19 @@ class GitHandler(object):
 
         todo_total = len(repo) - len(self._map_hg)
         topic = 'find commits to export'
-        pos = 0
         unit = 'commits'
 
-        export = []
-        for ctx in to_export:
-            item = hex(ctx.node())
-            pos += 1
-            repo.ui.progress(topic, pos, item, unit, todo_total)
-            if ctx.extra().get('hg-git', None) != 'octopus':
-                export.append(ctx)
+        with compat.makeprogress(repo.ui, topic, unit, todo_total) as progress:
+            export = []
+            for ctx in to_export:
+                item = hex(ctx.node())
+                progress.increment(item=item, total=todo_total)
+                if ctx.extra().get('hg-git', None) != 'octopus':
+                    export.append(ctx)
 
-        total = len(export)
-        if not total:
-            return
+            total = len(export)
+            if not total:
+                return
 
         self.ui.note(_("exporting hg objects to git\n"))
 
@@ -522,13 +521,13 @@ class GitHandler(object):
 
         mapsavefreq = compat.config(self.ui, 'int', 'hggit',
                                     'mapsavefrequency')
-        for i, ctx in enumerate(export):
-            self.ui.progress('exporting', i, total=total)
-            self.export_hg_commit(ctx.node(), exporter)
-            if mapsavefreq and i % mapsavefreq == 0:
-                self.ui.debug(_("saving mapfile\n"))
-                self.save_map(self.map_file)
-        self.ui.progress('exporting', None, total=total)
+        with compat.makeprogress(self.ui, 'exporting', total=total) as progress:
+            for i, ctx in enumerate(export):
+                progress.update(i, total=total)
+                self.export_hg_commit(ctx.node(), exporter)
+                if mapsavefreq and i % mapsavefreq == 0:
+                    self.ui.debug(_("saving mapfile\n"))
+                    self.save_map(self.map_file)
 
     def set_commiter_from_author(self, commit):
         commit.committer = commit.author
@@ -814,14 +813,14 @@ class GitHandler(object):
 
         mapsavefreq = compat.config(self.ui, 'int', 'hggit',
                                     'mapsavefrequency')
-        for i, csha in enumerate(commits):
-            self.ui.progress('importing', i, total=total, unit='commits')
-            commit = commit_cache[csha]
-            self.import_git_commit(commit)
-            if mapsavefreq and i % mapsavefreq == 0:
-                self.ui.debug(_("saving mapfile\n"))
-                self.save_map(self.map_file)
-        self.ui.progress('importing', None, total=total, unit='commits')
+        with compat.makeprogress(self.ui, 'importing', unit='commits', total=total) as progress:
+            for i, csha in enumerate(commits):
+                progress.update(i)
+                commit = commit_cache[csha]
+                self.import_git_commit(commit)
+                if mapsavefreq and i % mapsavefreq == 0:
+                    self.ui.debug(_("saving mapfile\n"))
+                    self.save_map(self.map_file)
 
         # TODO if the tags cache is used, remove any dangling tag references
         return total
