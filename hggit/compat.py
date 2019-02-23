@@ -3,6 +3,7 @@ from mercurial import (
     context,
     phases,
     templatekw,
+    ui,
     url,
     util as hgutil,
 )
@@ -204,3 +205,45 @@ class templatekeyword(object):
             templatekw.keywords.update({name: func})
             return func
         return decorate
+
+
+class progress(object):
+    '''Simplified implementation of mercurial.scmutil.progress for
+    compatibility with hg < 4.7'''
+    def __init__(self, ui, _updatebar, topic, unit="", total=None):
+        self.ui = ui
+        self.pos = 0
+        self.topic = topic
+        self.unit = unit
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_tb):
+        self.complete()
+
+    def _updatebar(self, item=""):
+        self.ui.progress(self.topic, self.pos, item, self.unit, self.total)
+        pass
+
+    def update(self, pos, item="", total=None):
+        self.pos = pos
+        if total is not None:
+            self.total = total
+        self._updatebar(item)
+
+    def increment(self, step=1, item="", total=None):
+        self.update(self.pos + step, item, total)
+
+    def complete(self):
+        self.unit = ""
+        self.total = None
+        self.update(None)
+
+
+if hgutil.safehasattr(ui.ui, 'makeprogress'):
+    def makeprogress(ui, topic, unit="", total=None):
+        return ui.makeprogress(topic, unit, total)
+else:
+    def makeprogress(ui, topic, unit="", total=None):
+        return progress(ui, None, topic, unit, total)
