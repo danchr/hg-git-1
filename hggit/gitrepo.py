@@ -12,7 +12,7 @@ except ImportError:
     from mercurial.peer import peerrepository
 
 
-class gitrepo(peerrepository):
+class basegitrepo(peerrepository):
     def __init__(self, ui, path, create, intents=None, **kwargs):
         if create:  # pragma: no cover
             raise error.Abort('Cannot create a git repository.')
@@ -96,9 +96,51 @@ class gitrepo(peerrepository):
         def unbundle(self):
             raise NotImplementedError
 
-    def commandexecutor(self):
-        from mercurial.wireprotov1peer import peerexecutor
-        return peerexecutor(self)
+try:
+    from mercurial.wireprotov1peer import (
+        batchable,
+        future,
+        peerexecutor,
+    )
+except ImportError:
+    # compat with <= hg-4.8
+    gitrepo = basegitrepo
+else:
+    class gitrepo(basegitrepo):
+
+        @batchable
+        def lookup(self, key):
+            f = future()
+            yield {}, f
+            yield super(gitrepo, self).lookup(key)
+
+        @batchable
+        def heads(self):
+            f = future()
+            yield {}, f
+            yield super(gitrepo, self).heads()
+
+        @batchable
+        def listkeys(self, namespace):
+            f = future()
+            yield {}, f
+            yield super(gitrepo, self).listkeys(namespace)
+
+        @batchable
+        def pushkey(self, namespace, key, old, new):
+            f = future()
+            yield {}, f
+            yield super(gitrepo, self).pushkey(key, old, new)
+
+        def commandexecutor(self):
+            return peerexecutor(self)
+
+        def _submitbatch(self, req):
+            for op, argsdict in req:
+                yield None
+
+        def _submitone(self, op, args):
+            return None
 
 instance = gitrepo
 
