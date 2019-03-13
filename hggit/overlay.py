@@ -534,3 +534,7 @@ class overlayrepo(object):
             elif ref.startswith('refs/tags/'):
                 tagname = ref[10:]
                 self.tagmap.setdefault(bin(refs[ref]), []).append(tagname)
+
+    def narrowmatch(self, *args, **kwargs):
+        return self.handler.repo.narrowmatch(*args, **kwargs)
+
