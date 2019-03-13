@@ -467,6 +467,8 @@ class overlayrepo(object):
                                      self.handler.repo._constructmanifest())
 
     def __getitem__(self, n):
+        if isinstance(n, int):
+            n = self.changelog.node(n)
         if n not in self.revmap:
             return self.handler.repo[n]
         return overlaychangectx(self, n)
