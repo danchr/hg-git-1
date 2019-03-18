@@ -215,6 +215,7 @@ class progress(object):
         self.pos = 0
         self.topic = topic
         self.unit = unit
+        self.total = total
 
     def __enter__(self):
         return self
@@ -224,7 +225,6 @@ class progress(object):
 
     def _updatebar(self, item=""):
         self.ui.progress(self.topic, self.pos, item, self.unit, self.total)
-        pass
 
     def update(self, pos, item="", total=None):
         self.pos = pos
