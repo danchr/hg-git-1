@@ -137,14 +137,14 @@ except (AttributeError, ImportError):
 
 
 def memfilectx(repo, changectx, path, data, islink=False,
-               isexec=False, copied=None):
+               isexec=False, copysource=None):
     # Different versions of mercurial have different parameters to
     # memfilectx.  Try them from newest to oldest.
     parameters_to_try = (
-        ((repo, changectx, path, data), { 'copysource': copied }), # hg >= 5.0
-        ((repo, changectx, path, data), { 'copied': copied }),     # hg 4.5 - 4.9.1
-        ((repo, path, data),            { 'copied': copied }),     # hg 3.1 - 4.4.2
-        ((path, data),                  { 'copied': copied }),     # hg <= 3.0.2
+        ((repo, changectx, path, data), { 'copysource': copysource }), # hg >= 5.0
+        ((repo, changectx, path, data), { 'copied': copysource }),     # hg 4.5 - 4.9.1
+        ((repo, path, data),            { 'copied': copysource }),     # hg 3.1 - 4.4.2
+        ((path, data),                  { 'copied': copysource }),     # hg <= 3.0.2
     )
     for (args, kwargs) in parameters_to_try:
         try:

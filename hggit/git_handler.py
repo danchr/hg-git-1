@@ -992,7 +992,7 @@ class GitHandler(object):
             return compat.memfilectx(self.repo, memctx, f, data,
                                      islink='l' in e,
                                      isexec='x' in e,
-                                     copied=copied_path)
+                                     copysource=copied_path)
 
         p1, p2 = (nullid, nullid)
         octopus = False
