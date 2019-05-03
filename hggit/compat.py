@@ -140,12 +140,12 @@ def memfilectx(repo, changectx, path, data, islink=False,
                isexec=False, copied=None):
     # Different versions of mercurial have different parameters to
     # memfilectx.  Try them from newest to oldest.
-    args_to_try = (
+    parameters_to_try = (
         (repo, changectx, path, data),  # hg >= 4.5
         (repo, path, data),             # hg 3.1 - 4.4.2
         (path, data),                   # hg <= 3.0.2
     )
-    for args in args_to_try:
+    for args in parameters_to_try:
         try:
             return context.memfilectx(*args,
                                       islink=islink,
