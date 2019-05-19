@@ -1,6 +1,5 @@
 from mercurial import (
     context,
-    phases,
     templatekw,
     ui,
     url,
@@ -45,13 +44,6 @@ def passwordmgr(ui):
     except (TypeError, AttributeError):
         # compat with hg < 3.9
         return url.passwordmgr(ui)
-
-def advancephaseboundary(repo, tr, targetphase, nodes):
-    # hg 3.2 - advanceboundary uses transaction
-    try:
-        phases.advanceboundary(repo, tr, targetphase, nodes)
-    except TypeError:
-        phases.advanceboundary(repo, targetphase, nodes)
 
 # hg 4.3 - osutil moved, but mercurial.util re-exports listdir
 if hgutil.safehasattr(hgutil, 'listdir'):

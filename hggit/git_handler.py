@@ -340,8 +340,8 @@ class GitHandler(object):
             lock = self.repo.lock()
             try:
                 tr = self.repo.transaction("phase")
-                compat.advancephaseboundary(self.repo, tr, phases.public,
-                                            blist)
+                phases.advanceboundary(self.repo, tr, phases.public,
+                                       blist)
                 tr.close()
             finally:
                 if tr is not None:
