@@ -59,14 +59,6 @@ except (AttributeError, ImportError):
     # We only *use* the exchange module in hg 3.2+, so this is safe
     pass
 
-# COMPAT: hg 3.5 - ignore module was removed
-try:
-    from mercurial import ignore
-    ignore.readpats
-    ignoremod = True
-except (AttributeError, ImportError):
-    ignoremod = False
-
 # COMPAT: hg 3.0 - revset.baseset was added
 baseset = set
 try:
@@ -224,15 +216,10 @@ def reposetup(ui, repo):
     if not isinstance(repo, gitrepo.gitrepo):
 
         if (getattr(dirstate, 'rootcache', False) and
-            (not ignoremod or getattr(ignore, 'readpats', False)) and
             hgutil.safehasattr(repo, 'vfs') and
             os.path.exists(compat.gitvfs(repo).join('git'))):
             # only install our dirstate wrapper if it has a hope of working
             import gitdirstate
-            if ignoremod:
-                def ignorewrap(orig, *args, **kwargs):
-                    return gitdirstate.gignore(*args, **kwargs)
-                extensions.wrapfunction(ignore, 'ignore', ignorewrap)
             dirstate.dirstate = gitdirstate.gitdirstate
 
         klass = hgrepo.generate_repo_subclass(repo.__class__)

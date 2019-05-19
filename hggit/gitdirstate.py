@@ -13,14 +13,6 @@ from mercurial import (
 
 import compat
 
-# COMPAT: hg 3.5 - ignore module was removed
-try:
-    from mercurial import ignore
-    ignore.readpats
-    ignoremod = True
-except (AttributeError, ImportError):
-    ignoremod = False
-
 # COMPAT: hg 2.9 - pathauditor moved to pathutil
 try:
     from mercurial import pathutil
@@ -78,11 +70,7 @@ def gignorepats(orig, lines, root=None):
 
 def gignore(root, files, warn, extrapatterns=None):
     allpats = []
-    pats = []
-    if ignoremod:
-        pats = ignore.readpats(root, files, warn)
-    else:
-        pats = [(f, ['include:%s' % f]) for f in files]
+    pats = [(f, ['include:%s' % f]) for f in files]
     for f, patlist in pats:
         allpats.extend(patlist)
 
@@ -97,11 +85,9 @@ def gignore(root, files, warn, extrapatterns=None):
             try:
                 matchmod.match(root, '', [], patlist)
             except error.Abort, inst:
-                if not ignoremod:
-                    # in this case, patlist is ['include: FILE'], and
-                    # inst[0] should already include FILE
-                    raise
-                raise error.Abort('%s: %s' % (f, inst[0]))
+                # in this case, patlist is ['include: FILE'], and
+                # inst[0] should already include FILE
+                raise
         if extrapatterns:
             try:
                 matchmod.match(root, '', [], extrapatterns)
