@@ -7,6 +7,7 @@ import stat
 
 import dulwich.objects as dulobjs
 from mercurial import (
+    encoding,
     error,
 )
 
@@ -50,7 +51,7 @@ def audit_git_path(ui, path):
     """
     dangerous = False
     for c in path.split(os.path.sep):
-        if compat.hfsignoreclean(c) == '.git':
+        if encoding.hfsignoreclean(c) == '.git':
             dangerous = True
             break
         elif '~' in c:
