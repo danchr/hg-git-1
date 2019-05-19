@@ -1224,8 +1224,6 @@ class GitHandler(object):
             progress = GitProgress(self.ui)
             f = StringIO.StringIO()
 
-            # only newer versions (0.18) of dulwich have symref support
-            client.read_pkt_refs = compat.read_pkt_refs
             ret = localclient.fetch_pack(path, determine_wants, graphwalker,
                                          f.write, progress.progress)
             if(f.pos != 0):
@@ -1239,17 +1237,6 @@ class GitHandler(object):
             if ret is None:
                 ret = {}
 
-            # for older dulwich, the return type was a dict, meaning we're
-            # running our monkey patch read_pkt_refs
-            if isinstance(ret, dict):
-                head = ret.get("HEAD")
-                symrefs = {}
-                # we want to raise a KeyError if HEAD is not a key
-                if head:
-                    symrefs["HEAD"] = head
-                # use FetchPackResult as upstream now does
-                agent = client.default_user_agent_string()
-                ret = compat.FetchPackResult(ret, symrefs, agent)
             return ret
         except (HangupException, GitProtocolError), e:
             raise error.Abort(_("git remote error: ") + str(e))
