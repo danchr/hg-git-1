@@ -1,5 +1,4 @@
 from mercurial import (
-    bookmarks,
     context,
     phases,
     templatekw,
@@ -46,12 +45,6 @@ def passwordmgr(ui):
     except (TypeError, AttributeError):
         # compat with hg < 3.9
         return url.passwordmgr(ui)
-
-# bookmarks.setcurrent was renamed to activate in hg 3.5
-if hgutil.safehasattr(bookmarks, 'activate'):
-    activatebookmark = bookmarks.activate
-else:
-    activatebookmark = bookmarks.setcurrent
 
 def advancephaseboundary(repo, tr, targetphase, nodes):
     # hg 3.2 - advanceboundary uses transaction
