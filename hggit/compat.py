@@ -61,7 +61,6 @@ def memfilectx(repo, changectx, path, data, islink=False,
         ((repo, changectx, path, data), { 'copysource': copysource }), # hg >= 5.0
         ((repo, changectx, path, data), { 'copied': copysource }),     # hg 4.5 - 4.9.1
         ((repo, path, data),            { 'copied': copysource }),     # hg 3.1 - 4.4.2
-        ((path, data),                  { 'copied': copysource }),     # hg <= 3.0.2
     )
     for (args, kwargs) in parameters_to_try:
         try:
