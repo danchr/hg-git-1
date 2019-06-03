@@ -1733,7 +1733,25 @@ class GitHandler(object):
                 str_uri = uri.decode('utf-8')
             else:
                 str_uri = uri
-            return client.HttpGitClient(str_uri, config=config), uri
+            url = hgutil.url(uri)
+            username = url.user
+            password = url.passwd
+            if pycompat.ispy3:
+                # urllib3.util.request.make_headers() converts them back to
+                # bytes using the latin-1 codec
+                if username is not None:
+                    username = username.decode('latin-1')
+                if password is not None:
+                    password = password.decode('latin-1')
+            return (
+                client.HttpGitClient(
+                    str_uri,
+                    config=config,
+                    username=username,
+                    password=password,
+                ),
+                uri,
+            )
 
         # if its not git or git+ssh, try a local url..
         return client.SubprocessGitClient(), uri
