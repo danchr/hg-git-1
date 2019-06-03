@@ -1721,7 +1721,10 @@ class GitHandler(object):
             uri = uri[4:]
 
         if uri.startswith('http://') or uri.startswith('https://'):
-            return client.HttpGitClient(uri), uri
+            ua = 'git/20x6 (hg-git ; uses dulwich and hg ; like git-core)'
+            config = dul_config.ConfigDict()
+            config.set(b'http', b'useragent', ua)
+            return client.HttpGitClient(uri, config=config), uri
 
         # if its not git or git+ssh, try a local url..
         return client.SubprocessGitClient(), uri
