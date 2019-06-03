@@ -2,7 +2,6 @@ import collections
 import itertools
 import os
 import urllib
-import urllib2
 import re
 import cStringIO
 import StringIO
@@ -1722,22 +1721,7 @@ class GitHandler(object):
             uri = uri[4:]
 
         if uri.startswith('http://') or uri.startswith('https://'):
-            pmgr = compat.passwordmgr(self.ui)
-            auth = urllib2.HTTPBasicAuthHandler(pmgr)
-
-            opener = urllib2.build_opener(auth)
-            ua = 'git/20x6 (hg-git ; uses dulwich and hg ; like git-core)'
-            opener.addheaders = [('User-Agent', ua)]
-            try:
-                return client.HttpGitClient(uri, opener=opener), uri
-            except TypeError as e:
-                if e.message.find("unexpected keyword argument 'opener'") >= 0:
-                    # Dulwich 0.9.4, which is the latest version that ships
-                    # with Ubuntu 14.04, doesn't support the 'opener' keyword.
-                    # Try without authentication.
-                    return client.HttpGitClient(uri), uri
-                else:
-                    raise
+            return client.HttpGitClient(uri), uri
 
         # if its not git or git+ssh, try a local url..
         return client.SubprocessGitClient(), uri
