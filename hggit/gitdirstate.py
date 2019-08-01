@@ -187,8 +187,10 @@ class gitdirstate(dirstate.dirstate):
             nd = work.pop()
             skip = None
             if nd == '.':
+                # <= hg-5.0 use "." for the root directory
+                # (see Mercurial-core27d6956d386b for details)
                 nd = ''
-            else:
+            if nd != '':
                 skip = '.hg'
             try:
                 entries = compat.listdir(join(nd), stat=True, skip=skip)
