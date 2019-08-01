@@ -48,7 +48,7 @@ We can override if needed:
   $ git clone hg/.hg/git git
   Cloning into 'git'...
   done.
-  error: Invalid path 'nested/.git/hooks/post-update'
+  error: [Ii]nvalid path 'nested/\.git/hooks/post-update' (re)
 
 Now check something that case-folds to .git, which might let you own
 Mac users:
