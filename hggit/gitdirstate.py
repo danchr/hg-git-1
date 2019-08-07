@@ -7,18 +7,11 @@ from mercurial import (
     dirstate,
     error,
     match as matchmod,
-    scmutil,
+    pathutil,
     util,
 )
 
 import compat
-
-# COMPAT: hg 2.9 - pathauditor moved to pathutil
-try:
-    from mercurial import pathutil
-    pathutil.pathauditor
-except (AttributeError, ImportError):
-    pathutil = scmutil
 from mercurial.i18n import _
 
 
