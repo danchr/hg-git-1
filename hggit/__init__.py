@@ -39,6 +39,7 @@ from mercurial import (
     demandimport,
     dirstate,
     discovery,
+    exchange,
     extensions,
     help,
     hg,
@@ -50,14 +51,6 @@ from mercurial import (
     scmutil,
     templatekw,
 )
-
-# COMPAT: hg 3.2 - exchange module was introduced
-try:
-    from mercurial import exchange
-    exchange.push  # existed in first iteration of this file
-except (AttributeError, ImportError):
-    # We only *use* the exchange module in hg 3.2+, so this is safe
-    pass
 
 # COMPAT: hg 3.0 - revset.baseset was added
 baseset = set
@@ -381,9 +374,7 @@ def exchangepull(orig, repo, remote, heads=None, force=False, bookmarks=(),
         return orig(repo, remote, heads, force, bookmarks=bookmarks, **kwargs)
 
 
-if not hgutil.safehasattr(localrepo.localrepository, 'pull'):
-    # Mercurial >= 3.2
-    extensions.wrapfunction(exchange, 'pull', exchangepull)
+extensions.wrapfunction(exchange, 'pull', exchangepull)
 
 
 # TODO figure out something useful to do with the newbranch param
@@ -404,9 +395,7 @@ def exchangepush(orig, repo, remote, force=False, revs=None, newbranch=False,
                     **kwargs)
 
 
-if not hgutil.safehasattr(localrepo.localrepository, 'push'):
-    # Mercurial >= 3.2
-    extensions.wrapfunction(exchange, 'push', exchangepush)
+extensions.wrapfunction(exchange, 'push', exchangepush)
 
 
 def revset_fromgit(repo, subset, x):
