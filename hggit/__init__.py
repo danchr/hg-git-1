@@ -59,6 +59,8 @@ try:
 except AttributeError:
     pass
 
+# COMPAT: hg 4.7 - demandimport.ignore was renamed to demandimport.IGNORES and
+# became a set
 try:
     demandimport.IGNORES.add('collections')
 except AttributeError as e:  # pre 4.7 API
