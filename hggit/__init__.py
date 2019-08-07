@@ -52,13 +52,6 @@ from mercurial import (
     templatekw,
 )
 
-# COMPAT: hg 3.0 - revset.baseset was added
-baseset = set
-try:
-    baseset = revset.baseset
-except AttributeError:
-    pass
-
 # COMPAT: hg 4.7 - demandimport.ignore was renamed to demandimport.IGNORES and
 # became a set
 try:
@@ -407,8 +400,8 @@ def revset_fromgit(repo, subset, x):
     revset.getargs(x, 0, 0, "fromgit takes no arguments")
     git = repo.githandler
     node = repo.changelog.node
-    return baseset(r for r in subset
-                   if git.map_git_get(hex(node(r))) is not None)
+    return revset.baseset(r for r in subset
+                          if git.map_git_get(hex(node(r))) is not None)
 
 
 def revset_gitnode(repo, subset, x):
@@ -428,7 +421,7 @@ def revset_gitnode(repo, subset, x):
         if gitnode is None:
             return False
         return gitnode.startswith(rev)
-    result = baseset(r for r in subset if matches(r))
+    result = revset.baseset(r for r in subset if matches(r))
     if 0 <= len(result) < 2:
         return result
     raise LookupError(rev, git.map_file, _('ambiguous identifier'))
