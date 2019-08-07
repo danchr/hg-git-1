@@ -194,9 +194,7 @@ def extsetup(ui):
     })
     helpdir = os.path.join(os.path.dirname(__file__), 'help')
     entry = (['git'], _("Working with Git Repositories"),
-             # COMPAT: hg 3.6 - help table expects a delayed loader (see
-             # help.loaddoc())
-             lambda *args: open(os.path.join(helpdir, 'git.rst')).read())
+             lambda ui: open(os.path.join(helpdir, 'git.rst')).read())
     insort(help.helptable, entry)
 
 
