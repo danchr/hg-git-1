@@ -168,11 +168,7 @@ class gitdirstate(dirstate.dirstate):
         results, work, dirsnotfound = self._walkexplicit(match, subrepos)
 
         skipstep3 = skipstep3 and not (work or dirsnotfound)
-        # COMPAT: hg 3.3.3 - work is now a list of tuples
-        if work and isinstance(work[0], tuple):
-            work = [nd for nd, d in work if not dirignore(d)]
-        else:
-            work = [d for d in work if not dirignore(d)]
+        work = [nd for nd, d in work if not dirignore(d)]
         wadd = work.append
 
         # step 2: visit subdirectories
