@@ -962,12 +962,7 @@ class GitHandler(object):
                 # it's a file reported as modified from Git
                 delete, mode, sha = info
                 if delete:
-                    # COMPAT: hg 3.2 - expects this function to return
-                    # None for missing files
-                    if getattr(memctx, '_returnnoneformissingfiles', False):
-                        return None
-                    else:  # Mercurial < 3.2
-                        raise IOError
+                    return None
 
                 if not sha:  # indicates there's no git counterpart
                     e = ''
