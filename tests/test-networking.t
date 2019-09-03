@@ -122,3 +122,16 @@ But we can specify authentication in the configuration:
   pulling from http://git-server/repo.git
   importing git objects into hg
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+
+#if py3
+Try using git credentials, only supported on Dulwich 0.20+
+
+NB: the use of printf is deliberate; otherwise the test fails due to
+dulwich considering the newline part of the url
+
+  $ printf http://git:git@git-server > $TESTTMP/.git-credentials
+  $ hg -R repo-http pull
+  pulling from http://git-server/repo.git
+  no changes found
+  $ rm -f $TESTTMP/.git-credentials
+#endif

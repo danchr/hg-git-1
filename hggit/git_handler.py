@@ -1822,6 +1822,17 @@ class GitHandler(object):
 
             pwmgr = url.passwordmgr(self.ui, self.ui.httppasswordmgrdb)
 
+            # not available in dulwich 0.19, used on Python 2.7
+            if hasattr(client, 'get_credentials_from_store'):
+                urlobj = hgutil.url(uri)
+                auth = client.get_credentials_from_store(
+                    urlobj.scheme,
+                    urlobj.host,
+                    urlobj.user,
+                )
+            else:
+                auth = None
+
             if self._http_auth_realm:
                 # since we've tried an unauthenticated request, and
                 # obtain a realm, we can do a "full" search, including
@@ -1829,6 +1840,10 @@ class GitHandler(object):
                 username, password = pwmgr.find_user_password(
                     self._http_auth_realm, str_uri,
                 )
+            elif auth is not None:
+                username, password = auth
+                username = username.decode('utf-8')
+                password = password.decode('utf-8')
             else:
                 username, password = pwmgr.find_stored_password(str_uri)
 
