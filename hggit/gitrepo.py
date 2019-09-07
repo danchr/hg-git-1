@@ -6,10 +6,14 @@ from mercurial import (
 
 peerapi = False
 try:
-    from mercurial.repository import peer as peerrepository
+    from mercurial.interfaces.repository import peer as peerrepository
     peerapi = True
 except ImportError:
-    from mercurial.peer import peerrepository
+    try:
+        from mercurial.repository import peer as peerrepository
+        peerapi = True
+    except ImportError:
+        from mercurial.peer import peerrepository
 
 
 class basegitrepo(peerrepository):
