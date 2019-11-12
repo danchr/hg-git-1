@@ -77,14 +77,14 @@ def gignore(root, files, warn, extrapatterns=None):
         for f, patlist in pats:
             try:
                 matchmod.match(root, '', [], patlist)
-            except error.Abort, inst:
+            except error.Abort as inst:
                 # in this case, patlist is ['include: FILE'], and
                 # inst[0] should already include FILE
                 raise
         if extrapatterns:
             try:
                 matchmod.match(root, '', [], extrapatterns)
-            except error.Abort, inst:
+            except error.Abort as inst:
                 raise error.Abort('%s: %s' % ('extra patterns', inst[0]))
     return ignorefunc
 
@@ -183,7 +183,7 @@ class gitdirstate(dirstate.dirstate):
                 skip = '.hg'
             try:
                 entries = compat.listdir(join(nd), stat=True, skip=skip)
-            except OSError, inst:
+            except OSError as inst:
                 if inst.errno in (errno.EACCES, errno.ENOENT):
                     fwarn(nd, inst.strerror)
                     continue

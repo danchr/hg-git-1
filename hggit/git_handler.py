@@ -397,7 +397,7 @@ class GitHandler(object):
                     old[bin(old_ref)] = 1
 
             return old, new
-        except (HangupException, GitProtocolError), e:
+        except (HangupException, GitProtocolError) as e:
             raise error.Abort(_("git remote error: ") + str(e))
 
     def push(self, remote, revs, force):
@@ -1120,7 +1120,7 @@ class GitHandler(object):
                                 change_totals.get(Tree, 0),
                                 change_totals.get(Blob, 0)))
             return old_refs, new_refs
-        except (HangupException, GitProtocolError), e:
+        except (HangupException, GitProtocolError) as e:
             raise error.Abort(_("git remote error: ") + str(e))
 
     def get_changed_refs(self, refs, exportable, force):
@@ -1232,7 +1232,7 @@ class GitHandler(object):
                 ret = {}
 
             return ret
-        except (HangupException, GitProtocolError), e:
+        except (HangupException, GitProtocolError) as e:
             raise error.Abort(_("git remote error: ") + str(e))
 
     # REFERENCES HANDLING
