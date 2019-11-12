@@ -433,11 +433,11 @@ class IncrementalChangesetExporter(object):
         flags = fctx.flags()
 
         if 'l' in flags:
-            mode = 0120000
+            mode = 0o120000
         elif 'x' in flags:
-            mode = 0100755
+            mode = 0o100755
         else:
-            mode = 0100644
+            mode = 0o100644
 
         return (dulobjs.TreeEntry(os.path.basename(fctx.path()), mode,
                                   blob_id), blob)

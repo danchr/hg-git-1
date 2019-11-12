@@ -886,7 +886,7 @@ class GitHandler(object):
         if hgsubdeleted or (not hgsubstate and parentsubdata):
             files['.hgsubstate'] = True, None, None
         elif util.serialize_hgsubstate(hgsubstate) != parentsubdata:
-            files['.hgsubstate'] = False, 0100644, None
+            files['.hgsubstate'] = False, 0o100644, None
 
         # Analyze .hgsub and merge with .gitmodules
         hgsub = None
@@ -896,13 +896,13 @@ class GitHandler(object):
                                                              '.hgsub'))
             for (sm_path, sm_url, sm_name) in gitmodules:
                 hgsub[sm_path] = '[git]' + sm_url
-            files['.hgsub'] = (False, 0100644, None)
+            files['.hgsub'] = (False, 0o100644, None)
         elif (commit.parents and '.gitmodules' in
               self.git[self.git[commit.parents[0]].tree]):
             # no .gitmodules in this commit, however present in the parent
             # mark its hg counterpart as deleted (assuming .hgsub is there
             # due to the same import_git_commit process
-            files['.hgsub'] = (True, 0100644, None)
+            files['.hgsub'] = (True, 0o100644, None)
 
         date = (commit.author_time, -commit.author_timezone)
         text = strip_message
@@ -1451,9 +1451,9 @@ class GitHandler(object):
     def convert_git_int_mode(self, mode):
         # TODO: make these into constants
         convert = {
-            0100644: '',
-            0100755: 'x',
-            0120000: 'l'
+            0o100644: '',
+            0o100755: 'x',
+            0o120000: 'l'
         }
         if mode in convert:
             return convert[mode]
@@ -1527,18 +1527,18 @@ class GitHandler(object):
             # file' case so is overwritten. add first, then rename -- add
             # stored in 'old = file' case, then membership check fails in 'new
             # = file' case so is overwritten.
-            if newmode == 0160000:
+            if newmode == 0o160000:
                 # new = gitlink
                 gitlinks[newfile] = newsha
                 if change.type == diff_tree.CHANGE_RENAME:
                     # don't record the rename because only file -> file renames
                     # make sense in Mercurial
                     gitlinks[oldfile] = None
-                if oldmode is not None and oldmode != 0160000:
+                if oldmode is not None and oldmode != 0o160000:
                     # file -> gitlink
                     files[oldfile] = True, None, None
                 continue
-            if oldmode == 0160000 and newmode != 0160000:
+            if oldmode == 0o160000 and newmode != 0o160000:
                 # gitlink -> no/file (gitlink -> gitlink is covered above)
                 gitlinks[oldfile] = None
                 continue
