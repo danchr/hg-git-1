@@ -56,7 +56,7 @@ from mercurial import (
 # became a set
 try:
     demandimport.IGNORES.add('collections')
-except AttributeError as e:  # pre 4.7 API
+except AttributeError:  # pre 4.7 API
     demandimport.ignore.extend([
         'collections',
     ])
