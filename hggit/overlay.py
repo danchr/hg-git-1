@@ -14,7 +14,7 @@ from mercurial import (
 )
 from mercurial.node import bin, hex, nullid
 
-import compat
+from . import compat
 
 def _maybehex(n):
     if len(n) == 20:

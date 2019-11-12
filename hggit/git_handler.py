@@ -26,12 +26,12 @@ from mercurial import (
     util as hgutil,
 )
 
-import _ssh
-import compat
-import git2hg
-import hg2git
-import util
-from overlay import overlayrepo
+from . import _ssh
+from . import compat
+from . import git2hg
+from . import hg2git
+from . import util
+from .overlay import overlayrepo
 
 
 RE_GIT_AUTHOR = re.compile('^(.*?) ?\<(.*?)(?:\>(.*))?$')

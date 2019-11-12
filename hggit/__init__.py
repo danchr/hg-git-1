@@ -21,15 +21,15 @@ For more information and instructions, see :hg:`help git`
 import os
 
 # local modules
-import compat
-import gitrepo
-import hgrepo
-import overlay
-import verify
-import util
+from . import compat
+from . import gitrepo
+from . import hgrepo
+from . import overlay
+from . import verify
+from . import util
 
 from bisect import insort
-from git_handler import GitHandler
+from .git_handler import GitHandler
 from mercurial.node import hex
 from mercurial.error import LookupError
 from mercurial.i18n import _
@@ -205,7 +205,7 @@ def reposetup(ui, repo):
             hgutil.safehasattr(repo, 'vfs') and
             os.path.exists(compat.gitvfs(repo).join('git'))):
             # only install our dirstate wrapper if it has a hope of working
-            import gitdirstate
+            from . import gitdirstate
             dirstate.dirstate = gitdirstate.gitdirstate
 
         klass = hgrepo.generate_repo_subclass(repo.__class__)

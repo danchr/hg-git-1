@@ -1,6 +1,6 @@
 from dulwich.client import SubprocessWrapper
 import subprocess
-import compat
+from . import compat
 
 
 class SSHVendor(object):

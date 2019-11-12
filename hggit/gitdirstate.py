@@ -11,7 +11,7 @@ from mercurial import (
     util,
 )
 
-import compat
+from . import compat
 from mercurial.i18n import _
 
 

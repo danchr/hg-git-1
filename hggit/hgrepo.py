@@ -4,9 +4,9 @@ from mercurial import (
 )
 from mercurial.node import bin
 
-from git_handler import GitHandler
-from gitrepo import gitrepo
-import util
+from .git_handler import GitHandler
+from .gitrepo import gitrepo
+from . import util
 
 
 def generate_repo_subclass(baseclass):

@@ -11,8 +11,8 @@ from mercurial import (
     error,
 )
 
-import compat
-import util
+from . import compat
+from . import util
 
 
 def parse_subrepos(ctx):

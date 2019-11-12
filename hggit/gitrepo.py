@@ -1,4 +1,4 @@
-from util import isgitsshuri
+from .util import isgitsshuri
 from mercurial import (
     error,
     util
