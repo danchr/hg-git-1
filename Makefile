@@ -31,7 +31,7 @@ tests-%:
 
 all-version-tests: tests-3.7.3 tests-3.8.4 tests-3.9.2 tests-4.0.2 tests-4.1.3 \
   tests-4.2.3 tests-4.3.3 tests-4.4.2 tests-4.5.3 tests-4.6.2 tests-4.7.2 \
-  tests-4.8.2 tests-4.9.1 tests-5.0 tests-@
+  tests-4.8.2 tests-4.9.1 tests-5.0.2 tests-5.1.2 tests-5.2 tests-@
 
 release:
 	$(PYTHON) setup.py sdist
