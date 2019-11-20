@@ -65,7 +65,7 @@ __version__ = '0.8.13'
 
 testedwith = ('3.7.3 3.8.4 3.9.2 4.0.2 4.1.3 4.2.3 4.3.3 4.4.2 4.5.3 4.6.2 '
               '4.7.2 4.8.2 4.9.1 5.0.2 5.1.2 5.2')
-buglink = 'https://bitbucket.org/durin42/hg-git/issues'
+buglink = 'https://dev.heptapod.net/mercurial/hg-git/issues'
 
 cmdtable = {}
 configtable = {}
