@@ -1,5 +1,8 @@
 """Compatibility functions for old Mercurial versions and other utility
 functions."""
+
+from __future__ import absolute_import
+
 import re
 import urllib
 

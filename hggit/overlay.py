@@ -4,6 +4,8 @@
 #
 # incomplete, implemented on demand
 
+from __future__ import absolute_import
+
 from mercurial import (
     ancestor,
     changelog,

@@ -1,5 +1,7 @@
 '''test helper extension to create commits with multiple extra fields'''
 
+from __future__ import absolute_import
+
 from mercurial import cmdutil, commands, scmutil
 
 cmdtable = {}

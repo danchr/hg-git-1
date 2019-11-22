@@ -17,6 +17,8 @@ Try hg clone git:// or hg clone git+ssh://
 For more information and instructions, see :hg:`help git`
 '''
 
+from __future__ import absolute_import
+
 # global modules
 import os
 

@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from dulwich.client import SubprocessWrapper
 import subprocess
 from . import compat
