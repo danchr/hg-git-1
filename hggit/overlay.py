@@ -7,9 +7,9 @@
 from mercurial import (
     ancestor,
     changelog,
+    context,
     manifest,
     match as matchmod,
-    context,
     util,
 )
 from mercurial.node import bin, hex, nullid
