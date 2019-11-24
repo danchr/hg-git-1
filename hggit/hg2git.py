@@ -144,7 +144,7 @@ class IncrementalChangesetExporter(object):
         while todo:
             path, tree = todo.pop()
             self._dirs[path] = tree
-            for entry in tree.iteritems():
+            for entry in compat.iteritems(tree):
                 if entry.mode == dirkind:
                     if path == '':
                         newpath = entry.path
@@ -396,7 +396,7 @@ class IncrementalChangesetExporter(object):
         def isgit(sub, path):
             return path not in sub or sub[path].startswith('[git]')
 
-        for path, sha in substate.iteritems():
+        for path, sha in compat.iteritems(substate):
             if not isgit(sub, path):
                 # old = hg -- will be handled in next loop
                 continue
@@ -405,7 +405,7 @@ class IncrementalChangesetExporter(object):
                 # new = hg or no, case (2) or (3)
                 removed.append(path)
 
-        for path, sha in newsubstate.iteritems():
+        for path, sha in compat.iteritems(newsubstate):
             if not isgit(newsub, path):
                 # new = hg or no; the only cases we care about are handled
                 # above

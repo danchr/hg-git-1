@@ -5,6 +5,7 @@ from __future__ import absolute_import, print_function
 import urllib
 from dulwich.objects import Commit, Tag
 
+from . import compat
 
 def find_incoming(git_object_store, git_map, refs):
     '''find what commits need to be imported
@@ -28,7 +29,7 @@ def find_incoming(git_object_store, git_map, refs):
     def get_heads(refs):
         todo = []
         seenheads = set()
-        for ref, sha in refs.iteritems():
+        for ref, sha in compat.iteritems(refs):
             # refs could contain refs on the server that we haven't pulled down
             # the objects for; also make sure it's a sha and not a symref
             if ref != 'HEAD' and sha in git_object_store:

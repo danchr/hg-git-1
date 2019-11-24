@@ -220,7 +220,7 @@ class GitHandler(object):
             map_hg = self._map_hg
             buf = io.BytesIO()
             bwrite = buf.write
-            for hgsha, gitsha in map_hg.iteritems():
+            for hgsha, gitsha in compat.iteritems(map_hg):
                 bwrite("%s %s\n" % (gitsha, hgsha))
             file.write(buf.getvalue())
             buf.close()
@@ -238,7 +238,7 @@ class GitHandler(object):
 
     def save_tags(self):
         file = self.vfs(self.tags_file, 'w+', atomictemp=True)
-        for name, sha in sorted(self.tags.iteritems()):
+        for name, sha in sorted(compat.iteritems(self.tags)):
             if not self.repo.tagtype(name) == 'global':
                 file.write("%s %s\n" % (sha, name))
         # If this complains, atomictempfile no longer has close
@@ -388,7 +388,7 @@ class GitHandler(object):
         try:
             client.send_pack(path, changed, lambda have, want: [])
 
-            changed_refs = [ref for ref, sha in new_refs.iteritems()
+            changed_refs = [ref for ref, sha in compat.iteritems(new_refs)
                             if sha != old_refs.get(ref)]
             new = [bin(self.map_hg_get(new_refs[ref])) for ref in changed_refs]
             old = {}
@@ -407,7 +407,7 @@ class GitHandler(object):
         remote_name = self.remote_name(remote)
 
         if remote_name and new_refs:
-            for ref, new_sha in sorted(new_refs.iteritems()):
+            for ref, new_sha in sorted(compat.iteritems(new_refs)):
                 old_sha = old_refs.get(ref)
                 if old_sha is None:
                     if self.ui.verbose:
@@ -872,9 +872,9 @@ class GitHandler(object):
                 parentsubdata = p1ctx.filectx('.hgsubstate').data()
                 parentsubdata = parentsubdata.splitlines()
                 parentsubstate = util.parse_hgsubstate(parentsubdata)
-                for path, sha in parentsubstate.iteritems():
+                for path, sha in compat.iteritems(parentsubstate):
                     hgsubstate[path] = sha
-        for path, sha in gitlinks.iteritems():
+        for path, sha in compat.iteritems(gitlinks):
             if sha is None:
                 hgsubstate.pop(path, None)
             else:
@@ -953,7 +953,7 @@ class GitHandler(object):
                 return []
             manifest1 = self.repo[p1].manifest()
             manifest2 = self.repo[p2].manifest()
-            return [path for path, node1 in manifest1.iteritems() if path not
+            return [path for path, node1 in compat.iteritems(manifest1) if path not
                     in files and manifest2.get(path, node1) != node1]
 
         def getfilectx(repo, memctx, f):
@@ -1148,7 +1148,7 @@ class GitHandler(object):
 
         # mapped nodes might be hidden
         unfiltered = self.repo.unfiltered()
-        for rev, rev_refs in exportable.iteritems():
+        for rev, rev_refs in compat.iteritems(exportable):
             ctx = self.repo[rev]
             if not rev_refs:
                 raise error.Abort("revision %s cannot be pushed since"
@@ -1213,7 +1213,7 @@ class GitHandler(object):
             if refs is None:
                 return None
             filteredrefs = self.filter_refs(refs, heads)
-            return [x for x in filteredrefs.itervalues() if x not in self.git]
+            return [x for x in compat.itervalues(filteredrefs) if x not in self.git]
 
         try:
             progress = GitProgress(self.ui)
@@ -1267,7 +1267,7 @@ class GitHandler(object):
                         raise error.Abort("ambiguous reference %s: %r"
                                           % (h, r))
         else:
-            for ref, sha in refs.iteritems():
+            for ref, sha in compat.iteritems(refs):
                 if (not ref.endswith('^{}') and
                     (ref.startswith('refs/heads/') or
                      ref.startswith('refs/tags/'))):
@@ -1295,7 +1295,7 @@ class GitHandler(object):
                 return obj.tag_time >= min_timestamp
             else:
                 return obj.commit_time >= min_timestamp
-        return util.OrderedDict((ref, sha) for ref, sha in refs.iteritems()
+        return util.OrderedDict((ref, sha) for ref, sha in compat.iteritems(refs)
                                 if check_min_time(self.git[sha]))
 
     def update_references(self):
@@ -1303,14 +1303,14 @@ class GitHandler(object):
 
         # Create a local Git branch name for each
         # Mercurial bookmark.
-        for hg_sha, refs in exportable.iteritems():
+        for hg_sha, refs in compat.iteritems(exportable):
             for git_ref in refs.heads:
                 git_sha = self.map_git_get(hg_sha)
                 if git_sha:
                     self.git.refs[git_ref] = git_sha
 
     def export_hg_tags(self):
-        for tag, sha in self.repo.tags().iteritems():
+        for tag, sha in compat.iteritems(self.repo.tags()):
             if self.repo.tagtype(tag) in ('global', 'git'):
                 tag = tag.replace(' ', '_')
                 target = self.map_git_get(hex(sha))
@@ -1356,7 +1356,7 @@ class GitHandler(object):
         bms = self.repo._bookmarks
         for filtered_bm, bm in self._filter_for_bookmarks(bms):
             res[hex(bms[bm])].heads.add('refs/heads/' + filtered_bm)
-        for tag, sha in self.tags.iteritems():
+        for tag, sha in compat.iteritems(self.tags):
             res[sha].tags.add('refs/tags/' + tag)
         return res
 
@@ -1402,7 +1402,7 @@ class GitHandler(object):
 
             suffix = self.branch_bookmark_suffix or ''
             changes = []
-            for head, sha in heads.iteritems():
+            for head, sha in compat.iteritems(heads):
                 # refs contains all the refs in the server, not just
                 # the ones we are pulling
                 hgsha = self.map_hg_get(sha)
@@ -1433,7 +1433,7 @@ class GitHandler(object):
         for t in list(remote_refs):
             if t.startswith(remote_name + '/'):
                 del remote_refs[t]
-        for ref_name, sha in refs.iteritems():
+        for ref_name, sha in compat.iteritems(refs):
             if ref_name.startswith('refs/heads'):
                 hgsha = self.map_hg_get(sha)
                 if hgsha is None or hgsha not in self.repo:

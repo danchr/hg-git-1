@@ -6,6 +6,8 @@ from mercurial import (
     util
 )
 
+from . import compat
+
 peerapi = False
 try:
     from mercurial.interfaces.repository import peer as peerrepository
@@ -62,7 +64,7 @@ class basegitrepo(peerrepository):
                 # map any git shas that exist in hg to hg shas
                 stripped_refs = {
                     ref[11:]: handler.map_hg_get(val) or val
-                    for ref, val in result.refs.iteritems()
+                    for ref, val in compat.iteritems(result.refs)
                     if ref.startswith('refs/heads/')
                 }
                 return stripped_refs

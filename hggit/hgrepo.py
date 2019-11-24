@@ -8,6 +8,7 @@ from mercurial.node import bin
 
 from .git_handler import GitHandler
 from .gitrepo import gitrepo
+from . import compat
 from . import util
 
 
@@ -47,12 +48,12 @@ def generate_repo_subclass(baseclass):
         def _findtags(self):
             (tags, tagtypes) = super(hgrepo, self)._findtags()
 
-            for tag, rev in self.githandler.tags.iteritems():
+            for tag, rev in compat.iteritems(self.githandler.tags):
                 if isinstance(tag, unicode):
                     tag = tag.encode('utf-8')
                 tags[tag] = bin(rev)
                 tagtypes[tag] = 'git'
-            for tag, rev in self.githandler.remote_refs.iteritems():
+            for tag, rev in compat.iteritems(self.githandler.remote_refs):
                 if isinstance(tag, unicode):
                     tag = tag.encode('utf-8')
                 tags[tag] = rev
@@ -72,7 +73,7 @@ def generate_repo_subclass(baseclass):
             # TODO consider using self._tagscache
             tagscache = super(hgrepo, self).tags()
             tagscache.update(self.githandler.remote_refs)
-            for tag, rev in self.githandler.tags.iteritems():
+            for tag, rev in compat.iteritems(self.githandler.tags):
                 if tag in tagscache:
                     continue
 

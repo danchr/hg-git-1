@@ -51,7 +51,7 @@ def gignorepats(orig, lines, root=None):
             rootsuffixes = ['', '**/']
         for rootsuffix in rootsuffixes:
             pat = syntax + rootprefix + rootsuffix + line
-            for s, rels in syntaxes.iteritems():
+            for s, rels in compat.iteritems(syntaxes):
                 if line.startswith(rels):
                     pat = line
                     break

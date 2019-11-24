@@ -19,6 +19,8 @@ from mercurial import (
     util as hgutil,
 )
 
+from . import compat
+
 gitschemes = ('git', 'git+ssh', 'git+http', 'git+https')
 
 
@@ -36,7 +38,7 @@ def parse_hgsub(lines):
 
 def serialize_hgsub(data):
     """Produces a string from OrderedDict hgsub content"""
-    return ''.join(['%s = %s\n' % (n, v) for n, v in data.iteritems()])
+    return ''.join(['%s = %s\n' % (n, v) for n, v in compat.iteritems(data)])
 
 
 def parse_hgsubstate(lines):

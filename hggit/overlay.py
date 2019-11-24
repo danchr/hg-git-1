@@ -33,7 +33,7 @@ class overlaymanifest(object):
 
     def withflags(self):
         self.load()
-        return set([path for path, flag in self._flags.iteritems()
+        return set([path for path, flag in compat.iteritems(self._flags)
                     if flag != ''])
 
     def copy(self):
@@ -62,7 +62,7 @@ class overlaymanifest(object):
                 return ''
 
         def addtree(tree, dirname):
-            for entry in tree.iteritems():
+            for entry in compat.iteritems(tree):
                 if entry.mode & 0o40000:
                     # expand directory
                     subtree = self.repo.handler.git.get_object(entry.sha)
@@ -87,7 +87,7 @@ class overlaymanifest(object):
 
     def iteritems(self):
         self.load()
-        return self._map.iteritems()
+        return compat.iteritems(self._map)
 
     def __iter__(self):
         self.load()
@@ -128,7 +128,7 @@ class overlaymanifest(object):
 
         if match is None:
             match = matchmod.always('', '')
-        for fn, n1 in self.iteritems():
+        for fn, n1 in compat.iteritems(self):
             if not match(fn):
                 continue
             fl1 = self._flags.get(fn)
@@ -141,7 +141,7 @@ class overlaymanifest(object):
             elif clean:
                 diff[fn] = None
 
-        for fn, n2 in m2.iteritems():
+        for fn, n2 in compat.iteritems(m2):
             if fn not in self:
                 if not match(fn):
                     continue
