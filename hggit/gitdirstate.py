@@ -246,7 +246,7 @@ class gitdirstate(dirstate.dirstate):
             else:
                 # We may not have walked the full directory tree above,
                 # so stat everything we missed.
-                nf = iter(visit).next
+                nf = next(iter(visit))
                 for st in util.statfiles([join(i) for i in visit]):
                     results[nf()] = st
         return results.keys()
