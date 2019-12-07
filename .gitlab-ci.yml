@@ -57,6 +57,13 @@ tests-hg-4.7:
       - ./hg version --debug
       - tests/run-tests.py -lv --color=always
 
+tests-hg-4.6:
+    image: octobus/ci-py2-hgext3rd:hg-4.6
+    script:
+      - cp /ci/repos/mercurial/hg .
+      - ./hg version --debug
+      - tests/run-tests.py -lv --color=always
+
 tests-hg-4.5:
     image: octobus/ci-py2-hgext3rd:hg-4.5
     script:
