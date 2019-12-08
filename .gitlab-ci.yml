@@ -10,6 +10,12 @@ tests-hg-stable:
         - hg -R /ci/repos/mercurial summary
         - (cd tests; /ci/repos/mercurial/tests/run-tests.py -v --color=always)
 
+tests-hg-5.2:
+    image: octobus/ci-py2-hgext3rd:hg-5.2
+    script:
+      - hg -R /ci/repos/mercurial summary
+      - (cd tests; /ci/repos/mercurial/tests/run-tests.py -v --color=always)
+
 tests-hg-5.1:
     image: octobus/ci-py2-hgext3rd:hg-5.1
     script:
@@ -17,3 +23,60 @@ tests-hg-5.1:
       - (cd tests; /ci/repos/mercurial/tests/run-tests.py -v --color=always)
     except:
         - schedules
+
+tests-hg-5.0:
+    image: octobus/ci-py2-hgext3rd:hg-5.0
+    script:
+      - hg -R /ci/repos/mercurial summary
+      - (cd tests; /ci/repos/mercurial/tests/run-tests.py -v --color=always)
+    except:
+        - schedules
+
+tests-hg-4.9:
+    image: octobus/ci-py2-hgext3rd:hg-4.9
+    script:
+      - hg -R /ci/repos/mercurial summary
+      - (cd tests; /ci/repos/mercurial/tests/run-tests.py -v --color=always)
+    except:
+        - schedules
+
+tests-hg-4.8:
+    image: octobus/ci-py2-hgext3rd:hg-4.8
+    script:
+      - hg -R /ci/repos/mercurial summary
+      - (cd tests; /ci/repos/mercurial/tests/run-tests.py -v --color=always)
+    except:
+        - schedules
+
+tests-hg-4.7:
+    image: octobus/ci-py2-hgext3rd:hg-4.7
+    script:
+      - hg -R /ci/repos/mercurial summary
+      - (cd tests; /ci/repos/mercurial/tests/run-tests.py -v --color=always)
+    except:
+        - schedules
+
+tests-hg-4.5:
+    image: octobus/ci-py2-hgext3rd:hg-4.5
+    script:
+      - hg -R /ci/repos/mercurial summary
+      - (cd tests; /ci/repos/mercurial/tests/run-tests.py -v --color=always)
+    except:
+        - schedules
+
+tests-hg-4.4:
+    image: octobus/ci-py2-hgext3rd:hg-4.4
+    script:
+      - hg -R /ci/repos/mercurial summary
+      - (cd tests; /ci/repos/mercurial/tests/run-tests.py -v --color=always)
+    except:
+        - schedules
+
+tests-hg-4.3:
+    image: octobus/ci-py2-hgext3rd:hg-4.3
+    script:
+      - hg -R /ci/repos/mercurial summary
+      - (cd tests; /ci/repos/mercurial/tests/run-tests.py -v --color=always)
+    except:
+        - schedules
+
