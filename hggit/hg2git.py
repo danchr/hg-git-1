@@ -192,7 +192,12 @@ class IncrementalChangesetExporter(object):
         # The only reliable way to get the full set of changes is by looking at
         # the full manifest. And, the easy way to compare two manifests is
         # localrepo.status().
-        modified, added, removed = self._hg.status(self._ctx, newctx)[0:3]
+        status = self._hg.status(self._ctx, newctx)
+        modified, added, removed = (
+            status.modified,
+            status.added,
+            status.removed,
+        )
 
         # We track which directories/trees have modified in this update and we
         # only export those.
