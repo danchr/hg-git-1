@@ -212,7 +212,7 @@ class overlayfilectx(object):
 
 
 class overlaychangectx(context.changectx):
-    def __init__(self, repo, sha):
+    def __init__(self, repo, sha, maybe_filtered=True):
         # Can't store this in self._repo because the base class uses that field
         self._hgrepo = repo
         if not isinstance(sha, basestring):
@@ -220,6 +220,7 @@ class overlaychangectx(context.changectx):
         self.commit = repo.handler.git.get_object(_maybehex(sha))
         self._overlay = getattr(repo, 'gitoverlay', repo)
         self._rev = self._overlay.rev(bin(self.commit.id))
+        self._maybe_filtered = maybe_filtered
 
     def __getattr__(self, name):
         # Since hg 4.6, context.changectx doesn't define self._repo,
