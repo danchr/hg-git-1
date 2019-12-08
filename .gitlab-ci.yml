@@ -1,0 +1,19 @@
+before_script:
+  - apt-get update && apt-get -y install git-core subversion subversion-tools
+  - pip install --user dulwich==0.19.13
+
+tests-hg-stable:
+    image: octobus/ci-py2-hgext3rd
+    script:
+        - hg pull -R /ci/repos/mercurial/ --rev stable
+        - hg -R /ci/repos/mercurial/ update stable
+        - hg -R /ci/repos/mercurial summary
+        - (cd tests; /ci/repos/mercurial/tests/run-tests.py -v --color=always)
+
+tests-hg-5.1:
+    image: octobus/ci-py2-hgext3rd:hg-5.1
+    script:
+      - hg -R /ci/repos/mercurial summary
+      - (cd tests; /ci/repos/mercurial/tests/run-tests.py -v --color=always)
+    except:
+        - schedules
