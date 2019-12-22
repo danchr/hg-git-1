@@ -3,14 +3,14 @@ variables:
 
 before_script:
   - apt-get update && apt-get -y install git-core subversion subversion-tools
-  - pip install --user dulwich==0.19.13
+  - PYTHONPATH= pip install --user dulwich==0.19.13
 
 tests-hg-stable:
     image: octobus/ci-py2-hgext3rd
     script:
-        - hg pull -R /ci/repos/mercurial/ --rev stable
-        - hg -R /ci/repos/mercurial/ update stable
-        - hg -R /ci/repos/mercurial summary
+        - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev stable
+        - PYTHONPATH= hg -R /ci/repos/mercurial/ update stable
+        - PYTHONPATH= hg -R /ci/repos/mercurial summary
         - make -C /ci/repos/mercurial local
         - cp /ci/repos/mercurial/hg .
         - tests/run-tests.py -lv --color=always
