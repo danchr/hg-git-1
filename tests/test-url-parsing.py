@@ -19,7 +19,7 @@ from hggit.git_handler import GitHandler
 class TestUrlParsing(object):
     def setUp(self):
         # create a test repo location.
-        self.tmpdir = tempfile.mkdtemp('hg-git_url-test')
+        self.tmpdir = tempfile.mkdtemp('hg-git_url-test').encode('utf-8')
         commands.init(ui.ui(), self.tmpdir)
         repo = hg.repository(ui.ui(), self.tmpdir)
         self.handler = GitHandler(repo, ui.ui())
@@ -28,36 +28,42 @@ class TestUrlParsing(object):
         # remove the temp repo
         shutil.rmtree(self.tmpdir)
 
-    def assertEquals(self, l, r):
+    def assertEquals(self, lb, r):
+        """assert equality of l (bytes) and r (str)
+
+        This is so we don't have to adapt the whole .t output.
+        """
+        rb = r.encode('utf-8')
+        ls = lb.decode('utf-8')
         print('%% expect %r' % (r, ))
-        print(l)
-        assert l == r
+        print(ls)
+        assert lb == rb
 
     def test_ssh_github_style_slash(self):
-        url = "git+ssh://git@github.com/webjam/webjam.git"
+        url = b"git+ssh://git@github.com/webjam/webjam.git"
         client, path = self.handler.get_transport_and_path(url)
         self.assertEquals(path, '/webjam/webjam.git')
         self.assertEquals(client.host, 'git@github.com')
 
     def test_ssh_github_style_colon_number_starting_username(self):
-        url = "git+ssh://git@github.com:42qu/vps.git"
+        url = b"git+ssh://git@github.com:42qu/vps.git"
         client, path = self.handler.get_transport_and_path(url)
         self.assertEquals(path, '42qu/vps.git')
         self.assertEquals(client.host, 'git@github.com')
 
     def test_ssh_github_style_colon(self):
-        url = "git+ssh://git@github.com:webjam/webjam.git"
+        url = b"git+ssh://git@github.com:webjam/webjam.git"
         client, path = self.handler.get_transport_and_path(url)
         self.assertEquals(path, 'webjam/webjam.git')
         self.assertEquals(client.host, 'git@github.com')
 
     def test_ssh_heroku_style(self):
-        url = "git+ssh://git@heroku.com:webjam.git"
+        url = b"git+ssh://git@heroku.com:webjam.git"
         client, path = self.handler.get_transport_and_path(url)
         self.assertEquals(path, 'webjam.git')
         self.assertEquals(client.host, 'git@heroku.com')
         # also test that it works even if heroku isn't in the name
-        url = "git+ssh://git@compatible.com:webjam.git"
+        url = b"git+ssh://git@compatible.com:webjam.git"
         client, path = self.handler.get_transport_and_path(url)
         self.assertEquals(path, 'webjam.git')
         self.assertEquals(client.host, 'git@compatible.com')
@@ -65,20 +71,20 @@ class TestUrlParsing(object):
     def test_ssh_heroku_style_with_trailing_slash(self):
         # some versions of mercurial add a trailing slash even if
         #  the user didn't supply one.
-        url = "git+ssh://git@heroku.com:webjam.git/"
+        url = b"git+ssh://git@heroku.com:webjam.git/"
         client, path = self.handler.get_transport_and_path(url)
         self.assertEquals(path, 'webjam.git')
         self.assertEquals(client.host, 'git@heroku.com')
 
     def test_heroku_style_with_port(self):
-        url = "git+ssh://git@heroku.com:999:webjam.git"
+        url = b"git+ssh://git@heroku.com:999:webjam.git"
         client, path = self.handler.get_transport_and_path(url)
         self.assertEquals(path, 'webjam.git')
         self.assertEquals(client.host, 'git@heroku.com')
         self.assertEquals(client.port, '999')
 
     def test_gitdaemon_style(self):
-        url = "git://github.com/webjam/webjam.git"
+        url = b"git://github.com/webjam/webjam.git"
         client, path = self.handler.get_transport_and_path(url)
         self.assertEquals(path, '/webjam/webjam.git')
         try:
@@ -87,14 +93,14 @@ class TestUrlParsing(object):
             self.assertEquals(client.host, 'github.com')
 
     def test_ssh_github_style_slash_with_port(self):
-        url = "git+ssh://git@github.com:10022/webjam/webjam.git"
+        url = b"git+ssh://git@github.com:10022/webjam/webjam.git"
         client, path = self.handler.get_transport_and_path(url)
         self.assertEquals(path, '/webjam/webjam.git')
         self.assertEquals(client.host, 'git@github.com')
         self.assertEquals(client.port, '10022')
 
     def test_gitdaemon_style_with_port(self):
-        url = "git://github.com:19418/webjam/webjam.git"
+        url = b"git://github.com:19418/webjam/webjam.git"
         client, path = self.handler.get_transport_and_path(url)
         self.assertEquals(path, '/webjam/webjam.git')
         try:
