@@ -36,7 +36,7 @@ Add a submodule (gitlink) and move it to a different spot:
   $ fn_git_commit -msubalpha
   $ cd ../gitrepo
 
-  $ rmpwd="import sys; print sys.stdin.read().replace('$(dirname $(pwd))/', '')"
+  $ rmpwd="import sys; print(sys.stdin.read().replace('$(dirname $(pwd))/', ''))"
   $ clonefilt='s/Cloning into/Initialized empty Git repository in/;s/in .*/in .../'
 
   $ git submodule add ../gitsubmodule 2>&1 | python -c "$rmpwd" | sed "$clonefilt" | egrep -v '^done\.$'

@@ -20,7 +20,7 @@ Load commonly used test logic
   $ mkdir gitrepo2
   $ cd gitrepo2
 
-  $ rmpwd="import sys; print sys.stdin.read().replace('$(dirname $(pwd))/', '')"
+  $ rmpwd="import sys; print(sys.stdin.read().replace('$(dirname $(pwd))/', ''))"
 different versions of git spell the dir differently. Older versions
 use the full path to the directory all the time, whereas newer
 version spell it sanely as it was given (eg . in a newer version,
