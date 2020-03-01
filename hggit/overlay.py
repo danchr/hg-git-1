@@ -129,9 +129,9 @@ class overlaymanifest(object):
         for fn, n1 in self.iteritems():
             if not match(fn):
                 continue
-            fl1 = self._flags.get(fn, '')
+            fl1 = self._flags.get(fn)
             n2 = m2.get(fn, None)
-            fl2 = m2flagget(fn, '')
+            fl2 = m2flagget(fn)
             if n2 is None:
                 fl2 = ''
             if n1 != n2 or fl1 != fl2:
@@ -143,7 +143,7 @@ class overlaymanifest(object):
             if fn not in self:
                 if not match(fn):
                     continue
-                fl2 = m2flagget(fn, '')
+                fl2 = m2flagget(fn)
                 diff[fn] = ((None, ''), (n2, fl2))
 
         return diff
