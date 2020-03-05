@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import collections
 import itertools
@@ -1679,16 +1679,16 @@ class GitHandler(object):
         >>> g = GitHandler(mockrepo, ui())
         >>> tp = g.get_transport_and_path
         >>> client, url = tp('http://fqdn.com/test.git')
-        >>> print isinstance(client, HttpGitClient)
+        >>> print(isinstance(client, HttpGitClient))
         True
-        >>> print url
+        >>> print(url)
         http://fqdn.com/test.git
         >>> client, url = tp('git@fqdn.com:user/repo.git')
-        >>> print isinstance(client, SSHGitClient)
+        >>> print(isinstance(client, SSHGitClient))
         True
-        >>> print url
+        >>> print(url)
         user/repo.git
-        >>> print client.host
+        >>> print(client.host)
         git@fqdn.com
         """
         # pass hg's ui.ssh config to dulwich

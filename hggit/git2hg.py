@@ -1,6 +1,6 @@
 # git2hg.py - convert Git repositories and commits to Mercurial ones
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import urllib
 from dulwich.objects import Commit, Tag

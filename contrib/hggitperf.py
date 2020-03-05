@@ -5,7 +5,7 @@ This requires both the hggit and hggitperf extensions to be enabled and
 available.
 '''
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 from mercurial import cmdutil
 import time, os, tempfile

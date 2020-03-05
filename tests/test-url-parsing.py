@@ -1,11 +1,11 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import sys
 
 try:
     import dulwich
 except ImportError:
-    print "skipped: missing feature: dulwich"
+    print("skipped: missing feature: dulwich")
     sys.exit(80)
 
 import os, tempfile, unittest, shutil
@@ -29,8 +29,8 @@ class TestUrlParsing(object):
         shutil.rmtree(self.tmpdir)
 
     def assertEquals(self, l, r):
-        print '%% expect %r' % (r, )
-        print l
+        print('%% expect %r' % (r, ))
+        print(l)
         assert l == r
 
     def test_ssh_github_style_slash(self):

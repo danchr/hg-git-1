@@ -2,7 +2,7 @@
 # repositories to Git repositories. Code in this file is meant to be a generic
 # library and should be usable outside the context of hg-git or an hg command.
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import os
 import stat
@@ -35,7 +35,7 @@ def audit_git_path(ui, path):
     ...     def configbool(*args):
     ...         return False
     ...     def warn(self, s):
-    ...         print s
+    ...         print(s)
     >>> u = fakeui()
     >>> audit_git_path(u, 'foo/git~100/wat')
     ... # doctest: +ELLIPSIS
