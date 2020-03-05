@@ -13,10 +13,12 @@ import sys
 
 checks = hghave.checks
 
+
 def list_features():
     for name, feature in sorted(checks.items()):
         desc = feature[1]
         print(name + ':', desc)
+
 
 def test_features():
     failed = 0
@@ -29,11 +31,15 @@ def test_features():
             failed += 1
     return failed
 
+
 parser = optparse.OptionParser("%prog [options] [features]")
-parser.add_option("--test-features", action="store_true",
-                  help="test available features")
-parser.add_option("--list-features", action="store_true",
-                  help="list available features")
+parser.add_option(
+    "--test-features", action="store_true", help="test available features"
+)
+parser.add_option(
+    "--list-features", action="store_true", help="list available features"
+)
+
 
 def _loadaddon():
     if 'TESTDIR' in os.environ:
@@ -49,12 +55,15 @@ def _loadaddon():
     sys.path.insert(0, path)
     try:
         import hghaveaddon
+
         assert hghaveaddon  # silence pyflakes
     except BaseException as inst:
-        sys.stderr.write('failed to import hghaveaddon.py from %r: %s\n'
-                         % (path, inst))
+        sys.stderr.write(
+            'failed to import hghaveaddon.py from %r: %s\n' % (path, inst)
+        )
         sys.exit(2)
     sys.path.pop(0)
+
 
 if __name__ == '__main__':
     options, args = parser.parse_args()
