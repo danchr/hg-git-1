@@ -24,6 +24,7 @@ from mercurial import (
     encoding,
     error,
     phases,
+    pycompat,
     util as hgutil,
 )
 
@@ -261,7 +262,7 @@ class GitHandler(object):
             for root, dirs, files in os.walk(remotedir):
                 for f in files:
                     try:
-                        ref = root.replace(refdir + os.sep, b'') + b'/'
+                        ref = root.replace(refdir + pycompat.ossep, b'') + b'/'
                         node = open(os.path.join(root, f)).read().strip()
                         self._remote_refs[ref + f] = bin(self._map_git[node])
                     except (KeyError, IOError):

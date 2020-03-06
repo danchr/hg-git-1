@@ -127,12 +127,12 @@ hg.schemes[b'file'] = _local
 def _url(orig, path, **kwargs):
     # we'll test for 'git@' then use our heuristic method to determine if it's
     # a git uri
-    if not (path.startswith(os.sep) and b':' in path):
+    if not (path.startswith(pycompat.ossep) and b':' in path):
         return orig(path, **kwargs)
 
     # the file path will be everything up until the last slash right before the
     # ':'
-    lastsep = path.rindex(os.sep, None, path.index(b':')) + 1
+    lastsep = path.rindex(pycompat.ossep, None, path.index(b':')) + 1
     gituri = path[lastsep:]
 
     if util.isgitsshuri(gituri):

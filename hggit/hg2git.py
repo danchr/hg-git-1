@@ -11,6 +11,7 @@ import dulwich.objects as dulobjs
 from mercurial import (
     encoding,
     error,
+    pycompat,
 )
 
 from . import compat
@@ -52,7 +53,7 @@ def audit_git_path(ui, path):
     >>> audit_git_path(u, b'this/is/safe')
     """
     dangerous = False
-    for c in path.split(os.path.sep):
+    for c in path.split(pycompat.ossep):
         if encoding.hfsignoreclean(c) == b'.git':
             dangerous = True
             break
