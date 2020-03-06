@@ -117,7 +117,7 @@ def registerconfigs(configitem):
 def config(ui, subtype, section, item):
     if subtype == b'string':
         subtype = b''
-    getconfig = getattr(ui, 'config' + subtype)
+    getconfig = getattr(ui, 'config' + pycompat.sysstr(subtype))
     if hasconfigitems:
         return getconfig(section, item)
     return getconfig(section, item, CONFIG_DEFAULTS[section][item])
