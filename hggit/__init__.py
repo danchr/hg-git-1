@@ -284,14 +284,14 @@ def findcommonoutgoing(orig, repo, other, *args, **kwargs):
         kw = {}
         kw.update(kwargs)
         for val, k in zip(args,
-                          (b'onlyheads', b'force', b'commoninc', b'portable')):
+                          ('onlyheads', 'force', 'commoninc', 'portable')):
             kw[k] = val
-        force = kw.get(b'force', False)
-        commoninc = kw.get(b'commoninc', None)
+        force = kw.get('force', False)
+        commoninc = kw.get('commoninc', None)
         if commoninc is None:
             commoninc = discovery.findcommonincoming(repo, other, heads=heads,
                                                      force=force)
-            kw[b'commoninc'] = commoninc
+            kw['commoninc'] = commoninc
         return orig(repo, other, **kw)
     return orig(repo, other, *args, **kwargs)
 
