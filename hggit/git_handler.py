@@ -845,7 +845,7 @@ class GitHandler(object):
         else:
             renames = hg_renames
 
-        gparents = map(self.map_hg_get, commit.parents)
+        gparents = pycompat.maplist(self.map_hg_get, commit.parents)
 
         for parent in gparents:
             if parent not in self.repo:
