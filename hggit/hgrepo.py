@@ -49,13 +49,11 @@ def generate_repo_subclass(baseclass):
             (tags, tagtypes) = super(hgrepo, self)._findtags()
 
             for tag, rev in compat.iteritems(self.githandler.tags):
-                if isinstance(tag, unicode):
-                    tag = tag.encode('utf-8')
+                assert isinstance(tag, bytes)
                 tags[tag] = bin(rev)
                 tagtypes[tag] = b'git'
             for tag, rev in compat.iteritems(self.githandler.remote_refs):
-                if isinstance(tag, unicode):
-                    tag = tag.encode('utf-8')
+                assert isinstance(tag, bytes)
                 tags[tag] = rev
                 tagtypes[tag] = b'git-remote'
             tags.update(self.githandler.remote_refs)
