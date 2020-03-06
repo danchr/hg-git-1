@@ -400,7 +400,8 @@ class GitHandler(object):
 
             return old, new
         except (HangupException, GitProtocolError) as e:
-            raise error.Abort(_(b"git remote error: ") + str(e))
+            raise error.Abort(_(b"git remote error: ")
+                              + pycompat.sysbytes(str(e)))
 
     def push(self, remote, revs, force):
         self.export_commits()
@@ -1121,7 +1122,8 @@ class GitHandler(object):
                                 change_totals.get(Blob, 0)))
             return old_refs, new_refs
         except (HangupException, GitProtocolError) as e:
-            raise error.Abort(_(b"git remote error: ") + str(e))
+            raise error.Abort(_(b"git remote error: ")
+                              + pycompat.sysbytes(str(e)))
 
     def get_changed_refs(self, refs, exportable, force):
         new_refs = refs.copy()
@@ -1233,7 +1235,8 @@ class GitHandler(object):
 
             return ret
         except (HangupException, GitProtocolError) as e:
-            raise error.Abort(_(b"git remote error: ") + str(e))
+            raise error.Abort(_(b"git remote error: ")
+                              + pycompat.sysbytes(str(e)))
 
     # REFERENCES HANDLING
 
