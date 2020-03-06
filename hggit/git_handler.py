@@ -165,7 +165,8 @@ class GitHandler(object):
         # have to cope with that. As a workaround, try decoding our
         # (bytes) path to the repo in hg's active encoding and hope
         # for the best.
-        gitpath = self.gitdir.decode(encoding.encoding, encoding.encodingmode)
+        gitpath = self.gitdir.decode(pycompat.sysstr(encoding.encoding),
+                                     pycompat.sysstr(encoding.encodingmode))
         # make the git data directory
         if os.path.exists(self.gitdir):
             return Repo(gitpath)
