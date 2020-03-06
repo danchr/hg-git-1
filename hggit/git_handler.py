@@ -248,7 +248,7 @@ class GitHandler(object):
 
     def load_remote_refs(self):
         self._remote_refs = {}
-        refdir = os.path.join(self.git.path, b'refs', b'remotes')
+        refdir = os.path.join(self.gitdir, b'refs', b'remotes')
 
         paths = self.paths
         # if paths are set, we should still check 'default'
