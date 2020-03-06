@@ -178,7 +178,7 @@ hg.defaultdest = defaultdest
 def getversion():
     """return version with dependencies for hg --version -v"""
     import dulwich
-    dulver = b'.'.join(str(i) for i in dulwich.__version__)
+    dulver = b'.'.join(pycompat.sysbytes(str(i)) for i in dulwich.__version__)
     return __version__ + (b" (dulwich %s)" % dulver)
 
 
