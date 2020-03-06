@@ -77,12 +77,7 @@ def gignore(root, files, warn, extrapatterns=None):
         ignorefunc = matchmod.match(root, '', [], allpats)
     except error.Abort:
         for f, patlist in pats:
-            try:
-                matchmod.match(root, '', [], patlist)
-            except error.Abort as inst:
-                # in this case, patlist is ['include: FILE'], and
-                # inst[0] should already include FILE
-                raise
+            matchmod.match(root, '', [], patlist)
         if extrapatterns:
             try:
                 matchmod.match(root, '', [], extrapatterns)
