@@ -773,9 +773,7 @@ class GitHandler(object):
                         git_extra.append((b'HG:rename', spec))
 
         # hg extra items always go at the end
-        extraitems = extra.items()
-        extraitems.sort()
-        for key, value in extraitems:
+        for key, value in sorted(extra.items()):
             if key in (b'author', b'committer', b'encoding', b'message', b'branch',
                        b'hg-git', b'hg-git-rename-source'):
                 continue
