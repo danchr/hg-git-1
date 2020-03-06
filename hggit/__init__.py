@@ -49,6 +49,7 @@ from mercurial import (
     util as hgutil,
     localrepo,
     manifest,
+    pycompat,
     revset,
     scmutil,
     templatekw,
@@ -194,7 +195,8 @@ def extsetup(ui):
     revset.symbols.update({
         b'fromgit': revset_fromgit, b'gitnode': revset_gitnode
     })
-    helpdir = os.path.join(os.path.dirname(__file__), b'help')
+    helpdir = os.path.join(os.path.dirname(pycompat.fsencode(__file__)),
+                           b'help')
     entry = ([b'git'], _(b"Working with Git Repositories"),
              lambda ui: open(os.path.join(helpdir, b'git.rst')).read())
     insort(help.helptable, entry)
