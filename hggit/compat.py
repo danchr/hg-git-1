@@ -2,6 +2,7 @@ from __future__ import absolute_import, print_function
 
 from mercurial import (
     context,
+    pycompat,
     templatekw,
     ui,
     url,
@@ -28,6 +29,13 @@ except ImportError:
     shellquote = hgutil.shellquote
     quotecommand = hgutil.quotecommand
     binary = hgutil.binary
+
+try:
+    from mercurial.pycompat import iteritems, itervalues
+except ImportError:
+    assert not pycompat.ispy3
+    iteritems = lambda x: x.iteritems()
+    itervalues = lambda x: x.itervalues()
 
 
 def gitvfs(repo):
