@@ -1701,12 +1701,12 @@ class GitHandler(object):
         git_match = RE_GIT_URI.match(uri)
         if git_match:
             res = git_match.groupdict()
-            host, port, sepr = res[b'host'], res[b'port'], res[b'sepr']
+            host, port, sepr = res['host'], res['port'], res['sepr']
             transport = client.TCPGitClient
-            if b'ssh' in res[b'scheme']:
+            if b'ssh' in res['scheme']:
                 util.checksafessh(host)
                 transport = client.SSHGitClient
-            path = res[b'path']
+            path = res['path']
             if sepr == b'/' and not path.startswith(b'~'):
                 path = b'/' + path
             # strip trailing slash for heroku-style URLs
