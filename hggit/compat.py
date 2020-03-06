@@ -37,6 +37,11 @@ except ImportError:
     iteritems = lambda x: x.iteritems()
     itervalues = lambda x: x.itervalues()
 
+try:
+    unicode = unicode
+except NameError:
+    from mercurial.pycompat import unicode
+
 
 def gitvfs(repo):
     """return a vfs suitable to read git related data"""
