@@ -1363,11 +1363,10 @@ class GitHandler(object):
         return res
 
     def import_tags(self, refs):
-        keys = refs.keys()
-        if not keys:
+        if not refs:
             return
         repotags = self.repo.tags()
-        for k in keys[:]:
+        for k in refs:
             ref_name = k
             parts = k.split(b'/')
             if parts[0] == b'refs' and parts[1] == b'tags':
