@@ -1655,7 +1655,7 @@ class GitHandler(object):
         # text is not valid utf-8, try to make sense of it
         if encoding:
             try:
-                return string.decode(encoding).encode('utf-8')
+                return string.decode(pycompat.sysstr(encoding)).encode('utf-8')
             except UnicodeDecodeError:
                 pass
 
