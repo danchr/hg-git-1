@@ -2,7 +2,7 @@
 
 from __future__ import absolute_import, print_function
 
-from mercurial import cmdutil, commands, scmutil
+from mercurial import cmdutil, commands, pycompat, scmutil
 
 cmdtable = {}
 try:
@@ -24,7 +24,9 @@ def commitextra(ui, repo, *pats, **opts):
     for field in fields:
         k, v = field.split(b'=', 1)
         extras[k] = v
-    message = cmdutil.logmessage(ui, opts)
+    message = cmdutil.logmessage(ui, pycompat.byteskwargs(opts))
     repo.commit(message, opts.get('user'), opts.get('date'),
-                match=scmutil.match(repo[None], pats, opts), extra=extras)
+                match=scmutil.match(repo[None], pats,
+                                    pycompat.byteskwargs(opts)),
+                extra=extras)
     return 0
