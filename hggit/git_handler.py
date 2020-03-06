@@ -1207,7 +1207,7 @@ class GitHandler(object):
         # can't just do 'refs/' here because the tag class doesn't have a
         # parents function for walking, and older versions of dulwich don't
         # like that.
-        haveheads = self.git.refs.as_dict(b'refs/remotes/').values()
+        haveheads = list(self.git.refs.as_dict(b'refs/remotes/').values())
         haveheads.extend(self.git.refs.as_dict(b'refs/heads/').values())
         graphwalker = self.git.get_graph_walker(heads=haveheads)
 
