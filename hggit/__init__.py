@@ -185,7 +185,11 @@ def getversion():
 # defend against tracebacks if we specify -r in 'hg pull'
 def safebranchrevs(orig, lrepo, repo, branches, revs):
     revs, co = orig(lrepo, repo, branches, revs)
-    if hgutil.safehasattr(lrepo, b'changelog') and co not in lrepo.changelog:
+    if (
+        not isinstance(co, int)
+        or hgutil.safehasattr(lrepo, b'changelog')
+        and co not in lrepo.changelog
+    ):
         co = None
     return revs, co
 extensions.wrapfunction(hg, b'addbranchrevs', safebranchrevs)
