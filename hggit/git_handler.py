@@ -1136,7 +1136,7 @@ class GitHandler(object):
         # capabilities^{} key when the dict should have been
         # empty. That check can probably be removed at some point in
         # the future.)
-        if not refs or refs.keys()[0] == b'capabilities^{}':
+        if not refs or next(iter(refs.keys())) == b'capabilities^{}':
             if not exportable:
                 tip = self.repo.lookup(b'tip')
                 if tip != nullid:
