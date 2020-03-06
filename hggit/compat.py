@@ -68,9 +68,9 @@ def memfilectx(repo, changectx, path, data, islink=False,
     # Different versions of mercurial have different parameters to
     # memfilectx.  Try them from newest to oldest.
     parameters_to_try = (
-        ((repo, changectx, path, data), { b'copysource': copysource }), # hg >= 5.0
-        ((repo, changectx, path, data), { b'copied': copysource }),     # hg 4.5 - 4.9.1
-        ((repo, path, data),            { b'copied': copysource }),     # hg 3.1 - 4.4.2
+        ((repo, changectx, path, data), { 'copysource': copysource }), # hg >= 5.0
+        ((repo, changectx, path, data), { 'copied': copysource }),     # hg 4.5 - 4.9.1
+        ((repo, path, data),            { 'copied': copysource }),     # hg 3.1 - 4.4.2
     )
     for (args, kwargs) in parameters_to_try:
         try:
