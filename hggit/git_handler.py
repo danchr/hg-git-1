@@ -4,7 +4,6 @@ import collections
 import itertools
 import io
 import os
-import urllib
 import re
 
 from dulwich.errors import HangupException, GitProtocolError
@@ -686,7 +685,7 @@ class GitHandler(object):
             name = self.get_valid_git_username_email(a.group(1))
             email = self.get_valid_git_username_email(a.group(2))
             if a.group(3) is not None and len(a.group(3)) != 0:
-                name += b' ext:(' + urllib.quote(a.group(3)) + b')'
+                name += b' ext:(' + compat.quote(a.group(3)) + b')'
             author = b'%s <%s>'\
                      % (self.get_valid_git_username_email(name),
                          self.get_valid_git_username_email(email))
@@ -751,7 +750,7 @@ class GitHandler(object):
 
         git_extraitems.sort()
         for i, field, value in git_extraitems:
-            git_extra.append((urllib.unquote(field), urllib.unquote(value)))
+            git_extra.append((compat.unquote(field), compat.unquote(value)))
 
         if extra.get(b'hg-git-rename-source', None) != b'git':
             renames = []
@@ -768,8 +767,8 @@ class GitHandler(object):
                         extra_message += (b"rename : " + oldfile + b" => " +
                                           newfile + b"\n")
                     else:
-                        spec = b'%s:%s' % (urllib.quote(oldfile),
-                                           urllib.quote(newfile))
+                        spec = b'%s:%s' % (compat.quote(oldfile),
+                                           compat.quote(newfile))
                         git_extra.append((b'HG:rename', spec))
 
         # hg extra items always go at the end
@@ -780,10 +779,10 @@ class GitHandler(object):
             else:
                 if extra_in_message:
                     extra_message += (b"extra : " + key + b" : " +
-                                      urllib.quote(value) + b"\n")
+                                      compat.quote(value) + b"\n")
                 else:
-                    spec = b'%s:%s' % (urllib.quote(key),
-                                       urllib.quote(value))
+                    spec = b'%s:%s' % (compat.quote(key),
+                                       compat.quote(value))
                     git_extra.append((b'HG:extra', spec))
 
         if extra_message:
@@ -925,7 +924,7 @@ class GitHandler(object):
             m = RE_GIT_AUTHOR_EXTRA.match(commit.author)
             if m:
                 name = m.group(1)
-                ex = urllib.unquote(m.group(2))
+                ex = compat.unquote(m.group(2))
                 email = m.group(3)
                 author = name + b' <' + email + b'>' + ex
 

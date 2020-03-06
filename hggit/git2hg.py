@@ -2,7 +2,6 @@
 
 from __future__ import absolute_import, print_function
 
-import urllib
 from dulwich.objects import Commit, Tag
 
 from . import compat
@@ -129,7 +128,7 @@ def extract_hg_metadata(message, git_extra):
                 branch = data
             if command == b'extra':
                 k, v = data.split(b" : ", 1)
-                extra[k] = urllib.unquote(v)
+                extra[k] = compat.unquote(v)
 
     git_fn = 0
     for field, data in git_extra:
@@ -139,16 +138,16 @@ def extract_hg_metadata(message, git_extra):
             command = field[3:]
             if command == b'rename':
                 before, after = data.split(b':', 1)
-                renames[urllib.unquote(after)] = urllib.unquote(before)
+                renames[compat.unquote(after)] = compat.unquote(before)
             elif command == b'extra':
                 k, v = data.split(b':', 1)
-                extra[urllib.unquote(k)] = urllib.unquote(v)
+                extra[compat.unquote(k)] = compat.unquote(v)
         else:
             # preserve ordering in Git by using an incrementing integer for
             # each field. Note that extra metadata in Git is an ordered list
             # of pairs.
             hg_field = b'GIT%d-%s' % (git_fn, field)
             git_fn += 1
-            extra[urllib.quote(hg_field)] = urllib.quote(data)
+            extra[compat.quote(hg_field)] = compat.quote(data)
 
     return (message, renames, branch, extra)

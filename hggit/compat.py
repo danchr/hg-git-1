@@ -42,6 +42,9 @@ try:
 except NameError:
     from mercurial.pycompat import unicode
 
+quote = hgutil.urlreq.quote
+unquote = hgutil.urlreq.unquote
+
 
 def gitvfs(repo):
     """return a vfs suitable to read git related data"""

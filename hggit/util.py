@@ -4,7 +4,6 @@ functions."""
 from __future__ import absolute_import, print_function
 
 import re
-import urllib
 
 try:
     from collections import OrderedDict
@@ -146,7 +145,7 @@ def checksafessh(host):
 
     Raises an error.Abort when the url is unsafe.
     """
-    host = urllib.unquote(host)
+    host = compat.unquote(host)
     if host.startswith(b'-'):
         raise error.Abort(_(b'potentially unsafe hostname: %r') %
                           (host,))
