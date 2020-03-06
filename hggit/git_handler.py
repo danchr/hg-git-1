@@ -2,11 +2,10 @@ from __future__ import absolute_import, print_function
 
 import collections
 import itertools
+import io
 import os
 import urllib
 import re
-import cStringIO
-import StringIO
 
 from dulwich.errors import HangupException, GitProtocolError
 from dulwich.objects import Blob, Commit, Tag, Tree, parse_timezone
@@ -219,7 +218,7 @@ class GitHandler(object):
         try:
             file = self.vfs(map_file, 'w+', atomictemp=True)
             map_hg = self._map_hg
-            buf = cStringIO.StringIO()
+            buf = io.BytesIO()
             bwrite = buf.write
             for hgsha, gitsha in map_hg.iteritems():
                 bwrite("%s %s\n" % (gitsha, hgsha))
@@ -1218,7 +1217,7 @@ class GitHandler(object):
 
         try:
             progress = GitProgress(self.ui)
-            f = StringIO.StringIO()
+            f = io.BytesIO()
 
             ret = localclient.fetch_pack(path, determine_wants, graphwalker,
                                          f.write, progress.progress)
@@ -1602,7 +1601,7 @@ class GitHandler(object):
         except KeyError:
             return rv
         gitmodules_content = self.git[gitmodules_sha].data
-        fo = StringIO.StringIO(gitmodules_content)
+        fo = io.BytesIO(gitmodules_content)
         tt = dul_config.ConfigFile.from_file(fo)
         for section in tt.keys():
             section_kind, section_name = section
