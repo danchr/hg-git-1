@@ -1,3 +1,7 @@
+stages:
+  - current
+  - compat
+
 variables:
   PYTHONPATH: /ci/repos/mercurial
 
@@ -7,6 +11,7 @@ before_script:
   - PYTHONPATH= pip install --user dulwich==0.19.13
 
 tests-hg-default:
+    stage: compat
     image: octobus/ci-py2-hgext3rd
     script:
         - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev default
@@ -17,6 +22,7 @@ tests-hg-default:
         - tests/run-tests.py -lv --color=always
 
 tests-hg-stable:
+    stage: compat
     image: octobus/ci-py2-hgext3rd
     script:
         - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev stable
@@ -27,6 +33,7 @@ tests-hg-stable:
         - tests/run-tests.py -lv --color=always
 
 tests-hg-5.3:
+    stage: current
     image: octobus/ci-py2-hgext3rd:hg-5.3
     script:
       - cp /ci/repos/mercurial/hg .
@@ -34,6 +41,7 @@ tests-hg-5.3:
       - tests/run-tests.py -lv --color=always
 
 tests-hg-5.2:
+    stage: compat
     image: octobus/ci-py2-hgext3rd:hg-5.2
     script:
       - cp /ci/repos/mercurial/hg .
@@ -41,6 +49,7 @@ tests-hg-5.2:
       - tests/run-tests.py -lv --color=always
 
 tests-hg-5.1:
+    stage: compat
     image: octobus/ci-py2-hgext3rd:hg-5.1
     script:
       - cp /ci/repos/mercurial/hg .
@@ -48,6 +57,7 @@ tests-hg-5.1:
       - tests/run-tests.py -lv --color=always
 
 tests-hg-5.0:
+    stage: compat
     image: octobus/ci-py2-hgext3rd:hg-5.0
     script:
       - cp /ci/repos/mercurial/hg .
@@ -55,6 +65,7 @@ tests-hg-5.0:
       - tests/run-tests.py -lv --color=always
 
 tests-hg-4.9:
+    stage: compat
     image: octobus/ci-py2-hgext3rd:hg-4.9
     script:
       - cp /ci/repos/mercurial/hg .
@@ -62,6 +73,7 @@ tests-hg-4.9:
       - tests/run-tests.py -lv --color=always
 
 tests-hg-4.8:
+    stage: compat
     image: octobus/ci-py2-hgext3rd:hg-4.8
     script:
       - cp /ci/repos/mercurial/hg .
@@ -69,6 +81,7 @@ tests-hg-4.8:
       - tests/run-tests.py -lv --color=always
 
 tests-hg-4.7:
+    stage: compat
     image: octobus/ci-py2-hgext3rd:hg-4.7
     script:
       - cp /ci/repos/mercurial/hg .
@@ -76,6 +89,7 @@ tests-hg-4.7:
       - tests/run-tests.py -lv --color=always
 
 tests-hg-4.6:
+    stage: compat
     image: octobus/ci-py2-hgext3rd:hg-4.6
     script:
       - cp /ci/repos/mercurial/hg .
@@ -83,6 +97,7 @@ tests-hg-4.6:
       - tests/run-tests.py -lv --color=always --extra-config-opt devel.all-warnings=no --extra-config-opt devel.deprec-warn=no
 
 tests-hg-4.5:
+    stage: compat
     image: octobus/ci-py2-hgext3rd:hg-4.5
     script:
       - cp /ci/repos/mercurial/hg .
@@ -90,6 +105,7 @@ tests-hg-4.5:
       - tests/run-tests.py -lv --color=always
 
 tests-hg-4.4:
+    stage: compat
     image: octobus/ci-py2-hgext3rd:hg-4.4
     script:
       - cp /ci/repos/mercurial/hg .
@@ -97,6 +113,7 @@ tests-hg-4.4:
       - tests/run-tests.py -lv --color=always
 
 tests-hg-4.3:
+    stage: compat
     image: octobus/ci-py2-hgext3rd:hg-4.3
     script:
       - cp /ci/repos/mercurial/hg .
