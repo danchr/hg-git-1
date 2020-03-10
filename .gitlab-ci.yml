@@ -5,14 +5,9 @@ stages:
 variables:
   PYTHONPATH: /ci/repos/mercurial
 
-before_script:
-  - apt-get update
-  - apt-get -y install git-core subversion subversion-tools openssh-client
-  - PYTHONPATH= pip install --user dulwich==0.19.13
-
 tests-hg-default:
     stage: compat
-    image: octobus/ci-py2-hgext3rd
+    image: octobus/ci-py2-hg-git
     script:
         - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev default
         - PYTHONPATH= hg -R /ci/repos/mercurial/ update default
@@ -23,7 +18,7 @@ tests-hg-default:
 
 tests-hg-stable:
     stage: compat
-    image: octobus/ci-py2-hgext3rd
+    image: octobus/ci-py2-hg-git
     script:
         - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev stable
         - PYTHONPATH= hg -R /ci/repos/mercurial/ update stable
@@ -34,7 +29,7 @@ tests-hg-stable:
 
 tests-hg-5.3:
     stage: current
-    image: octobus/ci-py2-hgext3rd:hg-5.3
+    image: octobus/ci-py2-hg-git:hg-5.3
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -42,7 +37,7 @@ tests-hg-5.3:
 
 tests-hg-5.2:
     stage: compat
-    image: octobus/ci-py2-hgext3rd:hg-5.2
+    image: octobus/ci-py2-hg-git:hg-5.2
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -50,7 +45,7 @@ tests-hg-5.2:
 
 tests-hg-5.1:
     stage: compat
-    image: octobus/ci-py2-hgext3rd:hg-5.1
+    image: octobus/ci-py2-hg-git:hg-5.1
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -58,7 +53,7 @@ tests-hg-5.1:
 
 tests-hg-5.0:
     stage: compat
-    image: octobus/ci-py2-hgext3rd:hg-5.0
+    image: octobus/ci-py2-hg-git:hg-5.0
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -66,7 +61,7 @@ tests-hg-5.0:
 
 tests-hg-4.9:
     stage: compat
-    image: octobus/ci-py2-hgext3rd:hg-4.9
+    image: octobus/ci-py2-hg-git:hg-4.9
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -74,7 +69,7 @@ tests-hg-4.9:
 
 tests-hg-4.8:
     stage: compat
-    image: octobus/ci-py2-hgext3rd:hg-4.8
+    image: octobus/ci-py2-hg-git:hg-4.8
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -82,7 +77,7 @@ tests-hg-4.8:
 
 tests-hg-4.7:
     stage: compat
-    image: octobus/ci-py2-hgext3rd:hg-4.7
+    image: octobus/ci-py2-hg-git:hg-4.7
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -90,7 +85,7 @@ tests-hg-4.7:
 
 tests-hg-4.6:
     stage: compat
-    image: octobus/ci-py2-hgext3rd:hg-4.6
+    image: octobus/ci-py2-hg-git:hg-4.6
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -98,7 +93,7 @@ tests-hg-4.6:
 
 tests-hg-4.5:
     stage: compat
-    image: octobus/ci-py2-hgext3rd:hg-4.5
+    image: octobus/ci-py2-hg-git:hg-4.5
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -106,7 +101,7 @@ tests-hg-4.5:
 
 tests-hg-4.4:
     stage: compat
-    image: octobus/ci-py2-hgext3rd:hg-4.4
+    image: octobus/ci-py2-hg-git:hg-4.4
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -114,7 +109,7 @@ tests-hg-4.4:
 
 tests-hg-4.3:
     stage: compat
-    image: octobus/ci-py2-hgext3rd:hg-4.3
+    image: octobus/ci-py2-hg-git:hg-4.3
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
