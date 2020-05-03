@@ -21,7 +21,7 @@ from mercurial import (
 
 from . import compat
 
-gitschemes = ('git', 'git+ssh', 'git+http', 'git+https')
+gitschemes = (b'git', b'git+ssh', b'git+http', b'git+https')
 
 
 def parse_hgsub(lines):
@@ -29,16 +29,16 @@ def parse_hgsub(lines):
     rv = OrderedDict()
     for l in lines:
         ls = l.strip()
-        if not ls or ls[0] == '#':
+        if not ls or ls[0] == b'#':
             continue
-        name, value = l.split('=', 1)
+        name, value = l.split(b'=', 1)
         rv[name.strip()] = value.strip()
     return rv
 
 
 def serialize_hgsub(data):
     """Produces a string from OrderedDict hgsub content"""
-    return ''.join(['%s = %s\n' % (n, v) for n, v in compat.iteritems(data)])
+    return b''.join([b'%s = %s\n' % (n, v) for n, v in compat.iteritems(data)])
 
 
 def parse_hgsubstate(lines):
@@ -46,16 +46,16 @@ def parse_hgsubstate(lines):
     rv = OrderedDict()
     for l in lines:
         ls = l.strip()
-        if not ls or ls[0] == '#':
+        if not ls or ls[0] == b'#':
             continue
-        value, name = l.split(' ', 1)
+        value, name = l.split(b' ', 1)
         rv[name.strip()] = value.strip()
     return rv
 
 
 def serialize_hgsubstate(data):
     """Produces a string from OrderedDict hgsubstate content"""
-    return ''.join(['%s %s\n' % (data[n], n) for n in sorted(data)])
+    return b''.join([b'%s %s\n' % (data[n], n) for n in sorted(data)])
 
 
 def transform_notgit(f):
@@ -64,7 +64,7 @@ def transform_notgit(f):
         try:
             return f(*args, **kwargs)
         except errors.NotGitRepository:
-            raise error.Abort('not a git repository')
+            raise error.Abort(b'not a git repository')
     return inner
 
 
@@ -87,10 +87,10 @@ def isgitsshuri(uri):
     True
     """
     for scheme in gitschemes:
-        if uri.startswith('%s://' % scheme):
+        if uri.startswith(b'%s://' % scheme):
             return False
 
-    if uri.startswith('http:') or uri.startswith('https:'):
+    if uri.startswith(b'http:') or uri.startswith(b'https:'):
         return False
 
     m = re.match(r'(?:.+@)*([\[]?[\w\d\.\:\-]+[\]]?):(.*)', uri)
@@ -99,7 +99,7 @@ def isgitsshuri(uri):
         # urls
         giturl, repopath = m.groups()
         # definitely a git repo
-        if repopath.endswith('.git'):
+        if repopath.endswith(b'.git'):
             return True
         # use a simple regex to check if it is a fqdn regex
         fqdn_re = (r'(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}'
@@ -109,7 +109,7 @@ def isgitsshuri(uri):
     return False
 
 
-def updatebookmarks(repo, changes, name='git_handler'):
+def updatebookmarks(repo, changes, name=b'git_handler'):
     """abstract writing bookmarks for backwards compatibility"""
     bms = repo._bookmarks
     tr = lock = wlock = None
@@ -117,7 +117,7 @@ def updatebookmarks(repo, changes, name='git_handler'):
         wlock = repo.wlock()
         lock = repo.lock()
         tr = repo.transaction(name)
-        if hgutil.safehasattr(bms, 'applychanges'):
+        if hgutil.safehasattr(bms, b'applychanges'):
             # applychanges was added in mercurial 4.3
             bms.applychanges(repo, tr, changes)
         else:
@@ -126,7 +126,7 @@ def updatebookmarks(repo, changes, name='git_handler'):
                     del bms[name]
                 else:
                     bms[name] = node
-            if hgutil.safehasattr(bms, 'recordchange'):
+            if hgutil.safehasattr(bms, b'recordchange'):
                 # recordchange was added in mercurial 3.2
                 bms.recordchange(tr)
             else:
@@ -147,6 +147,6 @@ def checksafessh(host):
     Raises an error.Abort when the url is unsafe.
     """
     host = urllib.unquote(host)
-    if host.startswith('-'):
-        raise error.Abort(_('potentially unsafe hostname: %r') %
+    if host.startswith(b'-'):
+        raise error.Abort(_(b'potentially unsafe hostname: %r') %
                           (host,))

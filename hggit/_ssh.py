@@ -24,12 +24,12 @@ def generate_ssh_vendor(ui):
                 # 0.11.x dulwich sends an array of [command arg1 arg2 ...], so
                 # we detect that here and reformat it back to what hg-git
                 # expects (e.g. "command 'arg1 arg2'")
-                command = ["%s '%s'" % (command[0], ' '.join(command[1:]))]
-            sshcmd = ui.config("ui", "ssh", "ssh")
+                command = [b"%s '%s'" % (command[0], b' '.join(command[1:]))]
+            sshcmd = ui.config(b"ui", b"ssh", b"ssh")
             args = compat.sshargs(sshcmd, host, username, port)
-            cmd = '%s %s %s' % (sshcmd, args,
-                                compat.shellquote(' '.join(command)))
-            ui.debug('calling ssh: %s\n' % cmd)
+            cmd = b'%s %s %s' % (sshcmd, args,
+                                 compat.shellquote(b' '.join(command)))
+            ui.debug(b'calling ssh: %s\n' % cmd)
             proc = subprocess.Popen(compat.quotecommand(cmd), shell=True,
                                     stdin=subprocess.PIPE,
                                     stdout=subprocess.PIPE)

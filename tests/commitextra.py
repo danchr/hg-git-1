@@ -10,19 +10,19 @@ try:
     command = registrar.command(cmdtable)
 except (ImportError, AttributeError):
     command = cmdutil.command(cmdtable)
-testedwith = 'internal'
+testedwith = b'internal'
 
-@command('commitextra',
-         [('', 'field', [],
-           'extra data to store', 'FIELD=VALUE'),
-         ] + commands.commitopts + commands.commitopts2,
-         'commitextra')
+@command(b'commitextra',
+         [(b'', b'field', [],
+           b'extra data to store', b'FIELD=VALUE'),
+          ] + commands.commitopts + commands.commitopts2,
+         b'commitextra')
 def commitextra(ui, repo, *pats, **opts):
     '''make a commit with extra fields'''
     fields = opts.get('field')
     extras = {}
     for field in fields:
-        k, v = field.split('=', 1)
+        k, v = field.split(b'=', 1)
         extras[k] = v
     message = cmdutil.logmessage(ui, opts)
     repo.commit(message, opts.get('user'), opts.get('date'),

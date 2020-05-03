@@ -35,13 +35,13 @@ from . import util
 from .overlay import overlayrepo
 
 
-RE_GIT_AUTHOR = re.compile('^(.*?) ?\<(.*?)(?:\>(.*))?$')
+RE_GIT_AUTHOR = re.compile(b'^(.*?) ?\<(.*?)(?:\>(.*))?$')
 
-RE_GIT_SANITIZE_AUTHOR = re.compile('[<>\n]')
+RE_GIT_SANITIZE_AUTHOR = re.compile(b'[<>\n]')
 
-RE_GIT_AUTHOR_EXTRA = re.compile('^(.*?)\ ext:\((.*)\) <(.*)\>$')
+RE_GIT_AUTHOR_EXTRA = re.compile(b'^(.*?)\ ext:\((.*)\) <(.*)\>$')
 
-RE_GIT_EXTRA_KEY = re.compile('GIT([0-9]*)-(.*)')
+RE_GIT_EXTRA_KEY = re.compile(b'GIT([0-9]*)-(.*)')
 
 # Test for git:// and git+ssh:// URI.
 # Support several URL forms, including separating the
@@ -50,10 +50,10 @@ RE_GIT_URI = re.compile(
     r'^(?P<scheme>git([+]ssh)?://)(?P<host>.*?)(:(?P<port>\d+))?'
     r'(?P<sepr>[:/])(?P<path>.*)$')
 
-RE_NEWLINES = re.compile('[\r\n]')
-RE_GIT_PROGRESS = re.compile('\((\d+)/(\d+)\)')
+RE_NEWLINES = re.compile(b'[\r\n]')
+RE_GIT_PROGRESS = re.compile(b'\((\d+)/(\d+)\)')
 
-RE_AUTHOR_FILE = re.compile('\s*=\s*')
+RE_AUTHOR_FILE = re.compile(b'\s*=\s*')
 
 # mercurial.utils.dateutil functions were in mercurial.util in Mercurial < 4.6
 try:
@@ -62,7 +62,7 @@ try:
 except ImportError:
     dateutil = hgutil
 
-CALLBACK_BUFFER = ''
+CALLBACK_BUFFER = b''
 
 
 class GitProgress(object):
@@ -71,7 +71,7 @@ class GitProgress(object):
         self.ui = ui
 
         self._progress = None
-        self.msgbuf = ''
+        self.msgbuf = b''
 
     def progress(self, msg):
         # 'Counting objects: 33640, done.\n'
@@ -80,7 +80,7 @@ class GitProgress(object):
         self.msgbuf = msgs.pop()
 
         for msg in msgs:
-            td = msg.split(':', 1)
+            td = msg.split(b':', 1)
             data = td.pop()
             if not td:
                 self.flush(data)
@@ -105,13 +105,13 @@ class GitProgress(object):
         self._progress.complete()
         self._progress = None
         if msg:
-            self.ui.note(msg + '\n')
+            self.ui.note(msg + b'\n')
 
 
 class GitHandler(object):
-    map_file = 'git-mapfile'
-    remote_refs_file = 'git-remote-refs'
-    tags_file = 'git-tags'
+    map_file = b'git-mapfile'
+    remote_refs_file = b'git-remote-refs'
+    tags_file = b'git-tags'
 
     def __init__(self, dest_repo, ui):
         self.repo = dest_repo
@@ -121,17 +121,17 @@ class GitHandler(object):
         # Mercurial >= 3.3:  repo.shared()
         if dest_repo.sharedpath != dest_repo.path:
             self.vfs = compat.hgvfs(dest_repo.sharedpath)
-        if compat.config(ui, 'bool', 'git', 'intree'):
-            self.gitdir = self.repo.wvfs.join('.git')
+        if compat.config(ui, b'bool', b'git', b'intree'):
+            self.gitdir = self.repo.wvfs.join(b'.git')
         else:
-            self.gitdir = self.vfs.join('git')
+            self.gitdir = self.vfs.join(b'git')
 
         self.init_author_file()
 
-        self.paths = ui.configitems('paths')
+        self.paths = ui.configitems(b'paths')
 
         self.branch_bookmark_suffix = compat.config(
-            ui, 'string', 'git', 'branch_bookmark_suffix')
+            ui, b'string', b'git', b'branch_bookmark_suffix')
 
         self._map_git_real = None
         self._map_hg_real = None
@@ -174,12 +174,12 @@ class GitHandler(object):
 
     def init_author_file(self):
         self.author_map = {}
-        authors_path = compat.config(self.ui, 'string', 'git', 'authors')
+        authors_path = compat.config(self.ui, b'string', b'git', b'authors')
         if authors_path:
             with open(self.repo.wvfs.join(authors_path)) as f:
                 for line in f:
                     line = line.strip()
-                    if not line or line.startswith('#'):
+                    if not line or line.startswith(b'#'):
                         continue
                     from_, to = RE_AUTHOR_FILE.split(line, 2)
                     self.author_map[from_] = to
@@ -204,7 +204,7 @@ class GitHandler(object):
                 # format is <40 hex digits> <40 hex digits>\n
                 if len(line) != 82:
                     raise ValueError(
-                        _('corrupt mapfile: incorrect line length %d') %
+                        _(b'corrupt mapfile: incorrect line length %d') %
                         len(line))
                 gitsha = line[:40]
                 hgsha = line[41:81]
@@ -216,12 +216,12 @@ class GitHandler(object):
     def save_map(self, map_file):
         wlock = self.repo.wlock()
         try:
-            file = self.vfs(map_file, 'w+', atomictemp=True)
+            file = self.vfs(map_file, b'w+', atomictemp=True)
             map_hg = self._map_hg
             buf = io.BytesIO()
             bwrite = buf.write
             for hgsha, gitsha in compat.iteritems(map_hg):
-                bwrite("%s %s\n" % (gitsha, hgsha))
+                bwrite(b"%s %s\n" % (gitsha, hgsha))
             file.write(buf.getvalue())
             buf.close()
             # If this complains, atomictempfile no longer has close
@@ -233,25 +233,25 @@ class GitHandler(object):
         self.tags = {}
         if os.path.exists(self.vfs.join(self.tags_file)):
             for line in self.vfs(self.tags_file):
-                sha, name = line.strip().split(' ', 1)
+                sha, name = line.strip().split(b' ', 1)
                 self.tags[name] = sha
 
     def save_tags(self):
-        file = self.vfs(self.tags_file, 'w+', atomictemp=True)
+        file = self.vfs(self.tags_file, b'w+', atomictemp=True)
         for name, sha in sorted(compat.iteritems(self.tags)):
-            if not self.repo.tagtype(name) == 'global':
-                file.write("%s %s\n" % (sha, name))
+            if not self.repo.tagtype(name) == b'global':
+                file.write(b"%s %s\n" % (sha, name))
         # If this complains, atomictempfile no longer has close
         file.close()
 
     def load_remote_refs(self):
         self._remote_refs = {}
-        refdir = os.path.join(self.git.path, 'refs', 'remotes')
+        refdir = os.path.join(self.git.path, b'refs', b'remotes')
 
         paths = self.paths
         # if paths are set, we should still check 'default'
         if not paths:
-            paths = (('default', None),)
+            paths = ((b'default', None),)
 
         # we avoid using dulwich's refs method because it is incredibly slow;
         # on a repo with a few hundred branches and a few thousand tags,
@@ -261,7 +261,7 @@ class GitHandler(object):
             for root, dirs, files in os.walk(remotedir):
                 for f in files:
                     try:
-                        ref = root.replace(refdir + os.sep, '') + '/'
+                        ref = root.replace(refdir + os.sep, b'') + b'/'
                         node = open(os.path.join(root, f)).read().strip()
                         self._remote_refs[ref + f] = bin(self._map_git[node])
                     except (KeyError, IOError):
@@ -295,11 +295,11 @@ class GitHandler(object):
             self.update_hg_bookmarks(result.refs)
 
             try:
-                symref = result.symrefs['HEAD']
-                if symref.startswith('refs/heads'):
-                    rhead = symref.replace('refs/heads/', '')
+                symref = result.symrefs[b'HEAD']
+                if symref.startswith(b'refs/heads'):
+                    rhead = symref.replace(b'refs/heads/', b'')
 
-                rnode = result.refs['refs/heads/%s' % rhead]
+                rnode = result.refs[b'refs/heads/%s' % rhead]
                 rnode = self._map_git[rnode]
                 rnode = self.repo[rnode].node()
             except KeyError:
@@ -309,18 +309,18 @@ class GitHandler(object):
 
             if remote_name:
                 self.update_remote_branches(remote_name, result.refs)
-            elif not self.git.refs.as_dict('refs/remotes/'):
+            elif not self.git.refs.as_dict(b'refs/remotes/'):
                 # intial cloning
-                self.update_remote_branches('default', result.refs)
+                self.update_remote_branches(b'default', result.refs)
 
                 # "Activate" a tipmost bookmark.
-                bms = self.repo['tip'].bookmarks()
+                bms = self.repo[b'tip'].bookmarks()
 
                 # override the 'tipmost' behavior if we know the remote HEAD
                 if rnode:
                     # make sure the bookmark exists; at the point the remote
                     # branches has already been set up
-                    suffix = self.branch_bookmark_suffix or ''
+                    suffix = self.branch_bookmark_suffix or b''
                     changes = [(rhead + suffix, rnode)]
                     util.updatebookmarks(self.repo, changes)
                     bms = [rhead + suffix]
@@ -332,14 +332,14 @@ class GitHandler(object):
 
         # also mark public any branches the user specified
         blist = [self.repo[branch].node() for branch in
-                 self.ui.configlist('git', 'public')]
-        if rnode and self.ui.configbool('hggit', 'usephases'):
+                 self.ui.configlist(b'git', b'public')]
+        if rnode and self.ui.configbool(b'hggit', b'usephases'):
             blist.append(rnode)
 
         if blist:
             lock = self.repo.lock()
             try:
-                tr = self.repo.transaction("phase")
+                tr = self.repo.transaction(b"phase")
                 phases.advanceboundary(self.repo, tr, phases.public,
                                        blist)
                 tr.close()
@@ -399,7 +399,7 @@ class GitHandler(object):
 
             return old, new
         except (HangupException, GitProtocolError) as e:
-            raise error.Abort(_("git remote error: ") + str(e))
+            raise error.Abort(_(b"git remote error: ") + str(e))
 
     def push(self, remote, revs, force):
         self.export_commits()
@@ -411,23 +411,23 @@ class GitHandler(object):
                 old_sha = old_refs.get(ref)
                 if old_sha is None:
                     if self.ui.verbose:
-                        self.ui.note("adding reference %s::%s => GIT:%s\n" %
+                        self.ui.note(b"adding reference %s::%s => GIT:%s\n" %
                                      (remote_name, ref, new_sha[0:8]))
                     else:
-                        self.ui.status("adding reference %s\n" % ref)
+                        self.ui.status(b"adding reference %s\n" % ref)
                 elif new_sha != old_sha:
                     if self.ui.verbose:
-                        self.ui.note("updating reference %s::%s => GIT:%s\n" %
+                        self.ui.note(b"updating reference %s::%s => GIT:%s\n" %
                                      (remote_name, ref, new_sha[0:8]))
                     else:
-                        self.ui.status("updating reference %s\n" % ref)
+                        self.ui.status(b"updating reference %s\n" % ref)
                 else:
-                    self.ui.debug("unchanged reference %s::%s => GIT:%s\n" %
+                    self.ui.debug(b"unchanged reference %s::%s => GIT:%s\n" %
                                   (remote_name, ref, new_sha[0:8]))
 
             self.update_remote_branches(remote_name, new_refs)
         if old_refs == new_refs:
-            self.ui.status(_("no changes found\n"))
+            self.ui.status(_(b"no changes found\n"))
             ret = None
         elif len(new_refs) > len(old_refs):
             ret = 1 + (len(new_refs) - len(old_refs))
@@ -458,7 +458,7 @@ class GitHandler(object):
         if revs:
             reqrefs = {}
             for rev in revs:
-                for n in ('refs/heads/' + rev, 'refs/tags/' + rev):
+                for n in (b'refs/heads/' + rev, b'refs/tags/' + rev):
                     if n in result.refs:
                         reqrefs[n] = result.refs[n]
         else:
@@ -473,7 +473,7 @@ class GitHandler(object):
     # CHANGESET CONVERSION METHODS
 
     def export_git_objects(self):
-        self.ui.note(_("finding hg commits to export\n"))
+        self.ui.note(_(b"finding hg commits to export\n"))
         repo = self.repo
         clnode = repo.changelog.node
 
@@ -482,22 +482,22 @@ class GitHandler(object):
                      self._map_hg)
 
         todo_total = len(repo) - len(self._map_hg)
-        topic = 'find commits to export'
-        unit = 'commits'
+        topic = b'find commits to export'
+        unit = b'commits'
 
         with compat.makeprogress(repo.ui, topic, unit, todo_total) as progress:
             export = []
             for ctx in to_export:
                 item = hex(ctx.node())
                 progress.increment(item=item, total=todo_total)
-                if ctx.extra().get('hg-git', None) != 'octopus':
+                if ctx.extra().get(b'hg-git', None) != b'octopus':
                     export.append(ctx)
 
             total = len(export)
             if not total:
                 return
 
-        self.ui.note(_("exporting hg objects to git\n"))
+        self.ui.note(_(b"exporting hg objects to git\n"))
 
         # By only exporting deltas, the assertion is that all previous objects
         # for all other changesets are already present in the Git repository.
@@ -514,20 +514,20 @@ class GitHandler(object):
             try:
                 gitcommit = self.git[gitsha]
             except KeyError:
-                raise error.Abort(_('Parent SHA-1 not present in Git'
-                                    'repo: %s' % gitsha))
+                raise error.Abort(_(b'Parent SHA-1 not present in Git'
+                                    b'repo: %s' % gitsha))
 
         exporter = hg2git.IncrementalChangesetExporter(
             self.repo, pctx, self.git.object_store, gitcommit)
 
-        mapsavefreq = compat.config(self.ui, 'int', 'hggit',
-                                    'mapsavefrequency')
-        with compat.makeprogress(self.ui, 'exporting', total=total) as progress:
+        mapsavefreq = compat.config(self.ui, b'int', b'hggit',
+                                    b'mapsavefrequency')
+        with compat.makeprogress(self.ui, b'exporting', total=total) as progress:
             for i, ctx in enumerate(export):
                 progress.update(i, total=total)
                 self.export_hg_commit(ctx.node(), exporter)
                 if mapsavefreq and i % mapsavefreq == 0:
-                    self.ui.debug(_("saving mapfile\n"))
+                    self.ui.debug(_(b"saving mapfile\n"))
                     self.save_map(self.map_file)
 
     def set_commiter_from_author(self, commit):
@@ -539,7 +539,7 @@ class GitHandler(object):
     # go through the manifest, convert all blobs/trees we don't have
     # write the commit object (with metadata info)
     def export_hg_commit(self, rev, exporter):
-        self.ui.note(_("converting revision %s\n") % hex(rev))
+        self.ui.note(_(b"converting revision %s\n") % hex(rev))
 
         oldenc = self.swap_out_encoding()
 
@@ -559,10 +559,10 @@ class GitHandler(object):
         commit.author_time = int(time)
         commit.author_timezone = -timezone
 
-        if 'committer' in extra:
+        if b'committer' in extra:
             try:
                 # fixup timezone
-                (name, timestamp, timezone) = extra['committer'].rsplit(' ', 2)
+                (name, timestamp, timezone) = extra[b'committer'].rsplit(b' ', 2)
                 commit.committer = name
                 commit.commit_time = timestamp
 
@@ -587,18 +587,18 @@ class GitHandler(object):
             git_sha = self.map_git_get(hgsha)
             if git_sha:
                 if git_sha not in self.git.object_store:
-                    raise error.Abort(_('Parent SHA-1 not present in Git'
-                                        'repo: %s' % git_sha))
+                    raise error.Abort(_(b'Parent SHA-1 not present in Git'
+                                        b'repo: %s' % git_sha))
 
                 commit.parents.append(git_sha)
 
         commit.message, extra = self.get_git_message_and_extra(ctx)
         commit.extra.extend(extra)
 
-        if 'encoding' in extra:
-            commit.encoding = extra['encoding']
-        if 'gpgsig' in extra:
-            commit.gpgsig = extra['gpgsig']
+        if b'encoding' in extra:
+            commit.encoding = extra[b'encoding']
+        if b'gpgsig' in extra:
+            commit.gpgsig = extra[b'gpgsig']
 
         for obj, nodeid in exporter.update_changeset(ctx):
             if obj.id not in self.git.object_store:
@@ -607,7 +607,7 @@ class GitHandler(object):
         tree_sha = exporter.root_tree_sha
 
         if tree_sha not in self.git.object_store:
-            raise error.Abort(_('Tree SHA-1 not present in Git repo: %s' %
+            raise error.Abort(_(b'Tree SHA-1 not present in Git repo: %s' %
                                 tree_sha))
 
         commit.tree = tree_sha
@@ -668,7 +668,7 @@ class GitHandler(object):
         >>> g('Typo in hgrc >but.hg-git@handles.it.gracefully>')
         'Typo in hgrc ?but.hg-git@handles.it.gracefully'
         """
-        return RE_GIT_SANITIZE_AUTHOR.sub('?', name.lstrip('< ').rstrip('> '))
+        return RE_GIT_SANITIZE_AUTHOR.sub(b'?', name.lstrip(b'< ').rstrip(b'> '))
 
     def get_git_author(self, ctx):
         # hg authors might not have emails
@@ -684,34 +684,34 @@ class GitHandler(object):
             name = self.get_valid_git_username_email(a.group(1))
             email = self.get_valid_git_username_email(a.group(2))
             if a.group(3) is not None and len(a.group(3)) != 0:
-                name += ' ext:(' + urllib.quote(a.group(3)) + ')'
-            author = '%s <%s>' \
+                name += b' ext:(' + urllib.quote(a.group(3)) + b')'
+            author = b'%s <%s>'\
                      % (self.get_valid_git_username_email(name),
-                        self.get_valid_git_username_email(email))
-        elif '@' in author:
-            author = '%s <%s>' \
+                         self.get_valid_git_username_email(email))
+        elif b'@' in author:
+            author = b'%s <%s>'\
                      % (self.get_valid_git_username_email(author),
-                        self.get_valid_git_username_email(author))
+                         self.get_valid_git_username_email(author))
         else:
-            author = self.get_valid_git_username_email(author) + ' <none@none>'
+            author = self.get_valid_git_username_email(author) + b' <none@none>'
 
-        if 'author' in ctx.extra():
-            author = "".join(apply_delta(author, ctx.extra()['author']))
+        if b'author' in ctx.extra():
+            author = b"".join(apply_delta(author, ctx.extra()[b'author']))
 
         return author
 
     def get_git_parents(self, ctx):
         def is_octopus_part(ctx):
-            olist = ('octopus', 'octopus-done')
-            return ctx.extra().get('hg-git', None) in olist
+            olist = (b'octopus', b'octopus-done')
+            return ctx.extra().get(b'hg-git', None) in olist
 
         parents = []
-        if ctx.extra().get('hg-git', None) == 'octopus-done':
+        if ctx.extra().get(b'hg-git', None) == b'octopus-done':
             # implode octopus parents
             part = ctx
             while is_octopus_part(part):
                 (p1, p2) = part.parents()
-                assert ctx.extra().get('hg-git', None) != 'octopus'
+                assert ctx.extra().get(b'hg-git', None) != b'octopus'
                 parents.append(p1)
                 part = p2
             parents.append(p2)
@@ -723,20 +723,20 @@ class GitHandler(object):
     def get_git_message_and_extra(self, ctx):
         extra = ctx.extra()
 
-        message = ctx.description() + "\n"
-        if 'message' in extra:
-            message = "".join(apply_delta(message, extra['message']))
+        message = ctx.description() + b"\n"
+        if b'message' in extra:
+            message = b"".join(apply_delta(message, extra[b'message']))
 
         # HG EXTRA INFORMATION
 
         # test only -- do not document this!
-        extra_in_message = compat.config(self.ui, 'bool', 'git',
-                                         'debugextrainmessage')
-        extra_message = ''
+        extra_in_message = compat.config(self.ui, b'bool', b'git',
+                                         b'debugextrainmessage')
+        extra_message = b''
         git_extra = []
-        if ctx.branch() != 'default':
+        if ctx.branch() != b'default':
             # we always store the branch in the extra message
-            extra_message += "branch : " + ctx.branch() + "\n"
+            extra_message += b"branch : " + ctx.branch() + b"\n"
 
         # Git native extra items always come first, followed by hg renames,
         # followed by hg extra keys
@@ -751,7 +751,7 @@ class GitHandler(object):
         for i, field, value in git_extraitems:
             git_extra.append((urllib.unquote(field), urllib.unquote(value)))
 
-        if extra.get('hg-git-rename-source', None) != 'git':
+        if extra.get(b'hg-git-rename-source', None) != b'git':
             renames = []
             for f in ctx.files():
                 if f not in ctx.manifest():
@@ -763,38 +763,38 @@ class GitHandler(object):
             if renames:
                 for oldfile, newfile in renames:
                     if extra_in_message:
-                        extra_message += ("rename : " + oldfile + " => " +
-                                          newfile + "\n")
+                        extra_message += (b"rename : " + oldfile + b" => " +
+                                          newfile + b"\n")
                     else:
-                        spec = '%s:%s' % (urllib.quote(oldfile),
-                                          urllib.quote(newfile))
-                        git_extra.append(('HG:rename', spec))
+                        spec = b'%s:%s' % (urllib.quote(oldfile),
+                                           urllib.quote(newfile))
+                        git_extra.append((b'HG:rename', spec))
 
         # hg extra items always go at the end
         extraitems = extra.items()
         extraitems.sort()
         for key, value in extraitems:
-            if key in ('author', 'committer', 'encoding', 'message', 'branch',
-                       'hg-git', 'hg-git-rename-source'):
+            if key in (b'author', b'committer', b'encoding', b'message', b'branch',
+                       b'hg-git', b'hg-git-rename-source'):
                 continue
             else:
                 if extra_in_message:
-                    extra_message += ("extra : " + key + " : " +
-                                      urllib.quote(value) + "\n")
+                    extra_message += (b"extra : " + key + b" : " +
+                                      urllib.quote(value) + b"\n")
                 else:
-                    spec = '%s:%s' % (urllib.quote(key),
-                                      urllib.quote(value))
-                    git_extra.append(('HG:extra', spec))
+                    spec = b'%s:%s' % (urllib.quote(key),
+                                       urllib.quote(value))
+                    git_extra.append((b'HG:extra', spec))
 
         if extra_message:
-            message += "\n--HG--\n" + extra_message
+            message += b"\n--HG--\n" + extra_message
 
-        if (extra.get('hg-git-rename-source', None) != 'git' and not
-            extra_in_message and not git_extra and extra_message == ''):
+        if (extra.get(b'hg-git-rename-source', None) != b'git' and not
+            extra_in_message and not git_extra and extra_message == b''):
             # We need to store this if no other metadata is stored. This
             # indicates that when reimporting the commit into Mercurial we'll
             # know not to detect renames.
-            git_extra.append(('HG:rename-source', 'hg'))
+            git_extra.append((b'HG:rename-source', b'hg'))
 
         return message, git_extra
 
@@ -808,26 +808,26 @@ class GitHandler(object):
         # import each of the commits, oldest first
         total = len(commits)
         if total:
-            self.ui.status(_("importing git objects into hg\n"))
+            self.ui.status(_(b"importing git objects into hg\n"))
         else:
-            self.ui.status(_("no changes found\n"))
+            self.ui.status(_(b"no changes found\n"))
 
-        mapsavefreq = compat.config(self.ui, 'int', 'hggit',
-                                    'mapsavefrequency')
-        with compat.makeprogress(self.ui, 'importing', unit='commits', total=total) as progress:
+        mapsavefreq = compat.config(self.ui, b'int', b'hggit',
+                                    b'mapsavefrequency')
+        with compat.makeprogress(self.ui, b'importing', unit=b'commits', total=total) as progress:
             for i, csha in enumerate(commits):
                 progress.update(i)
                 commit = commit_cache[csha]
                 self.import_git_commit(commit)
                 if mapsavefreq and i % mapsavefreq == 0:
-                    self.ui.debug(_("saving mapfile\n"))
+                    self.ui.debug(_(b"saving mapfile\n"))
                     self.save_map(self.map_file)
 
         # TODO if the tags cache is used, remove any dangling tag references
         return total
 
     def import_git_commit(self, commit):
-        self.ui.debug(_("importing: %s\n") % commit.id)
+        self.ui.debug(_(b"importing: %s\n") % commit.id)
 
         detect_renames = False
         (strip_message, hg_renames,
@@ -839,7 +839,7 @@ class GitHandler(object):
             # renames detected from Git. This is because we export an extra
             # 'HG:rename-source' Git parameter when this isn't set, which will
             # break bidirectionality.
-            extra['hg-git-rename-source'] = 'git'
+            extra[b'hg-git-rename-source'] = b'git'
         else:
             renames = hg_renames
 
@@ -847,8 +847,8 @@ class GitHandler(object):
 
         for parent in gparents:
             if parent not in self.repo:
-                raise error.Abort(_('you appear to have run strip - '
-                                    'please run hg git-cleanup'))
+                raise error.Abort(_(b'you appear to have run strip - '
+                                    b'please run hg git-cleanup'))
 
         # get a list of the changed, added, removed files and gitlinks
         files, gitlinks, git_renames = self.get_files_changed(commit,
@@ -864,12 +864,12 @@ class GitHandler(object):
         # - .hgsubstate from hg parent
         # - changes in gitlinks
         hgsubstate = util.parse_hgsubstate(
-            self.git_file_readlines(git_commit_tree, '.hgsubstate'))
-        parentsubdata = ''
+            self.git_file_readlines(git_commit_tree, b'.hgsubstate'))
+        parentsubdata = b''
         if gparents:
             p1ctx = self.repo[gparents[0]]
-            if '.hgsubstate' in p1ctx:
-                parentsubdata = p1ctx.filectx('.hgsubstate').data()
+            if b'.hgsubstate' in p1ctx:
+                parentsubdata = p1ctx.filectx(b'.hgsubstate').data()
                 parentsubdata = parentsubdata.splitlines()
                 parentsubstate = util.parse_hgsubstate(parentsubdata)
                 for path, sha in compat.iteritems(parentsubstate):
@@ -881,29 +881,29 @@ class GitHandler(object):
                 hgsubstate[path] = sha
         # in case .hgsubstate wasn't among changed files
         # force its inclusion if it wasn't already deleted
-        hgsubdeleted = files.get('.hgsubstate')
+        hgsubdeleted = files.get(b'.hgsubstate')
         if hgsubdeleted:
             hgsubdeleted = hgsubdeleted[0]
         if hgsubdeleted or (not hgsubstate and parentsubdata):
-            files['.hgsubstate'] = True, None, None
+            files[b'.hgsubstate'] = True, None, None
         elif util.serialize_hgsubstate(hgsubstate) != parentsubdata:
-            files['.hgsubstate'] = False, 0o100644, None
+            files[b'.hgsubstate'] = False, 0o100644, None
 
         # Analyze .hgsub and merge with .gitmodules
         hgsub = None
         gitmodules = self.parse_gitmodules(git_commit_tree)
         if gitmodules:
             hgsub = util.parse_hgsub(self.git_file_readlines(git_commit_tree,
-                                                             '.hgsub'))
+                                                             b'.hgsub'))
             for (sm_path, sm_url, sm_name) in gitmodules:
-                hgsub[sm_path] = '[git]' + sm_url
-            files['.hgsub'] = (False, 0o100644, None)
-        elif (commit.parents and '.gitmodules' in
+                hgsub[sm_path] = b'[git]' + sm_url
+            files[b'.hgsub'] = (False, 0o100644, None)
+        elif (commit.parents and b'.gitmodules' in
               self.git[self.git[commit.parents[0]].tree]):
             # no .gitmodules in this commit, however present in the parent
             # mark its hg counterpart as deleted (assuming .hgsub is there
             # due to the same import_git_commit process
-            files['.hgsub'] = (True, 0o100644, None)
+            files[b'.hgsub'] = (True, 0o100644, None)
 
         date = (commit.author_time, -commit.author_timezone)
         text = strip_message
@@ -914,22 +914,22 @@ class GitHandler(object):
         except UnicodeDecodeError:
             text = self.decode_guess(text, commit.encoding)
 
-        text = '\n'.join([l.rstrip() for l in text.splitlines()]).strip('\n')
-        if text + '\n' != origtext:
-            extra['message'] = create_delta(text + '\n', origtext)
+        text = b'\n'.join([l.rstrip() for l in text.splitlines()]).strip(b'\n')
+        if text + b'\n' != origtext:
+            extra[b'message'] = create_delta(text + b'\n', origtext)
 
         author = commit.author
 
         # convert extra data back to the end
-        if ' ext:' in commit.author:
+        if b' ext:' in commit.author:
             m = RE_GIT_AUTHOR_EXTRA.match(commit.author)
             if m:
                 name = m.group(1)
                 ex = urllib.unquote(m.group(2))
                 email = m.group(3)
-                author = name + ' <' + email + '>' + ex
+                author = name + b' <' + email + b'>' + ex
 
-        if ' <none@none>' in commit.author:
+        if b' <none@none>' in commit.author:
             author = commit.author[:-12]
 
         try:
@@ -937,7 +937,7 @@ class GitHandler(object):
         except UnicodeDecodeError:
             origauthor = author
             author = self.decode_guess(author, commit.encoding)
-            extra['author'] = create_delta(author, origauthor)
+            extra[b'author'] = create_delta(author, origauthor)
 
         oldenc = self.swap_out_encoding()
 
@@ -965,11 +965,11 @@ class GitHandler(object):
                     return None
 
                 if not sha:  # indicates there's no git counterpart
-                    e = ''
+                    e = b''
                     copied_path = None
-                    if '.hgsubstate' == f:
+                    if b'.hgsubstate' == f:
                         data = util.serialize_hgsubstate(hgsubstate)
-                    elif '.hgsub' == f:
+                    elif b'.hgsub' == f:
                         data = util.serialize_hgsub(hgsub)
                 else:
                     data = self.git[sha].data
@@ -986,8 +986,8 @@ class GitHandler(object):
                     copied_path = copied[0]
 
             return compat.memfilectx(self.repo, memctx, f, data,
-                                     islink='l' in e,
-                                     isexec='x' in e,
+                                     islink=b'l' in e,
+                                     isexec=b'x' in e,
                                      copysource=copied_path)
 
         p1, p2 = (nullid, nullid)
@@ -998,7 +998,7 @@ class GitHandler(object):
             def commit_octopus(p1, p2):
                 ctx = context.memctx(self.repo, (p1, p2), text, list(files) +
                                      findconvergedfiles(p1, p2), getfilectx,
-                                     author, date, {'hg-git': 'octopus'})
+                                     author, date, {b'hg-git': b'octopus'})
                 # See comment below about setting substate to None.
                 ctx.substate = None
                 return hex(self.repo.commitctx(ctx))
@@ -1015,24 +1015,24 @@ class GitHandler(object):
 
         # if named branch, add to extra
         if hg_branch:
-            extra['branch'] = hg_branch
+            extra[b'branch'] = hg_branch
         else:
-            extra['branch'] = 'default'
+            extra[b'branch'] = b'default'
 
         # if committer is different than author, add it to extra
-        if commit.author != commit.committer \
-           or commit.author_time != commit.commit_time \
+        if commit.author != commit.committer\
+           or commit.author_time != commit.commit_time\
            or commit.author_timezone != commit.commit_timezone:
-            extra['committer'] = "%s %d %d" % (
+            extra[b'committer'] = b"%s %d %d" % (
                 commit.committer, commit.commit_time, -commit.commit_timezone)
 
         if commit.encoding:
-            extra['encoding'] = commit.encoding
+            extra[b'encoding'] = commit.encoding
         if commit.gpgsig:
-            extra['gpgsig'] = commit.gpgsig
+            extra[b'gpgsig'] = commit.gpgsig
 
         if octopus:
-            extra['hg-git'] = 'octopus-done'
+            extra[b'hg-git'] = b'octopus-done'
 
         ctx = context.memctx(self.repo, (p1, p2), text,
                              list(files) + findconvergedfiles(p1, p2),
@@ -1061,7 +1061,7 @@ class GitHandler(object):
         change_totals = {}
 
         def changed(refs):
-            self.ui.status(_("searching for changes\n"))
+            self.ui.status(_(b"searching for changes\n"))
             old_refs.update(refs)
             all_exportable = self.get_exportable()
             if revs is None:
@@ -1070,8 +1070,8 @@ class GitHandler(object):
                 exportable = {}
                 for rev in (hex(r) for r in revs):
                     if rev not in all_exportable:
-                        raise error.Abort("revision %s cannot be pushed since"
-                                          " it doesn't have a bookmark" %
+                        raise error.Abort(b"revision %s cannot be pushed since"
+                                          b" it doesn't have a bookmark" %
                                           self.repo[rev])
                     exportable[rev] = all_exportable[rev]
             return self.get_changed_refs(refs, exportable, force)
@@ -1086,12 +1086,12 @@ class GitHandler(object):
                 if isinstance(o, Commit):
                     commits.append(sha)
             commit_count = len(commits)
-            self.ui.note(_("%d commits found\n") % commit_count)
+            self.ui.note(_(b"%d commits found\n") % commit_count)
             if commit_count > 0:
-                self.ui.debug(_("list of commits:\n"))
+                self.ui.debug(_(b"list of commits:\n"))
                 for commit in commits:
-                    self.ui.debug("%s\n" % commit)
-                self.ui.status(_("adding objects\n"))
+                    self.ui.debug(b"%s\n" % commit)
+                self.ui.status(_(b"adding objects\n"))
             return self.git.object_store.generate_pack_data(
                 have, want, progress=progress, ofs_delta=ofs_delta)
 
@@ -1099,30 +1099,30 @@ class GitHandler(object):
             # dulwich (perhaps git?) wraps remote output at a fixed width but
             # signifies the end of transmission with a double new line
             global CALLBACK_BUFFER
-            if remote_info and not remote_info.endswith('\n\n'):
+            if remote_info and not remote_info.endswith(b'\n\n'):
                 CALLBACK_BUFFER += remote_info
                 return
 
             remote_info = CALLBACK_BUFFER + remote_info
-            CALLBACK_BUFFER = ''
+            CALLBACK_BUFFER = b''
             if not remote_info:
-                remote_info = '\n'
+                remote_info = b'\n'
 
-            for line in remote_info[:-1].split('\n'):
-                self.ui.status(_("remote: %s\n") % line)
+            for line in remote_info[:-1].split(b'\n'):
+                self.ui.status(_(b"remote: %s\n") % line)
 
         try:
             new_refs = client.send_pack(path, changed, genpack,
                                         progress=callback)
             if len(change_totals) > 0:
-                self.ui.status(_("added %d commits with %d trees"
-                                 " and %d blobs\n") %
+                self.ui.status(_(b"added %d commits with %d trees"
+                                 b" and %d blobs\n") %
                                (change_totals.get(Commit, 0),
                                 change_totals.get(Tree, 0),
                                 change_totals.get(Blob, 0)))
             return old_refs, new_refs
         except (HangupException, GitProtocolError) as e:
-            raise error.Abort(_("git remote error: ") + str(e))
+            raise error.Abort(_(b"git remote error: ") + str(e))
 
     def get_changed_refs(self, refs, exportable, force):
         new_refs = refs.copy()
@@ -1134,25 +1134,25 @@ class GitHandler(object):
         # capabilities^{} key when the dict should have been
         # empty. That check can probably be removed at some point in
         # the future.)
-        if not refs or refs.keys()[0] == 'capabilities^{}':
+        if not refs or refs.keys()[0] == b'capabilities^{}':
             if not exportable:
-                tip = self.repo.lookup('tip')
+                tip = self.repo.lookup(b'tip')
                 if tip != nullid:
-                    if 'capabilities^{}' in new_refs:
-                        del new_refs['capabilities^{}']
+                    if b'capabilities^{}' in new_refs:
+                        del new_refs[b'capabilities^{}']
                     tip = hex(tip)
-                    commands.bookmark(self.ui, self.repo, 'master',
+                    commands.bookmark(self.ui, self.repo, b'master',
                                       rev=tip, force=True)
-                    bookmarks.activate(self.repo, 'master')
-                    new_refs['refs/heads/master'] = self.map_git_get(tip)
+                    bookmarks.activate(self.repo, b'master')
+                    new_refs[b'refs/heads/master'] = self.map_git_get(tip)
 
         # mapped nodes might be hidden
         unfiltered = self.repo.unfiltered()
         for rev, rev_refs in compat.iteritems(exportable):
             ctx = self.repo[rev]
             if not rev_refs:
-                raise error.Abort("revision %s cannot be pushed since"
-                                  " it doesn't have a bookmark" % ctx)
+                raise error.Abort(b"revision %s cannot be pushed since"
+                                  b" it doesn't have a bookmark" % ctx)
 
             # Check if the tags the server is advertising are annotated tags,
             # by attempting to retrieve it from the our git repo, and building
@@ -1185,15 +1185,15 @@ class GitHandler(object):
                     if rctx.ancestor(ctx) == rctx or force:
                         new_refs[ref] = self.map_git_get(ctx.hex())
                     else:
-                        raise error.Abort("pushing %s overwrites %s"
+                        raise error.Abort(b"pushing %s overwrites %s"
                                           % (ref, ctx))
                 elif ref in uptodate_annotated_tags:
                     # we already have the annotated tag.
                     pass
                 else:
                     raise error.Abort(
-                        "branch '%s' changed on the server, "
-                        "please pull and merge before pushing" % ref)
+                        b"branch '%s' changed on the server, "
+                        b"please pull and merge before pushing" % ref)
 
         return new_refs
 
@@ -1205,8 +1205,8 @@ class GitHandler(object):
         # can't just do 'refs/' here because the tag class doesn't have a
         # parents function for walking, and older versions of dulwich don't
         # like that.
-        haveheads = self.git.refs.as_dict('refs/remotes/').values()
-        haveheads.extend(self.git.refs.as_dict('refs/heads/').values())
+        haveheads = self.git.refs.as_dict(b'refs/remotes/').values()
+        haveheads.extend(self.git.refs.as_dict(b'refs/heads/').values())
         graphwalker = self.git.get_graph_walker(heads=haveheads)
 
         def determine_wants(refs):
@@ -1234,7 +1234,7 @@ class GitHandler(object):
 
             return ret
         except (HangupException, GitProtocolError) as e:
-            raise error.Abort(_("git remote error: ") + str(e))
+            raise error.Abort(_(b"git remote error: ") + str(e))
 
     # REFERENCES HANDLING
 
@@ -1247,10 +1247,10 @@ class GitHandler(object):
         if heads is not None:
             # contains pairs of ('refs/(heads|tags|...)/foo', 'foo')
             # if ref is just '<foo>', then we get ('foo', 'foo')
-            stripped_refs = [(r, r[r.find('/', r.find('/') + 1) + 1:]) for r in
+            stripped_refs = [(r, r[r.find(b'/', r.find(b'/') + 1) + 1:]) for r in
                              refs]
             for h in heads:
-                if h.endswith('/*'):
+                if h.endswith(b'/*'):
                     prefix = h[:-1]  # include the / but not the *
                     r = [pair[0] for pair in stripped_refs
                          if pair[1].startswith(prefix)]
@@ -1259,18 +1259,18 @@ class GitHandler(object):
                 else:
                     r = [pair[0] for pair in stripped_refs if pair[1] == h]
                     if not r:
-                        raise error.Abort("ref %s not found on remote server"
+                        raise error.Abort(b"ref %s not found on remote server"
                                           % h)
                     elif len(r) == 1:
                         filteredrefs.append(r[0])
                     else:
-                        raise error.Abort("ambiguous reference %s: %r"
+                        raise error.Abort(b"ambiguous reference %s: %r"
                                           % (h, r))
         else:
             for ref, sha in compat.iteritems(refs):
-                if (not ref.endswith('^{}') and
-                    (ref.startswith('refs/heads/') or
-                     ref.startswith('refs/tags/'))):
+                if (not ref.endswith(b'^{}') and
+                    (ref.startswith(b'refs/heads/') or
+                     ref.startswith(b'refs/tags/'))):
                     filteredrefs.append(ref)
             filteredrefs.sort()
 
@@ -1283,7 +1283,7 @@ class GitHandler(object):
         '''filter refs by minimum date
 
         This only works for refs that are available locally.'''
-        min_date = compat.config(self.ui, 'string', 'git', 'mindate')
+        min_date = compat.config(self.ui, b'string', b'git', b'mindate')
         if min_date is None:
             return refs
 
@@ -1311,22 +1311,22 @@ class GitHandler(object):
 
     def export_hg_tags(self):
         for tag, sha in compat.iteritems(self.repo.tags()):
-            if self.repo.tagtype(tag) in ('global', 'git'):
-                tag = tag.replace(' ', '_')
+            if self.repo.tagtype(tag) in (b'global', b'git'):
+                tag = tag.replace(b' ', b'_')
                 target = self.map_git_get(hex(sha))
                 if target is not None:
-                    tag_refname = 'refs/tags/' + tag
+                    tag_refname = b'refs/tags/' + tag
                     if(check_ref_format(tag_refname)):
                         self.git.refs[tag_refname] = target
                         self.tags[tag] = hex(sha)
                     else:
-                        self.repo.ui.warn('Skipping export of tag %s because '
-                                          'it has invalid name as a git '
-                                          'refname.\n' % tag)
+                        self.repo.ui.warn(b'Skipping export of tag %s because '
+                                          b'it has invalid name as a git '
+                                          b'refname.\n' % tag)
                 else:
                     self.repo.ui.warn(
-                        'Skipping export of tag %s because it '
-                        'has no matching git revision.\n' % tag)
+                        b'Skipping export of tag %s because it '
+                        b'has no matching git revision.\n' % tag)
 
     def _filter_for_bookmarks(self, bms):
         if not self.branch_bookmark_suffix:
@@ -1355,9 +1355,9 @@ class GitHandler(object):
 
         bms = self.repo._bookmarks
         for filtered_bm, bm in self._filter_for_bookmarks(bms):
-            res[hex(bms[bm])].heads.add('refs/heads/' + filtered_bm)
+            res[hex(bms[bm])].heads.add(b'refs/heads/' + filtered_bm)
         for tag, sha in compat.iteritems(self.tags):
-            res[sha].tags.add('refs/tags/' + tag)
+            res[sha].tags.add(b'refs/tags/' + tag)
         return res
 
     def import_tags(self, refs):
@@ -1367,14 +1367,14 @@ class GitHandler(object):
         repotags = self.repo.tags()
         for k in keys[:]:
             ref_name = k
-            parts = k.split('/')
-            if parts[0] == 'refs' and parts[1] == 'tags':
-                ref_name = "/".join([v for v in parts[2:]])
+            parts = k.split(b'/')
+            if parts[0] == b'refs' and parts[1] == b'tags':
+                ref_name = b"/".join([v for v in parts[2:]])
                 # refs contains all the refs in the server, not just
                 # the ones we are pulling
                 if refs[k] not in self.git.object_store:
                     continue
-                if ref_name[-3:] == '^{}':
+                if ref_name[-3:] == b'^{}':
                     ref_name = ref_name[:-3]
                 if ref_name not in repotags:
                     obj = self.git.get_object(refs[k])
@@ -1398,9 +1398,9 @@ class GitHandler(object):
             bms = self.repo._bookmarks
 
             heads = dict([(ref[11:], refs[ref]) for ref in refs
-                          if ref.startswith('refs/heads/')])
+                          if ref.startswith(b'refs/heads/')])
 
-            suffix = self.branch_bookmark_suffix or ''
+            suffix = self.branch_bookmark_suffix or b''
             changes = []
             for head, sha in compat.iteritems(heads):
                 # refs contains all the refs in the server, not just
@@ -1422,8 +1422,8 @@ class GitHandler(object):
                 util.updatebookmarks(self.repo, changes)
 
         except AttributeError:
-            self.ui.warn(_('creating bookmarks failed, do you have'
-                         ' bookmarks enabled?\n'))
+            self.ui.warn(_(b'creating bookmarks failed, do you have'
+                         b' bookmarks enabled?\n'))
 
     def update_remote_branches(self, remote_name, refs):
         remote_refs = self.remote_refs
@@ -1431,20 +1431,20 @@ class GitHandler(object):
         # all entries matching this remote from our refs list now so
         # that we avoid any stale refs hanging around forever
         for t in list(remote_refs):
-            if t.startswith(remote_name + '/'):
+            if t.startswith(remote_name + b'/'):
                 del remote_refs[t]
         for ref_name, sha in compat.iteritems(refs):
-            if ref_name.startswith('refs/heads'):
+            if ref_name.startswith(b'refs/heads'):
                 hgsha = self.map_hg_get(sha)
                 if hgsha is None or hgsha not in self.repo:
                     continue
                 head = ref_name[11:]
-                remote_refs['/'.join((remote_name, head))] = bin(hgsha)
+                remote_refs[b'/'.join((remote_name, head))] = bin(hgsha)
                 # TODO(durin42): what is this doing?
-                new_ref = 'refs/remotes/%s/%s' % (remote_name, head)
+                new_ref = b'refs/remotes/%s/%s' % (remote_name, head)
                 self.git.refs[new_ref] = sha
-            elif (ref_name.startswith('refs/tags') and not
-                  ref_name.endswith('^{}')):
+            elif (ref_name.startswith(b'refs/tags') and not
+                  ref_name.endswith(b'^{}')):
                 self.git.refs[ref_name] = sha
 
     # UTILITY FUNCTIONS
@@ -1452,17 +1452,17 @@ class GitHandler(object):
     def convert_git_int_mode(self, mode):
         # TODO: make these into constants
         convert = {
-            0o100644: '',
-            0o100755: 'x',
-            0o120000: 'l'
+            0o100644: b'',
+            0o100755: b'x',
+            0o120000: b'l'
         }
         if mode in convert:
             return convert[mode]
-        return ''
+        return b''
 
     def get_file(self, commit, f):
         otree = self.git.tree(commit.tree)
-        parts = f.split('/')
+        parts = f.split(b'/')
         for part in parts:
             (mode, sha) = otree[part]
             obj = self.git.get_object(sha)
@@ -1568,21 +1568,21 @@ class GitHandler(object):
     @hgutil.propertycache
     def _rename_detector(self):
         # disabled by default to avoid surprises
-        similarity = compat.config(self.ui, 'int', 'git', 'similarity')
+        similarity = compat.config(self.ui, b'int', b'git', b'similarity')
         if similarity < 0 or similarity > 100:
-            raise error.Abort(_('git.similarity must be between 0 and 100'))
+            raise error.Abort(_(b'git.similarity must be between 0 and 100'))
         if similarity == 0:
             return None
 
         # default is borrowed from Git
-        max_files = compat.config(self.ui, 'int', 'git', 'renamelimit')
+        max_files = compat.config(self.ui, b'int', b'git', b'renamelimit')
         if max_files < 0:
-            raise error.Abort(_('git.renamelimit must be non-negative'))
+            raise error.Abort(_(b'git.renamelimit must be non-negative'))
         if max_files == 0:
             max_files = None
 
-        find_copies_harder = compat.config(self.ui, 'bool', 'git',
-                                           'findcopiesharder')
+        find_copies_harder = compat.config(self.ui, b'bool', b'git',
+                                           b'findcopiesharder')
         return diff_tree.RenameDetector(self.git.object_store,
                                         rename_threshold=similarity,
                                         max_files=max_files,
@@ -1597,7 +1597,7 @@ class GitHandler(object):
         """
         rv = []
         try:
-            unused_mode, gitmodules_sha = tree_obj['.gitmodules']
+            unused_mode, gitmodules_sha = tree_obj[b'.gitmodules']
         except KeyError:
             return rv
         gitmodules_content = self.git[gitmodules_sha].data
@@ -1605,9 +1605,9 @@ class GitHandler(object):
         tt = dul_config.ConfigFile.from_file(fo)
         for section in tt.keys():
             section_kind, section_name = section
-            if section_kind == 'submodule':
-                sm_path = tt.get(section, 'path')
-                sm_url = tt.get(section, 'url')
+            if section_kind == b'submodule':
+                sm_path = tt.get(section, b'path')
+                sm_url = tt.get(section, b'url')
                 rv.append((sm_path, sm_url, section_name))
         return rv
 
@@ -1628,19 +1628,19 @@ class GitHandler(object):
             return names[0]
 
     def audit_hg_path(self, path):
-        if '.hg' in path.split(os.path.sep):
-            if compat.config(self.ui, 'bool', 'git', 'blockdothg'):
+        if b'.hg' in path.split(os.path.sep):
+            if compat.config(self.ui, b'bool', b'git', b'blockdothg'):
                 raise error.Abort(
-                    ('Refusing to import problematic path %r' % path),
-                    hint=("Mercurial cannot check out paths inside nested " +
-                          "repositories; if you need to continue, then set " +
-                          "'[git] blockdothg = false' in your hgrc."))
-            self.ui.warn(('warning: path %r is within a nested repository, ' +
-                          'which Mercurial cannot check out.\n')
+                    (b'Refusing to import problematic path %r' % path),
+                    hint=(b"Mercurial cannot check out paths inside nested " +
+                          b"repositories; if you need to continue, then set " +
+                          b"'[git] blockdothg = false' in your hgrc."))
+            self.ui.warn((b'warning: path %r is within a nested repository, ' +
+                          b'which Mercurial cannot check out.\n')
                          % path)
 
     # Stolen from hgsubversion
-    def swap_out_encoding(self, new_encoding='UTF-8'):
+    def swap_out_encoding(self, new_encoding=b'UTF-8'):
         try:
             from mercurial import encoding
             old = encoding.encoding
@@ -1696,33 +1696,33 @@ class GitHandler(object):
 
         # test for raw git ssh uri here so that we can reuse the logic below
         if util.isgitsshuri(uri):
-            uri = "git+ssh://" + uri
+            uri = b"git+ssh://" + uri
 
         git_match = RE_GIT_URI.match(uri)
         if git_match:
             res = git_match.groupdict()
-            host, port, sepr = res['host'], res['port'], res['sepr']
+            host, port, sepr = res[b'host'], res[b'port'], res[b'sepr']
             transport = client.TCPGitClient
-            if 'ssh' in res['scheme']:
+            if b'ssh' in res[b'scheme']:
                 util.checksafessh(host)
                 transport = client.SSHGitClient
-            path = res['path']
-            if sepr == '/' and not path.startswith('~'):
-                path = '/' + path
+            path = res[b'path']
+            if sepr == b'/' and not path.startswith(b'~'):
+                path = b'/' + path
             # strip trailing slash for heroku-style URLs
             # ssh+git://git@heroku.com:project.git/
-            if sepr == ':' and path.endswith('.git/'):
-                path = path.rstrip('/')
+            if sepr == b':' and path.endswith(b'.git/'):
+                path = path.rstrip(b'/')
             if port:
                 client.port = port
 
             return transport(host, port=port), path
 
-        if uri.startswith('git+http://') or uri.startswith('git+https://'):
+        if uri.startswith(b'git+http://') or uri.startswith(b'git+https://'):
             uri = uri[4:]
 
-        if uri.startswith('http://') or uri.startswith('https://'):
-            ua = 'git/20x6 (hg-git ; uses dulwich and hg ; like git-core)'
+        if uri.startswith(b'http://') or uri.startswith(b'https://'):
+            ua = b'git/20x6 (hg-git ; uses dulwich and hg ; like git-core)'
             config = dul_config.ConfigDict()
             config.set(b'http', b'useragent', ua)
             return client.HttpGitClient(uri, config=config), uri

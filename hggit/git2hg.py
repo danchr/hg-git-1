@@ -32,7 +32,7 @@ def find_incoming(git_object_store, git_map, refs):
         for ref, sha in compat.iteritems(refs):
             # refs could contain refs on the server that we haven't pulled down
             # the objects for; also make sure it's a sha and not a symref
-            if ref != 'HEAD' and sha in git_object_store:
+            if ref != b'HEAD' and sha in git_object_store:
                 obj = git_object_store[sha]
                 while isinstance(obj, Tag):
                     obj_type, sha = obj.object
@@ -89,7 +89,7 @@ class GitIncomingResult(object):
 
 
 def extract_hg_metadata(message, git_extra):
-    split = message.split("\n--HG--\n", 1)
+    split = message.split(b"\n--HG--\n", 1)
     # Renames are explicitly stored in Mercurial but inferred in Git. For
     # commits that originated in Git we'd like to optionally infer rename
     # information to store in Mercurial, but for commits that originated in
@@ -113,41 +113,41 @@ def extract_hg_metadata(message, git_extra):
     if len(split) == 2:
         renames = {}
         message, meta = split
-        lines = meta.split("\n")
+        lines = meta.split(b"\n")
         for line in lines:
-            if line == '':
+            if line == b'':
                 continue
 
-            if ' : ' not in line:
+            if b' : ' not in line:
                 break
-            command, data = line.split(" : ", 1)
+            command, data = line.split(b" : ", 1)
 
-            if command == 'rename':
-                before, after = data.split(" => ", 1)
+            if command == b'rename':
+                before, after = data.split(b" => ", 1)
                 renames[after] = before
-            if command == 'branch':
+            if command == b'branch':
                 branch = data
-            if command == 'extra':
-                k, v = data.split(" : ", 1)
+            if command == b'extra':
+                k, v = data.split(b" : ", 1)
                 extra[k] = urllib.unquote(v)
 
     git_fn = 0
     for field, data in git_extra:
-        if field.startswith('HG:'):
+        if field.startswith(b'HG:'):
             if renames is None:
                 renames = {}
             command = field[3:]
-            if command == 'rename':
-                before, after = data.split(':', 1)
+            if command == b'rename':
+                before, after = data.split(b':', 1)
                 renames[urllib.unquote(after)] = urllib.unquote(before)
-            elif command == 'extra':
-                k, v = data.split(':', 1)
+            elif command == b'extra':
+                k, v = data.split(b':', 1)
                 extra[urllib.unquote(k)] = urllib.unquote(v)
         else:
             # preserve ordering in Git by using an incrementing integer for
             # each field. Note that extra metadata in Git is an ordered list
             # of pairs.
-            hg_field = 'GIT%d-%s' % (git_fn, field)
+            hg_field = b'GIT%d-%s' % (git_fn, field)
             git_fn += 1
             extra[urllib.quote(hg_field)] = urllib.quote(data)
 

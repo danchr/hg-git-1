@@ -34,7 +34,7 @@ class overlaymanifest(object):
     def withflags(self):
         self.load()
         return set([path for path, flag in compat.iteritems(self._flags)
-                    if flag != ''])
+                    if flag != b''])
 
     def copy(self):
         return overlaymanifest(self.repo, self.tree.id)
@@ -55,24 +55,24 @@ class overlaymanifest(object):
 
         def hgflag(gitflag):
             if gitflag & 0o100:
-                return 'x'
+                return b'x'
             elif gitflag & 0o20000:
-                return 'l'
+                return b'l'
             else:
-                return ''
+                return b''
 
         def addtree(tree, dirname):
             for entry in compat.iteritems(tree):
                 if entry.mode & 0o40000:
                     # expand directory
                     subtree = self.repo.handler.git.get_object(entry.sha)
-                    addtree(subtree, dirname + entry.path + '/')
+                    addtree(subtree, dirname + entry.path + b'/')
                 else:
                     path = dirname + entry.path
                     self._map[path] = bin(entry.sha)
                     self._flags[path] = hgflag(entry.mode)
 
-        addtree(self.tree, '')
+        addtree(self.tree, b'')
 
     def matches(self, match):
         '''generate a new manifest filtered by the match argument'''
@@ -127,7 +127,7 @@ class overlaymanifest(object):
             m2flagget = m2._flags.get
 
         if match is None:
-            match = matchmod.always('', '')
+            match = matchmod.always(b'', b'')
         for fn, n1 in compat.iteritems(self):
             if not match(fn):
                 continue
@@ -135,7 +135,7 @@ class overlaymanifest(object):
             n2 = m2.get(fn, None)
             fl2 = m2flagget(fn)
             if n2 is None:
-                fl2 = ''
+                fl2 = b''
             if n1 != n2 or fl1 != fl2:
                 diff[fn] = ((n1, fl1), (n2, fl2))
             elif clean:
@@ -146,7 +146,7 @@ class overlaymanifest(object):
                 if not match(fn):
                     continue
                 fl2 = m2flagget(fn)
-                diff[fn] = ((None, ''), (n2, fl2))
+                diff[fn] = ((None, b''), (n2, fl2))
 
         return diff
 
@@ -163,7 +163,7 @@ def wrapmanifestdictdiff(orig, self, m2, match=None, clean=False):
         match = None
 
     kwargs = {
-        'clean': clean
+        b'clean': clean
     }
     # Older versions of mercurial don't support the match arg, so only add it
     # if it exists.
@@ -228,7 +228,7 @@ class overlaychangectx(context.changectx):
         # Since hg 4.6, context.changectx doesn't define self._repo,
         # but it is still used by self.obsolete() (and friends)
         # So, if the attribute wasn't found, fallback to _hgrepo
-        if name == '_repo':
+        if name == b'_repo':
             return self._hgrepo
         return super(overlaychangectx, self).__getattr__(name)
 
@@ -245,7 +245,7 @@ class overlaychangectx(context.changectx):
         return self.commit.author_time, self.commit.author_timezone
 
     def branch(self):
-        return 'default'
+        return b'default'
 
     def user(self):
         return self.commit.author
@@ -263,7 +263,7 @@ class overlaychangectx(context.changectx):
         cl = self.repo().changelog
         parents = cl.parents(cl.node(self._rev))
         if not parents:
-            return [self.repo()['null']]
+            return [self.repo()[b'null']]
         if parents[1] == nullid:
             parents = parents[:-1]
         return [self.repo()[sha] for sha in parents]
@@ -396,11 +396,11 @@ try:
         # Needed for 4.0, since __getitem__ did not redirect to get() in that
         # release.
         def __getitem__(self, node):
-            return self.get('', node)
+            return self.get(b'', node)
 
         def get(self, dir, node):
             if dir:
-                raise RuntimeError("hggit doesn't support treemanifests")
+                raise RuntimeError(b"hggit doesn't support treemanifests")
             if node == nullid:
                 return manifest.manifestctx()
             return overlaymanifestctx(self._repo, node)
@@ -414,7 +414,7 @@ class overlaychangelog(overlayrevlog):
         if isinstance(sha, int):
             sha = self.node(sha)
         if sha == nullid:
-            return (nullid, "", (0, 0), [], "", {})
+            return (nullid, b"", (0, 0), [], b"", {})
         try:
             return self.base.read(sha)
         except LookupError:
@@ -437,7 +437,7 @@ class overlayrepo(object):
         self.handler = handler
 
         self.changelog = overlaychangelog(self, handler.repo.changelog)
-        if util.safehasattr(handler.repo, 'manifest'):
+        if util.safehasattr(handler.repo, b'manifest'):
             self.manifest = overlayoldmanifestlog(self, handler.repo.manifest)
             # new as of mercurial 3.9+
             self.manifestlog = self.manifest
@@ -496,7 +496,7 @@ class overlayrepo(object):
                 r.gitoverlay = oldoverlay
 
     def status(self, *args, **kwargs):
-        return self._handlerhack('status', *args, **kwargs)
+        return self._handlerhack(b'status', *args, **kwargs)
 
     def node(self, n):
         """Returns an Hg or Git hash for the specified Git hash"""
@@ -520,7 +520,7 @@ class overlayrepo(object):
         return self.handler.repo.unfiltered()
 
     def _makemaps(self, commits, refs):
-        baserev = self.handler.repo['tip'].rev()
+        baserev = self.handler.repo[b'tip'].rev()
         self.revmap = {}
         self.nodemap = {}
         for i, n in enumerate(commits):
@@ -531,10 +531,10 @@ class overlayrepo(object):
         self.refmap = {}
         self.tagmap = {}
         for ref in refs:
-            if ref.startswith('refs/heads/'):
+            if ref.startswith(b'refs/heads/'):
                 refname = ref[11:]
                 self.refmap.setdefault(bin(refs[ref]), []).append(refname)
-            elif ref.startswith('refs/tags/'):
+            elif ref.startswith(b'refs/tags/'):
                 tagname = ref[10:]
                 self.tagmap.setdefault(bin(refs[ref]), []).append(tagname)
 

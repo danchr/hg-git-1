@@ -14,7 +14,7 @@ from . import util
 
 def generate_repo_subclass(baseclass):
     class hgrepo(baseclass):
-        if hgutil.safehasattr(localrepo.localrepository, 'pull'):
+        if hgutil.safehasattr(localrepo.localrepository, b'pull'):
             # Mercurial < 3.2
             @util.transform_notgit
             def pull(self, remote, heads=None, force=False):
@@ -23,7 +23,7 @@ def generate_repo_subclass(baseclass):
                 else:  # pragma: no cover
                     return super(hgrepo, self).pull(remote, heads, force)
 
-        if hgutil.safehasattr(localrepo.localrepository, 'push'):
+        if hgutil.safehasattr(localrepo.localrepository, b'push'):
             # Mercurial < 3.2
             # TODO figure out something useful to do with the newbranch param
             @util.transform_notgit
@@ -52,12 +52,12 @@ def generate_repo_subclass(baseclass):
                 if isinstance(tag, unicode):
                     tag = tag.encode('utf-8')
                 tags[tag] = bin(rev)
-                tagtypes[tag] = 'git'
+                tagtypes[tag] = b'git'
             for tag, rev in compat.iteritems(self.githandler.remote_refs):
                 if isinstance(tag, unicode):
                     tag = tag.encode('utf-8')
                 tags[tag] = rev
-                tagtypes[tag] = 'git-remote'
+                tagtypes[tag] = b'git-remote'
             tags.update(self.githandler.remote_refs)
             return (tags, tagtypes)
 

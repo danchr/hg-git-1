@@ -22,7 +22,7 @@ def gettimer(ui, opts=None):
     place instead of duplicating it in all performance command."""
 
     # enforce an idle period before execution to counteract power management
-    time.sleep(ui.configint("perf", "presleep", 1))
+    time.sleep(ui.configint(b"perf", b"presleep", 1))
 
     if opts is None:
         opts = {}
@@ -30,7 +30,7 @@ def gettimer(ui, opts=None):
     ui = ui.copy()
     ui.fout = ui.ferr
     # get a formatter
-    fm = ui.formatter('perf', opts)
+    fm = ui.formatter(b'perf', opts)
     return functools.partial(_timer, fm), fm
 
 def _timer(fm, func, title=None):
@@ -54,29 +54,29 @@ def _timer(fm, func, title=None):
     fm.startitem()
 
     if title:
-        fm.write('title', '! %s\n', title)
+        fm.write(b'title', b'! %s\n', title)
     if r:
-        fm.write('result', '! result: %s\n', r)
+        fm.write(b'result', b'! result: %s\n', r)
     m = min(results)
-    fm.plain('!')
-    fm.write('wall', ' wall %f', m[0])
-    fm.write('comb', ' comb %f', m[1] + m[2])
-    fm.write('user', ' user %f', m[1])
-    fm.write('sys',  ' sys %f', m[2])
-    fm.write('count',  ' (best of %d)', count)
-    fm.plain('\n')
+    fm.plain(b'!')
+    fm.write(b'wall', b' wall %f', m[0])
+    fm.write(b'comb', b' comb %f', m[1] + m[2])
+    fm.write(b'user', b' user %f', m[1])
+    fm.write(b'sys',  b' sys %f', m[2])
+    fm.write(b'count',  b' (best of %d)', count)
+    fm.plain(b'\n')
 
-@command('perfgitloadmap')
+@command(b'perfgitloadmap')
 def perfgitloadmap(ui, repo):
     timer, fm = gettimer(ui)
     timer(repo.githandler.load_map)
     fm.end()
 
-@command('perfgitsavemap')
+@command(b'perfgitsavemap')
 def perfgitsavemap(ui, repo):
     timer, fm = gettimer(ui)
     repo.githandler.load_map()
-    fd, f = tempfile.mkstemp(prefix='.git-mapfile-', dir=repo.path)
+    fd, f = tempfile.mkstemp(prefix=b'.git-mapfile-', dir=repo.path)
     basename = os.path.basename(f)
     try:
         timer(lambda: repo.githandler.save_map(basename))

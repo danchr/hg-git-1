@@ -23,12 +23,12 @@ except ImportError:
 class basegitrepo(peerrepository):
     def __init__(self, ui, path, create, intents=None, **kwargs):
         if create:  # pragma: no cover
-            raise error.Abort('Cannot create a git repository.')
+            raise error.Abort(b'Cannot create a git repository.')
         self._ui = ui
         self.path = path
         self.localrepo = None
 
-    _peercapabilities = ['lookup']
+    _peercapabilities = [b'lookup']
 
     def _capabilities(self):
         return self._peercapabilities
@@ -55,9 +55,9 @@ class basegitrepo(peerrepository):
         return []
 
     def listkeys(self, namespace):
-        if namespace == 'namespaces':
-            return {'bookmarks': ''}
-        elif namespace == 'bookmarks':
+        if namespace == b'namespaces':
+            return {b'bookmarks': b''}
+        elif namespace == b'bookmarks':
             if self.localrepo is not None:
                 handler = self.localrepo.githandler
                 result = handler.fetch_pack(self.path, heads=[])
@@ -65,7 +65,7 @@ class basegitrepo(peerrepository):
                 stripped_refs = {
                     ref[11:]: handler.map_hg_get(val) or val
                     for ref, val in compat.iteritems(result.refs)
-                    if ref.startswith('refs/heads/')
+                    if ref.startswith(b'refs/heads/')
                 }
                 return stripped_refs
         return {}
@@ -158,4 +158,4 @@ def islocal(path):
         return True
 
     u = util.url(path)
-    return not u.scheme or u.scheme == 'file'
+    return not u.scheme or u.scheme == b'file'

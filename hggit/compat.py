@@ -56,7 +56,7 @@ def passwordmgr(ui):
         return url.passwordmgr(ui)
 
 # hg 4.3 - osutil moved, but mercurial.util re-exports listdir
-if hgutil.safehasattr(hgutil, 'listdir'):
+if hgutil.safehasattr(hgutil, b'listdir'):
     listdir = hgutil.listdir
 else:
     from mercurial import osutil
@@ -68,9 +68,9 @@ def memfilectx(repo, changectx, path, data, islink=False,
     # Different versions of mercurial have different parameters to
     # memfilectx.  Try them from newest to oldest.
     parameters_to_try = (
-        ((repo, changectx, path, data), { 'copysource': copysource }), # hg >= 5.0
-        ((repo, changectx, path, data), { 'copied': copysource }),     # hg 4.5 - 4.9.1
-        ((repo, path, data),            { 'copied': copysource }),     # hg 3.1 - 4.4.2
+        ((repo, changectx, path, data), { b'copysource': copysource }), # hg >= 5.0
+        ((repo, changectx, path, data), { b'copied': copysource }),     # hg 4.5 - 4.9.1
+        ((repo, path, data),            { b'copied': copysource }),     # hg 3.1 - 4.4.2
     )
     for (args, kwargs) in parameters_to_try:
         try:
@@ -84,22 +84,22 @@ def memfilectx(repo, changectx, path, data, islink=False,
 
 
 CONFIG_DEFAULTS = {
-    'git': {
-        'authors': None,
-        'blockdotgit': True,
-        'blockdothg': True,
-        'branch_bookmark_suffix': None,
-        'debugextrainmessage': False,   # test only -- do not document this!
-        'findcopiesharder': False,
-        'intree': None,
-        'mindate': None,
-        'public': list,
-        'renamelimit': 400,
-        'similarity': 0,
+    b'git': {
+        b'authors': None,
+        b'blockdotgit': True,
+        b'blockdothg': True,
+        b'branch_bookmark_suffix': None,
+        b'debugextrainmessage': False,   # test only -- do not document this!
+        b'findcopiesharder': False,
+        b'intree': None,
+        b'mindate': None,
+        b'public': list,
+        b'renamelimit': 400,
+        b'similarity': 0,
     },
-    'hggit': {
-        'mapsavefrequency': 0,
-        'usephases': False,
+    b'hggit': {
+        b'mapsavefrequency': 0,
+        b'usephases': False,
     }
 }
 
@@ -115,8 +115,8 @@ def registerconfigs(configitem):
 
 
 def config(ui, subtype, section, item):
-    if subtype == 'string':
-        subtype = ''
+    if subtype == b'string':
+        subtype = b''
     getconfig = getattr(ui, 'config' + subtype)
     if hasconfigitems:
         return getconfig(section, item)
@@ -137,7 +137,7 @@ class templatekeyword(object):
 class progress(object):
     '''Simplified implementation of mercurial.scmutil.progress for
     compatibility with hg < 4.7'''
-    def __init__(self, ui, _updatebar, topic, unit="", total=None):
+    def __init__(self, ui, _updatebar, topic, unit=b"", total=None):
         self.ui = ui
         self.pos = 0
         self.topic = topic
@@ -150,27 +150,27 @@ class progress(object):
     def __exit__(self, exc_type, exc_value, exc_tb):
         self.complete()
 
-    def _updatebar(self, item=""):
+    def _updatebar(self, item=b""):
         self.ui.progress(self.topic, self.pos, item, self.unit, self.total)
 
-    def update(self, pos, item="", total=None):
+    def update(self, pos, item=b"", total=None):
         self.pos = pos
         if total is not None:
             self.total = total
         self._updatebar(item)
 
-    def increment(self, step=1, item="", total=None):
+    def increment(self, step=1, item=b"", total=None):
         self.update(self.pos + step, item, total)
 
     def complete(self):
-        self.unit = ""
+        self.unit = b""
         self.total = None
         self.update(None)
 
 
-if hgutil.safehasattr(ui.ui, 'makeprogress'):
-    def makeprogress(ui, topic, unit="", total=None):
+if hgutil.safehasattr(ui.ui, b'makeprogress'):
+    def makeprogress(ui, topic, unit=b"", total=None):
         return ui.makeprogress(topic, unit, total)
 else:
-    def makeprogress(ui, topic, unit="", total=None):
+    def makeprogress(ui, topic, unit=b"", total=None):
         return progress(ui, None, topic, unit, total)
