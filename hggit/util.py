@@ -93,7 +93,7 @@ def isgitsshuri(uri):
     if uri.startswith(b'http:') or uri.startswith(b'https:'):
         return False
 
-    m = re.match(r'(?:.+@)*([\[]?[\w\d\.\:\-]+[\]]?):(.*)', uri)
+    m = re.match(br'(?:.+@)*([\[]?[\w\d\.\:\-]+[\]]?):(.*)', uri)
     if m:
         # here we're being fairly conservative about what we consider to be git
         # urls
@@ -102,8 +102,8 @@ def isgitsshuri(uri):
         if repopath.endswith(b'.git'):
             return True
         # use a simple regex to check if it is a fqdn regex
-        fqdn_re = (r'(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}'
-                   r'(?<!-)\.)+[a-zA-Z]{2,63}$)')
+        fqdn_re = (br'(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}'
+                   br'(?<!-)\.)+[a-zA-Z]{2,63}$)')
         if re.match(fqdn_re, giturl):
             return True
     return False

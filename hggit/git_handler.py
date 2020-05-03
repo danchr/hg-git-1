@@ -47,8 +47,8 @@ RE_GIT_EXTRA_KEY = re.compile(b'GIT([0-9]*)-(.*)')
 # Support several URL forms, including separating the
 # host and path with either a / or : (sepr)
 RE_GIT_URI = re.compile(
-    r'^(?P<scheme>git([+]ssh)?://)(?P<host>.*?)(:(?P<port>\d+))?'
-    r'(?P<sepr>[:/])(?P<path>.*)$')
+    br'^(?P<scheme>git([+]ssh)?://)(?P<host>.*?)(:(?P<port>\d+))?'
+    br'(?P<sepr>[:/])(?P<path>.*)$')
 
 RE_NEWLINES = re.compile(b'[\r\n]')
 RE_GIT_PROGRESS = re.compile(b'\((\d+)/(\d+)\)')

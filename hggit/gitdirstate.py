@@ -29,9 +29,9 @@ def gignorepats(orig, lines, root=None):
 
     for line in lines:
         if b"#" in line:
-            _commentre = re.compile(r'((^|[^\\])(\\\\)*)#.*')
+            _commentre = re.compile(br'((^|[^\\])(\\\\)*)#.*')
             # remove comments prefixed by an even number of escapes
-            line = _commentre.sub(r'\1', line)
+            line = _commentre.sub(br'\1', line)
             # fixup properly escaped comments that survived the above
             line = line.replace(b"\\#", b"#")
         line = line.rstrip()
@@ -41,7 +41,7 @@ def gignorepats(orig, lines, root=None):
         if line.startswith(b'!'):
             warnings.append(_(b"unsupported ignore pattern '%s'") % line)
             continue
-        if re.match(r'(:?.*/)?\.hg(:?/|$)', line):
+        if re.match(br'(:?.*/)?\.hg(:?/|$)', line):
             continue
         rootprefix = b'%s/' % root if root else b''
         if line.startswith(b'/'):
