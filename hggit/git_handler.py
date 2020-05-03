@@ -1352,6 +1352,7 @@ class GitHandler(object):
 
             def __nonzero__(self):
                 return bool(self.heads) or bool(self.tags)
+            __bool__ = __nonzero__
 
         res = collections.defaultdict(heads_tags)
 

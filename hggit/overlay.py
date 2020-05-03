@@ -297,6 +297,7 @@ class overlaychangectx(context.changectx):
 
     def __nonzero__(self):
         return True
+    __bool__ = __nonzero__
 
     def phase(self):
         try:
