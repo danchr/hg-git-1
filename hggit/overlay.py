@@ -128,7 +128,7 @@ class overlaymanifest(object):
 
         if match is None:
             match = matchmod.always(b'', b'')
-        for fn, n1 in compat.iteritems(self):
+        for fn, n1 in self.iteritems():
             if not match(fn):
                 continue
             fl1 = self._flags.get(fn)
@@ -141,7 +141,7 @@ class overlaymanifest(object):
             elif clean:
                 diff[fn] = None
 
-        for fn, n2 in compat.iteritems(m2):
+        for fn, n2 in m2.iteritems():
             if fn not in self:
                 if not match(fn):
                     continue
