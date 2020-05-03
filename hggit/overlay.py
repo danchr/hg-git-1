@@ -217,7 +217,11 @@ class overlaychangectx(context.changectx):
     def __init__(self, repo, sha, maybe_filtered=True):
         # Can't store this in self._repo because the base class uses that field
         self._hgrepo = repo
-        if not isinstance(sha, basestring):
+        if isinstance(sha, bytes):
+            pass
+        elif isinstance(sha, compat.unicode):
+            sha = sha.encode('ascii')
+        else:
             sha = sha.hex()
         self.commit = repo.handler.git.get_object(_maybehex(sha))
         self._overlay = getattr(repo, 'gitoverlay', repo)
