@@ -114,3 +114,36 @@ tests-py2-hg-4.3:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
       - python2 tests/run-tests.py -lv --color=always
+
+tests-py3-hg-default:
+    stage: compat
+    image: octobus/ci-py3-hg-git
+    script:
+        - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev default
+        - PYTHONPATH= hg -R /ci/repos/mercurial/ update default
+        - PYTHONPATH= hg -R /ci/repos/mercurial summary
+        - make -C /ci/repos/mercurial local PYTHON=python3
+        - cp /ci/repos/mercurial/hg .
+        - python3 tests/run-tests.py -lv --color=always
+    allow_failure: true
+
+tests-py3-hg-stable:
+    stage: compat
+    image: octobus/ci-py3-hg-git
+    script:
+        - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev stable
+        - PYTHONPATH= hg -R /ci/repos/mercurial/ update stable
+        - PYTHONPATH= hg -R /ci/repos/mercurial summary
+        - make -C /ci/repos/mercurial local PYTHON=python3
+        - cp /ci/repos/mercurial/hg .
+        - python3 tests/run-tests.py -lv --color=always
+    allow_failure: true
+
+tests-py3-hg-5.3:
+    stage: current
+    image: octobus/ci-py3-hg-git:hg-5.3
+    script:
+      - cp /ci/repos/mercurial/hg .
+      - ./hg version --debug
+      - python3 tests/run-tests.py -lv --color=always
+    allow_failure: true
