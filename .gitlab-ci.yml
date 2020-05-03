@@ -125,7 +125,6 @@ tests-py3-hg-default:
         - make -C /ci/repos/mercurial local PYTHON=python3
         - cp /ci/repos/mercurial/hg .
         - python3 tests/run-tests.py -lv --color=always
-    allow_failure: true
 
 tests-py3-hg-stable:
     stage: compat
@@ -137,7 +136,6 @@ tests-py3-hg-stable:
         - make -C /ci/repos/mercurial local PYTHON=python3
         - cp /ci/repos/mercurial/hg .
         - python3 tests/run-tests.py -lv --color=always
-    allow_failure: true
 
 tests-py3-hg-5.3:
     stage: current
@@ -146,4 +144,3 @@ tests-py3-hg-5.3:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
       - python3 tests/run-tests.py -lv --color=always
-    allow_failure: true
