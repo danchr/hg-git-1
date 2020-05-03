@@ -5,7 +5,7 @@ stages:
 variables:
   PYTHONPATH: /ci/repos/mercurial
 
-tests-hg-default:
+tests-py2-hg-default:
     stage: compat
     image: octobus/ci-py2-hg-git
     script:
@@ -16,7 +16,7 @@ tests-hg-default:
         - cp /ci/repos/mercurial/hg .
         - tests/run-tests.py -lv --color=always
 
-tests-hg-stable:
+tests-py2-hg-stable:
     stage: compat
     image: octobus/ci-py2-hg-git
     script:
@@ -27,7 +27,7 @@ tests-hg-stable:
         - cp /ci/repos/mercurial/hg .
         - tests/run-tests.py -lv --color=always
 
-tests-hg-5.3:
+tests-py2-hg-5.3:
     stage: current
     image: octobus/ci-py2-hg-git:hg-5.3
     script:
@@ -35,7 +35,7 @@ tests-hg-5.3:
       - ./hg version --debug
       - tests/run-tests.py -lv --color=always
 
-tests-hg-5.2:
+tests-py2-hg-5.2:
     stage: compat
     image: octobus/ci-py2-hg-git:hg-5.2
     script:
@@ -43,7 +43,7 @@ tests-hg-5.2:
       - ./hg version --debug
       - tests/run-tests.py -lv --color=always
 
-tests-hg-5.1:
+tests-py2-hg-5.1:
     stage: compat
     image: octobus/ci-py2-hg-git:hg-5.1
     script:
@@ -51,7 +51,7 @@ tests-hg-5.1:
       - ./hg version --debug
       - tests/run-tests.py -lv --color=always
 
-tests-hg-5.0:
+tests-py2-hg-5.0:
     stage: compat
     image: octobus/ci-py2-hg-git:hg-5.0
     script:
@@ -59,7 +59,7 @@ tests-hg-5.0:
       - ./hg version --debug
       - tests/run-tests.py -lv --color=always
 
-tests-hg-4.9:
+tests-py2-hg-4.9:
     stage: compat
     image: octobus/ci-py2-hg-git:hg-4.9
     script:
@@ -67,7 +67,7 @@ tests-hg-4.9:
       - ./hg version --debug
       - tests/run-tests.py -lv --color=always
 
-tests-hg-4.8:
+tests-py2-hg-4.8:
     stage: compat
     image: octobus/ci-py2-hg-git:hg-4.8
     script:
@@ -75,7 +75,7 @@ tests-hg-4.8:
       - ./hg version --debug
       - tests/run-tests.py -lv --color=always
 
-tests-hg-4.7:
+tests-py2-hg-4.7:
     stage: compat
     image: octobus/ci-py2-hg-git:hg-4.7
     script:
@@ -83,7 +83,7 @@ tests-hg-4.7:
       - ./hg version --debug
       - tests/run-tests.py -lv --color=always
 
-tests-hg-4.6:
+tests-py2-hg-4.6:
     stage: compat
     image: octobus/ci-py2-hg-git:hg-4.6
     script:
@@ -91,7 +91,7 @@ tests-hg-4.6:
       - ./hg version --debug
       - tests/run-tests.py -lv --color=always --extra-config-opt devel.all-warnings=no --extra-config-opt devel.deprec-warn=no
 
-tests-hg-4.5:
+tests-py2-hg-4.5:
     stage: compat
     image: octobus/ci-py2-hg-git:hg-4.5
     script:
@@ -99,7 +99,7 @@ tests-hg-4.5:
       - ./hg version --debug
       - tests/run-tests.py -lv --color=always
 
-tests-hg-4.4:
+tests-py2-hg-4.4:
     stage: compat
     image: octobus/ci-py2-hg-git:hg-4.4
     script:
@@ -107,7 +107,7 @@ tests-hg-4.4:
       - ./hg version --debug
       - tests/run-tests.py -lv --color=always
 
-tests-hg-4.3:
+tests-py2-hg-4.3:
     stage: compat
     image: octobus/ci-py2-hg-git:hg-4.3
     script:
