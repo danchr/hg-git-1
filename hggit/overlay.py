@@ -228,7 +228,7 @@ class overlaychangectx(context.changectx):
         # Since hg 4.6, context.changectx doesn't define self._repo,
         # but it is still used by self.obsolete() (and friends)
         # So, if the attribute wasn't found, fallback to _hgrepo
-        if name == b'_repo':
+        if name == '_repo':
             return self._hgrepo
         return super(overlaychangectx, self).__getattr__(name)
 
