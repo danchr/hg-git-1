@@ -1727,7 +1727,13 @@ class GitHandler(object):
             ua = b'git/20x6 (hg-git ; uses dulwich and hg ; like git-core)'
             config = dul_config.ConfigDict()
             config.set(b'http', b'useragent', ua)
-            return client.HttpGitClient(uri, config=config), uri
+            if pycompat.ispy3:
+                # urllib3.util.url._encode_invalid_chars() converts the path
+                # back to bytes using the utf-8 codec
+                str_uri = uri.decode('utf-8')
+            else:
+                str_uri = uri
+            return client.HttpGitClient(str_uri, config=config), uri
 
         # if its not git or git+ssh, try a local url..
         return client.SubprocessGitClient(), uri
