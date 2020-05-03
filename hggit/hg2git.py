@@ -36,7 +36,11 @@ def audit_git_path(ui, path):
     ...     def configbool(*args):
     ...         return False
     ...     def warn(self, s):
-    ...         print(s)
+    ...         if pycompat.ispy3:
+    ...             import sys
+    ...             print(s.decode(sys.__stdout__.encoding))
+    ...         else:
+    ...             print(s)
     >>> u = fakeui()
     >>> audit_git_path(u, b'foo/git~100/wat')
     ... # doctest: +ELLIPSIS
