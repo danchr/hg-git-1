@@ -566,7 +566,7 @@ class GitHandler(object):
                 # fixup timezone
                 (name, timestamp, timezone) = extra[b'committer'].rsplit(b' ', 2)
                 commit.committer = name
-                commit.commit_time = timestamp
+                commit.commit_time = int(timestamp)
 
                 # work around a timezone format change
                 if int(timezone) % 60 != 0:  # pragma: no cover
