@@ -163,7 +163,7 @@ def wrapmanifestdictdiff(orig, self, m2, match=None, clean=False):
         match = None
 
     kwargs = {
-        b'clean': clean
+        'clean': clean
     }
     # Older versions of mercurial don't support the match arg, so only add it
     # if it exists.
