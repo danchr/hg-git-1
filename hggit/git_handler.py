@@ -1682,14 +1682,14 @@ class GitHandler(object):
         >>> client, url = tp(b'http://fqdn.com/test.git')
         >>> print(isinstance(client, HttpGitClient))
         True
-        >>> print(url)
+        >>> print(url.decode())
         http://fqdn.com/test.git
         >>> client, url = tp(b'git@fqdn.com:user/repo.git')
         >>> print(isinstance(client, SSHGitClient))
         True
-        >>> print(url)
+        >>> print(url.decode())
         user/repo.git
-        >>> print(client.host)
+        >>> print(client.host.decode())
         git@fqdn.com
         """
         # pass hg's ui.ssh config to dulwich
