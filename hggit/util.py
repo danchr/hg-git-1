@@ -147,5 +147,5 @@ def checksafessh(host):
     """
     host = compat.unquote(host)
     if host.startswith(b'-'):
-        raise error.Abort(_(b'potentially unsafe hostname: %r') %
+        raise error.Abort(_(b"potentially unsafe hostname: '%s'") %
                           (host,))
