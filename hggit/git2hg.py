@@ -55,7 +55,7 @@ def find_incoming(git_object_store, git_map, refs):
             if sha in done or sha in git_map:
                 todo.pop()
                 continue
-            assert isinstance(sha, str)
+            assert isinstance(sha, bytes)
             if sha in commit_cache:
                 obj = commit_cache[sha]
             else:
