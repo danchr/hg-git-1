@@ -388,7 +388,8 @@ def exchangepush(orig, repo, remote, force=False, revs=None, newbranch=False,
         if opargs is None:
             opargs = {}
         pushop = exchange.pushoperation(repo, remote, force, revs, newbranch,
-                                        bookmarks, **opargs)
+                                        bookmarks,
+                                        **pycompat.strkwargs(opargs))
         pushop.cgresult = repo.githandler.push(remote.path, revs, force)
         return pushop
     else:
