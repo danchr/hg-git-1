@@ -653,19 +653,19 @@ class GitHandler(object):
         >>> from collections import namedtuple
         >>> from mercurial.ui import ui
         >>> mockrepo = namedtuple('localrepo', ['vfs', 'sharedpath', 'path'])
-        >>> mockrepo.vfs = ''
-        >>> mockrepo.sharedpath = ''
-        >>> mockrepo.path = ''
+        >>> mockrepo.vfs = b''
+        >>> mockrepo.sharedpath = b''
+        >>> mockrepo.path = b''
         >>> g = GitHandler(mockrepo, ui()).get_valid_git_username_email
-        >>> g('John Doe')
+        >>> g(b'John Doe')
         'John Doe'
-        >>> g('john@doe.com')
+        >>> g(b'john@doe.com')
         'john@doe.com'
-        >>> g(' <john@doe.com> ')
+        >>> g(b' <john@doe.com> ')
         'john@doe.com'
-        >>> g('    <random<\n<garbage\n>  > > ')
+        >>> g(b'    <random<\n<garbage\n>  > > ')
         'random???garbage?'
-        >>> g('Typo in hgrc >but.hg-git@handles.it.gracefully>')
+        >>> g(b'Typo in hgrc >but.hg-git@handles.it.gracefully>')
         'Typo in hgrc ?but.hg-git@handles.it.gracefully'
         """
         return RE_GIT_SANITIZE_AUTHOR.sub(b'?', name.lstrip(b'< ').rstrip(b'> '))
@@ -1672,17 +1672,17 @@ class GitHandler(object):
         >>> from dulwich.client import HttpGitClient, SSHGitClient
         >>> from mercurial.ui import ui
         >>> mockrepo = namedtuple('localrepo', ['vfs', 'sharedpath', 'path'])
-        >>> mockrepo.vfs = ''
-        >>> mockrepo.sharedpath = ''
-        >>> mockrepo.path = ''
+        >>> mockrepo.vfs = b''
+        >>> mockrepo.sharedpath = b''
+        >>> mockrepo.path = b''
         >>> g = GitHandler(mockrepo, ui())
         >>> tp = g.get_transport_and_path
-        >>> client, url = tp('http://fqdn.com/test.git')
+        >>> client, url = tp(b'http://fqdn.com/test.git')
         >>> print(isinstance(client, HttpGitClient))
         True
         >>> print(url)
         http://fqdn.com/test.git
-        >>> client, url = tp('git@fqdn.com:user/repo.git')
+        >>> client, url = tp(b'git@fqdn.com:user/repo.git')
         >>> print(isinstance(client, SSHGitClient))
         True
         >>> print(url)

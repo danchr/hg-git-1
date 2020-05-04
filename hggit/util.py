@@ -73,17 +73,17 @@ def isgitsshuri(uri):
 
     Tests:
 
-    >>> print(isgitsshuri('http://fqdn.com/hg'))
+    >>> print(isgitsshuri(b'http://fqdn.com/hg'))
     False
-    >>> print(isgitsshuri('http://fqdn.com/test.git'))
+    >>> print(isgitsshuri(b'http://fqdn.com/test.git'))
     False
-    >>> print(isgitsshuri('git@github.com:user/repo.git'))
+    >>> print(isgitsshuri(b'git@github.com:user/repo.git'))
     True
-    >>> print(isgitsshuri('github-123.com:user/repo.git'))
+    >>> print(isgitsshuri(b'github-123.com:user/repo.git'))
     True
-    >>> print(isgitsshuri('git@127.0.0.1:repo.git'))
+    >>> print(isgitsshuri(b'git@127.0.0.1:repo.git'))
     True
-    >>> print(isgitsshuri('git@[2001:db8::1]:repository.git'))
+    >>> print(isgitsshuri(b'git@[2001:db8::1]:repository.git'))
     True
     """
     for scheme in gitschemes:

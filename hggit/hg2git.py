@@ -37,7 +37,7 @@ def audit_git_path(ui, path):
     ...     def warn(self, s):
     ...         print(s)
     >>> u = fakeui()
-    >>> audit_git_path(u, 'foo/git~100/wat')
+    >>> audit_git_path(u, b'foo/git~100/wat')
     ... # doctest: +ELLIPSIS
     warning: path 'foo/git~100/wat' contains a potentially dangerous ...
     It may not be legal to check out in Git.
@@ -49,7 +49,7 @@ def audit_git_path(ui, path):
     It may not be legal to check out in Git.
     It may also be rejected by some git server configurations.
     <BLANKLINE>
-    >>> audit_git_path(u, 'this/is/safe')
+    >>> audit_git_path(u, b'this/is/safe')
     """
     dangerous = False
     for c in path.split(os.path.sep):
