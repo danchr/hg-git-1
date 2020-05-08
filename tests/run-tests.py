@@ -2564,7 +2564,7 @@ def savetimes(outputdir, result):
     )
     with os.fdopen(fd, 'w') as fp:
         for name, ts in sorted(saved.items()):
-            fp.write('%s %s\n' % (name, ' '.join(['%.3f' % (t,) for t in ts])))
+            fp.write('%s %s\n' % (name, ' '.join('%.3f' % (t,) for t in ts)))
     timepath = os.path.join(outputdir, b'.testtimes')
     try:
         os.unlink(timepath)

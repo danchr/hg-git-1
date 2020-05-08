@@ -36,7 +36,7 @@ def parse_hgsub(lines):
 
 def serialize_hgsub(data):
     """Produces a string from OrderedDict hgsub content"""
-    return b''.join([b'%s = %s\n' % (n, v) for n, v in compat.iteritems(data)])
+    return b''.join(b'%s = %s\n' % (n, v) for n, v in compat.iteritems(data))
 
 
 def parse_hgsubstate(lines):
@@ -53,7 +53,7 @@ def parse_hgsubstate(lines):
 
 def serialize_hgsubstate(data):
     """Produces a string from OrderedDict hgsubstate content"""
-    return b''.join([b'%s %s\n' % (data[n], n) for n in sorted(data)])
+    return b''.join(b'%s %s\n' % (data[n], n) for n in sorted(data))
 
 
 def transform_notgit(f):

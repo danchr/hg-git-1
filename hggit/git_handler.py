@@ -910,7 +910,7 @@ class GitHandler(object):
         except UnicodeDecodeError:
             text = self.decode_guess(text, commit.encoding)
 
-        text = b'\n'.join([l.rstrip() for l in text.splitlines()]).strip(b'\n')
+        text = b'\n'.join(l.rstrip() for l in text.splitlines()).strip(b'\n')
         if text + b'\n' != origtext:
             extra[b'message'] = create_delta(text + b'\n', origtext)
 
@@ -1367,7 +1367,7 @@ class GitHandler(object):
             ref_name = k
             parts = k.split(b'/')
             if parts[0] == b'refs' and parts[1] == b'tags':
-                ref_name = b"/".join([v for v in parts[2:]])
+                ref_name = b"/".join(v for v in parts[2:])
                 # refs contains all the refs in the server, not just
                 # the ones we are pulling
                 if refs[k] not in self.git.object_store:
