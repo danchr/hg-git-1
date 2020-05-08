@@ -27,8 +27,16 @@ tests-py2-hg-stable:
         - cp /ci/repos/mercurial/hg .
         - python2 tests/run-tests.py -lv --color=always
 
-tests-py2-hg-5.3:
+tests-py2-hg-5.4:
     stage: current
+    image: octobus/ci-py2-hg-git:hg-5.4
+    script:
+      - cp /ci/repos/mercurial/hg .
+      - ./hg version --debug
+      - python2 tests/run-tests.py -lv --color=always
+
+tests-py2-hg-5.3:
+    stage: compat
     image: octobus/ci-py2-hg-git:hg-5.3
     script:
       - cp /ci/repos/mercurial/hg .
@@ -137,8 +145,16 @@ tests-py3-hg-stable:
         - cp /ci/repos/mercurial/hg .
         - python3 tests/run-tests.py -lv --color=always
 
-tests-py3-hg-5.3:
+tests-py3-hg-5.4:
     stage: current
+    image: octobus/ci-py3-hg-git:hg-5.4
+    script:
+      - cp /ci/repos/mercurial/hg .
+      - ./hg version --debug
+      - python3 tests/run-tests.py -lv --color=always
+
+tests-py3-hg-5.3:
+    stage: compat
     image: octobus/ci-py3-hg-git:hg-5.3
     script:
       - cp /ci/repos/mercurial/hg .
