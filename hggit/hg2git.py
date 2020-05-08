@@ -328,7 +328,7 @@ class IncrementalChangesetExporter(object):
         self._dirs.setdefault(b'', dulobjs.Tree())
 
         # Fill in missing directories.
-        for path in self._dirs.keys():
+        for path in list(self._dirs):
             parent = os.path.dirname(path)
 
             while parent != b'':
