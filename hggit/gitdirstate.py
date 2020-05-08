@@ -96,7 +96,7 @@ class gitdirstate(dirstate.dirstate):
         patterns = []
         # Only use .gitignore if there's no .hgignore
         try:
-            fp = open(files[0])
+            fp = open(files[0], 'rb')
             fp.close()
         except:
             fns = self._finddotgitignores()
@@ -105,7 +105,7 @@ class gitdirstate(dirstate.dirstate):
                 fn = self.pathto(fn)
                 if not os.path.exists(fn):
                     continue
-                fp = open(fn)
+                fp = open(fn, 'rb')
                 pats, warnings = gignorepats(None, fp, root=d)
                 for warning in warnings:
                     self._ui.warn(b"%s: %s\n" % (fn, warning))

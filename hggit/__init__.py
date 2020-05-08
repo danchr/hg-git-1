@@ -202,7 +202,7 @@ def extsetup(ui):
     helpdir = os.path.join(os.path.dirname(pycompat.fsencode(__file__)),
                            b'help')
     entry = ([b'git'], _(b"Working with Git Repositories"),
-             lambda ui: open(os.path.join(helpdir, b'git.rst')).read())
+             lambda ui: open(os.path.join(helpdir, b'git.rst'), 'rb').read())
     insort(help.helptable, entry)
 
 

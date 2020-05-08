@@ -263,7 +263,7 @@ class GitHandler(object):
                 for f in files:
                     try:
                         ref = root.replace(refdir + pycompat.ossep, b'') + b'/'
-                        node = open(os.path.join(root, f)).read().strip()
+                        node = open(os.path.join(root, f), 'rb').read().strip()
                         self._remote_refs[ref + f] = bin(self._map_git[node])
                     except (KeyError, IOError):
                         pass
