@@ -17,18 +17,10 @@ def generate_ssh_vendor(ui):
 
     class _Vendor(SSHVendor):
         def run_command(self, host, command, username=None, port=None):
-            if isinstance(command, basestring):
-                # 0.12.x dulwich sends the raw string
-                command = [command]
-            elif len(command) > 1:
-                # 0.11.x dulwich sends an array of [command arg1 arg2 ...], so
-                # we detect that here and reformat it back to what hg-git
-                # expects (e.g. "command 'arg1 arg2'")
-                command = [b"%s '%s'" % (command[0], b' '.join(command[1:]))]
+            assert isinstance(command, basestring)
             sshcmd = ui.config(b"ui", b"ssh", b"ssh")
             args = compat.sshargs(sshcmd, host, username, port)
-            cmd = b'%s %s %s' % (sshcmd, args,
-                                 compat.shellquote(b' '.join(command)))
+            cmd = b'%s %s %s' % (sshcmd, args, compat.shellquote(command))
             ui.debug(b'calling ssh: %s\n' % cmd)
             proc = subprocess.Popen(compat.quotecommand(cmd), shell=True,
                                     stdin=subprocess.PIPE,
