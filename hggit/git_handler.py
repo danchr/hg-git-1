@@ -37,13 +37,13 @@ from . import util
 from .overlay import overlayrepo
 
 
-RE_GIT_AUTHOR = re.compile(b'^(.*?) ?\<(.*?)(?:\>(.*))?$')
+RE_GIT_AUTHOR = re.compile(br'^(.*?) ?\<(.*?)(?:\>(.*))?$')
 
-RE_GIT_SANITIZE_AUTHOR = re.compile(b'[<>\n]')
+RE_GIT_SANITIZE_AUTHOR = re.compile(br'[<>\n]')
 
-RE_GIT_AUTHOR_EXTRA = re.compile(b'^(.*?)\ ext:\((.*)\) <(.*)\>$')
+RE_GIT_AUTHOR_EXTRA = re.compile(br'^(.*?)\ ext:\((.*)\) <(.*)\>$')
 
-RE_GIT_EXTRA_KEY = re.compile(b'GIT([0-9]*)-(.*)')
+RE_GIT_EXTRA_KEY = re.compile(br'GIT([0-9]*)-(.*)')
 
 # Test for git:// and git+ssh:// URI.
 # Support several URL forms, including separating the
@@ -52,10 +52,10 @@ RE_GIT_URI = re.compile(
     br'^(?P<scheme>git([+]ssh)?://)(?P<host>.*?)(:(?P<port>\d+))?'
     br'(?P<sepr>[:/])(?P<path>.*)$')
 
-RE_NEWLINES = re.compile(b'[\r\n]')
-RE_GIT_PROGRESS = re.compile(b'\((\d+)/(\d+)\)')
+RE_NEWLINES = re.compile(br'[\r\n]')
+RE_GIT_PROGRESS = re.compile(br'\((\d+)/(\d+)\)')
 
-RE_AUTHOR_FILE = re.compile(b'\s*=\s*')
+RE_AUTHOR_FILE = re.compile(br'\s*=\s*')
 
 # mercurial.utils.dateutil functions were in mercurial.util in Mercurial < 4.6
 try:
