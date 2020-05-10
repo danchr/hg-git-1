@@ -185,18 +185,15 @@ def getversion():
 # defend against tracebacks if we specify -r in 'hg pull'
 def safebranchrevs(orig, lrepo, otherrepo, branches, revs):
     revs, co = orig(lrepo, otherrepo, branches, revs)
-    if (
-        not isinstance(co, int)
-        or hgutil.safehasattr(lrepo, b'changelog')
-        and co not in lrepo.changelog
-    ):
+    if isinstance(otherrepo, gitrepo.gitrepo):
         # FIXME: Unless it's None, the 'co' result is passed to the lookup()
         # remote command. Since our implementation of the lookup() remote
         # command is incorrect, we set it to None to avoid a crash later when
         # the incorect result of the lookup() remote command would otherwise be
         # used. This can, in undocumented corner-cases, result in that a
         # different revision is updated to when passing both -u and -r to
-        # 'hg pull'.
+        # 'hg pull'. An example of such case is in tests/test-addbranchrevs.t
+        # (for the non-hg-git case).
         co = None
     return revs, co
 extensions.wrapfunction(hg, b'addbranchrevs', safebranchrevs)
