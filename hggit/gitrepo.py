@@ -44,8 +44,8 @@ class basegitrepo(peerrepository):
         return self.path
 
     def lookup(self, key):
-        if isinstance(key, bytes):
-            return key
+        assert isinstance(key, bytes)
+        return key
 
     def local(self):
         if not self.path:
