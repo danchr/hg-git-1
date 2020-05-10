@@ -45,6 +45,7 @@ class basegitrepo(peerrepository):
 
     def lookup(self, key):
         assert isinstance(key, bytes)
+        # FIXME: this method is supposed to return a 20-byte node hash
         return key
 
     def local(self):
