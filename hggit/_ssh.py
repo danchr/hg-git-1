@@ -24,6 +24,7 @@ def generate_ssh_vendor(ui):
             cmd = b'%s %s %s' % (sshcmd, args, compat.shellquote(command))
             ui.debug(b'calling ssh: %s\n' % cmd)
             proc = subprocess.Popen(compat.quotecommand(cmd), shell=True,
+                                    bufsize=0,
                                     stdin=subprocess.PIPE,
                                     stdout=subprocess.PIPE)
             return SubprocessWrapper(proc)
