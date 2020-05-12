@@ -278,7 +278,7 @@ def git_cleanup(ui, repo):
     wlock = repo.wlock()
     try:
         f = vfs(GitHandler.map_file, b'wb')
-        map(f.write, new_map)
+        f.writelines(new_map)
     finally:
         wlock.release()
     ui.status(_(b'git commit map cleaned\n'))
