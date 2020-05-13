@@ -8,6 +8,7 @@ variables:
 tests-py2-hg-default:
     stage: compat
     image: octobus/ci-py2-hg-git
+    allow_failure: true
     script:
         - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev default
         - PYTHONPATH= hg -R /ci/repos/mercurial/ update default
@@ -126,6 +127,7 @@ tests-py2-hg-4.3:
 tests-py3-hg-default:
     stage: compat
     image: octobus/ci-py3-hg-git
+    allow_failure: true
     script:
         - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev default
         - PYTHONPATH= hg -R /ci/repos/mercurial/ update default
