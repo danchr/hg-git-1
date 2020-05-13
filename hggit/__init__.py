@@ -64,7 +64,7 @@ except AttributeError:  # pre 4.7 API
         b'collections',
     ])
 
-__version__ = b'0.8.13'
+__version__ = b'0.9.0a1'
 
 testedwith = (b'4.3.3 4.4.2 4.5.3 4.6.2 '
               b'4.7.2 4.8.2 4.9.1 5.0.2 5.1.2 5.2 5.3 5.4')
