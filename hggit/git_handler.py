@@ -332,7 +332,7 @@ class GitHandler(object):
         self.save_map(self.map_file)
 
         # also mark public any branches the user specified
-        blist = [self.repo[branch].node() for branch in
+        blist = [self.repo._bookmarks[branch] for branch in
                  self.ui.configlist(b'git', b'public')]
         if rnode and self.ui.configbool(b'hggit', b'usephases'):
             blist.append(rnode)
