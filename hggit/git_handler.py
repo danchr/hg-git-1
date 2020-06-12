@@ -1630,7 +1630,7 @@ class GitHandler(object):
             return names[0]
 
     def audit_hg_path(self, path):
-        if b'.hg' in path.split(pycompat.ospathsep):
+        if b'.hg' in path.split(pycompat.ossep):
             if compat.config(self.ui, b'bool', b'git', b'blockdothg'):
                 raise error.Abort(
                     (b'Refusing to import problematic path %r' % path),
