@@ -46,10 +46,16 @@ We can override if needed:
   It may not be legal to check out in Git.
   It may also be rejected by some git server configurations.
   $ cd ..
-  $ git clone hg/.hg/git git
+  $ # different git versions give different return codes
+  $ git clone hg/.hg/git git || true
   Cloning into 'git'...
   done.
   error: [Ii]nvalid path 'nested/\.git/hooks/post-update' (re)
+  fatal: unable to checkout working tree (?)
+  warning: Clone succeeded, but checkout failed. (?)
+  You can inspect what was checked out with 'git status' (?)
+  and retry( the checkout)? with '.*' (re) (?)
+   (?)
 
 Now check something that case-folds to .git, which might let you own
 Mac users:
