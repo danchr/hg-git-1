@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # This file contains code dealing specifically with converting Mercurial
 # repositories to Git repositories. Code in this file is meant to be a generic
 # library and should be usable outside the context of hg-git or an hg command.
@@ -50,7 +51,7 @@ def audit_git_path(ui, path):
     <BLANKLINE>
     >>> audit_git_path(u, u'foo/.gi\u200ct'.encode('utf-8'))
     ... # doctest: +ELLIPSIS
-    warning: path 'foo/.gi\xe2\x80\x8ct' contains a potentially dangerous ...
+    warning: path 'foo/.gi‌t' contains a potentially dangerous ...
     It may not be legal to check out in Git.
     It may also be rejected by some git server configurations.
     <BLANKLINE>
@@ -69,10 +70,10 @@ def audit_git_path(ui, path):
     if dangerous:
         if compat.config(ui, b'bool', b'git', b'blockdotgit'):
             raise error.Abort(
-                (b'Refusing to export likely-dangerous path %r' % path),
+                (b"Refusing to export likely-dangerous path '%s'" % path),
                 hint=(b"If you need to continue, read about CVE-2014-9390 and "
                       b"then set '[git] blockdotgit = false' in your hgrc."))
-        ui.warn(b'warning: path %r contains a potentially dangerous path '
+        ui.warn(b"warning: path '%s' contains a potentially dangerous path "
                 b'component.\n'
                 b'It may not be legal to check out in Git.\n'
                 b'It may also be rejected by some git server configurations.\n'

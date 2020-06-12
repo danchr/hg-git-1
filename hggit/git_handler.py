@@ -1633,12 +1633,12 @@ class GitHandler(object):
         if b'.hg' in path.split(pycompat.ossep):
             if compat.config(self.ui, b'bool', b'git', b'blockdothg'):
                 raise error.Abort(
-                    (b'Refusing to import problematic path %r' % path),
+                    (b"Refusing to import problematic path '%s'" % path),
                     hint=(b"Mercurial cannot check out paths inside nested " +
                           b"repositories; if you need to continue, then set " +
                           b"'[git] blockdothg = false' in your hgrc."))
-            self.ui.warn((b'warning: path %r is within a nested repository, ' +
-                          b'which Mercurial cannot check out.\n')
+            self.ui.warn((b"warning: path '%s' is within a nested " +
+                          b'repository, which Mercurial cannot check out.\n')
                          % path)
 
     # Stolen from hgsubversion
