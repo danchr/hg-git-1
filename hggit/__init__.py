@@ -77,12 +77,14 @@ try:
     from mercurial import registrar
     command = registrar.command(cmdtable)
     configitem = registrar.configitem(configtable)
-    compat.registerconfigs(configitem)
     templatekeyword = registrar.templatekeyword()
 
 except (ImportError, AttributeError):
     command = cmdutil.command(cmdtable)
     templatekeyword = compat.templatekeyword()
+
+else:
+    compat.registerconfigs(configitem)
 
 # support for `hg clone git://github.com/defunkt/facebox.git`
 # also hg clone git+ssh://git@github.com/schacon/simplegit.git
