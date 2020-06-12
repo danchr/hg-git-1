@@ -378,12 +378,6 @@ def has_git_range(v):
     return getgitversion() >= (int(major), int(minor))
 
 
-@checkvers("gitbefore",
-           "git client (with ext::sh support) version < %s", (2.24,))
-def has_git_less(v):
-    major, minor = v.split('.')[0:2]
-    return getgitversion() < (int(major), int(minor))
-
 @check("docutils", "Docutils text processing library")
 def has_docutils():
     try:
