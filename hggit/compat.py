@@ -1,5 +1,7 @@
 from __future__ import absolute_import, print_function
 
+import sys
+
 from mercurial import (
     context,
     pycompat,
@@ -21,7 +23,14 @@ try:
     from mercurial.utils import procutil, stringutil
     sshargs = procutil.sshargs
     shellquote = procutil.shellquote
-    quotecommand = procutil.quotecommand
+    try:
+        quotecommand = procutil.quotecommand
+    except AttributeError:
+        # procutil.quotecommand() returned the argument unchanged on Python
+        # >= 2.7.1 and was removed after Mercurial raised the minimum
+        # Python version to 2.7.4.
+        assert sys.version_info[:3] >= (2, 7, 1)
+        quotecommand = pycompat.identity
     binary = stringutil.binary
 except ImportError:
     # these were moved in 4.6
