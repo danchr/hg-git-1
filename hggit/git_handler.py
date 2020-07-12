@@ -1755,5 +1755,8 @@ class GitHandler(object):
                 uri,
             )
 
+        if uri.startswith(b'file://'):
+            return client.LocalGitClient(), hgutil.url(uri).path
+
         # if its not git or git+ssh, try a local url..
         return client.SubprocessGitClient(), uri

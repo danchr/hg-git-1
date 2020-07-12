@@ -150,6 +150,16 @@ hg-git issue103 -- directories can lose information at hg-git export time
   summary:     add dir1/beta
   
 
+  $ cat >> .hg/hgrc << EOF
+  > [paths]
+  > default = file://$TESTTMP/gitrepo
+  > EOF
+  $ hg push -r master
+  pushing to file://$TESTTMP/gitrepo
+  searching for changes
+  no changes found
+  [1]
+
   $ cd ..
 
   $ hg clone gitrepo hgrepo-test
