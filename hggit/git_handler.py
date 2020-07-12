@@ -128,8 +128,6 @@ class GitHandler(object):
 
         self.init_author_file()
 
-        self.paths = ui.configitems(b'paths')
-
         self.branch_bookmark_suffix = compat.config(
             ui, b'string', b'git', b'branch_bookmark_suffix')
 
@@ -244,16 +242,14 @@ class GitHandler(object):
         self._remote_refs = {}
         refdir = os.path.join(self.gitdir, b'refs', b'remotes')
 
-        paths = self.paths
-        # if paths are set, we should still check 'default'
-        if not paths:
-            paths = ((b'default', None),)
+        # if no paths are set, we should still check 'default'
+        pathnames = list(self.ui.paths) or [b'default']
 
         # we avoid using dulwich's refs method because it is incredibly slow;
         # on a repo with a few hundred branches and a few thousand tags,
         # dulwich took about 200ms
-        for p in paths:
-            remotedir = os.path.join(refdir, p[0])
+        for pathname in pathnames:
+            remotedir = os.path.join(refdir, pathname)
             for root, dirs, files in os.walk(remotedir):
                 for f in files:
                     try:
@@ -278,7 +274,7 @@ class GitHandler(object):
 
     def fetch(self, remote, heads):
         result = self.fetch_pack(remote, heads)
-        remote_name = self.remote_name(remote)
+        remote_name = self.remote_name(remote, False)
 
         # if remote returns a symref for HEAD, then let's store that
         rhead = None
@@ -403,7 +399,7 @@ class GitHandler(object):
     def push(self, remote, revs, force):
         self.export_commits()
         old_refs, new_refs = self.upload_pack(remote, revs, force)
-        remote_name = self.remote_name(remote)
+        remote_name = self.remote_name(remote, True)
 
         if not isinstance(new_refs, dict):
             # dulwich 0.20.6 changed the API and deprectated treating
@@ -1626,10 +1622,12 @@ class GitHandler(object):
             return content.splitlines()
         return []
 
-    def remote_name(self, remote):
-        names = [name for name, path in self.paths if path == remote]
-        if names:
-            return names[0]
+    def remote_name(self, remote, push):
+        for path in compat.itervalues(self.ui.paths):
+            if push and path.pushloc == remote:
+                return path.name
+            if path.loc == remote:
+                return path.name
 
     def audit_hg_path(self, path):
         if b'.hg' in path.split(pycompat.ossep):
