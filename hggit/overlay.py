@@ -263,7 +263,8 @@ class overlaychangectx(context.changectx):
     def description(self):
         return self.commit.message
 
-    def parents(self):
+    @util.propertycache
+    def _parents(self):
         cl = self.repo().changelog
         parents = cl.parents(cl.node(self._rev))
         if not parents:
