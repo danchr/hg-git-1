@@ -442,6 +442,8 @@ def revset_gitnode(repo, subset, x):
 
 
 def _gitnodekw(node, repo):
+    if not hasattr(repo, 'githandler'):
+        return None
     gitnode = repo.githandler.map_git_get(node.hex())
     if gitnode is None:
         gitnode = b''

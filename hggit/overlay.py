@@ -441,6 +441,7 @@ class overlaychangelog(overlayrevlog):
 class overlayrepo(object):
     def __init__(self, handler, commits, refs):
         self.handler = handler
+        self._activebookmark = None
 
         self.changelog = overlaychangelog(self, handler.repo.changelog)
         if util.safehasattr(handler.repo, b'manifest'):
