@@ -95,12 +95,10 @@ Load commonly used test logic
   +gamma 2
   
 
-incoming with a template that uses gitnode shows no git hash, but does not crash
-  $ hg incoming -r master --template 'changeset {rev}:{node|short}\ngitnode {gitnode}\n' | grep -v 'no changes found'
+  $ hg incoming -r master --template 'changeset: {rev}:{node|short}\ngitnode:   {gitnode}\n' | grep -v 'no changes found'
   comparing with $TESTTMP/gitrepo
-  changeset 1:9497a4ee62e1
-  gitnode 
-
+  changeset: 1:9497a4ee62e1
+  gitnode:   9497a4ee62e16ee641860d7677cdb2589ea15554
 
 incoming -r
   $ hg incoming -r master | grep -v 'no changes found'

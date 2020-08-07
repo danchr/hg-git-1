@@ -12,6 +12,7 @@ from mercurial import (
     context,
     manifest,
     match as matchmod,
+    node,
     util,
 )
 from mercurial.node import bin, hex, nullid
@@ -438,6 +439,21 @@ class overlaychangelog(overlayrevlog):
         )
 
 
+class overlaygithandler(object):
+    # This was added to support the {gitnode} keyword in templates for incoming.
+    # For this, falling back to the underlying repository is not necessary.
+
+    def __init__(self, repo):
+        self.repo = repo
+
+    def map_git_get(self, sha):
+        # Normally, the parameter contains the hg hash. However, for incoming
+        # changesets, it contains the git hash, so we can return it as-is
+        # (after sanity-checking that it is the hash of an incoming commit).
+        assert node.bin(sha) in self.repo.revmap
+        return sha
+
+
 class overlayrepo(object):
     def __init__(self, handler, commits, refs):
         self.handler = handler
@@ -471,6 +487,8 @@ class overlayrepo(object):
             self.names = namespaces.namespaces()
         except (AttributeError, ImportError):
             pass
+
+        self.githandler = overlaygithandler(self)
 
     def _constructmanifest(self):
         return overlaymanifestrevlog(self,
