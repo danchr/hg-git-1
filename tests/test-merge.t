@@ -21,7 +21,7 @@ Load commonly used test logic
   $ fn_git_commit -m 'add gamma'
 
 clean merge
-  $ git merge beta | sed "s/the '//;s/' strategy//" | sed 's/^Merge.*recursive.*$/Merge successful/' | sed 's/files/file/;s/insertions/insertion/;s/, 0 deletions.*//' | sed 's/|  */| /'
+  $ git merge -m "Merge branch 'beta'" beta | sed "s/the '//;s/' strategy//" | sed 's/^Merge.*recursive.*$/Merge successful/' | sed 's/files/file/;s/insertions/insertion/;s/, 0 deletions.*//' | sed 's/|  */| /'
   Merge successful
    beta | 1 +
    1 file changed, 1 insertion(+)

@@ -126,7 +126,7 @@ pull everything else
   
 add a merge to the git repo
   $ cd gitrepo
-  $ git merge beta | sed 's/|  */| /'
+  $ git merge -m "Merge branch 'beta'" beta | sed 's/|  */| /'
   Merge made by the 'recursive' strategy.
    beta | 1 +
    1 file changed, 1 insertion(+)

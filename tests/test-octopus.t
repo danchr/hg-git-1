@@ -38,7 +38,7 @@ Load commonly used test logic
   $ git add delta
   $ fn_git_commit -m 'add delta'
 
-  $ git merge branch1 branch2 | sed "s/the '//;s/' strategy//" | sed 's/^Merge.*octopus.*$/Merge successful/;s/, 0 deletions.*//'  | sed 's/|  */| /'
+  $ git merge -m "Merge branches 'branch1' and 'branch2'" branch1 branch2 | sed "s/the '//;s/' strategy//" | sed 's/^Merge.*octopus.*$/Merge successful/;s/, 0 deletions.*//'  | sed 's/|  */| /'
   Trying simple merge with branch1
   Trying simple merge with branch2
   Merge successful
@@ -48,7 +48,7 @@ Load commonly used test logic
    create mode 100644 beta
    create mode 100644 gamma
 
-  $ git merge branch3 branch4 | sed "s/the '//;s/' strategy//" | sed 's/^Merge.*octopus.*$/Merge successful/;s/, 0 deletions.*//'  | sed 's/|  */| /'
+  $ git merge -m "Merge branches 'branch3' and 'branch4'" branch3 branch4 | sed "s/the '//;s/' strategy//" | sed 's/^Merge.*octopus.*$/Merge successful/;s/, 0 deletions.*//'  | sed 's/|  */| /'
   Trying simple merge with branch3
   Trying simple merge with branch4
   Merge successful
