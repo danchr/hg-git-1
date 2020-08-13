@@ -58,7 +58,7 @@ hg status shall NOT report .hgsub and .hgsubstate as untracked - either ignored 
   $ cd ..
   $ cd hgrepo
   $ cd xyz/subrepo2
-  $ git pull | sed 's/files/file/;s/insertions/insertion/;s/, 0 deletions.*//' | sed 's/|  */| /'
+  $ git pull --ff-only | sed 's/files/file/;s/insertions/insertion/;s/, 0 deletions.*//' | sed 's/|  */| /'
   From $TESTTMP/gitsubrepo
      56f0304..aabf7cd  master     -> origin/master
   Updating 56f0304..aabf7cd
