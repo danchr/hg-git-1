@@ -59,10 +59,14 @@ from mercurial import (
 # COMPAT: hg 4.7 - demandimport.ignore was renamed to demandimport.IGNORES and
 # became a set
 try:
-    demandimport.IGNORES.add(b'collections')
+    demandimport.IGNORES |= {
+        b'collections',
+        b'brotli',  # only needed in Python 2.7
+    }
 except AttributeError:  # pre 4.7 API
     demandimport.ignore.extend([
         b'collections',
+        b'brotli',
     ])
 
 __version__ = b'0.9.0'
