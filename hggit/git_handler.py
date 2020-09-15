@@ -217,16 +217,11 @@ class GitHandler(object):
     def save_map(self, map_file):
         wlock = self.repo.wlock()
         try:
-            file = self.vfs(map_file, b'w+', atomictemp=True)
             map_hg = self._map_hg
-            buf = io.BytesIO()
-            bwrite = buf.write
-            for hgsha, gitsha in compat.iteritems(map_hg):
-                bwrite(b"%s %s\n" % (gitsha, hgsha))
-            file.write(buf.getvalue())
-            buf.close()
-            # If this complains, atomictempfile no longer has close
-            file.close()
+            with self.vfs(map_file, b'wb+', atomictemp=True) as buf:
+                bwrite = buf.write
+                for hgsha, gitsha in compat.iteritems(map_hg):
+                    bwrite(b"%s %s\n" % (gitsha, hgsha))
         finally:
             wlock.release()
 
