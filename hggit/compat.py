@@ -48,6 +48,7 @@ except ImportError:
 
 try:
     unicode = unicode
+    assert unicode  # silence pyflakes
 except NameError:
     from mercurial.pycompat import unicode
 
