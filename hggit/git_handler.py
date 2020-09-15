@@ -1555,12 +1555,17 @@ class GitHandler(object):
 
     def update_remote_branches(self, remote_name, refs):
         remote_refs = self.remote_refs
-        # since we re-write all refs for this remote each time, prune
-        # all entries matching this remote from our refs list now so
-        # that we avoid any stale refs hanging around forever
-        for t in list(remote_refs):
-            if t.startswith(remote_name + b'/'):
-                del remote_refs[t]
+        if self.ui.configbool(b'git', b'pull-prune-remote-branches'):
+            # since we re-write all refs for this remote each time,
+            # prune all entries matching this remote from our refs
+            # list now so that we avoid any stale refs hanging around
+            # forever
+            for t in list(remote_refs):
+                if t.startswith(remote_name + b'/'):
+                    del remote_refs[t]
+                    if b'refs/heads/' + t[len(remote_name) + 1:] not in refs:
+                        del self.git.refs[b'refs/remotes/' + t]
+
         for ref_name, sha in refs.items():
             if ref_name.startswith(b'refs/heads'):
                 hgsha = self.map_hg_get(sha)

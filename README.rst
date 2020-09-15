@@ -293,6 +293,16 @@ A list of Git branches that should be considered "published", and
 therefore converted to Mercurial in the 'public' phase. This is only
 used if ``hggit.usephases`` is set.
 
+``git.pull-prune-remote-branches``
+--------------
+
+Before fetching, remove any remote-tracking references, or
+pseudo-tags, that no longer exist on the remote. This is equivalent to
+the ``--prune`` option to ``git fetch``, and means that pseudo-tags
+for remotes — such as ``default/master`` — always actually reflect
+what's on the remote.
+
+This option is enabled by default.
 
 ``git.renamelimit``
 -------------------

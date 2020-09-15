@@ -136,10 +136,19 @@ add a merge to the git repo, and delete the branch
   $ cd ..
 
 pull the merge
-  $ hg -R hgrepo pull
+  $ hg -R hgrepo tags | grep default/beta
+  default/beta                       1:7fe02317c63d
+  $ hg -R hgrepo pull --config git.pull-prune-remote-branches=false
   pulling from $TESTTMP/gitrepo
   importing git objects into hg
   (run 'hg update' to get a working copy)
+  $ hg -R hgrepo tags | grep default/beta
+  default/beta                       1:7fe02317c63d
+  $ hg -R hgrepo pull
+  pulling from $TESTTMP/gitrepo
+  no changes found
+  $ hg -R hgrepo tags | grep default/beta
+  [1]
   $ hg -R hgrepo log --graph
   o    changeset:   4:a02330f767a4
   |\   bookmark:    master
@@ -167,7 +176,6 @@ pull the merge
   | |
   o |  changeset:   1:7fe02317c63d
   |/   bookmark:    beta
-  |    tag:         default/beta
   |    tag:         t_beta
   |    user:        test <test@example.org>
   |    date:        Mon Jan 01 00:00:11 2007 +0000
@@ -244,7 +252,6 @@ ensure that releases/v1 and releases/v2 are pulled but not notreleases/v1
   | |
   o |  changeset:   1:7fe02317c63d
   |/   bookmark:    beta
-  |    tag:         default/beta
   |    tag:         t_beta
   |    user:        test <test@example.org>
   |    date:        Mon Jan 01 00:00:11 2007 +0000

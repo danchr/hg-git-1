@@ -15,6 +15,7 @@ CONFIG_DEFAULTS = {
         b'public': list,
         b'renamelimit': 400,
         b'similarity': 0,
+        b'pull-prune-remote-branches': True,
     },
     b'hggit': {
         b'mapsavefrequency': 0,
