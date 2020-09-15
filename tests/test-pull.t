@@ -124,13 +124,15 @@ pull everything else
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add alpha
   
-add a merge to the git repo
+add a merge to the git repo, and delete the branch
   $ cd gitrepo
   $ git merge -m "Merge branch 'beta'" beta | sed 's/|  */| /'
   Merge made by the 'recursive' strategy.
    beta | 1 +
    1 file changed, 1 insertion(+)
    create mode 100644 beta
+  $ git branch -d beta
+  Deleted branch beta (was 9497a4e).
   $ cd ..
 
 pull the merge
