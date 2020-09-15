@@ -410,6 +410,11 @@ class GitHandler(object):
         old_refs, new_refs = self.upload_pack(remote, revs, force)
         remote_name = self.remote_name(remote)
 
+        if not isinstance(new_refs, dict):
+            # dulwich 0.20.6 changed the API and deprectated treating
+            # the result as a dictionary
+            new_refs = new_refs.refs
+
         if remote_name and new_refs:
             for ref, new_sha in sorted(compat.iteritems(new_refs)):
                 old_sha = old_refs.get(ref)
