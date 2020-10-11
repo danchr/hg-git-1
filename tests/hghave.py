@@ -29,12 +29,12 @@ stderr = getattr(sys.stderr, 'buffer', sys.stderr)
 
 if sys.version_info[0] >= 3:
 
-    def _bytespath(p):
+    def _sys2bytes(p):
         if p is None:
             return p
         return p.encode('utf-8')
 
-    def _strpath(p):
+    def _bytes2sys(p):
         if p is None:
             return p
         return p.decode('utf-8')
@@ -42,10 +42,10 @@ if sys.version_info[0] >= 3:
 
 else:
 
-    def _bytespath(p):
+    def _sys2bytes(p):
         return p
 
-    _strpath = _bytespath
+    _bytes2sys = _sys2bytes
 
 
 def check(name, desc):
@@ -307,11 +307,21 @@ def has_lsprof():
         return False
 
 
-def gethgversion():
+def _gethgversion():
     m = matchoutput('hg --version --quiet 2>&1', br'(\d+)\.(\d+)')
     if not m:
         return (0, 0)
     return (int(m.group(1)), int(m.group(2)))
+
+
+_hgversion = None
+
+
+def gethgversion():
+    global _hgversion
+    if _hgversion is None:
+        _hgversion = _gethgversion()
+    return _hgversion
 
 
 @checkvers(
@@ -320,6 +330,17 @@ def gethgversion():
 def has_hg_range(v):
     major, minor = v.split('.')[0:2]
     return gethgversion() >= (int(major), int(minor))
+
+
+@check("rust", "Using the Rust extensions")
+def has_rust():
+    """Check is the mercurial currently running is using some rust code"""
+    cmd = 'hg debuginstall --quiet 2>&1'
+    match = br'checking module policy \(([^)]+)\)'
+    policy = matchoutput(cmd, match)
+    if not policy:
+        return False
+    return b'rust' in policy.group(1)
 
 
 @check("hg08", "Mercurial >= 0.8")
@@ -358,6 +379,17 @@ def getgitversion():
     if not m:
         return (0, 0)
     return (int(m.group(1)), int(m.group(2)))
+
+
+@check("pygit2", "pygit2 Python library")
+def has_git():
+    try:
+        import pygit2
+
+        pygit2.Oid  # silence unused import
+        return True
+    except ImportError:
+        return False
 
 
 # https://github.com/git-lfs/lfs-test-server
@@ -451,7 +483,7 @@ def has_hardlink():
     os.close(fh)
     name = tempfile.mktemp(dir='.', prefix=tempprefix)
     try:
-        util.oslink(_bytespath(fn), _bytespath(name))
+        util.oslink(_sys2bytes(fn), _sys2bytes(name))
         os.unlink(name)
         return True
     except OSError:
@@ -542,11 +574,14 @@ def has_root():
 
 @check("pyflakes", "Pyflakes python linter")
 def has_pyflakes():
-    return matchoutput(
-        "sh -c \"echo 'import re' 2>&1 | pyflakes\"",
-        br"<stdin>:1: 're' imported but unused",
-        True,
-    )
+    try:
+        import pyflakes
+
+        pyflakes.__version__
+    except ImportError:
+        return False
+    else:
+        return True
 
 
 @check("pylint", "Pylint python linter")
@@ -556,7 +591,7 @@ def has_pylint():
 
 @check("clang-format", "clang-format C code formatter")
 def has_clang_format():
-    m = matchoutput('clang-format --version', br'clang-format version (\d)')
+    m = matchoutput('clang-format --version', br'clang-format version (\d+)')
     # style changed somewhere between 4.x and 6.x
     return m and int(m.group(1)) >= 6
 
@@ -610,34 +645,10 @@ def has_ssl():
         return False
 
 
-@check("sslcontext", "python >= 2.7.9 ssl")
-def has_sslcontext():
-    try:
-        import ssl
-
-        ssl.SSLContext
-        return True
-    except (ImportError, AttributeError):
-        return False
-
-
-@check("defaultcacerts", "can verify SSL certs by system's CA certs store")
-def has_defaultcacerts():
-    from mercurial import sslutil, ui as uimod
-
-    ui = uimod.ui.load()
-    return sslutil._defaultcacerts(ui) or sslutil._canloaddefaultcerts
-
-
 @check("defaultcacertsloaded", "detected presence of loaded system CA certs")
 def has_defaultcacertsloaded():
     import ssl
     from mercurial import sslutil, ui as uimod
-
-    if not has_defaultcacerts():
-        return False
-    if not has_sslcontext():
-        return False
 
     ui = uimod.ui.load()
     cafile = sslutil._defaultcacerts(ui)
@@ -672,6 +683,17 @@ def has_serve():
     return True
 
 
+@check("setprocname", "whether osutil.setprocname is available or not")
+def has_setprocname():
+    try:
+        from mercurial.utils import procutil
+
+        procutil.setprocname
+        return True
+    except AttributeError:
+        return False
+
+
 @check("test-repo", "running tests from repository")
 def has_test_repo():
     t = os.environ["TESTDIR"]
@@ -685,7 +707,7 @@ def has_tic():
 
         curses.COLOR_BLUE
         return matchoutput('test -x "`which tic`"', br'')
-    except ImportError:
+    except (ImportError, AttributeError):
         return False
 
 
@@ -864,8 +886,11 @@ def has_ensurepip():
         return False
 
 
-@check("virtualenv", "Python virtualenv support")
-def has_virtualenv():
+@check("py2virtualenv", "Python2 virtualenv support")
+def has_py2virtualenv():
+    if sys.version_info[0] != 2:
+        return False
+
     try:
         import virtualenv
 
@@ -1022,7 +1047,7 @@ def has_black():
     version_regex = b'black, version ([0-9a-b.]+)'
     version = matchoutput(blackcmd, version_regex)
     sv = distutils.version.StrictVersion
-    return version and sv(_strpath(version.group(1))) >= sv('19.10b0')
+    return version and sv(_bytes2sys(version.group(1))) >= sv('19.10b0')
 
 
 @check('pytype', 'the pytype type checker')
@@ -1030,7 +1055,7 @@ def has_pytype():
     pytypecmd = 'pytype --version'
     version = matchoutput(pytypecmd, b'[0-9a-b.]+')
     sv = distutils.version.StrictVersion
-    return version and sv(_strpath(version.group(0))) >= sv('2019.10.17')
+    return version and sv(_bytes2sys(version.group(0))) >= sv('2019.10.17')
 
 
 @check("rustfmt", "rustfmt tool")
@@ -1039,3 +1064,14 @@ def has_rustfmt():
     return matchoutput(
         '`rustup which --toolchain nightly rustfmt` --version', b'rustfmt'
     )
+
+
+@check("lzma", "python lzma module")
+def has_lzma():
+    try:
+        import _lzma
+
+        _lzma.FORMAT_XZ
+        return True
+    except ImportError:
+        return False
