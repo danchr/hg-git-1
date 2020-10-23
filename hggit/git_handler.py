@@ -439,6 +439,7 @@ class GitHandler(object):
 
     def clear(self):
         mapfile = self.vfs.join(self.map_file)
+        tagsfile = self.vfs.join(self.tags_file)
         if os.path.exists(self.gitdir):
             for root, dirs, files in os.walk(self.gitdir, topdown=False):
                 for name in files:
@@ -448,6 +449,8 @@ class GitHandler(object):
             os.rmdir(self.gitdir)
         if os.path.exists(mapfile):
             os.remove(mapfile)
+        if os.path.exists(tagsfile):
+            os.remove(tagsfile)
 
     # incoming support
     def getremotechanges(self, remote, revs):
