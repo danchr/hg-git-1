@@ -163,6 +163,8 @@ make sure that only beta is in the manifest
 
   $ hg gclear
   clearing out the git cache data
+  $ ls .hg | grep git
+  git-tags
   $ hg push ../gitrepo2
   pushing to ../gitrepo2
   searching for changes
