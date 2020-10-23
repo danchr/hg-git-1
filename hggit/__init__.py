@@ -32,7 +32,7 @@ from . import util
 
 from bisect import insort
 from .git_handler import GitHandler
-from mercurial.node import hex
+from mercurial.node import bin, hex
 from mercurial.error import LookupError
 from mercurial.i18n import _
 from mercurial import (
@@ -50,6 +50,7 @@ from mercurial import (
     localrepo,
     manifest,
     pycompat,
+    repoview,
     revset,
     scmutil,
     templatekw,
@@ -327,6 +328,22 @@ def getremotechanges(orig, ui, repo, other, *args, **opts):
 
 
 extensions.wrapfunction(bundlerepo, b'getremotechanges', getremotechanges)
+
+
+def pinnedrevs(orig, repo):
+    pinned = orig(repo)
+
+    # Mercurial pins bookmarks, even if obsoleted, so that they always
+    # appear in e.g. log; do the same with git tags and remotes.
+    if repo.local() and hasattr(repo, 'githandler'):
+        rev = repo.changelog.rev
+
+        pinned.update(rev(bin(r)) for r in repo.githandler.tags.values())
+        pinned.update(rev(r) for r in repo.githandler.remote_refs.values())
+
+    return pinned
+
+extensions.wrapfunction(repoview, b'pinnedrevs', pinnedrevs)
 
 
 def peer(orig, uiorrepo, *args, **opts):

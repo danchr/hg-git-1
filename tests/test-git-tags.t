@@ -63,11 +63,14 @@ Verify that amending commits known to remotes doesn't break anything
 NB: rev is inconsistent, as older hg uses an intermetadiate commit
   $ hg log -T '{rev}:{node|short} {tags}{if(obsolete, " X")}\n'
   [34]:d4e231d3f8e3 tip (re)
+  2:cb3879a0347e default/master X
   1:5403d6137622 beta
   0:ff7a2f2d8d70 alpha
   $ hg tags
-  abort: 00changelog.i@cb3879a0347e6461912cddb21095eb52117c5f45: filtered node!
-  [255]
+  tip                                [34]:d4e231d3f8e3 (re)
+  default/master                     2:cb3879a0347e
+  beta                               1:5403d6137622
+  alpha                              0:ff7a2f2d8d70
   $ hg push
   pushing to $TESTTMP/gitrepo
   searching for changes
@@ -90,16 +93,19 @@ Now create a tag for the old, obsolete master
   no changes found
   $ hg log -T '{rev}:{node|short} {tags}{if(obsolete, " X")}\n'
   [34]:d4e231d3f8e3 default/master tip (re)
+  2:cb3879a0347e detached X
   1:5403d6137622 beta
   0:ff7a2f2d8d70 alpha
   $ hg tags
-  abort: 00changelog.i@cb3879a0347e6461912cddb21095eb52117c5f45: filtered node!
-  [255]
+  tip                                [34]:d4e231d3f8e3 (re)
+  default/master                     [34]:d4e231d3f8e3 (re)
+  detached                           2:cb3879a0347e
+  beta                               1:5403d6137622
+  alpha                              0:ff7a2f2d8d70
   $ hg push
   pushing to $TESTTMP/gitrepo
   searching for changes
-  abort: (hidden|filtered) revision 'cb3879a0347e6461912cddb21095eb52117c5f45'! (re)
-  (use --hidden to access hidden revisions) (?)
-  [255]
+  no changes found
+  [1]
 
   $ cd ..
