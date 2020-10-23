@@ -46,4 +46,60 @@ Load commonly used test logic
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
 
+Verify that amending commits known to remotes doesn't break anything
+
+  $ cat >> .hg/hgrc << EOF
+  > [experimental]
+  > evolution = createmarkers
+  > evolution.createmarkers = yes
+  > EOF
+  $ hg tags
+  tip                                2:cb3879a0347e
+  default/master                     2:cb3879a0347e
+  beta                               1:5403d6137622
+  alpha                              0:ff7a2f2d8d70
+  $ echo beta-fix-again >> beta
+  $ hg commit --amend
+NB: rev is inconsistent, as older hg uses an intermetadiate commit
+  $ hg log -T '{rev}:{node|short} {tags}{if(obsolete, " X")}\n'
+  [34]:d4e231d3f8e3 tip (re)
+  1:5403d6137622 beta
+  0:ff7a2f2d8d70 alpha
+  $ hg tags
+  abort: 00changelog.i@cb3879a0347e6461912cddb21095eb52117c5f45: filtered node!
+  [255]
+  $ hg push
+  pushing to $TESTTMP/gitrepo
+  searching for changes
+  abort: pushing refs/heads/master overwrites d4e231d3f8e3
+  [255]
+  $ hg push -f
+  pushing to $TESTTMP/gitrepo
+  searching for changes
+  adding objects
+  added 1 commits with 1 trees and 1 blobs
+  updating reference refs/heads/master
+
+Now create a tag for the old, obsolete master
+
+  $ cd ../gitrepo
+  $ git tag detached $(hg log -R ../hgrepo --hidden -r 2 -T '{gitnode}\n')
+  $ cd ../hgrepo
+  $ hg pull
+  pulling from $TESTTMP/gitrepo
+  no changes found
+  $ hg log -T '{rev}:{node|short} {tags}{if(obsolete, " X")}\n'
+  [34]:d4e231d3f8e3 default/master tip (re)
+  1:5403d6137622 beta
+  0:ff7a2f2d8d70 alpha
+  $ hg tags
+  abort: 00changelog.i@cb3879a0347e6461912cddb21095eb52117c5f45: filtered node!
+  [255]
+  $ hg push
+  pushing to $TESTTMP/gitrepo
+  searching for changes
+  abort: (hidden|filtered) revision 'cb3879a0347e6461912cddb21095eb52117c5f45'! (re)
+  (use --hidden to access hidden revisions) (?)
+  [255]
+
   $ cd ..
