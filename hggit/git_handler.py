@@ -5,6 +5,7 @@ import itertools
 import io
 import os
 import re
+import shutil
 
 from dulwich.errors import HangupException, GitProtocolError
 from dulwich.objects import Blob, Commit, Tag, Tree, parse_timezone
@@ -441,12 +442,7 @@ class GitHandler(object):
         mapfile = self.vfs.join(self.map_file)
         tagsfile = self.vfs.join(self.tags_file)
         if os.path.exists(self.gitdir):
-            for root, dirs, files in os.walk(self.gitdir, topdown=False):
-                for name in files:
-                    os.remove(os.path.join(root, name))
-                for name in dirs:
-                    os.rmdir(os.path.join(root, name))
-            os.rmdir(self.gitdir)
+            shutil.rmtree(self.gitdir)
         if os.path.exists(mapfile):
             os.remove(mapfile)
         if os.path.exists(tagsfile):
