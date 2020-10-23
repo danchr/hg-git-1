@@ -3,8 +3,9 @@
 # repositories to Git repositories. Code in this file is meant to be a generic
 # library and should be usable outside the context of hg-git or an hg command.
 
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
+import collections
 import os
 import stat
 
@@ -19,10 +20,10 @@ from . import util
 
 
 def parse_subrepos(ctx):
-    sub = util.OrderedDict()
+    sub = collections.OrderedDict()
     if b'.hgsub' in ctx:
         sub = util.parse_hgsub(ctx[b'.hgsub'].data().splitlines())
-    substate = util.OrderedDict()
+    substate = collections.OrderedDict()
     if b'.hgsubstate' in ctx:
         substate = util.parse_hgsubstate(
             ctx[b'.hgsubstate'].data().splitlines())
@@ -150,7 +151,7 @@ class IncrementalChangesetExporter(object):
         while todo:
             path, tree = todo.pop()
             self._dirs[path] = tree
-            for entry in compat.iteritems(tree):
+            for entry in tree.items():
                 if entry.mode == dirkind:
                     if path == b'':
                         newpath = entry.path
@@ -402,7 +403,7 @@ class IncrementalChangesetExporter(object):
         def isgit(sub, path):
             return path not in sub or sub[path].startswith(b'[git]')
 
-        for path, sha in compat.iteritems(substate):
+        for path, sha in substate.items():
             if not isgit(sub, path):
                 # old = hg -- will be handled in next loop
                 continue
@@ -411,7 +412,7 @@ class IncrementalChangesetExporter(object):
                 # new = hg or no, case (2) or (3)
                 removed.append(path)
 
-        for path, sha in compat.iteritems(newsubstate):
+        for path, sha in newsubstate.items():
             if not isgit(newsub, path):
                 # new = hg or no; the only cases we care about are handled
                 # above

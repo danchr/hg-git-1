@@ -1,4 +1,4 @@
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 import collections
 import itertools
@@ -242,7 +242,7 @@ class GitHandler(object):
             map_hg = self._map_hg
             with self.vfs(map_file, b'wb+', atomictemp=True) as buf:
                 bwrite = buf.write
-                for hgsha, gitsha in compat.iteritems(map_hg):
+                for hgsha, gitsha in map_hg.items():
                     bwrite(b"%s %s\n" % (gitsha, hgsha))
 
     def load_tags(self):
@@ -255,7 +255,7 @@ class GitHandler(object):
     def save_tags(self):
         with self.repo.wlock(), self.store_repo.wlock():
             with self.vfs(self.tags_file, b'w+', atomictemp=True) as fp:
-                for name, sha in sorted(compat.iteritems(self.tags)):
+                for name, sha in sorted(self.tags.items()):
                     if not self.repo.tagtype(name) == b'global':
                         fp.write(b"%s %s\n" % (sha, name))
 
@@ -402,7 +402,7 @@ class GitHandler(object):
         try:
             self._call_client(remote, 'send_pack', changed, lambda have, want: [])
 
-            changed_refs = [ref for ref, sha in compat.iteritems(new_refs)
+            changed_refs = [ref for ref, sha in new_refs.items()
                             if sha != old_refs.get(ref)]
             new = [bin(self.map_hg_get(new_refs[ref])) for ref in changed_refs]
             old = {}
@@ -427,7 +427,7 @@ class GitHandler(object):
             new_refs = new_refs.refs
 
         if remote_name and new_refs:
-            for ref, new_sha in sorted(compat.iteritems(new_refs)):
+            for ref, new_sha in sorted(new_refs.items()):
                 old_sha = old_refs.get(ref)
                 if old_sha is None:
                     if self.ui.verbose:
@@ -884,9 +884,9 @@ class GitHandler(object):
                 parentsubdata = p1ctx.filectx(b'.hgsubstate').data()
                 parentsubdata = parentsubdata.splitlines()
                 parentsubstate = util.parse_hgsubstate(parentsubdata)
-                for path, sha in compat.iteritems(parentsubstate):
+                for path, sha in parentsubstate.items():
                     hgsubstate[path] = sha
-        for path, sha in compat.iteritems(gitlinks):
+        for path, sha in gitlinks.items():
             if sha is None:
                 hgsubstate.pop(path, None)
             else:
@@ -965,7 +965,7 @@ class GitHandler(object):
                 return []
             manifest1 = unfiltered[p1].manifest()
             manifest2 = unfiltered[p2].manifest()
-            return [path for path, node1 in compat.iteritems(manifest1) if path not
+            return [path for path, node1 in manifest1.items() if path not
                     in files and manifest2.get(path, node1) != node1]
 
         def getfilectx(repo, memctx, f):
@@ -1161,7 +1161,7 @@ class GitHandler(object):
 
         # mapped nodes might be hidden
         unfiltered = self.repo.unfiltered()
-        for rev, rev_refs in compat.iteritems(exportable):
+        for rev, rev_refs in exportable.items():
             ctx = self.repo[rev]
             if not rev_refs:
                 raise error.Abort(b"revision %s cannot be pushed since"
@@ -1224,7 +1224,7 @@ class GitHandler(object):
             if refs is None:
                 return None
             filteredrefs = self.filter_refs(refs, heads)
-            return [x for x in compat.itervalues(filteredrefs) if x not in self.git]
+            return [x for x in filteredrefs.values() if x not in self.git]
 
         try:
             progress = GitProgress(self.ui)
@@ -1331,7 +1331,7 @@ class GitHandler(object):
                         raise error.Abort(b"ambiguous reference %s: %r"
                                           % (h, r))
         else:
-            for ref, sha in compat.iteritems(refs):
+            for ref, sha in refs.items():
                 if (not ref.endswith(b'^{}') and
                     (ref.startswith(b'refs/heads/') or
                      ref.startswith(b'refs/tags/'))):
@@ -1341,7 +1341,7 @@ class GitHandler(object):
         # the choice of OrderedDict vs plain dict has no impact on stock
         # hg-git, but allows extensions to customize the order in which refs
         # are returned
-        return util.OrderedDict((r, refs[r]) for r in filteredrefs)
+        return collections.OrderedDict((r, refs[r]) for r in filteredrefs)
 
     def filter_min_date(self, refs):
         '''filter refs by minimum date
@@ -1359,22 +1359,25 @@ class GitHandler(object):
                 return obj.tag_time >= min_timestamp
             else:
                 return obj.commit_time >= min_timestamp
-        return util.OrderedDict((ref, sha) for ref, sha in compat.iteritems(refs)
-                                if check_min_time(self.git[sha]))
+        return collections.OrderedDict(
+            (ref, sha)
+            for ref, sha in refs.items()
+            if check_min_time(self.git[sha])
+        )
 
     def update_references(self):
         exportable = self.get_exportable()
 
         # Create a local Git branch name for each
         # Mercurial bookmark.
-        for hg_sha, refs in compat.iteritems(exportable):
+        for hg_sha, refs in exportable.items():
             for git_ref in refs.heads:
                 git_sha = self.map_git_get(hg_sha)
                 if git_sha:
                     self.git.refs[git_ref] = git_sha
 
     def export_hg_tags(self):
-        for tag, sha in compat.iteritems(self.repo.tags()):
+        for tag, sha in self.repo.tags().items():
             if self.repo.tagtype(tag) in (b'global', b'git'):
                 tag = tag.replace(b' ', b'_')
                 target = self.map_git_get(hex(sha))
@@ -1426,7 +1429,7 @@ class GitHandler(object):
                 self.repo.ui.warn(b"warning: not exporting bookmark '%s' "
                                   b"due to invalid name\n" % bm)
 
-        for tag, sha in compat.iteritems(self.tags):
+        for tag, sha in self.tags.items():
             res[sha].tags.add(b'refs/tags/' + tag)
         return res
 
@@ -1524,7 +1527,7 @@ class GitHandler(object):
         for t in list(remote_refs):
             if t.startswith(remote_name + b'/'):
                 del remote_refs[t]
-        for ref_name, sha in compat.iteritems(refs):
+        for ref_name, sha in refs.items():
             if ref_name.startswith(b'refs/heads'):
                 hgsha = self.map_hg_get(sha)
                 if hgsha is None or hgsha not in self.repo:
@@ -1714,7 +1717,7 @@ class GitHandler(object):
         return []
 
     def remote_name(self, remote, push):
-        for path in compat.itervalues(self.ui.paths):
+        for path in self.ui.paths.values():
             if push and path.pushloc == remote:
                 return path.name
             if path.loc == remote:
@@ -1824,7 +1827,7 @@ class GitHandler(object):
             if proxy:
                 config.set(b'http', b'proxy', b'http://' + proxy)
 
-                if compat.config(self.ui, b'string', b'http_proxy', b'passwd'):
+                if self.ui.config(b'http_proxy', b'passwd'):
                     self.ui.warn(
                         b"warning: proxy authentication is unsupported\n",
                     )

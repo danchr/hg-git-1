@@ -1,6 +1,6 @@
 # git2hg.py - convert Git repositories and commits to Mercurial ones
 
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 from dulwich.objects import Commit, Tag
 
@@ -28,7 +28,7 @@ def find_incoming(git_object_store, git_map, refs):
     def get_heads(refs):
         todo = []
         seenheads = set()
-        for ref, sha in compat.iteritems(refs):
+        for ref, sha in refs.items():
             # refs could contain refs on the server that we haven't pulled down
             # the objects for; also make sure it's a sha and not a symref
             if ref != b'HEAD' and sha in git_object_store:

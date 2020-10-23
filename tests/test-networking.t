@@ -12,7 +12,7 @@ We assume the git server is unavailable elsewhere.
 Allow password prompts without a TTY:
 
   $ cat << EOF > get_pass.py
-  > from __future__ import print_function, absolute_import
+  > from __future__ import generator_stop
   > import getpass, os, sys
   > def newgetpass(args):
   >     try:

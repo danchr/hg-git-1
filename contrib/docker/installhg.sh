@@ -12,12 +12,7 @@ else
     PIPDEPENDS="https://www.mercurial-scm.org/repo/hg/archive/$HG.tar.gz"
 fi
 
-if echo "$PYTHON" | grep -q ^2
-then
-    PIPDEPENDS="$PIPDEPENDS dulwich~=0.19.0"
-else
-    PIPDEPENDS="$PIPDEPENDS dulwich pyflakes"
-fi
+PIPDEPENDS="$PIPDEPENDS dulwich pyflakes"
 
 if test "$PYTHON" -gt 3.5
 then

@@ -100,7 +100,7 @@ revisions. See :hg:`help revsets` for details.
 
 '''
 
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 # global modules
 import os

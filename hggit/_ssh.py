@@ -1,4 +1,4 @@
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 import subprocess
 
@@ -21,7 +21,7 @@ def generate_ssh_vendor(ui):
 
     class _Vendor(SSHVendor):
         def run_command(self, host, command, username=None, port=None):
-            assert isinstance(command, compat.unicode)
+            assert isinstance(command, str)
             command = command.encode(SSHGitClient.DEFAULT_ENCODING)
             sshcmd = ui.config(b"ui", b"ssh", b"ssh")
             args = compat.sshargs(sshcmd, pycompat.bytesurl(host),

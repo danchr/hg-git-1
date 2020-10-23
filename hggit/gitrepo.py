@@ -1,12 +1,10 @@
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 from .util import isgitsshuri
 from mercurial import (
     error,
     util
 )
-
-from . import compat
 
 peerapi = False
 try:
@@ -65,7 +63,7 @@ class basegitrepo(peerrepository):
                 # map any git shas that exist in hg to hg shas
                 stripped_refs = {
                     ref[11:]: handler.map_hg_get(val) or val
-                    for ref, val in compat.iteritems(result.refs)
+                    for ref, val in result.refs.items()
                     if ref.startswith(b'refs/heads/')
                 }
                 return stripped_refs

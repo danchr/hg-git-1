@@ -4,7 +4,7 @@
 #
 # incomplete, implemented on demand
 
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 from mercurial import (
     ancestor,
@@ -37,7 +37,7 @@ class overlaymanifest(object):
         self.load()
         return {
             path
-            for path, flag in compat.iteritems(self._flags)
+            for path, flag in self._flags.items()
             if flag != b''
         }
 
@@ -67,7 +67,7 @@ class overlaymanifest(object):
                 return b''
 
         def addtree(tree, dirname):
-            for entry in compat.iteritems(tree):
+            for entry in tree.items():
                 if entry.mode & 0o40000:
                     # expand directory
                     subtree = self.repo.handler.git.get_object(entry.sha)
@@ -92,7 +92,7 @@ class overlaymanifest(object):
 
     def iteritems(self):
         self.load()
-        return compat.iteritems(self._map)
+        return self._map.items()
 
     def __iter__(self):
         self.load()
@@ -214,7 +214,7 @@ class overlaychangectx(context.changectx):
         self._hgrepo = repo
         if isinstance(sha, bytes):
             pass
-        elif isinstance(sha, compat.unicode):
+        elif isinstance(sha, str):
             sha = sha.encode('ascii')
         else:
             sha = sha.hex()

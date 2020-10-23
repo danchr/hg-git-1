@@ -1,4 +1,4 @@
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 import sys
 
@@ -42,13 +42,6 @@ except ImportError:
     tonativestr = pycompat.identity
 
 try:
-    from mercurial.pycompat import iteritems, itervalues
-except ImportError:
-    assert not pycompat.ispy3
-    iteritems = lambda x: x.iteritems()
-    itervalues = lambda x: x.itervalues()
-
-try:
     from mercurial.cmdutil import check_at_most_one_arg
 except (ImportError, AttributeError):
     # added in 5.3
@@ -60,7 +53,7 @@ except (ImportError, AttributeError):
 
         def to_display(name):
             # 5.2 does not check this
-            if isinstance(name, unicode):
+            if isinstance(name, str):
                 name = pycompat.sysbytes(name)
             return name.replace(b'_', b'-')
 
@@ -96,12 +89,6 @@ except (ImportError, AttributeError):
             return True
         except error.RepoLookupError:
             return False
-
-try:
-    unicode = unicode
-    assert unicode  # silence pyflakes
-except NameError:
-    from mercurial.pycompat import unicode
 
 quote = hgutil.urlreq.quote
 unquote = hgutil.urlreq.unquote
@@ -176,8 +163,8 @@ hasconfigitems = False
 def registerconfigs(configitem):
     global hasconfigitems
     hasconfigitems = True
-    for section, items in iteritems(CONFIG_DEFAULTS):
-        for item, default in iteritems(items):
+    for section, items in CONFIG_DEFAULTS.items():
+        for item, default in items.items():
             configitem(section, item, default=default)
 
 

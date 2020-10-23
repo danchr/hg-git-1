@@ -1,4 +1,4 @@
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 import os
 import stat
@@ -14,7 +14,6 @@ from mercurial import (
     util,
 )
 
-from . import compat
 from mercurial.i18n import _
 
 
@@ -52,7 +51,7 @@ def gignorepats(orig, lines, root=None):
             rootsuffixes = [b'', b'**/']
         for rootsuffix in rootsuffixes:
             pat = syntax + rootprefix + rootsuffix + line
-            for s, rels in compat.iteritems(syntaxes):
+            for s, rels in syntaxes.items():
                 if line.startswith(rels):
                     pat = line
                     break

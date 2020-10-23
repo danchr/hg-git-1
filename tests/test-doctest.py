@@ -1,6 +1,6 @@
 # this is hack to make sure no escape characters are inserted into the output
 
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 import doctest
 import os
