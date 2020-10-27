@@ -9,7 +9,7 @@ except ImportError:
     sys.exit(80)
 
 import os, tempfile, unittest, shutil
-from mercurial import ui, hg, commands
+from mercurial import ui, hg, commands, pycompat
 
 sys.path.append(os.path.join(os.path.dirname(__file__), os.path.pardir))
 
@@ -28,16 +28,16 @@ class TestUrlParsing(object):
         # remove the temp repo
         shutil.rmtree(self.tmpdir)
 
-    def assertEquals(self, lb, r):
-        """assert equality of l (bytes) and r (str)
+    def assertEquals(self, l, r):
+        """assert equality of l and r, converting bytes to str
 
         This is so we don't have to adapt the whole .t output.
         """
-        rb = r.encode('utf-8')
-        ls = lb.decode('utf-8')
+        ls = pycompat.strurl(l)
+        rs = pycompat.strurl(r)
         print('%% expect %r' % (r, ))
         print(ls)
-        assert lb == rb
+        assert ls == rs, (l, r)
 
     def test_ssh_github_style_slash(self):
         url = b"git+ssh://git@github.com/webjam/webjam.git"

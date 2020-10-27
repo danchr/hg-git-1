@@ -1686,7 +1686,7 @@ class GitHandler(object):
         True
         >>> print(url.decode())
         user/repo.git
-        >>> print(client.host.decode())
+        >>> print(client.host)
         git@fqdn.com
         """
         # pass hg's ui.ssh config to dulwich
@@ -1703,7 +1703,7 @@ class GitHandler(object):
             host, port, sepr = res['host'], res['port'], res['sepr']
             transport = client.TCPGitClient
             if b'ssh' in res['scheme']:
-                util.checksafessh(host)
+                util.checksafessh(pycompat.bytesurl(host))
                 transport = client.SSHGitClient
             path = res['path']
             if sepr == b'/' and not path.startswith(b'~'):
@@ -1715,7 +1715,7 @@ class GitHandler(object):
             if port:
                 client.port = port
 
-            return transport(host, port=port), path
+            return transport(pycompat.strurl(host), port=port), path
 
         if uri.startswith(b'git+http://') or uri.startswith(b'git+https://'):
             uri = uri[4:]

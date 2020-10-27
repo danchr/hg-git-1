@@ -15,7 +15,11 @@ Load commonly used test logic
   > --base-path=$TESTTMP \
   > || exit 80
 
-Show that clone over the old git protocol breaks
+Make sure that clone over the old git protocol doesn't break
 
-  $ hg clone git://localhost:$HGPORT/test copy 2>&1 | tail -n 1
-  AttributeError: 'bytes' object has no attribute 'encode'
+  $ hg clone git://localhost:$HGPORT/test copy 2>&1
+  importing git objects into hg
+  updating to branch default
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ ls copy
+  foo

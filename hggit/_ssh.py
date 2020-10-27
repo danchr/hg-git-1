@@ -1,6 +1,7 @@
 from __future__ import absolute_import, print_function
 
 from dulwich.client import SSHGitClient, SubprocessWrapper
+from mercurial import pycompat
 import subprocess
 from . import compat
 
@@ -20,7 +21,8 @@ def generate_ssh_vendor(ui):
             assert isinstance(command, compat.unicode)
             command = command.encode(SSHGitClient.DEFAULT_ENCODING)
             sshcmd = ui.config(b"ui", b"ssh", b"ssh")
-            args = compat.sshargs(sshcmd, host, username, port)
+            args = compat.sshargs(sshcmd, pycompat.bytesurl(host),
+                                  username, port)
             cmd = b'%s %s %s' % (sshcmd, args, compat.shellquote(command))
             ui.debug(b'calling ssh: %s\n' % cmd)
             proc = subprocess.Popen(compat.quotecommand(cmd), shell=True,
