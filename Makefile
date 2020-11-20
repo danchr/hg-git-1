@@ -29,9 +29,9 @@ tests-%:
 # minor version should be listed for each major version; earlier minor
 # versions are not needed.
 
-all-version-tests: tests-4.3.3 tests-4.4.2 tests-4.5.3 tests-4.6.2 \
-  tests-4.7.2 tests-4.8.2 tests-4.9.1 tests-5.0.2 tests-5.1.2 tests-5.2.2 \
-  tests-5.3.2 tests-5.4.2 tests-5.5.2 tests-@
+all-version-tests: tests-4.4.2 tests-4.5.3 tests-4.6.2  tests-4.7.2 \
+  tests-4.8.2 tests-4.9.1 tests-5.0.2 tests-5.1.2 tests-5.2.2 tests-5.3.2 \
+  tests-5.4.2 tests-5.5.2 tests-@
 
 release:
 	$(PYTHON) setup.py sdist

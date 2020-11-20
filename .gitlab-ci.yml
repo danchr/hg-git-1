@@ -116,14 +116,6 @@ tests-py2-hg-4.4:
       - ./hg version --debug
       - python2 tests/run-tests.py -lv --color=always
 
-tests-py2-hg-4.3:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.3
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python2 tests/run-tests.py -lv --color=always
-
 tests-py3-hg-default:
     stage: compat
     image: registry.heptapod.net:443/mercurial/hg-git/ci-py3
