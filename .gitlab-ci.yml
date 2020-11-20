@@ -7,7 +7,7 @@ variables:
 
 tests-py2-hg-default:
     stage: compat
-    image: octobus/ci-py2-hg-git
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2
     allow_failure: true
     script:
         - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev default
@@ -19,7 +19,7 @@ tests-py2-hg-default:
 
 tests-py2-hg-stable:
     stage: compat
-    image: octobus/ci-py2-hg-git
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2
     script:
         - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev stable
         - PYTHONPATH= hg -R /ci/repos/mercurial/ update stable
@@ -30,7 +30,7 @@ tests-py2-hg-stable:
 
 tests-py2-hg-5.4:
     stage: current
-    image: octobus/ci-py2-hg-git:hg-5.4
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-5.4
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -38,7 +38,7 @@ tests-py2-hg-5.4:
 
 tests-py2-hg-5.3:
     stage: compat
-    image: octobus/ci-py2-hg-git:hg-5.3
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-5.3
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -46,7 +46,7 @@ tests-py2-hg-5.3:
 
 tests-py2-hg-5.2:
     stage: compat
-    image: octobus/ci-py2-hg-git:hg-5.2
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-5.2
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -54,7 +54,7 @@ tests-py2-hg-5.2:
 
 tests-py2-hg-5.1:
     stage: compat
-    image: octobus/ci-py2-hg-git:hg-5.1
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-5.1
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -62,7 +62,7 @@ tests-py2-hg-5.1:
 
 tests-py2-hg-5.0:
     stage: compat
-    image: octobus/ci-py2-hg-git:hg-5.0
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-5.0
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -70,7 +70,7 @@ tests-py2-hg-5.0:
 
 tests-py2-hg-4.9:
     stage: compat
-    image: octobus/ci-py2-hg-git:hg-4.9
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.9
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -78,7 +78,7 @@ tests-py2-hg-4.9:
 
 tests-py2-hg-4.8:
     stage: compat
-    image: octobus/ci-py2-hg-git:hg-4.8
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.8
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -86,7 +86,7 @@ tests-py2-hg-4.8:
 
 tests-py2-hg-4.7:
     stage: compat
-    image: octobus/ci-py2-hg-git:hg-4.7
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.7
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -94,7 +94,7 @@ tests-py2-hg-4.7:
 
 tests-py2-hg-4.6:
     stage: compat
-    image: octobus/ci-py2-hg-git:hg-4.6
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.6
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -102,7 +102,7 @@ tests-py2-hg-4.6:
 
 tests-py2-hg-4.5:
     stage: compat
-    image: octobus/ci-py2-hg-git:hg-4.5
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.5
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -110,7 +110,7 @@ tests-py2-hg-4.5:
 
 tests-py2-hg-4.4:
     stage: compat
-    image: octobus/ci-py2-hg-git:hg-4.4
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.4
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -118,7 +118,7 @@ tests-py2-hg-4.4:
 
 tests-py2-hg-4.3:
     stage: compat
-    image: octobus/ci-py2-hg-git:hg-4.3
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.3
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -126,7 +126,7 @@ tests-py2-hg-4.3:
 
 tests-py3-hg-default:
     stage: compat
-    image: octobus/ci-py3-hg-git
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py3
     allow_failure: true
     script:
         - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev default
@@ -138,7 +138,7 @@ tests-py3-hg-default:
 
 tests-py3-hg-stable:
     stage: compat
-    image: octobus/ci-py3-hg-git
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py3
     script:
         - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev stable
         - PYTHONPATH= hg -R /ci/repos/mercurial/ update stable
@@ -149,7 +149,7 @@ tests-py3-hg-stable:
 
 tests-py3-hg-5.4:
     stage: current
-    image: octobus/ci-py3-hg-git:hg-5.4
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py3:hg-5.4
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
@@ -157,7 +157,7 @@ tests-py3-hg-5.4:
 
 tests-py3-hg-5.3:
     stage: compat
-    image: octobus/ci-py3-hg-git:hg-5.3
+    image: registry.heptapod.net:443/mercurial/hg-git/ci-py3:hg-5.3
     script:
       - cp /ci/repos/mercurial/hg .
       - ./hg version --debug
