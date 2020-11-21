@@ -39,7 +39,7 @@ def audit_git_path(ui, path):
     ...     def warn(self, s):
     ...         if pycompat.ispy3:
     ...             import sys
-    ...             print(s.decode(sys.__stdout__.encoding))
+    ...             print(s.decode('utf-8', 'surrogatepass'))
     ...         else:
     ...             print(s)
     >>> u = fakeui()
