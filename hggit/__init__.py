@@ -223,7 +223,7 @@ def reposetup(ui, repo):
 
         if (getattr(dirstate, 'rootcache', False) and
             hgutil.safehasattr(repo, b'vfs') and
-            os.path.exists(compat.gitvfs(repo).join(b'git'))):
+            os.path.exists(repo.vfs.join(b'git'))):
             # only install our dirstate wrapper if it has a hope of working
             from . import gitdirstate
             dirstate.dirstate = gitdirstate.gitdirstate
@@ -232,10 +232,8 @@ def reposetup(ui, repo):
         repo.__class__ = klass
 
 
-if hgutil.safehasattr(manifest, b'_lazymanifest'):
-    # Mercurial >= 3.4
-    extensions.wrapfunction(manifest.manifestdict, b'diff',
-                            overlay.wrapmanifestdictdiff)
+extensions.wrapfunction(manifest.manifestdict, b'diff',
+                        overlay.wrapmanifestdictdiff)
 
 
 @command(b'gimport')
@@ -288,7 +286,7 @@ def gverify(ui, repo, **opts):
 def git_cleanup(ui, repo):
     '''clean up Git commit map after history editing'''
     new_map = []
-    vfs = compat.gitvfs(repo)
+    vfs = repo.vfs
     for line in vfs(GitHandler.map_file):
         gitsha, hgsha = line.strip().split(b' ', 1)
         if hgsha in repo:
@@ -380,29 +378,19 @@ if (hgutil.safehasattr(hgui, b'path') and
 def exchangepull(orig, repo, remote, heads=None, force=False, bookmarks=(),
                  **kwargs):
     if isinstance(remote, gitrepo.gitrepo):
-        # transaction manager is present in Mercurial >= 3.3
-        try:
-            trmanager = getattr(exchange, 'transactionmanager')
-        except AttributeError:
-            trmanager = None
         pullop = exchange.pulloperation(repo, remote, heads, force,
                                         bookmarks=bookmarks)
-        if trmanager:
-            pullop.trmanager = trmanager(repo, b'pull', remote.url())
+        pullop.trmanager = exchange.transactionmanager(repo, b'pull',
+                                                       remote.url())
+
         wlock = repo.wlock()
         lock = repo.lock()
         try:
             pullop.cgresult = repo.githandler.fetch(remote.path, heads)
-            if trmanager:
-                pullop.trmanager.close()
-            else:
-                pullop.closetransaction()
+            pullop.trmanager.close()
             return pullop
         finally:
-            if trmanager:
-                pullop.trmanager.release()
-            else:
-                pullop.releasetransaction()
+            pullop.trmanager.release()
             lock.release()
             wlock.release()
     else:
@@ -415,20 +403,16 @@ extensions.wrapfunction(exchange, b'pull', exchangepull)
 # TODO figure out something useful to do with the newbranch param
 @util.transform_notgit
 def exchangepush(orig, repo, remote, force=False, revs=None, newbranch=False,
-                 bookmarks=(), **kwargs):
+                 bookmarks=(), opargs=None, **kwargs):
     if isinstance(remote, gitrepo.gitrepo):
-        # opargs is in Mercurial >= 3.6
-        opargs = kwargs.get('opargs')
-        if opargs is None:
-            opargs = {}
         pushop = exchange.pushoperation(repo, remote, force, revs, newbranch,
                                         bookmarks,
-                                        **pycompat.strkwargs(opargs))
+                                        **pycompat.strkwargs(opargs or {}))
         pushop.cgresult = repo.githandler.push(remote.path, revs, force)
         return pushop
     else:
         return orig(repo, remote, force, revs, newbranch, bookmarks=bookmarks,
-                    **kwargs)
+                    opargs=None, **kwargs)
 
 
 extensions.wrapfunction(exchange, b'push', exchangepush)

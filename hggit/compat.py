@@ -7,17 +7,8 @@ from mercurial import (
     pycompat,
     templatekw,
     ui,
-    url,
     util as hgutil,
 )
-
-try:
-    from mercurial import vfs as vfsmod
-    hgvfs = vfsmod.vfs
-except ImportError:
-    # vfsmod was extracted in hg 4.2
-    from mercurial import scmutil
-    hgvfs = scmutil.vfs
 
 try:
     from mercurial.utils import procutil, stringutil
@@ -54,31 +45,6 @@ except NameError:
 
 quote = hgutil.urlreq.quote
 unquote = hgutil.urlreq.unquote
-
-
-def gitvfs(repo):
-    """return a vfs suitable to read git related data"""
-    # Mercurial >= 3.3:  repo.shared()
-    if repo.sharedpath != repo.path:
-        return hgvfs(repo.sharedpath)
-    else:
-        return repo.vfs
-
-
-def passwordmgr(ui):
-    try:
-        realm = hgutil.urlreq.httppasswordmgrwithdefaultrealm()
-        return url.passwordmgr(ui, realm)
-    except (TypeError, AttributeError):
-        # compat with hg < 3.9
-        return url.passwordmgr(ui)
-
-# hg 4.3 - osutil moved, but mercurial.util re-exports listdir
-if hgutil.safehasattr(hgutil, b'listdir'):
-    listdir = hgutil.listdir
-else:
-    from mercurial import osutil
-    listdir = osutil.listdir
 
 
 def memfilectx(repo, changectx, path, data, islink=False,
@@ -186,6 +152,7 @@ class progress(object):
         self.update(None)
 
 
+# no makeprogress in < 4.7
 if hgutil.safehasattr(ui.ui, b'makeprogress'):
     def makeprogress(ui, topic, unit=b"", total=None):
         return ui.makeprogress(topic, unit, total)

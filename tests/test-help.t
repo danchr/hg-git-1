@@ -9,7 +9,7 @@ Load commonly used test logic
    git Working with Git Repositories
 
 Mercurial 3.7+ uses single quotes
-  $ hg help hggit | grep 'help git' | sed "s/'/\"/g"
-  For more information and instructions, see "hg help git"
+  $ hg help hggit | grep 'help git'
+  For more information and instructions, see 'hg help git'
   $ hg help git | grep 'Working with Git Repositories'
   Working with Git Repositories

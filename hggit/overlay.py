@@ -12,6 +12,7 @@ from mercurial import (
     context,
     manifest,
     match as matchmod,
+    namespaces,
     node,
     util,
 )
@@ -106,26 +107,16 @@ class overlaymanifest(object):
         self.load()
         return self._map.get(path, default)
 
-    def diff(self, m2, match=None, clean=False):
-        # Older mercurial clients used diff(m2, clean=False). If a caller
-        # failed to specify clean as a keyword arg, it might get passed as
-        # match here.
-        if isinstance(match, bool):
-            clean = match
-            match = None
+    def flags(self, key, default=''):
+        return self._flags.get(key, default)
 
+    def diff(self, m2, match=None, clean=False):
         self.load()
         if isinstance(m2, overlaymanifest):
             m2.load()
 
         # below code copied from manifest.py:manifestdict.diff
         diff = {}
-
-        try:
-            m2flagget = m2.flags
-        except AttributeError:
-            # Mercurial <= 3.3
-            m2flagget = m2._flags.get
 
         if match is None:
             match = matchmod.always(b'', b'')
@@ -134,7 +125,7 @@ class overlaymanifest(object):
                 continue
             fl1 = self._flags.get(fn)
             n2 = m2.get(fn, None)
-            fl2 = m2flagget(fn)
+            fl2 = m2.flags(fn)
             if n2 is None:
                 fl2 = b''
             if n1 != n2 or fl1 != fl2:
@@ -146,7 +137,7 @@ class overlaymanifest(object):
             if fn not in self:
                 if not match(fn):
                     continue
-                fl2 = m2flagget(fn)
+                fl2 = m2.flags(fn)
                 diff[fn] = ((None, b''), (n2, fl2))
 
         return diff
@@ -372,16 +363,6 @@ class overlayrevlog(object):
         return len(self.repo.handler.repo) + len(self.repo.revmap)
 
 
-class overlayoldmanifestlog(overlayrevlog):
-    def read(self, sha):
-        if sha == nullid:
-            return manifest.manifestdict()
-        return overlaymanifest(self.repo, sha)
-
-    def __getitem__(self, sha):
-        return overlaymanifestctx(self.repo, sha)
-
-
 class overlaymanifestrevlog(overlayrevlog):
     pass
 
@@ -395,25 +376,16 @@ class overlaymanifestctx(object):
         return overlaymanifest(self._repo, self._node)
 
 
-try:
-    class overlaymanifestlog(manifest.manifestlog):
-        def __init__(self, repo):
-            self._repo = repo
+class overlaymanifestlog(manifest.manifestlog):
+    def __init__(self, repo):
+        self._repo = repo
 
-        # Needed for 4.0, since __getitem__ did not redirect to get() in that
-        # release.
-        def __getitem__(self, node):
-            return self.get(b'', node)
-
-        def get(self, dir, node):
-            if dir:
-                raise RuntimeError(b"hggit doesn't support treemanifests")
-            if node == nullid:
-                return manifest.manifestctx()
-            return overlaymanifestctx(self._repo, node)
-except AttributeError:
-    # manifestlog did not exist prior to 4.0
-    pass
+    def get(self, dir, node):
+        if dir:
+            raise RuntimeError(b"hggit doesn't support treemanifests")
+        if node == nullid:
+            return manifest.manifestctx()
+        return overlaymanifestctx(self._repo, node)
 
 
 class overlaychangelog(overlayrevlog):
@@ -460,13 +432,7 @@ class overlayrepo(object):
         self._activebookmark = None
 
         self.changelog = overlaychangelog(self, handler.repo.changelog)
-        if util.safehasattr(handler.repo, b'manifest'):
-            self.manifest = overlayoldmanifestlog(self, handler.repo.manifest)
-            # new as of mercurial 3.9+
-            self.manifestlog = self.manifest
-        else:
-            # no more manifest class as of 4.1
-            self.manifestlog = overlaymanifestlog(self)
+        self.manifestlog = overlaymanifestlog(self)
 
         # for incoming -p
         self.root = handler.repo.root
@@ -481,12 +447,7 @@ class overlayrepo(object):
 
         self._makemaps(commits, refs)
 
-        try:
-            # Mercurial >= 3.3
-            from mercurial import namespaces
-            self.names = namespaces.namespaces()
-        except (AttributeError, ImportError):
-            pass
+        self.names = namespaces.namespaces()
 
         self.githandler = overlaygithandler(self)
 

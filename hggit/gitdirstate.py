@@ -179,7 +179,7 @@ class gitdirstate(dirstate.dirstate):
             if nd != b'':
                 skip = b'.hg'
             try:
-                entries = compat.listdir(join(nd), stat=True, skip=skip)
+                entries = util.listdir(join(nd), stat=True, skip=skip)
             except OSError as inst:
                 if inst.errno in (errno.EACCES, errno.ENOENT):
                     fwarn(nd, inst.strerror)

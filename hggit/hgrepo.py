@@ -1,9 +1,6 @@
 from __future__ import absolute_import, print_function
 
-from mercurial import (
-    util as hgutil,
-    localrepo,
-)
+from mercurial import util as hgutil
 from mercurial.node import bin
 
 from .git_handler import GitHandler
@@ -14,26 +11,6 @@ from . import util
 
 def generate_repo_subclass(baseclass):
     class hgrepo(baseclass):
-        if hgutil.safehasattr(localrepo.localrepository, b'pull'):
-            # Mercurial < 3.2
-            @util.transform_notgit
-            def pull(self, remote, heads=None, force=False):
-                if isinstance(remote, gitrepo):
-                    return self.githandler.fetch(remote.path, heads)
-                else:  # pragma: no cover
-                    return super(hgrepo, self).pull(remote, heads, force)
-
-        if hgutil.safehasattr(localrepo.localrepository, b'push'):
-            # Mercurial < 3.2
-            # TODO figure out something useful to do with the newbranch param
-            @util.transform_notgit
-            def push(self, remote, force=False, revs=None, newbranch=False):
-                if isinstance(remote, gitrepo):
-                    return self.githandler.push(remote.path, revs, force)
-                else:  # pragma: no cover
-                    return super(hgrepo, self).push(remote, force, revs,
-                                                    newbranch)
-
         @util.transform_notgit
         def findoutgoing(self, remote, base=None, heads=None, force=False):
             if isinstance(remote, gitrepo):

@@ -26,6 +26,7 @@ from mercurial import (
     phases,
     pycompat,
     util as hgutil,
+    vfs,
 )
 
 from . import _ssh
@@ -119,9 +120,8 @@ class GitHandler(object):
         self.ui = ui
         self.vfs = self.repo.vfs
 
-        # Mercurial >= 3.3:  repo.shared()
-        if dest_repo.sharedpath != dest_repo.path:
-            self.vfs = compat.hgvfs(dest_repo.sharedpath)
+        if dest_repo.shared():
+            self.vfs = vfs.vfs(dest_repo.sharedpath)
         if compat.config(ui, b'bool', b'git', b'intree'):
             self.gitdir = self.repo.wvfs.join(b'.git')
         else:
@@ -651,10 +651,9 @@ class GitHandler(object):
 
         >>> from collections import namedtuple
         >>> from mercurial.ui import ui
-        >>> mockrepo = namedtuple('localrepo', ['vfs', 'sharedpath', 'path'])
-        >>> mockrepo.vfs = namedtuple('vfs', ['join'])(lambda x: x)
-        >>> mockrepo.sharedpath = b''
-        >>> mockrepo.path = b''
+        >>> mockrepo = namedtuple('localrepo', ['vfs', 'shared', 'path'])(
+        ...     namedtuple('vfs', ['join'])(lambda x: x), lambda: False, b'',
+        ... )
         >>> g = GitHandler(mockrepo, ui()).get_valid_git_username_email
         >>> g(b'John Doe')
         'John Doe'
@@ -1672,10 +1671,9 @@ class GitHandler(object):
         >>> from collections import namedtuple
         >>> from dulwich.client import HttpGitClient, SSHGitClient
         >>> from mercurial.ui import ui
-        >>> mockrepo = namedtuple('localrepo', ['vfs', 'sharedpath', 'path'])
-        >>> mockrepo.vfs = namedtuple('vfs', ['join'])(lambda x: x)
-        >>> mockrepo.sharedpath = b''
-        >>> mockrepo.path = b''
+        >>> mockrepo = namedtuple('localrepo', ['vfs', 'shared', 'path'])(
+        ...     namedtuple('vfs', ['join'])(lambda x: x), lambda: False, b'',
+        ... )
         >>> g = GitHandler(mockrepo, ui())
         >>> tp = g.get_transport_and_path
         >>> client, url = tp(b'http://fqdn.com/test.git')

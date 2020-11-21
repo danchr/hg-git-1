@@ -15,7 +15,6 @@ from mercurial.i18n import _
 from mercurial import (
     error,
     lock as lockmod,
-    util as hgutil,
 )
 
 from . import compat
@@ -116,20 +115,7 @@ def updatebookmarks(repo, changes, name=b'git_handler'):
         wlock = repo.wlock()
         lock = repo.lock()
         tr = repo.transaction(name)
-        if hgutil.safehasattr(bms, b'applychanges'):
-            # applychanges was added in mercurial 4.3
-            bms.applychanges(repo, tr, changes)
-        else:
-            for name, node in changes:
-                if node is None:
-                    del bms[name]
-                else:
-                    bms[name] = node
-            if hgutil.safehasattr(bms, b'recordchange'):
-                # recordchange was added in mercurial 3.2
-                bms.recordchange(tr)
-            else:
-                bms.write()
+        bms.applychanges(repo, tr, changes)
         tr.close()
     finally:
         lockmod.release(tr, lock, wlock)
