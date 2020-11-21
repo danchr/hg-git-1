@@ -1,3 +1,6 @@
+Load commonly used test logic
+  $ . "$TESTDIR/testutil"
+
 bail if the user does not have dulwich
   $ python -c 'import dulwich, dulwich.repo' || exit 80
 
