@@ -13,6 +13,13 @@ echo 'mq=' >> $HGRCPATH
 echo '[subrepos]' >> $HGRCPATH
 echo 'git:allowed = yes' >> $HGRCPATH
 
+# Disable warnings on 4.6, specifically; clone triggers a warning
+if hg --version | fgrep -q 'version 4.6'
+then
+    echo "[devel]" >> $HGRCPATH
+    echo "all-warnings=no" >> $HGRCPATH
+fi
+
 # Standard checks for external dependencies
 # We use the git command-line client and dulwich in pretty much all the tests.
 # Thus, to avoid repetitively declaring that requirement in almost every test,
