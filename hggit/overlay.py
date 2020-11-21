@@ -35,8 +35,11 @@ class overlaymanifest(object):
 
     def withflags(self):
         self.load()
-        return set([path for path, flag in compat.iteritems(self._flags)
-                    if flag != b''])
+        return {
+            path
+            for path, flag in compat.iteritems(self._flags)
+            if flag != b''
+        }
 
     def copy(self):
         return overlaymanifest(self.repo, self.tree.id)

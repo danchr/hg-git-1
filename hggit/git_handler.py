@@ -1395,8 +1395,11 @@ class GitHandler(object):
         try:
             bms = self.repo._bookmarks
 
-            heads = dict([(ref[11:], refs[ref]) for ref in refs
-                          if ref.startswith(b'refs/heads/')])
+            heads = {
+                ref[11:]: refs[ref]
+                for ref in refs
+                if ref.startswith(b'refs/heads/')
+            }
 
             suffix = self.branch_bookmark_suffix or b''
             changes = []
