@@ -16,4 +16,4 @@ run pyflakes on all tracked files ending in .py or without a file ending
   $ testrepohg locate 'set:**.py or grep("^#!.*python")' \
   > -X tests/ \
   > 2>/dev/null \
-  > | xargs pyflakes 2>/dev/null
+  > | xargs $PYTHON -m pyflakes 2>/dev/null
