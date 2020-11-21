@@ -111,7 +111,7 @@ class TestUrlParsing(object):
 
 if __name__ == '__main__':
     tc = TestUrlParsing()
-    for test in sorted([t for t in dir(tc) if t.startswith('test_')]):
+    for test in sorted(t for t in dir(tc) if t.startswith('test_')):
         tc.setUp()
         getattr(tc, test)()
         tc.tearDown()
