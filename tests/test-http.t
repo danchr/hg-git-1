@@ -23,7 +23,7 @@ Test server address cannot be reused
   [255]
 #else
   $ hg serve -p $HGPORT1 2>&1
-  abort: cannot start server at '*:$HGPORT1': Address already in use (glob)
+  abort: cannot start server at '*:$HGPORT1': Address* in use (glob)
   [255]
 #endif
   $ cd ..
