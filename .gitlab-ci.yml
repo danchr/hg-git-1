@@ -1,156 +1,157 @@
 stages:
+  - images
   - current
   - compat
 
-variables:
-  PYTHONPATH: /ci/repos/mercurial
+# First, test with the latest and greatest Mercurial, across the
+# versions Python supported. We generally assume that if e.g. CPython
+# 3.5 and 3.8 work, anything in between will work as well.
+Latest:
+  stage: current
+  image: registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
+  script:
+    - python$PYTHON tests/run-tests.py --xunit tests.xml -v --color=always
+  parallel:
+    matrix:
+      - PYTHON:
+          - "2.7"
+          - "3.5"
+          - "3.9"
+        HG:
+          - "5.6"
+  artifacts:
+    reports:
+      junit: tests.xml
 
-tests-py2-hg-default:
+# This is the authoritative list of versions of Mercurial that this
+# extension is supported and tested with; it should be kept in sync
+# with __init__.py.
+#
+# Versions prior to the version that ships in the latest Ubuntu LTS
+# release (4.5.3 for 18.04; 5.3.1 for 20.04) may be dropped if they
+# interfere with new development. The latest released minor version
+# should be listed for each major version; earlier minor versions are
+# not needed.
+Supported:
+  stage: compat
+  image: registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
+  script:
+    - python$PYTHON tests/run-tests.py -v --color=always
+  parallel:
+    matrix:
+      - PYTHON: "2.7"
+        HG:
+          - "4.4"
+          - "4.5"
+          - "4.6"
+          - "4.7"
+          - "4.8"
+          - "4.9"
+          - "5.0"
+          - "5.1"
+          - "5.2"
+          - "5.3"
+          - "5.4"
+          - "5.5"
+      - PYTHON: "3.9"
+        HG:
+          - "5.2"
+          - "5.3"
+          - "5.4"
+          - "5.5"
+
+# Test that it is possible to use and run hg-git on Ubuntu without
+# compiling any C code, i.e. with stock Dulwich, Mercurial and
+# CPython. This should most definitely be the case on the latest
+# rolling release without a PPA. We can live with PPAs on older
+# systems.
+Ubuntu:
     stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2
-    allow_failure: true
+    image: ubuntu:20.10
     script:
-        - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev default
-        - PYTHONPATH= hg -R /ci/repos/mercurial/ update default
-        - PYTHONPATH= hg -R /ci/repos/mercurial summary
-        - make -C /ci/repos/mercurial local PYTHON=python2
-        - cp /ci/repos/mercurial/hg .
-        - python2 tests/run-tests.py -lv --color=always
+      - apt-get -qq update
+      - >
+        DEBIAN_FRONTEND=noninteractive
+        apt-get -qq install --no-install-recommends
+        gnupg gnupg-agent git unzip ssh
+        mercurial python3-dulwich python3-setuptools pyflakes3
+      - python3 tests/run-tests.py -v --color=always
 
-tests-py2-hg-stable:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2
-    script:
-        - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev stable
-        - PYTHONPATH= hg -R /ci/repos/mercurial/ update stable
-        - PYTHONPATH= hg -R /ci/repos/mercurial summary
-        - make -C /ci/repos/mercurial local PYTHON=python2
-        - cp /ci/repos/mercurial/hg .
-        - python2 tests/run-tests.py -lv --color=always
+# Test that the tests pass against the current branches
+Development:
+  stage: compat
+  allow_failure: true
+  image: registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
+  script:
+    - python$PYTHON tests/run-tests.py -v --color=always
+  parallel:
+    matrix:
+      - PYTHON:
+          - "2.7"
+          - "3.9"
+        HG:
+          - "stable"
+          - "default"
 
-tests-py2-hg-5.4:
-    stage: current
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-5.4
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python2 tests/run-tests.py -lv --color=always
+# Build images for the above tasks; this should be a scheduled job, as
+# it is quite unnecessary to run on every invocation.
+Release images:
+  stage: images
+  only:
+    - schedules
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - >
+      /kaniko/executor --context $CI_PROJECT_DIR
+      --dockerfile $CI_PROJECT_DIR/contrib/docker/Dockerfile.alpine
+      --build-arg PYTHON=$PYTHON
+      --build-arg HG=$HG
+      --reproducible
+      --single-snapshot
+      --cleanup
+      --destination registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
+  parallel:
+    matrix:
+      - PYTHON:
+          - "2.7"
+        HG:
+          - "4.4"
+          - "4.5"
+          - "4.6"
+          - "4.7"
+          - "4.8"
+          - "4.9"
+          - "5.0"
+          - "5.1"
+      - PYTHON:
+          - "2.7"
+          - "3.9"
+        HG:
+          - "5.2"
+          - "5.3"
+          - "5.4"
+          - "5.5"
+      - PYTHON:
+          - "2.7"
+          - "3.5"
+          - "3.9"
+        HG:
+          - "5.6"
 
-tests-py2-hg-5.3:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-5.3
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python2 tests/run-tests.py -lv --color=always
-
-tests-py2-hg-5.2:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-5.2
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python2 tests/run-tests.py -lv --color=always
-
-tests-py2-hg-5.1:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-5.1
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python2 tests/run-tests.py -lv --color=always
-
-tests-py2-hg-5.0:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-5.0
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python2 tests/run-tests.py -lv --color=always
-
-tests-py2-hg-4.9:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.9
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python2 tests/run-tests.py -lv --color=always
-
-tests-py2-hg-4.8:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.8
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python2 tests/run-tests.py -lv --color=always
-
-tests-py2-hg-4.7:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.7
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python2 tests/run-tests.py -lv --color=always
-
-tests-py2-hg-4.6:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.6
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python2 tests/run-tests.py -lv --color=always --extra-config-opt devel.all-warnings=no --extra-config-opt devel.deprec-warn=no
-
-tests-py2-hg-4.5:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.5
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python2 tests/run-tests.py -lv --color=always
-
-tests-py2-hg-4.4:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py2:hg-4.4
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python2 tests/run-tests.py -lv --color=always
-
-tests-py3-hg-default:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py3
-    allow_failure: true
-    script:
-        - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev default
-        - PYTHONPATH= hg -R /ci/repos/mercurial/ update default
-        - PYTHONPATH= hg -R /ci/repos/mercurial summary
-        - make -C /ci/repos/mercurial local PYTHON=python3
-        - cp /ci/repos/mercurial/hg .
-        - python3 tests/run-tests.py -lv --color=always
-
-tests-py3-hg-stable:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py3
-    script:
-        - PYTHONPATH= hg pull -R /ci/repos/mercurial/ --rev stable
-        - PYTHONPATH= hg -R /ci/repos/mercurial/ update stable
-        - PYTHONPATH= hg -R /ci/repos/mercurial summary
-        - make -C /ci/repos/mercurial local PYTHON=python3
-        - cp /ci/repos/mercurial/hg .
-        - python3 tests/run-tests.py -lv --color=always
-
-tests-py3-hg-5.4:
-    stage: current
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py3:hg-5.4
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python3 tests/run-tests.py -lv --color=always
-
-tests-py3-hg-5.3:
-    stage: compat
-    image: registry.heptapod.net:443/mercurial/hg-git/ci-py3:hg-5.3
-    script:
-      - cp /ci/repos/mercurial/hg .
-      - ./hg version --debug
-      - python3 tests/run-tests.py -lv --color=always
+# Build branch images; factored out so it may be invoked separately
+Current images:
+  extends: Release images
+  only:
+    - schedules
+  parallel:
+    matrix:
+      - PYTHON:
+          - "2.7"
+          - "3.9"
+        HG:
+          - "default"
+          - "stable"

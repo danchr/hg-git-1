@@ -1,0 +1,10 @@
+FROM ubuntu:20.10
+
+RUN \
+    set -x && \
+    apt-get -qq update && \
+    DEBIAN_FRONTEND=noninteractive \
+      apt-get -qq install --no-install-recommends \
+        mercurial git pyflakes3 unzip ssh gpg gpg-agent \
+        python3-dulwich python3-setuptools && \
+    apt-get clean

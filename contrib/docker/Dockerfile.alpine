@@ -1,0 +1,8 @@
+ARG PYTHON=3
+FROM python:$PYTHON-alpine
+
+ARG HG=stable
+ARG PYTHON=3
+
+COPY contrib/docker/installhg.sh /tmp
+RUN /tmp/installhg.sh
