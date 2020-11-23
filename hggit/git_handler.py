@@ -1724,6 +1724,11 @@ class GitHandler(object):
             ua = b'git/20x6 (hg-git ; uses dulwich and hg ; like git-core)'
             config = dul_config.ConfigDict()
             config.set(b'http', b'useragent', ua)
+
+            proxy = compat.config(self.ui, b'string', b'http_proxy', b'host')
+            if proxy:
+                config.set(b'http', b'proxy', b'http://' + proxy)
+
             if pycompat.ispy3:
                 # urllib3.util.url._encode_invalid_chars() converts the path
                 # back to bytes using the utf-8 codec
