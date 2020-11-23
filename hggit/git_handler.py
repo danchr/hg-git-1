@@ -25,6 +25,7 @@ from mercurial import (
     error,
     phases,
     pycompat,
+    url,
     util as hgutil,
     scmutil,
     vfs,
@@ -137,6 +138,11 @@ class GitHandler(object):
         self._map_hg_real = None
         self.load_tags()
         self._remote_refs = None
+
+        # the HTTP authentication realm -- this specifies that we've
+        # tried an unauthenticated request, gotten a realm, and are now
+        # ready to prompt the user, if necessary
+        self._http_auth_realm = None
 
     @property
     def _map_git(self):
@@ -371,7 +377,6 @@ class GitHandler(object):
 
     def get_refs(self, remote):
         self.export_commits()
-        client, path = self.get_transport_and_path(remote)
         old_refs = {}
         new_refs = {}
 
@@ -382,7 +387,7 @@ class GitHandler(object):
             return refs  # always return the same refs to make the send a no-op
 
         try:
-            client.send_pack(path, changed, lambda have, want: [])
+            self._call_client(remote, 'send_pack', changed, lambda have, want: [])
 
             changed_refs = [ref for ref, sha in compat.iteritems(new_refs)
                             if sha != old_refs.get(ref)]
@@ -1050,7 +1055,6 @@ class GitHandler(object):
     # PACK UPLOADING AND FETCHING
 
     def upload_pack(self, remote, revs, force):
-        client, path = self.get_transport_and_path(remote)
         old_refs = {}
         change_totals = {}
 
@@ -1106,8 +1110,9 @@ class GitHandler(object):
                 self.ui.status(_(b"remote: %s\n") % line)
 
         try:
-            new_refs = client.send_pack(path, changed, genpack,
-                                        progress=callback)
+            new_refs = self._call_client(remote, 'send_pack', changed, genpack,
+                                         progress=callback)
+
             if len(change_totals) > 0:
                 self.ui.status(_(b"added %d commits with %d trees"
                                  b" and %d blobs\n") %
@@ -1193,8 +1198,6 @@ class GitHandler(object):
         return new_refs
 
     def fetch_pack(self, remote_name, heads=None):
-        localclient, path = self.get_transport_and_path(remote_name)
-
         # The dulwich default walk only checks refs/heads/. We also want to
         # consider remotes when doing discovery, so we build our own list. We
         # can't just do 'refs/' here because the tag class doesn't have a
@@ -1214,8 +1217,9 @@ class GitHandler(object):
             progress = GitProgress(self.ui)
             f = io.BytesIO()
 
-            ret = localclient.fetch_pack(path, determine_wants, graphwalker,
-                                         f.write, progress.progress)
+            ret = self._call_client(remote_name, 'fetch_pack', determine_wants,
+                                    graphwalker, f.write, progress.progress)
+
             if(f.tell() != 0):
                 f.seek(0)
                 self.git.object_store.add_thin_pack(f.read, None)
@@ -1231,6 +1235,57 @@ class GitHandler(object):
         except (HangupException, GitProtocolError) as e:
             raise error.Abort(_(b"git remote error: ")
                               + pycompat.sysbytes(str(e)))
+
+    def _call_client(self, remote_name, method, *args, **kwargs):
+        clientobj, path = self._get_transport_and_path(remote_name)
+
+        func = getattr(clientobj, method)
+
+        # dulwich 0.19, used in python 2.7, does not offer a specific
+        # exception class
+        HTTPUnauthorized = getattr(
+            client, 'HTTPUnauthorized', type('<dummy>', (Exception,), {}),
+        )
+
+        try:
+            return func(path, *args, **kwargs)
+        except (HTTPUnauthorized, GitProtocolError) as e:
+            self.ui.traceback()
+
+            if isinstance(e, HTTPUnauthorized):
+                # this is a fallback just in case the header isn't
+                # specified
+                self._http_auth_realm = 'Git'
+                if e.www_authenticate:
+                    m = re.search(r'realm="([^"]*)"', e.www_authenticate)
+                    if m:
+                        self._http_auth_realm = m.group(1)
+
+            elif 'unexpected http resp 407' in e.args[0]:
+                raise error.Abort(
+                    b'HTTP proxy requires authentication',
+                )
+            # dulwich 0.19
+            elif 'unexpected http resp 401' in e.args[0]:
+                self._http_auth_realm = 'Git'
+            else:
+                raise
+
+            clientobj, path = self._get_transport_and_path(remote_name)
+            func = getattr(clientobj, method)
+
+            try:
+                return func(path, *args, **kwargs)
+            except HTTPUnauthorized:
+                raise error.Abort(_(b'authorization failed'))
+            except GitProtocolError as e:
+                # python 2.7
+                if 'unexpected http resp 401' in e.args[0]:
+                    raise error.Abort(_(b'authorization failed'))
+                else:
+                    raise
+
+
 
     # REFERENCES HANDLING
 
@@ -1688,7 +1743,7 @@ class GitHandler(object):
         except UnicodeDecodeError:
             return string.decode('ascii', 'replace').encode('utf-8')
 
-    def get_transport_and_path(self, uri):
+    def _get_transport_and_path(self, uri):
         """Method that sets up the transport (either ssh or http(s))
 
         Tests:
@@ -1696,8 +1751,10 @@ class GitHandler(object):
         >>> from dulwich.client import HttpGitClient, SSHGitClient
         >>> from mercurial import ui
         >>> class SubHandler(GitHandler):
-        ...    def __init__(self): self.ui = ui.ui()
-        >>> tp = SubHandler().get_transport_and_path
+        ...    def __init__(self):
+        ...         self.ui = ui.ui()
+        ...         self._http_auth_realm = None
+        >>> tp = SubHandler()._get_transport_and_path
         >>> client, url = tp(b'http://fqdn.com/test.git')
         >>> print(isinstance(client, HttpGitClient))
         True
@@ -1751,22 +1808,30 @@ class GitHandler(object):
             if proxy:
                 config.set(b'http', b'proxy', b'http://' + proxy)
 
+                if compat.config(self.ui, b'string', b'http_proxy', b'passwd'):
+                    self.ui.warn(
+                        b"warning: proxy authentication is unsupported\n",
+                    )
+
             if pycompat.ispy3:
                 # urllib3.util.url._encode_invalid_chars() converts the path
                 # back to bytes using the utf-8 codec
                 str_uri = uri.decode('utf-8')
             else:
                 str_uri = uri
-            url = hgutil.url(uri)
-            username = url.user
-            password = url.passwd
-            if pycompat.ispy3:
-                # urllib3.util.request.make_headers() converts them back to
-                # bytes using the latin-1 codec
-                if username is not None:
-                    username = username.decode('latin-1')
-                if password is not None:
-                    password = password.decode('latin-1')
+
+            pwmgr = url.passwordmgr(self.ui, self.ui.httppasswordmgrdb)
+
+            if self._http_auth_realm:
+                # since we've tried an unauthenticated request, and
+                # obtain a realm, we can do a "full" search, including
+                # a prompt
+                username, password = pwmgr.find_user_password(
+                    self._http_auth_realm, str_uri,
+                )
+            else:
+                username, password = pwmgr.find_stored_password(str_uri)
+
             return (
                 client.HttpGitClient(
                     str_uri,

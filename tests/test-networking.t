@@ -9,14 +9,30 @@ We assume the git server is unavailable elsewhere.
   >   exit 80
   > fi
 
+Allow password prompts without a TTY:
+
+  $ cat << EOF > get_pass.py
+  > from __future__ import print_function, absolute_import
+  > import getpass, os, sys
+  > def newgetpass(args):
+  >     try:
+  >       passwd = os.environb.get(b'PASSWD', b'nope')
+  >       print(passwd.encode())
+  >     except AttributeError: # python 2.7
+  >       passwd = os.environ.get('PASSWD', 'nope')
+  >       print(passwd)
+  >     sys.stdout.flush()
+  >     return passwd
+  > getpass.getpass = newgetpass
+  > EOF
+  $ cat >> $HGRCPATH << EOF
+  > [extensions]
+  > getpass = $TESTTMP/get_pass.py
+  > EOF
+
 Create a silly SSH configuration:
 
   $ cat >> $HGRCPATH << EOF
-  > [auth]
-  > # alas, not supported :(
-  > git.prefix = http://git-server/
-  > git.username = git
-  > git.password = git
   > [ui]
   > ssh = ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $TESTTMP/id_ed25519
   > EOF
@@ -31,15 +47,32 @@ Clone using the git protocol:
 
 ..and HTTP:
 
-  $ hg clone http://git:git@git-server/repo.git repo-http
+  $ hg clone http://git-server/repo.git repo-http
+  abort: http authorization required for http://git-server/repo.git
+  [255]
+  $ hg clone --config ui.interactive=yes \
+  >    --config ui.interactive=yes \
+  >    --config auth.git.prefix=http://git-server \
+  >    --config auth.git.username=git \
+  >    http://git-server/repo.git repo-http
+  http authorization required for http://git-server/repo.git
+  realm: Git Access (?)
+  realm: Git (?)
+  user: git
+  password: nope
+  abort: authorization failed
+  [255]
+  $ PASSWD=git hg clone --config ui.interactive=yes \
+  >          http://git-server/repo.git repo-http <<EOF
+  > git
+  > EOF
+  http authorization required for http://git-server/repo.git
+  realm: Git Access (?)
+  realm: Git (?)
+  user: git
+  password: git
   updating to branch default
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-
-Fix up authentication:
-  $ cat > repo-http/.hg/hgrc <<EOF
-  > [paths]
-  > default = http://git:git@git-server/repo.git
-  > EOF
 
 ..and finally SSH:
 
@@ -71,7 +104,21 @@ And finally, pull the new commit:
   pulling from git://git-server/repo.git
   importing git objects into hg
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+
+Straight HTTP doesn't work:
+
   $ hg -R repo-http pull -u
-  pulling from http://git:***@git-server/repo.git
+  pulling from http://git-server/repo.git
+  abort: http authorization required for http://git-server/repo.git
+  [255]
+
+But we can specify authentication in the configuration:
+
+  $ hg -R repo-http \
+  >    --config auth.git.prefix=http://git-server \
+  >    --config auth.git.username=git \
+  >    --config auth.git.password=git \
+  >    pull -u
+  pulling from http://git-server/repo.git
   importing git objects into hg
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
