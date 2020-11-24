@@ -24,7 +24,7 @@ across from hg to git
 Rebase will add a rebase_source
 
   $ hg --config extensions.rebase= rebase -s 1 -d 2
-  rebasing 1:4c7da7adf18b "b" (not-master)
+  rebasing 1:4c7da7adf18b * (glob)
   saved backup bundle to $TESTTMP/*.hg (glob)
   $ hg up 2
   1 files updated, 0 files merged, 1 files removed, 0 files unresolved
