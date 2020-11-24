@@ -1,4 +1,6 @@
 PYTHON=python
+HG=$(shell which hg)
+HGPYTHON=$(shell $(HG) hg debuginstall -T '{pythonexe}')
 TESTFLAGS ?= $(shell echo $$HGTESTFLAGS)
 
 help:
@@ -10,7 +12,7 @@ help:
 all: help
 
 tests:
-	cd tests && $(PYTHON) run-tests.py --with-hg=`which hg` $(TESTFLAGS)
+	cd tests && $(HGPYTHON) run-tests.py --with-hg=$(HG) $(TESTFLAGS)
 
 release:
 	$(PYTHON) setup.py sdist
