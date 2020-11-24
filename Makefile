@@ -14,6 +14,9 @@ all: help
 tests:
 	cd tests && $(HGPYTHON) run-tests.py --with-hg=$(HG) $(TESTFLAGS)
 
+test-%:
+	@+$(MAKE) tests TESTFLAGS="$(strip $(TESTFLAGS) $@)"
+
 release:
 	$(PYTHON) setup.py sdist
 
