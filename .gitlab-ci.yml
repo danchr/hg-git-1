@@ -35,6 +35,8 @@ Latest:
 Supported:
   stage: compat
   image: registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
+  retry: 1
+  timeout: 5m
   script:
     - python$PYTHON tests/run-tests.py -v --color=always
   parallel:
