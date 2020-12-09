@@ -2,6 +2,7 @@ stages:
   - images
   - current
   - compat
+  - upcoming
 
 .base:
   image: registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
@@ -86,7 +87,7 @@ Ubuntu:
 # Test that the tests pass against the current branches
 Development:
   extends: .base
-  stage: compat
+  stage: upcoming
   allow_failure: true
   parallel:
     matrix:
