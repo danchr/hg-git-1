@@ -10,6 +10,7 @@ from mercurial import (
     error,
     match as matchmod,
     pathutil,
+    pycompat,
     util,
 )
 
@@ -125,7 +126,9 @@ class gitdirstate(dirstate.dirstate):
         ignored = False
 
         def fwarn(f, msg):
-            self._ui.warn(b'%s: %s\n' % (self.pathto(f), msg))
+            self._ui.warn(b'%s: %s\n' % (
+                self.pathto(f), pycompat.sysbytes(msg),
+            ))
             return False
 
         ignore = super(gitdirstate, self)._ignore

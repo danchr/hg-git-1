@@ -31,8 +31,18 @@ Add a .gitignore, and to make sure that we're using it, make it ignore
 something.
 
   $ echo nothingtoseehere > .gitignore
+  $ hg status
+  not_readable: Permission denied
+  not_readable: Permission denied
+  ? .gitignore
 
-This fails on Python 3:
+And notice that we really did ignore it!
 
-  $ hg status 2>&1 | tail -n 1
-  TypeError: %b requires a bytes-like object, or an object that implements __bytes__, not 'str'
+For comparison, how does a normal status handle this?
+
+  $ hg status --config extensions.hggit=!
+  not_readable: Permission denied
+  ? .gitignore
+  ? nothingtoseehere
+
+So the duplicated output is actually a bug...
