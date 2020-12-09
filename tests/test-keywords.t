@@ -42,6 +42,6 @@ as commit alpha. This lets us test ambiguous abbreviated identifiers.
   $ hg log --template "gitnode_existsB {rev}\n" --rev "gitnode(7eeab)"
   gitnode_existsB 0
   $ hg log --rev "gitnode(7e)"
-  abort: git-mapfile@7e: ambiguous identifier!
+  abort: git-mapfile@7e: ambiguous identifier!? (re)
   [255]
   $ hg log --template "gitnode_notexists {rev}\n" --rev "gitnode(1234567890ab)"
