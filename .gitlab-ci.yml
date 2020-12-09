@@ -3,14 +3,21 @@ stages:
   - current
   - compat
 
+.base:
+  image: registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
+  timeout: 5m
+  script:
+    - python$PYTHON tests/run-tests.py -v --xunit $PWD/tests-$PYTHON-$HG.xml --color=always
+  artifacts:
+    reports:
+      junit: tests-$PYTHON-$HG.xml
+
 # First, test with the latest and greatest Mercurial, across the
 # versions Python supported. We generally assume that if e.g. CPython
 # 3.5 and 3.8 work, anything in between will work as well.
 Latest:
+  extends: .base
   stage: current
-  image: registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
-  script:
-    - python$PYTHON tests/run-tests.py -v --xunit $PWD/tests-$PYTHON-$HG.xml --color=always
   parallel:
     matrix:
       - PYTHON:
@@ -19,9 +26,6 @@ Latest:
           - "3.9"
         HG:
           - "5.6"
-  artifacts:
-    reports:
-      junit: tests.xml
 
 # This is the authoritative list of versions of Mercurial that this
 # extension is supported and tested with; it should be kept in sync
@@ -33,12 +37,9 @@ Latest:
 # should be listed for each major version; earlier minor versions are
 # not needed.
 Supported:
+  extends: .base
   stage: compat
-  image: registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
   retry: 1
-  timeout: 5m
-  script:
-    - python$PYTHON tests/run-tests.py -v --xunit $PWD/tests-$PYTHON-$HG.xml --color=always
   parallel:
     matrix:
       - PYTHON: "2.7"
@@ -61,9 +62,6 @@ Supported:
           - "5.3"
           - "5.4"
           - "5.5"
-  artifacts:
-    reports:
-      junit: tests-$PYTHON-$HG.xml
 
 # Test that it is possible to use and run hg-git on Ubuntu without
 # compiling any C code, i.e. with stock Dulwich, Mercurial and
@@ -87,11 +85,9 @@ Ubuntu:
 
 # Test that the tests pass against the current branches
 Development:
+  extends: .base
   stage: compat
   allow_failure: true
-  image: registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
-  script:
-    - python$PYTHON tests/run-tests.py --xunit $PWD/tests-$PYTHON-$HG.xml -v --color=always
   parallel:
     matrix:
       - PYTHON:
@@ -100,9 +96,6 @@ Development:
         HG:
           - "stable"
           - "default"
-  artifacts:
-    reports:
-      junit: tests-$PYTHON-$HG.xml
 
 # Build images for the above tasks; this should be a scheduled job, as
 # it is quite unnecessary to run on every invocation.
