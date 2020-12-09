@@ -10,7 +10,7 @@ Latest:
   stage: current
   image: registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
   script:
-    - python$PYTHON tests/run-tests.py --xunit tests.xml -v --color=always
+    - python$PYTHON tests/run-tests.py -v --xunit $PWD/tests-$PYTHON-$HG.xml --color=always
   parallel:
     matrix:
       - PYTHON:
