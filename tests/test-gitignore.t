@@ -6,15 +6,29 @@ Load commonly used test logic
   $ hg init repo
   $ cd repo
 
+Create a commit that we can export later on
+
+  $ touch thefile
+  $ hg commit -A -m "initial commit"
+  adding thefile
+
 We should only read .gitignore files in a hg-git repo (i.e. one with .hg/git
 directory) otherwise, a rogue .gitignore could slow down a hg-only repo
-
-  $ mkdir .hg/git
 
   $ touch foo
   $ touch foobar
   $ touch bar
   $ echo 'foo*' > .gitignore
+  $ hg status
+  ? .gitignore
+  ? bar
+  ? foo
+  ? foobar
+
+Notice that foo appears above. Now export the commit to git and verify
+it's gone:
+
+  $ hg gexport
   $ hg status
   ? .gitignore
   ? bar
