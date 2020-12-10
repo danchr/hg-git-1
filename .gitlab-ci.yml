@@ -109,7 +109,17 @@ Release images:
     entrypoint: [""]
   script:
     - mkdir -p /kaniko/.docker /kaniko/ssl/certs
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - |
+      cat > /kaniko/.docker/config.json <<EOF
+      {
+        "auths": {
+          "$CI_REGISTRY": {
+            "username": "$CI_REGISTRY_USER",
+            "password": "$CI_REGISTRY_PASSWORD"
+          }
+        }
+      }
+      EOF
     - |
       cat > /kaniko/ssl/certs/Heptapod_Tooling_CA.crt << EOF
       -----BEGIN CERTIFICATE-----
