@@ -25,6 +25,7 @@ import os
 # local modules
 from . import compat
 from . import gitrepo
+from . import git_handler
 from . import hgrepo
 from . import overlay
 from . import verify
@@ -199,10 +200,8 @@ def extsetup(ui):
 
 def reposetup(ui, repo):
     if not isinstance(repo, gitrepo.gitrepo):
-
         if (getattr(dirstate, 'rootcache', False) and
-            hgutil.safehasattr(repo, b'vfs') and
-            os.path.exists(repo.vfs.join(b'git'))):
+            git_handler.has_gitrepo(repo)):
             # only install our dirstate wrapper if it has a hope of working
             from . import gitdirstate
             dirstate.dirstate = gitdirstate.gitdirstate
@@ -287,12 +286,9 @@ def git_cleanup(ui, repo):
         gitsha, hgsha = line.strip().split(b' ', 1)
         if hgsha in repo:
             new_map.append(b'%s %s\n' % (gitsha, hgsha))
-    wlock = repo.wlock()
-    try:
+    with repo.githandler.store_repo.wlock():
         f = gh.vfs(gh.map_file, b'wb')
         f.writelines(new_map)
-    finally:
-        wlock.release()
     ui.status(_(b'git commit map cleaned\n'))
 
 

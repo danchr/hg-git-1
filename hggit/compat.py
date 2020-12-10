@@ -6,6 +6,7 @@ from mercurial.i18n import _
 from mercurial import (
     context,
     error,
+    hg,
     pycompat,
     templatekw,
     ui,
@@ -104,6 +105,29 @@ except NameError:
 
 quote = hgutil.urlreq.quote
 unquote = hgutil.urlreq.unquote
+
+
+try:
+    from mercurial.hg import sharedreposource
+except (ImportError, AttributeError):
+    # added in 4.6
+    def sharedreposource(repo):
+        """Returns repository object for source repository of a shared repo.
+
+        If repo is not a shared repository, returns None.
+        """
+        if repo.sharedpath == repo.path:
+            return None
+
+        if hgutil.safehasattr(repo, b'srcrepo') and repo.srcrepo:
+            return repo.srcrepo
+
+        # the sharedpath always ends in the .hg; we want the path to the repo
+        source = repo.vfs.split(repo.sharedpath)[0]
+        srcurl, branches = hg.parseurl(source)
+        srcrepo = hg.repository(repo.ui, srcurl)
+        repo.srcrepo = srcrepo
+        return srcrepo
 
 
 def memfilectx(repo, changectx, path, data, islink=False,

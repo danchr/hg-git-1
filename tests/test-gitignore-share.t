@@ -39,4 +39,3 @@ We should also ignore the file in a shared repository:
   ignored
   $ touch ignored
   $ hg status
-  ? ignored

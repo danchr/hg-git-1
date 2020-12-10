@@ -28,7 +28,6 @@ from mercurial import (
     url,
     util as hgutil,
     scmutil,
-    vfs,
 )
 
 from . import _ssh
@@ -112,6 +111,27 @@ class GitProgress(object):
             self.ui.note(msg + b'\n')
 
 
+def get_repo_and_gitdir(repo):
+    if repo.shared():
+        repo = compat.sharedreposource(repo)
+
+    if compat.config(repo.ui, b'bool', b'git', b'intree'):
+        gitdir = repo.wvfs.join(b'.git')
+    else:
+        gitdir = repo.vfs.join(b'git')
+
+    return repo, gitdir
+
+
+def has_gitrepo(repo):
+    if not hgutil.safehasattr(repo, b'vfs'):
+        return False
+
+    repo, gitdir = get_repo_and_gitdir(repo)
+
+    return os.path.isdir(gitdir)
+
+
 class GitHandler(object):
     map_file = b'git-mapfile'
     remote_refs_file = b'git-remote-refs'
@@ -119,15 +139,8 @@ class GitHandler(object):
 
     def __init__(self, dest_repo, ui):
         self.repo = dest_repo
+        self.store_repo, self.gitdir = get_repo_and_gitdir(self.repo)
         self.ui = ui
-        self.vfs = self.repo.vfs
-
-        if dest_repo.shared():
-            self.vfs = vfs.vfs(dest_repo.sharedpath)
-        if compat.config(ui, b'bool', b'git', b'intree'):
-            self.gitdir = self.repo.wvfs.join(b'.git')
-        else:
-            self.gitdir = self.vfs.join(b'git')
 
         self.init_author_file()
 
@@ -143,6 +156,10 @@ class GitHandler(object):
         # tried an unauthenticated request, gotten a realm, and are now
         # ready to prompt the user, if necessary
         self._http_auth_realm = None
+
+    @property
+    def vfs(self):
+        return self.store_repo.vfs
 
     @property
     def _map_git(self):
@@ -221,15 +238,12 @@ class GitHandler(object):
         self._map_hg_real = map_hg_real
 
     def save_map(self, map_file):
-        wlock = self.repo.wlock()
-        try:
+        with self.store_repo.wlock():
             map_hg = self._map_hg
             with self.vfs(map_file, b'wb+', atomictemp=True) as buf:
                 bwrite = buf.write
                 for hgsha, gitsha in compat.iteritems(map_hg):
                     bwrite(b"%s %s\n" % (gitsha, hgsha))
-        finally:
-            wlock.release()
 
     def load_tags(self):
         self.tags = {}
@@ -239,12 +253,11 @@ class GitHandler(object):
                 self.tags[name] = sha
 
     def save_tags(self):
-        file = self.vfs(self.tags_file, b'w+', atomictemp=True)
-        for name, sha in sorted(compat.iteritems(self.tags)):
-            if not self.repo.tagtype(name) == b'global':
-                file.write(b"%s %s\n" % (sha, name))
-        # If this complains, atomictempfile no longer has close
-        file.close()
+        with self.repo.wlock(), self.store_repo.wlock():
+            with self.vfs(self.tags_file, b'w+', atomictemp=True) as fp:
+                for name, sha in sorted(compat.iteritems(self.tags)):
+                    if not self.repo.tagtype(name) == b'global':
+                        fp.write(b"%s %s\n" % (sha, name))
 
     def load_remote_refs(self):
         self._remote_refs = {}
