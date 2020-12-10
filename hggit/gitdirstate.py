@@ -245,3 +245,12 @@ class gitdirstate(dirstate.dirstate):
                 for st in util.statfiles([join(i) for i in visit]):
                     results[nf()] = st
         return results.keys()
+
+    def _rust_status(self, *args, **kwargs):
+        # intercept a rust status call and force the fallback,
+        # otherwise our patching won't work
+        if not os.path.lexists(self._join(b'.hgignore')):
+            self._ui.debug(b'suppressing rust status to intercept gitignores\n')
+            raise dirstate.rustmod.FallbackError
+        else:
+            return super(gitdirstate, self)._rust_status(*args, **kwargs)
