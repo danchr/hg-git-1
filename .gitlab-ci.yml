@@ -8,7 +8,9 @@ stages:
   image: registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
   timeout: 5m
   script:
-    - python$PYTHON tests/run-tests.py -v --xunit $PWD/tests-$PYTHON-$HG.xml --color=always
+    - adduser -D test
+    - chown -R test *
+    - su test -c contrib/ci.sh
   artifacts:
     reports:
       junit: tests-$PYTHON-$HG.xml
