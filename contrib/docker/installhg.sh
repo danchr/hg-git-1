@@ -21,7 +21,7 @@ fi
 
 set -xe
 
-apk add $BUILDDEPENDS $RUNDEPENDS
+apk add --no-cache $BUILDDEPENDS $RUNDEPENDS
 
 python -m pip --no-cache-dir install $PIPDEPENDS
 
