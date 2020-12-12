@@ -3,7 +3,7 @@
 set -e
 
 BUILDDEPENDS="curl gcc gettext musl-dev"
-RUNDEPENDS="git unzip openssh gnupg"
+RUNDEPENDS="git git-daemon unzip openssh gnupg"
 
 if echo "$HG" | fgrep -q .
 then
