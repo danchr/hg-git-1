@@ -23,12 +23,20 @@ try:
         assert sys.version_info[:3] >= (2, 7, 1)
         quotecommand = pycompat.identity
     binary = stringutil.binary
+    try:
+        # added in 4.8
+        tonativestr = procutil.tonativestr
+    except AttributeError:
+        assert not pycompat.ispy3
+        tonativestr = pycompat.identity
 except ImportError:
+    assert not pycompat.ispy3
     # these were moved in 4.6
     sshargs = hgutil.sshargs
     shellquote = hgutil.shellquote
     quotecommand = hgutil.quotecommand
     binary = hgutil.binary
+    tonativestr = pycompat.identity
 
 try:
     from mercurial.pycompat import iteritems, itervalues

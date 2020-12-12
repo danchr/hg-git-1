@@ -1,8 +1,11 @@
 from __future__ import absolute_import, print_function
 
-from dulwich.client import SSHGitClient, SubprocessWrapper
-from mercurial import pycompat
 import subprocess
+
+from dulwich.client import SSHGitClient, SubprocessWrapper
+
+from mercurial import pycompat
+
 from . import compat
 
 
@@ -24,11 +27,17 @@ def generate_ssh_vendor(ui):
             args = compat.sshargs(sshcmd, pycompat.bytesurl(host),
                                   username, port)
             cmd = b'%s %s %s' % (sshcmd, args, compat.shellquote(command))
-            ui.debug(b'calling ssh: %s\n' % cmd)
-            proc = subprocess.Popen(compat.quotecommand(cmd), shell=True,
-                                    bufsize=0,
-                                    stdin=subprocess.PIPE,
-                                    stdout=subprocess.PIPE)
+            # consistent with mercurial
+            ui.debug(b'running %s\n' % cmd)
+            # we cannot use Mercurial's procutil.popen4() since it
+            # always redirects stderr into a pipe
+            proc = subprocess.Popen(
+                compat.tonativestr(compat.quotecommand(cmd)),
+                shell=True,
+                bufsize=0,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+            )
             return SubprocessWrapper(proc)
 
     return _Vendor
