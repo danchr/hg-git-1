@@ -26,6 +26,7 @@ from mercurial import (
     phases,
     pycompat,
     util as hgutil,
+    scmutil,
     vfs,
 )
 
@@ -1394,6 +1395,25 @@ class GitHandler(object):
                             # TODO: better handling for annotated tags
                             if sha is not None:
                                 self.tags[ref_name] = sha
+        self.save_tags()
+
+    def add_tag(self, target, *tags):
+        for tag in tags:
+            scmutil.checknewlabel(self.repo, tag, b'tag')
+
+            # -f/--force is deliberately unimplemented and unmentioned
+            # as its git semantics are quite confusing
+            if compat.isrevsymbol(self.repo, tag):
+                raise error.Abort(b"the name '%s' already exists" % tag)
+
+            if check_ref_format(b'refs/tags/' + tag):
+                self.ui.debug(b'adding git tag %s\n' % tag)
+                self.tags[tag] = target
+            else:
+                raise error.Abort(b"the name '%s' is not a valid git "
+                                  b"tag" % tag)
+
+        self.export_commits()
         self.save_tags()
 
     def update_hg_bookmarks(self, refs):

@@ -2,8 +2,10 @@ from __future__ import absolute_import, print_function
 
 import sys
 
+from mercurial.i18n import _
 from mercurial import (
     context,
+    error,
     pycompat,
     templatekw,
     ui,
@@ -44,6 +46,55 @@ except ImportError:
     assert not pycompat.ispy3
     iteritems = lambda x: x.iteritems()
     itervalues = lambda x: x.itervalues()
+
+try:
+    from mercurial.cmdutil import check_at_most_one_arg
+except (ImportError, AttributeError):
+    # added in 5.3
+    def check_at_most_one_arg(opts, *args):
+        """abort if more than one of the arguments are in opts
+
+        Returns the unique argument or None if none of them were specified.
+        """
+
+        def to_display(name):
+            # 5.2 does not check this
+            if isinstance(name, unicode):
+                name = pycompat.sysbytes(name)
+            return name.replace(b'_', b'-')
+
+        previous = None
+        for x in args:
+            if opts.get(x):
+                if previous:
+                    raise error.Abort(
+                        _(b'cannot specify both --%s and --%s')
+                        % (to_display(previous), to_display(x))
+                    )
+                previous = x
+        return previous
+
+# added in 5.3 but changed in 5.4, so always use our implementation
+def check_incompatible_arguments(opts, first, others):
+    """abort if the first argument is given along with any of the others
+
+    Unlike check_at_most_one_arg(), `others` are not mutually exclusive
+    among themselves, and they're passed as a single collection.
+    """
+    for other in others:
+        check_at_most_one_arg(opts, first, other)
+
+try:
+    from mercurial.scmutil import isrevsymbol
+except (ImportError, AttributeError):
+    # added in 4.6, although much more thorough; if you want better
+    # error checking, use the latest hg!
+    def isrevsymbol(repo, symbol):
+        try:
+            repo.lookup(symbol)
+            return True
+        except error.RepoLookupError:
+            return False
 
 try:
     unicode = unicode
