@@ -1314,17 +1314,16 @@ class GitHandler(object):
                 target = self.map_git_get(hex(sha))
                 if target is not None:
                     tag_refname = b'refs/tags/' + tag
-                    if(check_ref_format(tag_refname)):
+                    if check_ref_format(tag_refname):
                         self.git.refs[tag_refname] = target
                         self.tags[tag] = hex(sha)
                     else:
-                        self.repo.ui.warn(b'Skipping export of tag %s because '
-                                          b'it has invalid name as a git '
-                                          b'refname.\n' % tag)
+                        self.repo.ui.warn(b"warning: not exporting tag '%s' "
+                                          b"due to invalid name\n" % tag)
                 else:
-                    self.repo.ui.warn(
-                        b'Skipping export of tag %s because it '
-                        b'has no matching git revision.\n' % tag)
+                    self.repo.ui.warn(b"warning: not exporting tag '%s' "
+                                      b"due to missing git "
+                                      b"revision\n" % tag)
 
     def _filter_for_bookmarks(self, bms):
         if not self.branch_bookmark_suffix:
@@ -1354,7 +1353,13 @@ class GitHandler(object):
 
         bms = self.repo._bookmarks
         for filtered_bm, bm in self._filter_for_bookmarks(bms):
-            res[hex(bms[bm])].heads.add(b'refs/heads/' + filtered_bm)
+            ref_name = b'refs/heads/' + filtered_bm
+            if check_ref_format(ref_name):
+                res[hex(bms[bm])].heads.add(ref_name)
+            else:
+                self.repo.ui.warn(b"warning: not exporting bookmark '%s' "
+                                  b"due to invalid name\n" % bm)
+
         for tag, sha in compat.iteritems(self.tags):
             res[sha].tags.add(b'refs/tags/' + tag)
         return res

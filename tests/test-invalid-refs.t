@@ -11,29 +11,38 @@ Load commonly used test logic
   Switched to a new branch 'not-master'
 
   $ cd ..
-  $ hg clone gitrepo hgrepo | grep -v '^updating'
+  $ hg clone -U gitrepo hgrepo
   importing git objects into hg
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgrepo
-  $ hg co master | egrep -v '^\(activating bookmark master\)$'
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg up master
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (activating bookmark master)
   $ fn_hg_tag alph#a
   $ fn_hg_tag bet*a
   $ fn_hg_tag 'gamm a'
+  $ hg book -r . delt#a
+  $ hg book -r . epsil*on
+
   $ hg push
   pushing to $TESTTMP/gitrepo
-  Skipping export of tag bet*a because it has invalid name as a git refname.
+  warning: not exporting tag 'bet*a' due to invalid name
+  warning: not exporting bookmark 'epsil*on' due to invalid name
   searching for changes
+  warning: not exporting bookmark 'epsil*on' due to invalid name
   adding objects
   added 3 commits with 3 trees and 3 blobs
+  adding reference refs/heads/delt#a
   updating reference refs/heads/master
   adding reference refs/tags/alph#a
   adding reference refs/tags/gamm_a
 
   $ hg log --graph
   @  changeset:   3:0950ab44ea23
+  |  bookmark:    delt#a
+  |  bookmark:    epsil*on
   |  bookmark:    master
+  |  tag:         default/delt#a
   |  tag:         default/master
   |  tag:         tip
   |  user:        test
@@ -74,7 +83,9 @@ git should have only the valid tag alph#a but have full commit log including the
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo2 log --graph
   @  changeset:   3:0950ab44ea23
+  |  bookmark:    delt#a
   |  bookmark:    master
+  |  tag:         default/delt#a
   |  tag:         default/master
   |  tag:         tip
   |  user:        test
