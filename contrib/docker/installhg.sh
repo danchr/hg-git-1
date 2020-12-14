@@ -19,6 +19,11 @@ else
     PIPDEPENDS="$PIPDEPENDS dulwich pyflakes"
 fi
 
+if test "$PYTHON" -gt 3.5
+then
+    PIPDEPENDS="$PIPDEPENDS black==20.8b1"
+fi
+
 set -xe
 
 apk add --no-cache $BUILDDEPENDS $RUNDEPENDS
