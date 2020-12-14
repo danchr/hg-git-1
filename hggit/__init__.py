@@ -231,7 +231,16 @@ def gimport(ui, repo, remote_name=None):
 
 @command(b'gexport')
 def gexport(ui, repo):
-    '''export commits from Mercurial to Git'''
+    '''export commits from Mercurial to Git (ADVANCED)
+
+    This command is equivalent to pushing to a Git source, but without
+    actually access the network. Internally, hg-git relies on a local,
+    cached git repository containing changes equivalent to the
+    Mercurial repository. If you wish to see what the Git commits
+    would be, use this command to export those changes. As an example,
+    it ensures that all changesets have a corresponding Git node.
+
+    '''
     repo.githandler.export_commits()
 
 
