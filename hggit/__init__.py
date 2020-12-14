@@ -217,7 +217,15 @@ extensions.wrapfunction(manifest.manifestdict, b'diff',
 
 @command(b'gimport')
 def gimport(ui, repo, remote_name=None):
-    '''import commits from Git to Mercurial'''
+    '''import commits from Git to Mercurial (ADVANCED)
+
+    This command is equivalent to pulling from a Git source, but
+    without actually accessing the network. Internally, hg-git relies
+    on a local, cached git repository containing changes equivalent to
+    the Mercurial repository. If you modify that Git repository
+    somehow, use this command to import those changes.
+
+    '''
     repo.githandler.import_commits(remote_name)
 
 
