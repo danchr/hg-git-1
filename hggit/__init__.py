@@ -33,7 +33,6 @@ from . import util
 from bisect import insort
 from .git_handler import GitHandler
 from mercurial.node import bin, hex
-from mercurial.error import LookupError
 from mercurial.i18n import _
 from mercurial import (
     bundlerepo,
@@ -41,6 +40,7 @@ from mercurial import (
     demandimport,
     dirstate,
     discovery,
+    error,
     exchange,
     extensions,
     help,
@@ -449,7 +449,11 @@ def revset_gitnode(repo, subset, x):
     result = revset.baseset(r for r in subset if matches(r))
     if 0 <= len(result) < 2:
         return result
-    raise LookupError(rev, git.map_file, _(b'ambiguous identifier'))
+
+    # added in 4.8
+    exctype = getattr(error, 'AmbiguousPrefixLookupError', error.LookupError)
+
+    raise exctype(rev, git.map_file, _(b'ambiguous identifier'))
 
 
 def _gitnodekw(node, repo):
