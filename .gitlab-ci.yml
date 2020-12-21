@@ -3,6 +3,7 @@ stages:
   - current
   - compat
   - upcoming
+  - archives
 
 .base:
   image: registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
@@ -254,3 +255,33 @@ Git service image:
       --single-snapshot
       --cleanup
       --destination registry.heptapod.net:443/mercurial/hg-git/git-server
+
+Linux x86-64 wheels:
+  image: quay.io/pypa/manylinux2014_x86_64
+  stage: archives
+  only:
+    - tags
+  script:
+    - yum install -y gettext
+    - |
+      for pythondir in /opt/python/*
+      do
+        $pythondir/bin/pip install docutils
+        $pythondir/bin/pip wheel --no-binary :all: -w wheelhouse mercurial .
+      done
+    - |
+      for whl in wheelhouse/*-linux_*.whl
+      do
+        auditwheel repair $whl
+      done
+    - rm -v wheelhouse/*-linux_*.whl
+    - mv -v wheelhouse/*.whl .
+  artifacts:
+    paths:
+      - "*.whl"
+
+Linux ARM64 wheels:
+  extends: "Linux x86-64 wheels"
+  image: quay.io/pypa/manylinux2014_aarch64
+  tags:
+    - arm64
