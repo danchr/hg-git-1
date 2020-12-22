@@ -215,8 +215,11 @@ This changed in 3.4 to start showing changed and deleted bookmarks again.
 As of 2.3, Mercurial's outgoing -B doesn't actually show changed bookmarks
 It only shows "new" bookmarks.  Thus, b1 doesn't show up.
 This changed in 3.4 to start showing changed and deleted bookmarks again.
-  $ hg outgoing -B | grep -v -E -w 'b1|b3|b4'
+  $ hg outgoing -B
   comparing with $TESTTMP/gitremoterepo
   searching for changed bookmarks
+     b1                        ca33a262eb46
      b2                        ff7a2f2d8d70
+     b3                                    
+     b4                                    
   $ cd ..

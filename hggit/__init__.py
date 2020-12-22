@@ -118,7 +118,6 @@ from mercurial.node import bin, hex, nullhex
 from mercurial.i18n import _
 from mercurial import (
     bundlerepo,
-    cmdutil,
     commands,
     demandimport,
     dirstate,
@@ -132,46 +131,29 @@ from mercurial import (
     localrepo,
     manifest,
     pycompat,
+    registrar,
     repoview,
     revset,
     scmutil,
-    templatekw,
 )
 
-# COMPAT: hg 4.7 - demandimport.ignore was renamed to demandimport.IGNORES and
-# became a set
-try:
-    demandimport.IGNORES |= {
-        b'collections',
-        b'brotli',  # only needed in Python 2.7
-    }
-except AttributeError:  # pre 4.7 API
-    demandimport.ignore.extend([
-        b'collections',
-        b'brotli',
-    ])
+demandimport.IGNORES |= {
+    b'collections',
+}
 
 __version__ = b'0.11.0dev'
 
-testedwith = (b'4.4.2 4.5.3 4.6.2 4.7.2 4.8.2 4.9.1 5.0.2 5.1.2 5.2 5.3 5.4 '
-              b'5.5 5.6 5.7')
-minimumhgversion = b'4.4'
+testedwith = (b'5.2 5.3 5.4 5.5 5.6 5.7')
+minimumhgversion = b'5.2'
 buglink = b'https://foss.heptapod.net/mercurial/hg-git/issues'
 
 cmdtable = {}
 configtable = {}
-try:
-    from mercurial import registrar
-    command = registrar.command(cmdtable)
-    configitem = registrar.configitem(configtable)
-    templatekeyword = registrar.templatekeyword()
+command = registrar.command(cmdtable)
+configitem = registrar.configitem(configtable)
+templatekeyword = registrar.templatekeyword()
 
-except (ImportError, AttributeError):
-    command = cmdutil.command(cmdtable)
-    templatekeyword = compat.templatekeyword()
-
-else:
-    compat.registerconfigs(configitem)
+compat.registerconfigs(configitem)
 
 # support for `hg clone git://github.com/defunkt/facebox.git`
 # also hg clone git+ssh://git@github.com/schacon/simplegit.git
@@ -617,10 +599,9 @@ def revset_gitnode(repo, subset, x):
     if 0 <= len(result) < 2:
         return result
 
-    # added in 4.8
-    exctype = getattr(error, 'AmbiguousPrefixLookupError', error.LookupError)
-
-    raise exctype(rev, git.map_file, _(b'ambiguous identifier'))
+    raise error.AmbiguousPrefixLookupError(
+        rev, git.map_file, _(b'ambiguous identifier'),
+    )
 
 
 def _gitnodekw(node, repo):
@@ -632,23 +613,10 @@ def _gitnodekw(node, repo):
     return gitnode
 
 
-if (hgutil.safehasattr(templatekw, b'templatekeyword') and
-        hgutil.safehasattr(templatekw.templatekeyword._table[b'node'],
-                           b'_requires')):
-    @templatekeyword(b'gitnode', requires={b'ctx', b'repo'})
-    def gitnodekw(context, mapping):
-        """:gitnode: String. The Git changeset identification hash, as a
+@templatekeyword(b'gitnode', requires={b'ctx', b'repo'})
+def gitnodekw(context, mapping):
+    """:gitnode: String. The Git changeset identification hash, as a
         40 hexadecimal digit string."""
-        node = context.resource(mapping, b'ctx')
-        repo = context.resource(mapping, b'repo')
-        return _gitnodekw(node, repo)
-
-else:
-    # COMPAT: hg < 4.6 - templatekeyword API changed
-    @templatekeyword(b'gitnode')
-    def gitnodekw(**args):
-        """:gitnode: String. The Git changeset identification hash, as a
-        40 hexadecimal digit string."""
-        node = args[b'ctx']
-        repo = args[b'repo']
-        return _gitnodekw(node, repo)
+    node = context.resource(mapping, b'ctx')
+    repo = context.resource(mapping, b'repo')
+    return _gitnodekw(node, repo)

@@ -16,9 +16,8 @@ from mercurial import (
     node,
     util,
 )
+from mercurial.utils import stringutil
 from mercurial.node import bin, hex, nullid
-
-from . import compat
 
 def _maybehex(n):
     if len(n) == 20:
@@ -205,7 +204,7 @@ class overlayfilectx(object):
         return blob.data
 
     def isbinary(self):
-        return compat.binary(self.data())
+        return stringutil.binary(self.data())
 
 
 class overlaychangectx(context.changectx):

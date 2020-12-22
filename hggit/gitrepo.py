@@ -5,17 +5,12 @@ from mercurial import (
     error,
     util
 )
-
-peerapi = False
-try:
-    from mercurial.interfaces.repository import peer as peerrepository
-    peerapi = True
-except ImportError:
-    try:
-        from mercurial.repository import peer as peerrepository
-        peerapi = True
-    except ImportError:
-        from mercurial.peer import peerrepository
+from mercurial.wireprotov1peer import (
+        batchable,
+        future,
+        peerexecutor,
+)
+from mercurial.interfaces.repository import peer as peerrepository
 
 
 class basegitrepo(peerrepository):
@@ -72,82 +67,71 @@ class basegitrepo(peerrepository):
     def pushkey(self, namespace, key, old, new):
         return False
 
-    if peerapi:
-        def branchmap(self):
-            raise NotImplementedError
+    def branchmap(self):
+        raise NotImplementedError
 
-        def canpush(self):
-            return True
+    def canpush(self):
+        return True
 
-        def close(self):
-            pass
+    def close(self):
+        pass
 
-        def debugwireargs(self):
-            raise NotImplementedError
+    def debugwireargs(self):
+        raise NotImplementedError
 
-        def getbundle(self):
-            raise NotImplementedError
+    def getbundle(self):
+        raise NotImplementedError
 
-        def iterbatch(self):
-            raise NotImplementedError
+    def iterbatch(self):
+        raise NotImplementedError
 
-        def known(self):
-            raise NotImplementedError
+    def known(self):
+        raise NotImplementedError
 
-        def peer(self):
-            return self
+    def peer(self):
+        return self
 
-        def stream_out(self):
-            raise NotImplementedError
+    def stream_out(self):
+        raise NotImplementedError
 
-        def unbundle(self):
-            raise NotImplementedError
+    def unbundle(self):
+        raise NotImplementedError
 
-try:
-    from mercurial.wireprotov1peer import (
-        batchable,
-        future,
-        peerexecutor,
-    )
-except ImportError:
-    # compat with <= hg-4.8
-    gitrepo = basegitrepo
-else:
-    class gitrepo(basegitrepo):
 
-        @batchable
-        def lookup(self, key):
-            f = future()
-            yield {}, f
-            yield super(gitrepo, self).lookup(key)
+class gitrepo(basegitrepo):
+    @batchable
+    def lookup(self, key):
+        f = future()
+        yield {}, f
+        yield super(gitrepo, self).lookup(key)
 
-        @batchable
-        def heads(self):
-            f = future()
-            yield {}, f
-            yield super(gitrepo, self).heads()
+    @batchable
+    def heads(self):
+        f = future()
+        yield {}, f
+        yield super(gitrepo, self).heads()
 
-        @batchable
-        def listkeys(self, namespace):
-            f = future()
-            yield {}, f
-            yield super(gitrepo, self).listkeys(namespace)
+    @batchable
+    def listkeys(self, namespace):
+        f = future()
+        yield {}, f
+        yield super(gitrepo, self).listkeys(namespace)
 
-        @batchable
-        def pushkey(self, namespace, key, old, new):
-            f = future()
-            yield {}, f
-            yield super(gitrepo, self).pushkey(key, old, new)
+    @batchable
+    def pushkey(self, namespace, key, old, new):
+        f = future()
+        yield {}, f
+        yield super(gitrepo, self).pushkey(key, old, new)
 
-        def commandexecutor(self):
-            return peerexecutor(self)
+    def commandexecutor(self):
+        return peerexecutor(self)
 
-        def _submitbatch(self, req):
-            for op, argsdict in req:
-                yield None
+    def _submitbatch(self, req):
+        for op, argsdict in req:
+            yield None
 
-        def _submitone(self, op, args):
-            return None
+    def _submitone(self, op, args):
+        return None
 
 instance = gitrepo
 

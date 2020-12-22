@@ -15,7 +15,6 @@ from mercurial import (
     error,
 )
 
-from . import compat
 from . import util
 
 
@@ -69,7 +68,7 @@ def audit_git_path(ui, path):
                 dangerous = True
                 break
     if dangerous:
-        if compat.config(ui, b'bool', b'git', b'blockdotgit'):
+        if ui.configbool(b'git', b'blockdotgit'):
             raise error.Abort(
                 (b"Refusing to export likely-dangerous path '%s'" % path),
                 hint=(b"If you need to continue, read about CVE-2014-9390 and "

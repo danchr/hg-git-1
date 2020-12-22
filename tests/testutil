@@ -13,16 +13,9 @@ echo "[extensions]" >> $HGRCPATH
 echo "hggit=$(echo $(dirname $TESTDIR))/hggit" >> $HGRCPATH
 echo 'mq=' >> $HGRCPATH
 
-# Enable git subrepository for hg >= 4.4.1
+# Enable git subrepository
 echo '[subrepos]' >> $HGRCPATH
 echo 'git:allowed = yes' >> $HGRCPATH
-
-# Disable warnings on 4.6, specifically; clone triggers a warning
-if hg --version | fgrep -q 'version 4.6'
-then
-    echo "[devel]" >> $HGRCPATH
-    echo "all-warnings=no" >> $HGRCPATH
-fi
 
 # silence warning from recent git
 cat >> $TESTTMP/.gitconfig <<EOF

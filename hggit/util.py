@@ -11,9 +11,8 @@ from mercurial.i18n import _
 from mercurial import (
     error,
     lock as lockmod,
+    util as hgutil,
 )
-
-from . import compat
 
 gitschemes = (b'git', b'git+ssh', b'git+http', b'git+https')
 
@@ -127,7 +126,7 @@ def checksafessh(host):
 
     Raises an error.Abort when the url is unsafe.
     """
-    host = compat.unquote(host)
+    host = hgutil.urlreq.unquote(host)
     if host.startswith(b'-'):
         raise error.Abort(_(b"potentially unsafe hostname: '%s'") %
                           (host,))

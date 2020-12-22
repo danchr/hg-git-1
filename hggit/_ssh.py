@@ -5,8 +5,7 @@ import subprocess
 from dulwich.client import SSHGitClient, SubprocessWrapper
 
 from mercurial import pycompat
-
-from . import compat
+from mercurial.utils import procutil
 
 
 class SSHVendor(object):
@@ -24,15 +23,15 @@ def generate_ssh_vendor(ui):
             assert isinstance(command, str)
             command = command.encode(SSHGitClient.DEFAULT_ENCODING)
             sshcmd = ui.config(b"ui", b"ssh", b"ssh")
-            args = compat.sshargs(sshcmd, pycompat.bytesurl(host),
+            args = procutil.sshargs(sshcmd, pycompat.bytesurl(host),
                                   username, port)
-            cmd = b'%s %s %s' % (sshcmd, args, compat.shellquote(command))
+            cmd = b'%s %s %s' % (sshcmd, args, procutil.shellquote(command))
             # consistent with mercurial
             ui.debug(b'running %s\n' % cmd)
             # we cannot use Mercurial's procutil.popen4() since it
             # always redirects stderr into a pipe
             proc = subprocess.Popen(
-                compat.tonativestr(compat.quotecommand(cmd)),
+                procutil.tonativestr(cmd),
                 shell=True,
                 bufsize=0,
                 stdin=subprocess.PIPE,

@@ -82,12 +82,10 @@ Pull that
   $ hg pull
   pulling from $TESTTMP/repo.git
   importing git objects into hg
-  1 new orphan changesets (?)
+  1 new orphan changesets
   (run 'hg heads' to see heads, 'hg merge' to merge)
-hg 4.4 lacks reporting new orphans, and the `*` marking unstable
-changesets below
   $ hg log --graph -T '{bookmarks} {rev}:{node}\n'
-  [*o]  otherbranch 4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5 (re)
+  *  otherbranch 4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5
   |
   | @  branch 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
   | |

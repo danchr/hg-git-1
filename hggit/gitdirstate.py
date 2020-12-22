@@ -171,10 +171,6 @@ class gitdirstate(dirstate.dirstate):
         while work:
             nd = work.pop()
             skip = None
-            if nd == b'.':
-                # <= hg-5.0 use "." for the root directory
-                # (see Mercurial-core27d6956d386b for details)
-                nd = b''
             if nd != b'':
                 skip = b'.hg'
             try:

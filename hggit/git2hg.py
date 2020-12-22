@@ -1,10 +1,8 @@
 # git2hg.py - convert Git repositories and commits to Mercurial ones
 
-from __future__ import generator_stop
-
 from dulwich.objects import Commit, Tag
 
-from . import compat
+from mercurial import util as hgutil
 
 def find_incoming(git_object_store, git_map, refs):
     '''find what commits need to be imported
@@ -128,7 +126,7 @@ def extract_hg_metadata(message, git_extra):
                 branch = data
             if command == b'extra':
                 k, v = data.split(b" : ", 1)
-                extra[k] = compat.unquote(v)
+                extra[k] = hgutil.urlreq.unquote(v)
 
     git_fn = 0
     for field, data in git_extra:
@@ -138,16 +136,16 @@ def extract_hg_metadata(message, git_extra):
             command = field[3:]
             if command == b'rename':
                 before, after = data.split(b':', 1)
-                renames[compat.unquote(after)] = compat.unquote(before)
+                renames[hgutil.urlreq.unquote(after)] = hgutil.urlreq.unquote(before)
             elif command == b'extra':
                 k, v = data.split(b':', 1)
-                extra[compat.unquote(k)] = compat.unquote(v)
+                extra[hgutil.urlreq.unquote(k)] = hgutil.urlreq.unquote(v)
         else:
             # preserve ordering in Git by using an incrementing integer for
             # each field. Note that extra metadata in Git is an ordered list
             # of pairs.
             hg_field = b'GIT%d-%s' % (git_fn, field)
             git_fn += 1
-            extra[compat.quote(hg_field)] = compat.quote(data)
+            extra[hgutil.urlreq.quote(hg_field)] = hgutil.urlreq.quote(data)
 
     return (message, renames, branch, extra)

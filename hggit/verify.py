@@ -15,8 +15,6 @@ from mercurial.i18n import _
 from dulwich import diff_tree
 from dulwich.objects import Commit, S_IFGITLINK
 
-from . import compat
-
 
 def verify(ui, repo, hgctx):
     '''verify that a Mercurial rev matches the corresponding Git rev
@@ -57,7 +55,7 @@ def verify(ui, repo, hgctx):
     hgfiles.discard(b'.hgsub')
     gitfiles = set()
 
-    with compat.makeprogress(ui, b'verify', total=len(hgfiles)) as progress:
+    with ui.makeprogress(b'verify', total=len(hgfiles)) as progress:
         for gitfile, dummy in diff_tree.walk_trees(handler.git.object_store,
                                                    gitcommit.tree, None):
             if gitfile.mode == dirkind:

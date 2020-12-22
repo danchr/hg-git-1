@@ -17,12 +17,14 @@ from dulwich import diff_tree
 
 from mercurial.i18n import _
 from mercurial.node import hex, bin, nullid
+from mercurial.utils import dateutil
 from mercurial import (
     bookmarks,
     commands,
     context,
     encoding,
     error,
+    hg,
     phases,
     pycompat,
     url,
@@ -31,7 +33,6 @@ from mercurial import (
 )
 
 from . import _ssh
-from . import compat
 from . import git2hg
 from . import hg2git
 from . import util
@@ -57,13 +58,6 @@ RE_NEWLINES = re.compile(br'[\r\n]')
 RE_GIT_PROGRESS = re.compile(br'\((\d+)/(\d+)\)')
 
 RE_AUTHOR_FILE = re.compile(br'\s*=\s*')
-
-# mercurial.utils.dateutil functions were in mercurial.util in Mercurial < 4.6
-try:
-    from mercurial.utils import dateutil
-    dateutil.parsedate
-except ImportError:
-    dateutil = hgutil
 
 CALLBACK_BUFFER = b''
 
@@ -95,7 +89,7 @@ class GitProgress(object):
                 if self._progress and self._progress.topic != topic:
                     self.flush()
                 if not self._progress:
-                    self._progress = compat.makeprogress(self.ui, topic)
+                    self._progress = self.ui.makeprogress(topic)
 
                 pos, total = map(int, m.group(1, 2))
                 self._progress.update(pos, total=total)
@@ -113,9 +107,9 @@ class GitProgress(object):
 
 def get_repo_and_gitdir(repo):
     if repo.shared():
-        repo = compat.sharedreposource(repo)
+        repo = hg.sharedreposource(repo)
 
-    if compat.config(repo.ui, b'bool', b'git', b'intree'):
+    if repo.ui.configbool(b'git', b'intree'):
         gitdir = repo.wvfs.join(b'.git')
     else:
         gitdir = repo.vfs.join(b'git')
@@ -144,8 +138,8 @@ class GitHandler(object):
 
         self.init_author_file()
 
-        self.branch_bookmark_suffix = compat.config(
-            ui, b'string', b'git', b'branch_bookmark_suffix')
+        self.branch_bookmark_suffix = ui.config(b'git',
+                                                b'branch_bookmark_suffix')
 
         self._map_git_real = None
         self._map_hg_real = None
@@ -198,7 +192,7 @@ class GitHandler(object):
 
     def init_author_file(self):
         self.author_map = {}
-        authors_path = compat.config(self.ui, b'string', b'git', b'authors')
+        authors_path = self.ui.config(b'git', b'authors')
         if authors_path:
             with open(self.repo.wvfs.join(authors_path)) as f:
                 for line in f:
@@ -503,7 +497,7 @@ class GitHandler(object):
         topic = b'find commits to export'
         unit = b'commits'
 
-        with compat.makeprogress(repo.ui, topic, unit, todo_total) as progress:
+        with repo.ui.makeprogress(topic, unit, todo_total) as progress:
             export = []
             for ctx in to_export:
                 item = hex(ctx.node())
@@ -538,9 +532,8 @@ class GitHandler(object):
         exporter = hg2git.IncrementalChangesetExporter(
             self.repo, pctx, self.git.object_store, gitcommit)
 
-        mapsavefreq = compat.config(self.ui, b'int', b'hggit',
-                                    b'mapsavefrequency')
-        with compat.makeprogress(self.ui, b'exporting', total=total) as progress:
+        mapsavefreq = self.ui.configint(b'hggit', b'mapsavefrequency')
+        with self.repo.ui.makeprogress(b'exporting', total=total) as progress:
             for i, ctx in enumerate(export):
                 progress.update(i, total=total)
                 self.export_hg_commit(ctx.node(), exporter)
@@ -697,7 +690,7 @@ class GitHandler(object):
             name = self.get_valid_git_username_email(a.group(1))
             email = self.get_valid_git_username_email(a.group(2))
             if a.group(3) is not None and len(a.group(3)) != 0:
-                name += b' ext:(' + compat.quote(a.group(3)) + b')'
+                name += b' ext:(' + hgutil.urlreq.quote(a.group(3)) + b')'
             author = b'%s <%s>'\
                      % (self.get_valid_git_username_email(name),
                          self.get_valid_git_username_email(email))
@@ -743,8 +736,7 @@ class GitHandler(object):
         # HG EXTRA INFORMATION
 
         # test only -- do not document this!
-        extra_in_message = compat.config(self.ui, b'bool', b'git',
-                                         b'debugextrainmessage')
+        extra_in_message = self.ui.configbool(b'git', b'debugextrainmessage')
         extra_message = b''
         git_extra = []
         if ctx.branch() != b'default':
@@ -762,7 +754,7 @@ class GitHandler(object):
 
         git_extraitems.sort()
         for i, field, value in git_extraitems:
-            git_extra.append((compat.unquote(field), compat.unquote(value)))
+            git_extra.append((hgutil.urlreq.unquote(field), hgutil.urlreq.unquote(value)))
 
         if extra.get(b'hg-git-rename-source', None) != b'git':
             renames = []
@@ -779,8 +771,8 @@ class GitHandler(object):
                         extra_message += (b"rename : " + oldfile + b" => " +
                                           newfile + b"\n")
                     else:
-                        spec = b'%s:%s' % (compat.quote(oldfile),
-                                           compat.quote(newfile))
+                        spec = b'%s:%s' % (hgutil.urlreq.quote(oldfile),
+                                           hgutil.urlreq.quote(newfile))
                         git_extra.append((b'HG:rename', spec))
 
         # hg extra items always go at the end
@@ -791,10 +783,10 @@ class GitHandler(object):
             else:
                 if extra_in_message:
                     extra_message += (b"extra : " + key + b" : " +
-                                      compat.quote(value) + b"\n")
+                                      hgutil.urlreq.quote(value) + b"\n")
                 else:
-                    spec = b'%s:%s' % (compat.quote(key),
-                                       compat.quote(value))
+                    spec = b'%s:%s' % (hgutil.urlreq.quote(key),
+                                       hgutil.urlreq.quote(value))
                     git_extra.append((b'HG:extra', spec))
 
         if extra_message:
@@ -823,9 +815,8 @@ class GitHandler(object):
         else:
             self.ui.status(_(b"no changes found\n"))
 
-        mapsavefreq = compat.config(self.ui, b'int', b'hggit',
-                                    b'mapsavefrequency')
-        with compat.makeprogress(self.ui, b'importing', unit=b'commits', total=total) as progress:
+        mapsavefreq = self.ui.configint(b'hggit', b'mapsavefrequency')
+        with self.ui.makeprogress(b'importing', unit=b'commits', total=total) as progress:
             for i, csha in enumerate(commits):
                 progress.update(i)
                 commit = commit_cache[csha]
@@ -937,7 +928,7 @@ class GitHandler(object):
             m = RE_GIT_AUTHOR_EXTRA.match(commit.author)
             if m:
                 name = m.group(1)
-                ex = compat.unquote(m.group(2))
+                ex = hgutil.urlreq.unquote(m.group(2))
                 email = m.group(3)
                 author = name + b' <' + email + b'>' + ex
 
@@ -997,10 +988,10 @@ class GitHandler(object):
                 if copied:
                     copied_path = copied[0]
 
-            return compat.memfilectx(unfiltered, memctx, f, data,
-                                     islink=b'l' in e,
-                                     isexec=b'x' in e,
-                                     copysource=copied_path)
+            return context.memfilectx(unfiltered, memctx, f, data,
+                                      islink=b'l' in e,
+                                      isexec=b'x' in e,
+                                      copysource=copied_path)
 
         p1, p2 = (nullid, nullid)
         octopus = False
@@ -1347,7 +1338,7 @@ class GitHandler(object):
         '''filter refs by minimum date
 
         This only works for refs that are available locally.'''
-        min_date = compat.config(self.ui, b'string', b'git', b'mindate')
+        min_date = self.ui.config(b'git', b'mindate')
         if min_date is None:
             return refs
 
@@ -1471,7 +1462,7 @@ class GitHandler(object):
 
             # -f/--force is deliberately unimplemented and unmentioned
             # as its git semantics are quite confusing
-            if compat.isrevsymbol(self.repo, tag):
+            if scmutil.isrevsymbol(self.repo, tag):
                 raise error.Abort(b"the name '%s' already exists" % tag)
 
             if check_ref_format(b'refs/tags/' + tag):
@@ -1496,7 +1487,7 @@ class GitHandler(object):
 
             suffix = self.branch_bookmark_suffix or b''
             changes = []
-            for head, sha in compat.iteritems(heads):
+            for head, sha in heads.items():
                 # refs contains all the refs in the server, not just
                 # the ones we are pulling
                 hgsha = self.map_hg_get(sha)
@@ -1662,21 +1653,20 @@ class GitHandler(object):
     @hgutil.propertycache
     def _rename_detector(self):
         # disabled by default to avoid surprises
-        similarity = compat.config(self.ui, b'int', b'git', b'similarity')
+        similarity = self.ui.configint(b'git', b'similarity')
         if similarity < 0 or similarity > 100:
             raise error.Abort(_(b'git.similarity must be between 0 and 100'))
         if similarity == 0:
             return None
 
         # default is borrowed from Git
-        max_files = compat.config(self.ui, b'int', b'git', b'renamelimit')
+        max_files = self.ui.configint(b'git', b'renamelimit')
         if max_files < 0:
             raise error.Abort(_(b'git.renamelimit must be non-negative'))
         if max_files == 0:
             max_files = None
 
-        find_copies_harder = compat.config(self.ui, b'bool', b'git',
-                                           b'findcopiesharder')
+        find_copies_harder = self.ui.configbool(b'git', b'findcopiesharder')
         return diff_tree.RenameDetector(self.git.object_store,
                                         rename_threshold=similarity,
                                         max_files=max_files,
@@ -1686,7 +1676,7 @@ class GitHandler(object):
         """Parse .gitmodules from a git tree specified by tree_obj
 
            :return: list of tuples (submodule path, url, name),
-           where name is quoted part of the section's name, or
+           where name is hgutil.urlreq.quoted part of the section's name, or
            empty list if nothing found
         """
         rv = []
@@ -1725,7 +1715,7 @@ class GitHandler(object):
 
     def audit_hg_path(self, path):
         if b'.hg' in path.split(b'/'):
-            if compat.config(self.ui, b'bool', b'git', b'blockdothg'):
+            if self.ui.configbool(b'git', b'blockdothg'):
                 raise error.Abort(
                     (b"Refusing to import problematic path '%s'" % path),
                     hint=(b"Mercurial cannot check out paths inside nested " +
@@ -1823,7 +1813,7 @@ class GitHandler(object):
             config = dul_config.ConfigDict()
             config.set(b'http', b'useragent', ua)
 
-            proxy = compat.config(self.ui, b'string', b'http_proxy', b'host')
+            proxy = self.ui.config(b'http_proxy', b'host')
             if proxy:
                 config.set(b'http', b'proxy', b'http://' + proxy)
 
