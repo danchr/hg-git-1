@@ -29,57 +29,6 @@ def parse_subrepos(ctx):
     return sub, substate
 
 
-def audit_git_path(ui, path):
-    r"""Check for path components that case-fold to .git.
-
-    >>> from mercurial import pycompat
-    >>> class fakeui(object):
-    ...     def configbool(*args):
-    ...         return False
-    ...     def warn(self, s):
-    ...         if pycompat.ispy3:
-    ...             import sys
-    ...             print(s.decode('utf-8', 'surrogatepass'))
-    ...         else:
-    ...             print(s)
-    >>> u = fakeui()
-    >>> audit_git_path(u, b'foo/git~100/wat')
-    ... # doctest: +ELLIPSIS
-    warning: path 'foo/git~100/wat' contains a potentially dangerous ...
-    It may not be legal to check out in Git.
-    It may also be rejected by some git server configurations.
-    <BLANKLINE>
-    >>> audit_git_path(u, u'foo/.gi\u200ct'.encode('utf-8'))
-    ... # doctest: +ELLIPSIS
-    warning: path 'foo/.gi‌t' contains a potentially dangerous ...
-    It may not be legal to check out in Git.
-    It may also be rejected by some git server configurations.
-    <BLANKLINE>
-    >>> audit_git_path(u, b'this/is/safe')
-    """
-    dangerous = False
-    for c in path.split(b'/'):
-        if encoding.hfsignoreclean(c) == b'.git':
-            dangerous = True
-            break
-        elif b'~' in c:
-            base, tail = c.split(b'~', 1)
-            if tail.isdigit() and base.upper().startswith(b'GIT'):
-                dangerous = True
-                break
-    if dangerous:
-        if ui.configbool(b'git', b'blockdotgit'):
-            raise error.Abort(
-                (b"Refusing to export likely-dangerous path '%s'" % path),
-                hint=(b"If you need to continue, read about CVE-2014-9390 and "
-                      b"then set '[git] blockdotgit = false' in your hgrc."))
-        ui.warn(b"warning: path '%s' contains a potentially dangerous path "
-                b'component.\n'
-                b'It may not be legal to check out in Git.\n'
-                b'It may also be rejected by some git server configurations.\n'
-                % path)
-
-
 class IncrementalChangesetExporter(object):
     """Incrementally export Mercurial changesets to Git trees.
 
@@ -166,6 +115,52 @@ class IncrementalChangesetExporter(object):
         """
         return self._dirs[b''].id
 
+    def _audit_one_path(self, path):
+        r"""Check for path components that case-fold to .git.
+
+        Returns ``True`` for normal paths. The results for insecure
+        paths depend on the configuration in ``ui``:
+
+        If ``git.blockdotgit`` is set, insecure paths raise an
+        exception.
+
+        Otherwise, a warning may be printed, but the return value is
+        ``True``, indicating that all paths should be retained
+        regardless of any problems they may cause.
+
+        """
+        ui = self._hg.ui
+
+        dangerous = False
+        for c in path.split(b'/'):
+            if encoding.hfsignoreclean(c) == b'.git':
+                dangerous = True
+                break
+            elif b'~' in c:
+                base, tail = c.split(b'~', 1)
+                if tail.isdigit() and base.upper().startswith(b'GIT'):
+                    dangerous = True
+                    break
+        if dangerous:
+            if ui.configbool(b'git', b'blockdotgit'):
+                raise error.Abort(
+                    b"Refusing to export likely-dangerous path '%s'" % path,
+                    hint=(b'If you need to continue, read about '
+                          b'CVE-2014-9390 and then set '
+                          b"'[git] blockdotgit = false' in your hgrc."))
+            ui.warn(b"warning: path '%s' contains a potentially dangerous "
+                    b'path component.\n'
+                    b'It may not be legal to check out in Git.\n'
+                    b'It may also be rejected by some git server '
+                    b'configurations.\n'
+                    % path)
+
+    def audit_paths(self, paths):
+        """Handle insecure paths"""
+        for path in paths:
+            self._audit_one_path(path)
+        return paths
+
     def update_changeset(self, newctx):
         """Set the tree to track a new Mercurial changeset.
 
@@ -201,10 +196,8 @@ class IncrementalChangesetExporter(object):
         # the full manifest. And, the easy way to compare two manifests is
         # localrepo.status().
         status = self._hg.status(self._ctx, newctx)
-        modified, added, removed = (
-            status.modified,
-            status.added,
-            status.removed,
+        modified, added, removed = map(
+            self.audit_paths, (status.modified, status.added, status.removed),
         )
 
         # We track which directories/trees have modified in this update and we
@@ -239,7 +232,6 @@ class IncrementalChangesetExporter(object):
         # corresponding Git blob and its tree entry. We emit the blob
         # immediately and update trees to be aware of its presence.
         for path in set(modified) | set(added):
-            audit_git_path(self._hg.ui, path)
             if path == b'.hgsubstate' or path == b'.hgsub':
                 continue
 

@@ -11,15 +11,39 @@ Load commonly used test logic
   > #!/bin/sh
   > echo pwned
   > EOF
-
+  $ python - foo/git~100/wat bar/.gi\\u200ct/wut this/is/safe <<EOF
+  > import os, sys
+  > for p in sys.argv[1:]:
+  >   p = p.encode('ascii').decode('unicode_escape').encode('utf-8')
+  >   os.makedirs(os.path.dirname(p))
+  >   open(p, 'w')
+  > EOF
   $ hg addremove
   adding .git/hooks/post-update
+  adding bar/.gi\xe2\x80\x8ct/wut (esc)
+  adding foo/git~100/wat
+  adding this/is/safe
   $ hg ci -m "we should refuse to export this"
   $ hg book master
   $ hg gexport
   abort: Refusing to export likely-dangerous path '.git/hooks/post-update'
   (If you need to continue, read about CVE-2014-9390 and then set '[git] blockdotgit = false' in your hgrc.)
   [255]
+  $ hg gexport --config git.blockdotgit=no
+  warning: path '.git/hooks/post-update' contains a potentially dangerous path component.
+  It may not be legal to check out in Git.
+  It may also be rejected by some git server configurations.
+  warning: path 'bar/.gi\xe2\x80\x8ct/wut' contains a potentially dangerous path component. (esc)
+  It may not be legal to check out in Git.
+  It may also be rejected by some git server configurations.
+  warning: path 'foo/git~100/wat' contains a potentially dangerous path component.
+  It may not be legal to check out in Git.
+  It may also be rejected by some git server configurations.
+  $ GIT_DIR=.hg/git git ls-tree -r --name-only  master
+  .git/hooks/post-update
+  "bar/.gi\342\200\214t/wut"
+  foo/git~100/wat
+  this/is/safe
   $ cd ..
 
   $ rm -rf hg
