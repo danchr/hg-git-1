@@ -43,7 +43,7 @@ Fix up authentication:
 
 ..and finally SSH:
 
-  $ hg clone git+ssh://git@git-server/srv/repo.git repo-ssh
+  $ hg clone git@git-server:/srv/repo.git repo-ssh
   Warning: Permanently added * (glob)
   updating to branch default
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -57,7 +57,7 @@ So, that went well; now push...
   $ hg book -r tip master
   $ hg push
   Warning: Permanently added * (glob) (?)
-  pushing to git+ssh://git@git-server/srv/repo.git
+  pushing to git@git-server:/srv/repo.git
   Warning: Permanently added * (glob) (?)
   searching for changes
   adding objects

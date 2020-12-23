@@ -129,27 +129,6 @@ def _local(path):
 hg.schemes[b'file'] = _local
 
 
-# we need to wrap this so that git-like ssh paths are not prepended with a
-# local filesystem path. ugh.
-def _url(orig, path, **kwargs):
-    # we'll test for 'git@' then use our heuristic method to determine if it's
-    # a git uri
-    if not (path.startswith(pycompat.ossep) and b':' in path):
-        return orig(path, **kwargs)
-
-    # the file path will be everything up until the last slash right before the
-    # ':'
-    lastsep = path.rindex(pycompat.ossep, None, path.index(b':')) + 1
-    gituri = path[lastsep:]
-
-    if util.isgitsshuri(gituri):
-        return orig(gituri, **kwargs)
-    return orig(path, **kwargs)
-
-
-extensions.wrapfunction(hgutil, b'url', _url)
-
-
 def _httpgitwrapper(orig):
     # we should probably test the connection but for now, we just keep it
     # simple and check for a url ending in '.git'
@@ -371,6 +350,22 @@ def isvalidlocalpath(orig, self, path):
 if (hgutil.safehasattr(hgui, b'path') and
     hgutil.safehasattr(hgui.path, b'_isvalidlocalpath')):
     extensions.wrapfunction(hgui.path, b'_isvalidlocalpath', isvalidlocalpath)
+
+
+def islocal(orig, path):
+    # recognise git scp-style paths when cloning
+    return orig(path) and not util.isgitsshuri(path)
+
+
+extensions.wrapfunction(hg, b'islocal', islocal)
+
+
+def hasscheme(orig, path):
+    # recognise git scp-style paths
+    return orig(path) or util.isgitsshuri(path)
+
+
+extensions.wrapfunction(hgutil, b'hasscheme', hasscheme)
 
 
 @util.transform_notgit
