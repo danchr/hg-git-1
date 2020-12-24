@@ -27,5 +27,5 @@ as commit alpha. This lets us test ambiguous abbreviated identifiers.
   $ cd hgrepo
 
   $ hg log -r 'gitnode(7e)'
-  abort: git-mapfile@7e: ambiguous identifier!
+  abort: git-mapfile@7e: ambiguous identifier!? (re)
   [255]
