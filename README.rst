@@ -216,22 +216,6 @@ username/email combination be used on both the Mercurial and Git sides; the
 author file is mostly useful for translating legacy changesets.
 
 
-``git.blockdotgit``
--------------------
-
-Blocks exporting revisions to Git that contain a directory named .git or
-any letter-case variation thereof. This prevents creating repositories
-that newer versions of Git and many Git hosting services block due to
-security concerns. Defaults to True.
-
-
-``git.blockdothg``
-------------------
-
-Blocks importing revisions from Git that contain a directory named .hg.
-Defaults to True.
-
-
 ``git.branch_bookmark_suffix``
 ------------------------------
 
@@ -366,3 +350,23 @@ remote Git repository's ``HEAD`` will be marked *public*. For most
 repositories, this means the remote ``master`` branch will be
 converted as public. Publishing commits prevents their modification,
 and speeds up many local Mercurial operations, such as ``hg shelve``.
+
+``hggit.invalidpaths``
+-------------------
+
+Both Mercurial and Git consider paths as just bytestrings internally,
+and allow almost anything. The difference, however, is in the _almost_
+part. For example, many Git servers will reject a push for security
+reasons if it contains a nested Git repository. Similarly, Mercurial
+cannot checkout commits with a nested repository, and it cannot even
+store paths containing an embedded newline or carrage return
+character.
+
+The default is to issue a warning and skip these paths. You can
+change this by setting ``hggit.invalidpaths`` in ``.hgrc``::
+
+  [hggit]
+  invalidpaths = keep
+
+Possible values are ``keep``, ``skip`` or ``abort``. Prior to 0.11,
+the default was ``abort``.

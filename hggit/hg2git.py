@@ -115,18 +115,21 @@ class IncrementalChangesetExporter(object):
         """
         return self._dirs[b''].id
 
-    def _audit_one_path(self, path):
+    def audit_path(self, path):
         r"""Check for path components that case-fold to .git.
 
         Returns ``True`` for normal paths. The results for insecure
-        paths depend on the configuration in ``ui``:
+        paths depend on the ``hggit.invalidpaths`` configuration in
+        ``ui``:
 
-        If ``git.blockdotgit`` is set, insecure paths raise an
-        exception.
+        ``abort`` means insecure paths abort the conversion —
+        this was the default prior to 0.11.
 
-        Otherwise, a warning may be printed, but the return value is
-        ``True``, indicating that all paths should be retained
-        regardless of any problems they may cause.
+        ``keep`` means issue a warning and keep the path,
+        returning ``True``.
+
+        Anything else, but documented as ``skip``, means issue a
+        warning and disregard the path, returning ``False``.
 
         """
         ui = self._hg.ui
@@ -142,24 +145,37 @@ class IncrementalChangesetExporter(object):
                     dangerous = True
                     break
         if dangerous:
-            if ui.configbool(b'git', b'blockdotgit'):
-                raise error.Abort(
-                    b"Refusing to export likely-dangerous path '%s'" % path,
-                    hint=(b'If you need to continue, read about '
-                          b'CVE-2014-9390 and then set '
-                          b"'[git] blockdotgit = false' in your hgrc."))
-            ui.warn(b"warning: path '%s' contains a potentially dangerous "
-                    b'path component.\n'
-                    b'It may not be legal to check out in Git.\n'
-                    b'It may also be rejected by some git server '
-                    b'configurations.\n'
-                    % path)
+            opt = ui.config(b'hggit', b'invalidpaths')
 
-    def audit_paths(self, paths):
-        """Handle insecure paths"""
-        for path in paths:
-            self._audit_one_path(path)
-        return paths
+            # escape the path when printing it out
+            prettypath = path.decode('latin1').encode('unicode-escape')
+
+            if opt == b'abort':
+                raise error.Abort(
+                    b"invalid path '%s' rejected by configuration" % prettypath,
+                    hint=b"see 'hg help hggit' for details",
+                )
+            elif opt == b'keep':
+                ui.warn(
+                    b"warning: path '%s' contains an invalid path component\n"
+                    % prettypath,
+                )
+                return True
+            else:
+                # undocumented: just let anything else mean "skip"
+                ui.warn(b"warning: skipping invalid path '%s'\n" % prettypath)
+                return False
+        else:
+            return True
+
+    def filter_unsafe_paths(self, paths):
+        """Return a copy of the given list, with dangerous paths removed.
+
+        Please note that the configuration can suppress the removal;
+        see above.
+
+        """
+        return [path for path in paths if self.audit_path(path)]
 
     def update_changeset(self, newctx):
         """Set the tree to track a new Mercurial changeset.
@@ -197,7 +213,7 @@ class IncrementalChangesetExporter(object):
         # localrepo.status().
         status = self._hg.status(self._ctx, newctx)
         modified, added, removed = map(
-            self.audit_paths, (status.modified, status.added, status.removed),
+            self.filter_unsafe_paths, (status.modified, status.added, status.removed),
         )
 
         # We track which directories/trees have modified in this update and we

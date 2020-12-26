@@ -98,6 +98,25 @@ For example::
 Revsets are accepted by several Mercurial commands for specifying
 revisions. See :hg:`help revsets` for details.
 
+Invalid and dangerous paths
+---------------------------
+
+Both Mercurial and Git consider paths as just bytestrings internally,
+and allow almost anything. The difference, however, is in the _almost_
+part. For example, many Git servers will reject a push for security
+reasons if it contains a nested Git repository. Similarly, Mercurial
+cannot checkout commits with a nested repository, and it cannot even
+store paths containing an embedded newline or carrage return
+character.
+
+The default is to issue a warning and skip these paths. You can
+change this by setting ``hggit.invalidpaths`` in :hg:`config`::
+
+  [hggit]
+  invalidpaths = keep
+
+Possible values are ``keep``, ``skip`` or ``abort``.
+
 '''
 
 from __future__ import generator_stop

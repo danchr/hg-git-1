@@ -11,13 +11,7 @@ Load commonly used test logic
   > #!/bin/sh
   > echo pwned
   > EOF
-  $ python - foo/git~100/wat bar/.gi\\u200ct/wut this/is/safe <<EOF
-  > import os, sys
-  > for p in sys.argv[1:]:
-  >   p = p.encode('ascii').decode('unicode_escape').encode('utf-8')
-  >   os.makedirs(os.path.dirname(p))
-  >   open(p, 'w')
-  > EOF
+  $ fn_touch_escaped foo/git~100/wat bar/.gi\\u200ct/wut this/is/safe
   $ hg addremove
   adding .git/hooks/post-update
   adding bar/.gi\xe2\x80\x8ct/wut (esc)
@@ -26,19 +20,17 @@ Load commonly used test logic
   $ hg ci -m "we should refuse to export this"
   $ hg book master
   $ hg gexport
-  abort: Refusing to export likely-dangerous path '.git/hooks/post-update'
-  (If you need to continue, read about CVE-2014-9390 and then set '[git] blockdotgit = false' in your hgrc.)
-  [255]
-  $ hg gexport --config git.blockdotgit=no
-  warning: path '.git/hooks/post-update' contains a potentially dangerous path component.
-  It may not be legal to check out in Git.
-  It may also be rejected by some git server configurations.
-  warning: path 'bar/.gi\xe2\x80\x8ct/wut' contains a potentially dangerous path component. (esc)
-  It may not be legal to check out in Git.
-  It may also be rejected by some git server configurations.
-  warning: path 'foo/git~100/wat' contains a potentially dangerous path component.
-  It may not be legal to check out in Git.
-  It may also be rejected by some git server configurations.
+  warning: skipping invalid path '.git/hooks/post-update'
+  warning: skipping invalid path 'bar/.gi\xe2\x80\x8ct/wut'
+  warning: skipping invalid path 'foo/git~100/wat'
+  $ GIT_DIR=.hg/git git ls-tree -r --name-only  master
+  this/is/safe
+  $ hg gclear
+  clearing out the git cache data
+  $ hg gexport --config hggit.invalidpaths=keep
+  warning: path '.git/hooks/post-update' contains an invalid path component
+  warning: path 'bar/.gi\xe2\x80\x8ct/wut' contains an invalid path component
+  warning: path 'foo/git~100/wat' contains an invalid path component
   $ GIT_DIR=.hg/git git ls-tree -r --name-only  master
   .git/hooks/post-update
   "bar/.gi\342\200\214t/wut"
@@ -60,14 +52,24 @@ Load commonly used test logic
   $ hg ci -m "also refuse to export this"
   $ hg book master
   $ hg gexport
-  abort: Refusing to export likely-dangerous path 'nested/.git/hooks/post-update'
-  (If you need to continue, read about CVE-2014-9390 and then set '[git] blockdotgit = false' in your hgrc.)
+  warning: skipping invalid path 'nested/.git/hooks/post-update'
+  $ git clone .hg/git git
+  Cloning into 'git'...
+  done.
+  $ rm -rf git
+
+We can trigger an error:
+
+  $ hg -q gclear
+  $ hg --config hggit.invalidpaths=abort gexport
+  abort: invalid path 'nested/.git/hooks/post-update' rejected by configuration
+  (see 'hg help hggit' for details)
   [255]
+
 We can override if needed:
-  $ hg --config git.blockdotgit=false gexport
-  warning: path 'nested/.git/hooks/post-update' contains a potentially dangerous path component.
-  It may not be legal to check out in Git.
-  It may also be rejected by some git server configurations.
+
+  $ hg --config hggit.invalidpaths=keep gexport
+  warning: path 'nested/.git/hooks/post-update' contains an invalid path component
   $ cd ..
   $ # different git versions give different return codes
   $ git clone hg/.hg/git git || true
@@ -116,9 +118,7 @@ And the NTFS case:
   $ hg ci -m "also refuse to export this"
   $ hg book master
   $ hg gexport
-  abort: Refusing to export likely-dangerous path 'GIT~1/hooks/post-checkout'
-  (If you need to continue, read about CVE-2014-9390 and then set '[git] blockdotgit = false' in your hgrc.)
-  [255]
+  warning: skipping invalid path 'GIT~1/hooks/post-checkout'
   $ cd ..
 
 Now check a Git repository containing a Mercurial repository, which
@@ -132,18 +132,59 @@ you can't check out.
   $ git add nested
   $ fn_git_commit -m 'add a Mercurial repository'
   $ cd ..
-  $ hg clone git hg
+  $ hg clone --config hggit.invalidpaths=abort git hg
   importing git objects into hg
-  abort: Refusing to import problematic path 'nested/.hg/00changelog.i'
-  (Mercurial cannot check out paths inside nested repositories; if you need to continue, then set '[git] blockdothg = false' in your hgrc.)
+  abort: invalid path 'nested/.hg/00changelog.i' rejected by configuration
+  (see 'hg help hggit' for details)
   [255]
   $ rm -rf hg
-  $ hg clone --config git.blockdothg=false git hg
+  $ hg clone --config hggit.invalidpaths=keep git hg
   importing git objects into hg
-  warning: path 'nested/.hg/00changelog.i' is within a nested repository, which Mercurial cannot check out.
-  warning: path 'nested/.hg/requires' is within a nested repository, which Mercurial cannot check out.
+  warning: path 'nested/.hg/00changelog.i' contains an invalid path component
+  warning: path 'nested/.hg/requires' contains an invalid path component
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
   abort: path 'nested/.hg/00changelog.i' is inside nested repo 'nested'
   [255]
+  $ rm -rf hg
+  $ hg clone git hg
+  importing git objects into hg
+  warning: skipping invalid path 'nested/.hg/00changelog.i'
+  warning: skipping invalid path 'nested/.hg/requires'
+  updating to branch default (no-hg57 !)
+  updating to bookmark master (hg57 !)
+  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd ..
+
+Now check a Git repository containing paths with carriage return and
+newline, which Mercurial expressly forbids
+(see https://bz.mercurial-scm.org/show_bug.cgi?id=352)
+
+  $ rm -rf hg git
+  $ git init -q git
+  $ cd git
+  $ fn_touch_escaped Icon\\r the\\nfile
+  $ git add .
+  $ fn_git_commit -m 'add files disallowed by mercurial'
+  $ cd ..
+  $ hg clone --config hggit.invalidpaths=abort git hg
+  importing git objects into hg
+  abort: invalid path 'Icon\r' rejected by configuration
+  (see 'hg help hggit' for details)
+  [255]
+  $ hg clone --config hggit.invalidpaths=keep git hg
+  importing git objects into hg
+  warning: skipping invalid path 'Icon\r'
+  warning: skipping invalid path 'the\nfile'
+  updating to branch default (no-hg57 !)
+  updating to bookmark master (hg57 !)
+  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ rm -rf hg
+  $ hg clone git hg
+  importing git objects into hg
+  warning: skipping invalid path 'Icon\r'
+  warning: skipping invalid path 'the\nfile'
+  updating to branch default (no-hg57 !)
+  updating to bookmark master (hg57 !)
+  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+

@@ -1614,6 +1614,9 @@ class GitHandler(object):
             # stored in 'old = file' case, then membership check fails in 'new
             # = file' case so is overwritten.
             if newmode == 0o160000:
+                if not self.audit_hg_path(newfile):
+                    # disregard illegal or inconvenient paths
+                    continue
                 # new = gitlink
                 gitlinks[newfile] = newsha
                 if change.type == diff_tree.CHANGE_RENAME:
@@ -1629,7 +1632,8 @@ class GitHandler(object):
                 gitlinks[oldfile] = None
                 continue
             if newfile is not None:
-                self.audit_hg_path(newfile)
+                if not self.audit_hg_path(newfile):
+                    continue
                 # new = file
                 files[newfile] = False, newmode, newsha
                 if renames is not None and newfile != oldfile:
@@ -1714,16 +1718,30 @@ class GitHandler(object):
                 return path.name
 
     def audit_hg_path(self, path):
-        if b'.hg' in path.split(b'/'):
-            if self.ui.configbool(b'git', b'blockdothg'):
+        if b'.hg' in path.split(b'/') or b'\r' in path or b'\n' in path:
+            ui = self.ui
+
+            # escape the path when printing it out
+            prettypath = path.decode('latin1').encode('unicode-escape')
+
+            opt = ui.config(b'hggit', b'invalidpaths')
+            if opt == b'abort':
                 raise error.Abort(
-                    (b"Refusing to import problematic path '%s'" % path),
-                    hint=(b"Mercurial cannot check out paths inside nested " +
-                          b"repositories; if you need to continue, then set " +
-                          b"'[git] blockdothg = false' in your hgrc."))
-            self.ui.warn((b"warning: path '%s' is within a nested " +
-                          b'repository, which Mercurial cannot check out.\n')
-                         % path)
+                    b"invalid path '%s' rejected by configuration" % prettypath,
+                    hint=b"see 'hg help hggit' for details",
+                )
+            elif opt == b'keep' and b'\r' not in path and b'\n' not in path:
+                ui.warn(
+                    b"warning: path '%s' contains an invalid path component\n"
+                    % prettypath,
+                )
+                return True
+            else:
+                # undocumented: just let anything else mean "skip"
+                ui.warn(b"warning: skipping invalid path '%s'\n" % prettypath)
+                return False
+
+        return True
 
     # Stolen from hgsubversion
     def swap_out_encoding(self, new_encoding=b'UTF-8'):

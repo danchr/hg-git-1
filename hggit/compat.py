@@ -47,8 +47,6 @@ def check_incompatible_arguments(opts, first, others):
 CONFIG_DEFAULTS = {
     b'git': {
         b'authors': None,
-        b'blockdotgit': True,
-        b'blockdothg': True,
         b'branch_bookmark_suffix': None,
         b'debugextrainmessage': False,   # test only -- do not document this!
         b'findcopiesharder': False,
@@ -61,6 +59,7 @@ CONFIG_DEFAULTS = {
     b'hggit': {
         b'mapsavefrequency': 0,
         b'usephases': False,
+        b'invalidpaths': b'skip',
     }
 }
 

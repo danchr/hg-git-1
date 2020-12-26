@@ -72,3 +72,14 @@ fn_hg_tag() {
     hg tag -d "$HGDATE" "$@" >/dev/null || echo "hg tag error"
     count=`expr $count + 1`
 }
+
+fn_touch_escaped() {
+    python - "$@" <<EOF
+import os, sys
+for p in sys.argv[1:]:
+  p = p.encode('ascii').decode('unicode_escape').encode('utf-8')
+  if b'/' in p and not os.path.exists(os.path.dirname(p)):
+    os.makedirs(os.path.dirname(p))
+  open(p, 'w')
+EOF
+}
