@@ -24,6 +24,8 @@ clone a tag
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg -R hgrepo-a bookmarks
+   * master                    0:ff7a2f2d8d70
   $ hg -R hgrepo-a log --graph
   @  changeset:   0:ff7a2f2d8d70
      bookmark:    master
@@ -43,6 +45,9 @@ clone a branch
   importing git objects into hg
   updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg -R hgrepo-b bookmarks
+   * beta                      1:7fe02317c63d
+     master                    0:ff7a2f2d8d70
   $ hg -R hgrepo-b log --graph
   @  changeset:   1:7fe02317c63d
   |  bookmark:    beta
@@ -81,6 +86,9 @@ Make sure that a deleted .hgsubstate does not confuse hg-git
   importing git objects into hg
   updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg -R hgrepo-c bookmarks
+   * beta                      3:3a77db64d0e8
+     master                    0:ff7a2f2d8d70
   $ hg --cwd hgrepo-c status
 
 test shared repositories
@@ -90,6 +98,9 @@ test shared repositories
   updating to branch default (no-hg57 !)
   updating to bookmark beta (hg57 !)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg -R hgrepo-base bookmarks
+   * beta                      3:3a77db64d0e8
+     master                    0:ff7a2f2d8d70
   $ hg  --config extensions.share= share hgrepo-base hgrepo-shared
   updating working directory
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
