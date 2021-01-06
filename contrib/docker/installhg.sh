@@ -4,7 +4,7 @@ set -e
 
 BUILDDEPENDS="curl jq coreutils gcc gettext musl-dev"
 RUNDEPENDS="git git-daemon unzip openssh gnupg"
-PIPDEPENDS="dulwich pyflakes pygments coverage black==20.8b1"
+PIPDEPENDS="black==21.12b0 coverage dulwich pyflakes pygments pylint"
 
 set -xe
 
