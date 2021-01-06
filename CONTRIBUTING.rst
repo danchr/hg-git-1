@@ -21,11 +21,6 @@ We use a variant of Mercurial's `own contribution system
 <https://www.mercurial-scm.org/wiki/ContributingChanges>`_. Key
 differences are (by rule number):
 
-1
-  For hg-git, we're not strict about the ``topic: a few words`` format
-  for the first line, but do insist on a sensible summary as the first
-  commit line.
-
 2
   You can cross-reference Heptapod issues in the ``#NNN`` format.
 
