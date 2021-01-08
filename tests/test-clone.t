@@ -99,6 +99,9 @@ test shared repositories
   [1]
   $ ls hgrepo-shared/.hg | grep git
   [1]
+  $ hg -R hgrepo-shared git-cleanup
+  abort: No such file or directory: '$TESTTMP/hgrepo-shared/.hg/git-mapfile'
+  [255]
   $ rm -rf hgrepo-base hgrepo-shared
 
 clone empty repo
