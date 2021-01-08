@@ -31,7 +31,6 @@ from . import verify
 from . import util
 
 from bisect import insort
-from .git_handler import GitHandler
 from mercurial.node import bin, hex
 from mercurial.i18n import _
 from mercurial import (
@@ -286,14 +285,14 @@ def gverify(ui, repo, **opts):
 def git_cleanup(ui, repo):
     '''clean up Git commit map after history editing'''
     new_map = []
-    vfs = repo.vfs
-    for line in vfs(GitHandler.map_file):
+    gh = repo.githandler
+    for line in gh.vfs(gh.map_file):
         gitsha, hgsha = line.strip().split(b' ', 1)
         if hgsha in repo:
             new_map.append(b'%s %s\n' % (gitsha, hgsha))
     wlock = repo.wlock()
     try:
-        f = vfs(GitHandler.map_file, b'wb')
+        f = gh.vfs(gh.map_file, b'wb')
         f.writelines(new_map)
     finally:
         wlock.release()
