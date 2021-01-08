@@ -619,7 +619,8 @@ class GitHandler(object):
         self.swap_out_encoding(oldenc)
         return commit.id
 
-    def get_valid_git_username_email(self, name):
+    @staticmethod
+    def get_valid_git_username_email(name):
         r"""Sanitize usernames and emails to fit git's restrictions.
 
         The following is taken from the man page of git's fast-import
@@ -650,12 +651,7 @@ class GitHandler(object):
 
         TESTS:
 
-        >>> from collections import namedtuple
-        >>> from mercurial.ui import ui
-        >>> mockrepo = namedtuple('localrepo', ['vfs', 'shared', 'path'])(
-        ...     namedtuple('vfs', ['join'])(lambda x: x), lambda: False, b'',
-        ... )
-        >>> g = GitHandler(mockrepo, ui()).get_valid_git_username_email
+        >>> g = GitHandler.get_valid_git_username_email
         >>> g(b'John Doe')
         'John Doe'
         >>> g(b'john@doe.com')
@@ -1696,14 +1692,11 @@ class GitHandler(object):
 
         Tests:
 
-        >>> from collections import namedtuple
         >>> from dulwich.client import HttpGitClient, SSHGitClient
-        >>> from mercurial.ui import ui
-        >>> mockrepo = namedtuple('localrepo', ['vfs', 'shared', 'path'])(
-        ...     namedtuple('vfs', ['join'])(lambda x: x), lambda: False, b'',
-        ... )
-        >>> g = GitHandler(mockrepo, ui())
-        >>> tp = g.get_transport_and_path
+        >>> from mercurial import ui
+        >>> class SubHandler(GitHandler):
+        ...    def __init__(self): self.ui = ui.ui()
+        >>> tp = SubHandler().get_transport_and_path
         >>> client, url = tp(b'http://fqdn.com/test.git')
         >>> print(isinstance(client, HttpGitClient))
         True
