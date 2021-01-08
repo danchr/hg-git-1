@@ -821,6 +821,7 @@ class GitHandler(object):
 
     def import_git_commit(self, commit):
         self.ui.debug(_(b"importing: %s\n") % commit.id)
+        unfiltered = self.repo.unfiltered()
 
         detect_renames = False
         (strip_message, hg_renames,
@@ -839,7 +840,7 @@ class GitHandler(object):
         gparents = pycompat.maplist(self.map_hg_get, commit.parents)
 
         for parent in gparents:
-            if parent not in self.repo:
+            if parent not in unfiltered:
                 raise error.Abort(_(b'you appear to have run strip - '
                                     b'please run hg git-cleanup'))
 
@@ -860,7 +861,7 @@ class GitHandler(object):
             self.git_file_readlines(git_commit_tree, b'.hgsubstate'))
         parentsubdata = b''
         if gparents:
-            p1ctx = self.repo[gparents[0]]
+            p1ctx = unfiltered[gparents[0]]
             if b'.hgsubstate' in p1ctx:
                 parentsubdata = p1ctx.filectx(b'.hgsubstate').data()
                 parentsubdata = parentsubdata.splitlines()
@@ -944,8 +945,8 @@ class GitHandler(object):
             # begin with).
             if p2 == nullid:
                 return []
-            manifest1 = self.repo[p1].manifest()
-            manifest2 = self.repo[p2].manifest()
+            manifest1 = unfiltered[p1].manifest()
+            manifest2 = unfiltered[p2].manifest()
             return [path for path, node1 in compat.iteritems(manifest1) if path not
                     in files and manifest2.get(path, node1) != node1]
 
@@ -970,7 +971,7 @@ class GitHandler(object):
                     e = self.convert_git_int_mode(mode)
             else:
                 # it's a converged file
-                fc = context.filectx(self.repo, f, changeid=memctx.p1().rev())
+                fc = context.filectx(unfiltered, f, changeid=memctx.p1().rev())
                 data = fc.data()
                 e = fc.flags()
                 copied_path = None
@@ -978,7 +979,7 @@ class GitHandler(object):
                 if copied:
                     copied_path = copied[0]
 
-            return compat.memfilectx(self.repo, memctx, f, data,
+            return compat.memfilectx(unfiltered, memctx, f, data,
                                      islink=b'l' in e,
                                      isexec=b'x' in e,
                                      copysource=copied_path)
@@ -989,12 +990,12 @@ class GitHandler(object):
         if len(gparents) > 1:
             # merge, possibly octopus
             def commit_octopus(p1, p2):
-                ctx = context.memctx(self.repo, (p1, p2), text, list(files) +
+                ctx = context.memctx(unfiltered, (p1, p2), text, list(files) +
                                      findconvergedfiles(p1, p2), getfilectx,
                                      author, date, {b'hg-git': b'octopus'})
                 # See comment below about setting substate to None.
                 ctx.substate = None
-                return hex(self.repo.commitctx(ctx))
+                return hex(unfiltered.commitctx(ctx))
 
             octopus = len(gparents) > 2
             p2 = gparents.pop()
@@ -1027,7 +1028,7 @@ class GitHandler(object):
         if octopus:
             extra[b'hg-git'] = b'octopus-done'
 
-        ctx = context.memctx(self.repo, (p1, p2), text,
+        ctx = context.memctx(unfiltered, (p1, p2), text,
                              list(files) + findconvergedfiles(p1, p2),
                              getfilectx, author, date, extra)
         # Starting Mercurial commit d2743be1bb06, memctx imports from
@@ -1038,7 +1039,7 @@ class GitHandler(object):
         # that won't work. Forcibly set the substate to None so that there's no
         # attempt to read subrepos.
         ctx.substate = None
-        node = self.repo.commitctx(ctx)
+        node = unfiltered.commitctx(ctx)
 
         self.swap_out_encoding(oldenc)
 

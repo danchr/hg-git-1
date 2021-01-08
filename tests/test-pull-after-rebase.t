@@ -78,26 +78,14 @@ Now switch back to git and create a new commit based on what we just rebased
   Branch 'otherbranch' set up to track remote branch 'otherbranch' from 'origin'.
   $ cd ..
 
-Pull that, which incorrectly mentions strip and requires --hidden
+Pull that
 
   $ cd hgrepo
   $ hg pull
   pulling from $TESTTMP/repo.git
   importing git objects into hg
-  abort: you appear to have run strip - please run hg git-cleanup
-  [255]
-  $ hg git-cleanup
-  git commit map cleaned
-  $ hg pull
-  pulling from $TESTTMP/repo.git
-  importing git objects into hg
-  abort: you appear to have run strip - please run hg git-cleanup
-  [255]
-  $ hg pull --hidden
-  pulling from $TESTTMP/repo.git
-  importing git objects into hg
   1 new orphan changesets (?)
-  (run 'hg update' to get a working copy)
+  (run 'hg heads' to see heads, 'hg merge' to merge)
 hg 4.4 lacks reporting new orphans, and the `*` marking unstable
 changesets below
   $ hg log --graph -T '{bookmarks} {rev}:{node}\n'
