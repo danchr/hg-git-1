@@ -1,8 +1,8 @@
 Basic Use
 ---------
 
-You can clone a Git repository from Mercurial by running `hg clone <url> [dest]`.
-For example, if you were to run::
+You can clone a Git repository from Mercurial by running :hg:`clone
+<url> [dest]`. For example, if you were to run::
 
  $ hg clone git://github.com/schacon/hg-git.git
 
@@ -22,17 +22,17 @@ These also work::
   git+ssh://git@github.com:hg-git/hg-git.git
   git@github.com:hg-git/hg-git.git
 
-Please note that you need to prepend HTTP, HTTPS, and SSH URLs with "git+"
-in order differentiate them from Mercurial URLs. For example, an HTTPS URL would
-start with "git+https://". Also, note that Git doesn't require the
-specification of the protocol for SSH, but Mercurial does.  Hg-Git
-automatically detects whether file paths should be treated as Git repositories
-by their contents.
+Please note that you need to prepend HTTP, HTTPS, and SSH URLs with
+``git+`` in order differentiate them from Mercurial URLs. For example,
+an HTTPS URL would start with ``git+https://``. Also, note that Git
+doesn't require the specification of the protocol for SSH, but
+Mercurial does. Hg-Git automatically detects whether file paths should
+be treated as Git repositories by their contents.
 
-If you are starting from an existing Mercurial repository, you have to set up a
-Git repository somewhere that you have push access to, add a path entry
-for it in your .hg/hgrc file, and then run `hg push [name]` from within
-your repository. For example::
+If you are starting from an existing Mercurial repository, you have to
+set up a Git repository somewhere that you have push access to, add a
+path entry for it in your .hg/hgrc file, and then run :hg:`push
+[name]` from within your repository. For example::
 
  $ cd hg-git # (a Mercurial repository)
  $ # edit .hg/hgrc and add the target Git URL in the paths section
@@ -50,8 +50,8 @@ all equivalent::
  $ hg pull git://github.com/hg-git/hg-git.git
 
 Git branches are exposed in Mercurial as bookmarks, while Git remote
-branches are exposed as unchangable Mercurial local tags. See `hg help
-bookmarks` and `hg help tags` for further information.
+branches are exposed as unchangable Mercurial local tags. See
+:hg:`help bookmarks` and :hg:`help tags` for further information.
 
 Finding and displaying Git revisions
 ------------------------------------
@@ -78,5 +78,5 @@ For example::
   $ hg log -r 'fromgit()'
   $ hg log -r 'gitnode(84f75b909fc3)'
 
-Revsets are accepted by several Mercurial commands for specifying revisions.
-See ``hg help revsets`` for details.
+Revsets are accepted by several Mercurial commands for specifying
+revisions. See :hg:`help revsets` for details.
