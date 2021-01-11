@@ -20,6 +20,12 @@ then
     echo "all-warnings=no" >> $HGRCPATH
 fi
 
+# silence warning from recent git
+cat >> $TESTTMP/.gitconfig <<EOF
+[init]
+defaultBranch = master
+EOF
+
 # Standard checks for external dependencies
 # We use the git command-line client and dulwich in pretty much all the tests.
 # Thus, to avoid repetitively declaring that requirement in almost every test,
