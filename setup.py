@@ -10,10 +10,11 @@ except:
 
 def get_version(relpath):
     root = dirname(__file__)
-    for line in open(join(root, relpath), 'rb'):
-        line = line.decode('utf-8')
-        if '__version__' in line:
-            return line.split("'")[1]
+    with open(join(root, relpath), 'rb') as fp:
+        for line in fp:
+            line = line.decode('utf-8')
+            if '__version__' in line:
+                return line.split("'")[1]
 
 
 setup(
