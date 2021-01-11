@@ -70,7 +70,7 @@ except AttributeError:  # pre 4.7 API
         b'brotli',
     ])
 
-__version__ = b'0.9.0'
+__version__ = b'0.10.0'
 
 testedwith = (b'4.4.2 4.5.3 4.6.2 4.7.2 4.8.2 4.9.1 5.0.2 5.1.2 5.2 5.3 5.4 '
               b'5.5 5.6 5.7')
