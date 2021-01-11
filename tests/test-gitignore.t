@@ -3,7 +3,8 @@
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
-  $ hg init
+  $ hg init repo
+  $ cd repo
 
 We should only read .gitignore files in a hg-git repo (i.e. one with .hg/git
 directory) otherwise, a rogue .gitignore could slow down a hg-only repo
@@ -159,5 +160,5 @@ show pattern error in hgignore file as expected (issue197)
   > foo(
   > EOF
   $ hg status
-  abort: $TESTTMP/.hgignore: invalid pattern (relre): foo(
+  abort: $TESTTMP/repo/.hgignore: invalid pattern (relre): foo(
   [255]

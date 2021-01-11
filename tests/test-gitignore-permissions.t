@@ -3,7 +3,8 @@
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
-  $ hg init
+  $ hg init repo
+  $ cd repo
 
   $ if test `whoami` = root
   > then
