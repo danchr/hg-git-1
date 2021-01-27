@@ -110,13 +110,14 @@ Development:
 # it is quite unnecessary to run on every invocation.
 Release images:
   stage: images
+  tags:
+    - container-registry-push
   only:
     - schedules
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   script:
-    - mkdir -p /kaniko/.docker /kaniko/ssl/certs
     - |
       cat > /kaniko/.docker/config.json <<EOF
       {
@@ -127,30 +128,6 @@ Release images:
           }
         }
       }
-      EOF
-    - |
-      cat > /kaniko/ssl/certs/Heptapod_Tooling_CA.crt << EOF
-      -----BEGIN CERTIFICATE-----
-      MIIDfjCCAmagAwIBAgIUZ7t3vKco1mvle/l1TfTRooLWduMwDQYJKoZIhvcNAQEL
-      BQAwJzElMCMGA1UEAwwcSGVwdGFwb2QgSW50ZXJuYWwgVG9vbGluZyBDQTAeFw0y
-      MDExMzAyMTMzMTBaFw0zMDExMjgyMTMzMTBaMCcxJTAjBgNVBAMMHEhlcHRhcG9k
-      IEludGVybmFsIFRvb2xpbmcgQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
-      AoIBAQCnxPEwRwppDzuHGccnfdVpppX5s1mWlWl1FqiqdtnJWrkTzKiolJurZXms
-      Kt6iEB75yMD9r6KiTSN0vRcaH+qhZ2rA/frfKpkhSShp6TZke87tRdLufgUNxVNt
-      ObAWaXEV2qePRHzLwx016uc/TwrdBvBqjPrRv2gwXLk9gadIPmAMVqSZE9I4qKru
-      1RciZ2J2R8zDcJuZ4Pi/uQi3XGD0Tm0iVyjIO5zou3+5R6khx4tBcZQX+XZD/usU
-      10emcZoFHIkc0+uKos+AEB1CBkXCYZDy2G3u8+tYXvNQaMk12Y31/Fv1LdjGwtYG
-      qEi9k05x/nxOwSK/idPPSeeogcdxAgMBAAGjgaEwgZ4wHQYDVR0OBBYEFNnphf7w
-      hzIVfEaGTRgGA+COTFfvMGIGA1UdIwRbMFmAFNnphf7whzIVfEaGTRgGA+COTFfv
-      oSukKTAnMSUwIwYDVQQDDBxIZXB0YXBvZCBJbnRlcm5hbCBUb29saW5nIENBghRn
-      u3e8pyjWa+V7+XVN9NGigtZ24zAMBgNVHRMEBTADAQH/MAsGA1UdDwQEAwIBBjAN
-      BgkqhkiG9w0BAQsFAAOCAQEAmW/80xxQBSQdcEYw3euGDsK72ENztS4P4x12H55j
-      lULg7DaoWgGDkIIBuhCK+5Y3wzhQyvsBrSB+LcVyVLQbS6yIIgzBVZPf/ZPMrC5x
-      HjwXKGyZQFqFR/NGxVMmLidHXADF28EqFqSfdfWtdntnUL34hzAHZQkGn+d5S/d3
-      8qze9BWueo213tLCBtZxoTpneJDhq/fW++5BTagipzwpsmT26ycJ+k4uBwbkcnBo
-      JP7Hk/I4BC3bZg8dDQShpPCGRlp9b8R0XSGoOoFRGW6z3nhh88kcdFdoPiMgEOuq
-      FDmDjn14Jct6uFGIHEadGvenxDLivFxV+UnSS8u6tVwYTw==
-      -----END CERTIFICATE-----
       EOF
     - >
       /kaniko/executor --context $CI_PROJECT_DIR
