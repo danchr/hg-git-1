@@ -351,7 +351,7 @@ def tag(orig, ui, repo, *names, **opts):
 
     '''
 
-    if not opts['git']:
+    if not opts.get('git'):
         return orig(ui, repo, *names, **opts)
 
     opts = pycompat.byteskwargs(opts)
