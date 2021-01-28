@@ -153,10 +153,11 @@ hg-git issue103 -- directories can lose information at hg-git export time
 
   $ cat >> .hg/hgrc << EOF
   > [paths]
-  > default:pushurl = file://$TESTTMP/gitrepo
+  > default:pushurl = file:///$TESTTMP/gitrepo
   > EOF
+NB: the triple slashes are intentional, due to windows
   $ hg push -r master
-  pushing to file://$TESTTMP/gitrepo
+  pushing to file:///$TESTTMP/gitrepo
   searching for changes
   no changes found
   [1]
