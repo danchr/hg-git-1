@@ -12,7 +12,6 @@ import dulwich.objects as dulobjs
 from mercurial import (
     encoding,
     error,
-    pycompat,
 )
 
 from . import compat
@@ -33,6 +32,7 @@ def parse_subrepos(ctx):
 def audit_git_path(ui, path):
     r"""Check for path components that case-fold to .git.
 
+    >>> from mercurial import pycompat
     >>> class fakeui(object):
     ...     def configbool(*args):
     ...         return False
@@ -58,7 +58,7 @@ def audit_git_path(ui, path):
     >>> audit_git_path(u, b'this/is/safe')
     """
     dangerous = False
-    for c in path.split(pycompat.ossep):
+    for c in path.split(b'/'):
         if encoding.hfsignoreclean(c) == b'.git':
             dangerous = True
             break
