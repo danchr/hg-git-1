@@ -67,6 +67,15 @@ Make sure legacy extra (in commit message, after '--HG--') doesn't break
 
 Test some nutty filenames
   $ hg book b3
+#if windows
+  $ hg mv c2 'c2 => c3'
+  abort: filename contains '>', which is reserved on Windows: "c2 => c3"
+  [255]
+  $ hg mv c2 c3
+  $ fn_hg_commit -m 'dummy commit'
+  $ hg mv c3 c4
+  $ fn_hg_commit -m 'dummy commit'
+#else
   $ hg mv c2 'c2 => c3'
   warning: filename contains '>', which is reserved on Windows: 'c2 => c3'
   $ fn_hg_commit -m 'test filename with arrow'
@@ -83,6 +92,7 @@ Test some nutty filenames
   o  4 58f855ae26f4930ce857e648d3dd949901cce817
   |  bbbbbbb=databbb branch=default yyyyyyy=datayyy
   |
+#endif
   $ hg push -r b2 -r b3
   pushing to $TESTTMP/gitrepo
   searching for changes
@@ -116,6 +126,7 @@ Test some nutty filenames
   
   
 
+#if no-windows
   $ git cat-file commit b3
   tree e63df52695f9b06e54b37e7ef60d0c43994de620
   parent 6a66c937dea689a8bb2aa053bd91667fe4a7bfe8
@@ -124,6 +135,7 @@ Test some nutty filenames
   HG:rename c2%20%3D%3E%20c3:c3%20%3D%3E%20c4
   
   test filename with arrow 2
+#endif
   $ cd ../gitrepo
   $ git checkout b1
   Switched to branch 'b1'
@@ -168,13 +180,7 @@ lets you do that, though.
   $ cd ..
   $ hg clone -qU gitrepo hgrepo2
   $ cd hgrepo2
-  $ hg log --graph --template "{rev} {node} {desc|firstline}\n{join(extras, ' ')}\n\n"
-  o  7 e003ec989aaae23b3eb30d4423419fb4dc346089 test filename with arrow 2
-  |  branch=default
-  |
-  o  6 a2e276bd9458cb7dc309230ec8064d544e4f0c68 test filename with arrow
-  |  branch=default
-  |
+  $ hg log -G -r :5 -T "{rev} {node} {desc|firstline}\n{join(extras, ' ')}\n\n"
   o  5 524e82e66b589f8b56bdd0679ad457a162ba16cd
   |  bbbbbbb=databbb branch=default yyyyyyy=datayyy
   |
