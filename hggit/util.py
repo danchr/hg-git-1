@@ -97,7 +97,7 @@ def isgitsshuri(uri):
         # urls
         giturl, repopath = m.groups()
         # definitely a git repo
-        if repopath.endswith(b'.git'):
+        if len(giturl) > 1 and repopath.endswith(b'.git'):
             return True
         # use a simple regex to check if it is a fqdn regex
         fqdn_re = (br'(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}'

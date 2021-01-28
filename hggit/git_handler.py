@@ -1760,6 +1760,9 @@ class GitHandler(object):
         True
         >>> print(url.decode())
         http://fqdn.com/test.git
+        >>> client, url = tp(b'c:/path/to/repo.git')
+        >>> print(isinstance(client, SSHGitClient))
+        False
         >>> client, url = tp(b'git@fqdn.com:user/repo.git')
         >>> print(isinstance(client, SSHGitClient))
         True
