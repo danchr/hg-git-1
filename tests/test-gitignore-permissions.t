@@ -1,5 +1,7 @@
   $ python -c 'from mercurial.dirstate import rootcache' || exit 80
 
+#require no-windows
+
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 

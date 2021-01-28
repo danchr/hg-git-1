@@ -2,6 +2,11 @@ Other tests make sure that gverify passes. This makes sure that gverify detects
 inconsistencies. Since hg-git is ostensibly correct, we artificially create
 inconsistencies by placing different Mercurial and Git repos in the right spots.
 
+Unfortunately, these inconsistencies rely on stuff like the file mode,
+which we cannot set on Windows.
+
+#require no-windows
+
   $ . "$TESTDIR/testutil"
   $ git init gitrepo
   Initialized empty Git repository in $TESTTMP/gitrepo/.git/
