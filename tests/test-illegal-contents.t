@@ -113,6 +113,7 @@ you can't check out.
   abort: Refusing to import problematic path 'nested/.hg/00changelog.i'
   (Mercurial cannot check out paths inside nested repositories; if you need to continue, then set '[git] blockdothg = false' in your hgrc.)
   [255]
+  $ rm -rf hg
   $ hg clone --config git.blockdothg=false git hg
   importing git objects into hg
   warning: path 'nested/.hg/00changelog.i' is within a nested repository, which Mercurial cannot check out.

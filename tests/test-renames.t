@@ -612,6 +612,8 @@ Config values out of range
   importing git objects into hg
   abort: git.similarity must be between 0 and 100
   [255]
+Left-over on Windows with some pack files
+  $ rm -rf hgcopyharder2
   $ hg --config git.renamelimit=-5 clone gitcopyharder hgcopyharder2
   importing git objects into hg
   abort: git.renamelimit must be non-negative
