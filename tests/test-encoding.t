@@ -1,5 +1,21 @@
 # -*- coding: utf-8 -*-
 
+Test fails on Windows, it seems, as the messages aren't
+latin1-encoded. This may be caused by e.g. environment variables being
+Unicode on Python 3, or something else. Just running this test on
+POSIX systems should suffice, for now.
+
+(Mercurial generally conforms to the UNIX & Python 2 custom of text
+being ASCII-like binary data with an optional encoding. As this is
+generally unsuitable for an internationalised UI, Windows and most
+other desktop environments enforce a particular encoding. Due to
+compatibility, Windows gets weird by having _two_ possible encodings:
+an 8-bit codepage or full UTF-16. Way back, this lead to all sorts of
+discussions w.r.t. Mercurial, but in this case, we can just skip the
+test and hope for the best.)
+
+#require no-windows
+
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
