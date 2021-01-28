@@ -8,7 +8,7 @@ run pyflakes on all tracked files ending in .py or without a file ending
   $ cat > test.py <<EOF
   > print(undefinedname)
   > EOF
-  $ $PYTHON -m pyflakes test.py 2>/dev/null
+  $ "$PYTHON" -m pyflakes test.py 2>/dev/null
   test.py:1:* undefined name 'undefinedname' (glob)
   [1]
   $ cd "`dirname "$TESTDIR"`"

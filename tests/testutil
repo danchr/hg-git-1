@@ -34,7 +34,7 @@ EOF
 # We use the git command-line client and dulwich in pretty much all the tests.
 # Thus, to avoid repetitively declaring that requirement in almost every test,
 # we just call the checks in all tests that include this library.
-$PYTHON -c 'import dulwich' || {
+"$PYTHON" -c 'import dulwich' || {
     echo "skipped: missing feature: dulwich" && exit 80
 }
 "$TESTDIR/hghave" git || exit 80
