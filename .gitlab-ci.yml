@@ -124,8 +124,9 @@ Release images:
   stage: images
   tags:
     - container-registry-push
-  only:
-    - schedules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_BUILD_IMAGES == "1"'
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -182,8 +183,6 @@ Release images:
 # Build branch images; factored out so it may be invoked separately
 Current images:
   extends: Release images
-  only:
-    - schedules
   parallel:
     matrix:
       - PYTHON:
@@ -196,8 +195,9 @@ Current images:
 # Builds the image used by tests/test-networking.t
 Git service image:
   stage: images
-  only:
-    - schedules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_BUILD_IMAGES == "1"'
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
