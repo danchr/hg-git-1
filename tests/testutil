@@ -4,6 +4,10 @@
 # It can be called in a test like this:
 #  $ . "$TESTDIR/testutil"
 
+# our test suite relies on being able to create symlinks, even on
+# Windows
+export MSYS=winsymlinks:nativestrict
+
 # Activate extensions
 echo "[extensions]" >> $HGRCPATH
 echo "hggit=$(echo $(dirname $TESTDIR))/hggit" >> $HGRCPATH
