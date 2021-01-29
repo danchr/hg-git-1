@@ -45,7 +45,7 @@ def gignorepats(orig, lines, root=None):
         if re.match(br'(:?.*/)?\.hg(:?/|$)', line):
             continue
         rootprefix = b'%s/' % root if root else b''
-        if line.startswith(b'/'):
+        if line and line[0] in br'\/':
             line = line[1:]
             rootsuffixes = [b'']
         else:
@@ -64,7 +64,7 @@ def gignorepats(orig, lines, root=None):
     return patterns, warnings
 
 
-def gignore(root, files, warn, extrapatterns=None):
+def gignore(root, files, ui, extrapatterns=None):
     allpats = []
     pats = [(f, [b'include:%s' % f]) for f in files]
     for f, patlist in pats:
@@ -77,13 +77,11 @@ def gignore(root, files, warn, extrapatterns=None):
     try:
         ignorefunc = matchmod.match(root, b'', [], allpats)
     except error.Abort:
+        ui.traceback()
         for f, patlist in pats:
             matchmod.match(root, b'', [], patlist)
         if extrapatterns:
-            try:
-                matchmod.match(root, b'', [], extrapatterns)
-            except error.Abort as inst:
-                raise error.Abort(b'%s: %s' % (b'extra patterns', inst[0]))
+            matchmod.match(root, b'', [], extrapatterns)
     return ignorefunc
 
 
@@ -111,8 +109,7 @@ class gitdirstate(dirstate.dirstate):
                 for warning in warnings:
                     self._ui.warn(b"%s: %s\n" % (fn, warning))
                 patterns.extend(pats)
-        return gignore(self._root, files, self._ui.warn,
-                       extrapatterns=patterns)
+        return gignore(self._root, files, self._ui, extrapatterns=patterns)
 
     def _finddotgitignores(self):
         """A copy of dirstate.walk. This is called from the new _ignore method,
