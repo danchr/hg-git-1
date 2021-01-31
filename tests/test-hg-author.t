@@ -1,17 +1,24 @@
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
-  $ git init gitrepo
-  Initialized empty Git repository in $TESTTMP/gitrepo/.git/
+  $ git init --bare repo.git
+  Initialized empty Git repository in $TESTTMP/repo.git/
+
+  $ git clone repo.git gitrepo
+  Cloning into 'gitrepo'...
+  warning: You appear to have cloned an empty repository.
+  done.
   $ cd gitrepo
   $ echo alpha > alpha
   $ git add alpha
   $ fn_git_commit -m "add alpha"
-  $ git checkout -b not-master
-  Switched to a new branch 'not-master'
+  $ git push --set-upstream origin master
+  To $TESTTMP/repo.git
+   * [new branch]      master -> master
+  Branch 'master' set up to track remote branch 'master' from 'origin'.
 
   $ cd ..
-  $ hg clone gitrepo hgrepo | grep -v '^updating'
+  $ hg clone repo.git hgrepo | grep -v '^updating'
   importing git objects into hg
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
@@ -21,7 +28,7 @@ Load commonly used test logic
   $ hg add beta
   $ fn_hg_commit -u "test" -m 'add beta'
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
@@ -30,7 +37,7 @@ Load commonly used test logic
   $ echo gamma >> beta
   $ fn_hg_commit -u "test <test@example.com> (comment)" -m 'modify beta'
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
@@ -40,7 +47,7 @@ Load commonly used test logic
   $ hg add gamma
   $ fn_hg_commit -u "<test@example.com>" -m 'add gamma'
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
@@ -50,7 +57,7 @@ Load commonly used test logic
   $ hg add delta
   $ fn_hg_commit -u "name<test@example.com>" -m 'add delta'
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
@@ -60,7 +67,7 @@ Load commonly used test logic
   $ hg add epsilon
   $ fn_hg_commit -u "name <test@example.com" -m 'add epsilon'
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
@@ -70,7 +77,7 @@ Load commonly used test logic
   $ hg add zeta
   $ fn_hg_commit -u " test " -m 'add zeta'
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
@@ -80,7 +87,7 @@ Load commonly used test logic
   $ hg add eta
   $ fn_hg_commit -u "test < test@example.com >" -m 'add eta'
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
@@ -90,7 +97,7 @@ Load commonly used test logic
   $ hg add theta
   $ fn_hg_commit -u "test >test@example.com>" -m 'add theta'
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
@@ -141,16 +148,15 @@ Load commonly used test logic
   |  summary:     add beta
   |
   o  changeset:   0:ff7a2f2d8d70
-     bookmark:    not-master
-     tag:         default/not-master
      user:        test <test@example.org>
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add alpha
   
 
   $ cd ..
-  $ hg clone gitrepo hgrepo2 | grep -v '^updating'
+  $ hg clone repo.git hgrepo2
   importing git objects into hg
+  updating to branch default
   8 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo2 log --graph
   @  changeset:   8:1fbf3aa91221
@@ -197,13 +203,11 @@ Load commonly used test logic
   |  summary:     add beta
   |
   o  changeset:   0:ff7a2f2d8d70
-     bookmark:    not-master
-     tag:         default/not-master
      user:        test <test@example.org>
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add alpha
   
-  $ git --git-dir=gitrepo/.git log --pretty=medium master
+  $ git --git-dir=repo.git log --pretty=medium master
   commit 2fe60ba69727981e6ede78be70354c3a9e30e21d
   Author: test ?test@example.com <test ?test@example.com>
   Date:   Mon Jan 1 00:00:18 2007 +0000

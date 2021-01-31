@@ -88,11 +88,14 @@ Remove the submodule and rename the file back:
   $ git mv gamma-new gamma
   $ fn_git_commit -m 'remove submodule and rename back'
 
-  $ git checkout -f -b not-master 2>&1 | sed s/\'/\"/g
-  Switched to a new branch "not-master"
+  $ git init --bare ../repo.git
+  Initialized empty Git repository in $TESTTMP/repo.git/
+  $ git push ../repo.git master
+  To ../repo.git
+   * [new branch]      master -> master
 
   $ cd ..
-  $ hg clone -q gitrepo hgrepo
+  $ hg clone -q repo.git hgrepo
   $ cd hgrepo
   $ hg book master -q
   $ hg log -p --graph --template "{rev} {node} {desc|firstline}\n{join(extras, ' ')}\n\n"
@@ -366,13 +369,13 @@ Make a new commit with a copy and a rename in Mercurial
    12
   +16
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 2 commits with 2 trees and 3 blobs
   updating reference refs/heads/master
 
-  $ cd ../gitrepo
+  $ cd ../repo.git
   $ git log master --pretty=oneline
   5f2948d029693346043f320620af99a615930dc4 delta/epsilon
   bbd2ec050f7fbc64f772009844f7d58a556ec036 gamma2
@@ -408,7 +411,7 @@ Make sure the right metadata is stored
 Now make another clone and compare the hashes
 
   $ cd ..
-  $ hg clone -q gitrepo hgrepo2
+  $ hg clone -q repo.git hgrepo2
   $ cd hgrepo2
   $ hg book master -qf
   $ hg export master

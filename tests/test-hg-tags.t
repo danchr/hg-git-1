@@ -1,26 +1,32 @@
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
-  $ git init gitrepo
-  Initialized empty Git repository in $TESTTMP/gitrepo/.git/
+  $ git init --bare repo.git
+  Initialized empty Git repository in $TESTTMP/repo.git/
+
+  $ git clone repo.git gitrepo
+  Cloning into 'gitrepo'...
+  warning: You appear to have cloned an empty repository.
+  done.
   $ cd gitrepo
   $ echo alpha > alpha
   $ git add alpha
   $ fn_git_commit -m "add alpha"
-  $ git checkout -b not-master
-  Switched to a new branch 'not-master'
+  $ git push --set-upstream origin master
+  To $TESTTMP/repo.git
+   * [new branch]      master -> master
+  Branch 'master' set up to track remote branch 'master' from 'origin'.
 
   $ cd ..
-  $ hg clone gitrepo hgrepo | grep -v '^updating'
+  $ hg clone -U repo.git hgrepo
   importing git objects into hg
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgrepo
   $ hg co master | egrep -v '^\(activating bookmark master\)$'
-  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ fn_hg_tag alpha
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
@@ -37,9 +43,7 @@ Load commonly used test logic
   |  summary:     Added tag alpha for changeset ff7a2f2d8d70
   |
   o  changeset:   0:ff7a2f2d8d70
-     bookmark:    not-master
      tag:         alpha
-     tag:         default/not-master
      user:        test <test@example.org>
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add alpha
@@ -48,11 +52,13 @@ Load commonly used test logic
   $ cd ..
   $ cd gitrepo
 git should have the tag alpha
-  $ git tag -l
-  alpha
-
+  $ git fetch origin
+  From $TESTTMP/repo
+     7eeab2e..bbae830  master     -> origin/master
+   * [new tag]         alpha      -> alpha
   $ cd ..
-  $ hg clone gitrepo hgrepo2 | grep -v '^updating'
+
+  $ hg clone repo.git hgrepo2 | grep -v '^updating'
   importing git objects into hg
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo2 log --graph
@@ -65,9 +71,7 @@ git should have the tag alpha
   |  summary:     Added tag alpha for changeset ff7a2f2d8d70
   |
   o  changeset:   0:ff7a2f2d8d70
-     bookmark:    not-master
      tag:         alpha
-     tag:         default/not-master
      user:        test <test@example.org>
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add alpha
