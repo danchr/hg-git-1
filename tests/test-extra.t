@@ -11,7 +11,11 @@ across from hg to git
   Switched to a new branch "not-master"
 
   $ cd ..
-  $ hg clone -q gitrepo hgrepo
+  $ hg clone gitrepo hgrepo
+  importing git objects into hg
+  updating to branch default (no-hg57 !)
+  updating to bookmark not-master (hg57 !)
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
   $ hg mv a b
   $ fn_hg_commit -mb

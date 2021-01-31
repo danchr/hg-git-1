@@ -15,7 +15,8 @@ Load commonly used test logic
   $ cd ..
   $ hg clone gitrepo hgrepo
   importing git objects into hg
-  updating to branch default
+  updating to bookmark master (hg57 !)
+  updating to branch default (no-hg57 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgrepo

@@ -56,7 +56,8 @@ Hg clone it
 
   $ hg clone gitrepo hgrepo
   importing git objects into hg
-  updating to branch default
+  updating to branch default (no-hg57 !)
+  updating to bookmark signed (hg57 !)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgrepo

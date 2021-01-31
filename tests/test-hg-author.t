@@ -20,7 +20,8 @@ Load commonly used test logic
   $ cd ..
   $ hg clone repo.git hgrepo
   importing git objects into hg
-  updating to branch default
+  updating to bookmark master (hg57 !)
+  updating to branch default (no-hg57 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgrepo
@@ -157,7 +158,8 @@ Load commonly used test logic
   $ cd ..
   $ hg clone repo.git hgrepo2
   importing git objects into hg
-  updating to branch default
+  updating to bookmark master (hg57 !)
+  updating to branch default (no-hg57 !)
   8 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo2 log --graph
   @  changeset:   8:1fbf3aa91221

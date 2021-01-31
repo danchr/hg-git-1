@@ -21,7 +21,8 @@ Load commonly used test logic
 clone a tag
   $ hg clone -r alpha gitrepo hgrepo-a
   importing git objects into hg
-  updating to branch default
+  updating to bookmark master (hg57 !)
+  updating to branch default (no-hg57 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo-a log --graph
   @  changeset:   0:ff7a2f2d8d70
@@ -86,7 +87,8 @@ test shared repositories
 
   $ hg clone gitrepo hgrepo-base
   importing git objects into hg
-  updating to branch default
+  updating to branch default (no-hg57 !)
+  updating to bookmark beta (hg57 !)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg  --config extensions.share= share hgrepo-base hgrepo-shared
   updating working directory
@@ -111,3 +113,4 @@ clone empty repo
   $ hg clone empty emptyhg
   updating to branch default
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ rm -rf empty emptyhg

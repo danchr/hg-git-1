@@ -21,7 +21,8 @@ Load commonly used test logic
 clone a tag
   $ hg clone -r alpha gitrepo hgrepo-a
   importing git objects into hg
-  updating to branch default
+  updating to bookmark master (hg57 !)
+  updating to branch default (no-hg57 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo-a log --graph
   @  changeset:   0:ff7a2f2d8d70

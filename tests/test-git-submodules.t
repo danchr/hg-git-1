@@ -189,7 +189,8 @@ replace subrepo with symlink
 
   $ hg clone gitrepo2 hgrepo
   importing git objects into hg
-  updating to branch default
+  updating to bookmark master (hg57 !)
+  updating to branch default (no-hg57 !)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
   $ hg log --graph
@@ -355,7 +356,8 @@ are the same is enough
   $ cd ../../..
   $ hg --config git.similarity=100 clone gitrepo2 hgreporenames
   importing git objects into hg
-  updating to branch default
+  updating to bookmark master (hg57 !)
+  updating to branch default (no-hg57 !)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgreporenames
   $ hg log --graph

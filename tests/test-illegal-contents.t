@@ -117,7 +117,8 @@ you can't check out.
   importing git objects into hg
   warning: path 'nested/.hg/00changelog.i' is within a nested repository, which Mercurial cannot check out.
   warning: path 'nested/.hg/requires' is within a nested repository, which Mercurial cannot check out.
-  updating to branch default
+  updating to branch default (no-hg57 !)
+  updating to bookmark master (hg57 !)
   abort: path 'nested/.hg/00changelog.i' is inside nested repo 'nested'
   [255]
   $ cd ..
