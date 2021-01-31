@@ -102,7 +102,7 @@ bring working copy to HEAD state (it's not bare repo)
   pulling from $TESTTMP/gitrepo1
   importing git objects into hg
   (run 'hg update' to get a working copy)
-  $ hg checkout -C | egrep -v '^\(activating bookmark master\)$'
+  $ hg checkout -C
   updating to active bookmark master
   cloning subrepo hgsub from $TESTTMP/hgsub
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved

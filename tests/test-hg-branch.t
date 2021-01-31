@@ -18,8 +18,9 @@ Load commonly used test logic
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgrepo
-  $ hg co master | egrep -v '^\(activating bookmark master\)$'
+  $ hg co master
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (activating bookmark master)
   $ hg mv alpha beta
   $ fn_hg_commit -m 'rename alpha to beta'
   $ hg push

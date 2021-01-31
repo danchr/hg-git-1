@@ -22,7 +22,7 @@ Load commonly used test logic
   importing git objects into hg
 
   $ cd hgrepo
-  $ hg co master | egrep -v '^\(activating bookmark master\)$'
+  $ hg co master
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ fn_hg_tag alpha
   $ hg push

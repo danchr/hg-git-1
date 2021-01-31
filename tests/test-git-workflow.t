@@ -31,8 +31,9 @@ configure for use from git
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd gitrepo
   $ hg book master
-  $ hg up null | egrep -v '^\(leaving bookmark master\)$'
+  $ hg up null
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
+  (leaving bookmark master)
   $ echo "[git]" >> .hg/hgrc
   $ echo "intree = True" >> .hg/hgrc
   $ hg debuggitdir

@@ -119,7 +119,7 @@ this should fail, no changes to push
 
 hg-git issue103 -- directories can lose information at hg-git export time
 
-  $ hg up master | egrep -v '^\(activating bookmark master\)$'
+  $ hg up master
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ mkdir dir1
   $ echo alpha > dir1/alpha
