@@ -78,11 +78,10 @@ git should have only the valid tag alph#a but have full commit log including the
   gamm_a
 
   $ cd ..
-  $ hg clone gitrepo hgrepo2 | grep -v '^updating'
+  $ hg clone -U gitrepo hgrepo2
   importing git objects into hg
-  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo2 log --graph
-  @  changeset:   3:0950ab44ea23
+  o  changeset:   3:0950ab44ea23
   |  bookmark:    delt#a
   |  bookmark:    master
   |  tag:         default/delt#a
@@ -115,7 +114,7 @@ git should have only the valid tag alph#a but have full commit log including the
   
 
 the tag should be in .hgtags
-  $ cat hgrepo2/.hgtags
+  $ hg cat -r master hgrepo2/.hgtags
   ff7a2f2d8d7099694ae1e8b03838d40575bebb63 alph#a
   491ceeb1b0f10d65d956dfcdd3470ac2bc2c96a8 bet*a
   0b27ab2b3df69c6f7defd7040b93e539136db5be gamm a

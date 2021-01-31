@@ -11,8 +11,9 @@ Load commonly used test logic
   Switched to a new branch "not-master"
 
   $ cd ..
-  $ hg clone gitrepo hgrepo | grep -v '^updating'
+  $ hg clone -u tip gitrepo hgrepo
   importing git objects into hg
+  updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgrepo
@@ -162,7 +163,7 @@ hg-git issue103 -- directories can lose information at hg-git export time
 
   $ cd ..
 
-  $ hg clone gitrepo hgrepo-test
+  $ hg clone -u tip gitrepo hgrepo-test
   importing git objects into hg
   updating to branch default
   5 files updated, 0 files merged, 0 files removed, 0 files unresolved

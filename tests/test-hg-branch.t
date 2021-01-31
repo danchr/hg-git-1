@@ -61,9 +61,8 @@ Load commonly used test logic
   
 
   $ cd ..
-  $ hg clone gitrepo hgrepo2 | grep -v '^updating'
+  $ hg clone -U gitrepo hgrepo2
   importing git objects into hg
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo2 log --graph
   o  changeset:   2:400db38f4f64
   |  branch:      gamma
@@ -74,7 +73,7 @@ Load commonly used test logic
   |  date:        Mon Jan 01 00:00:12 2007 +0000
   |  summary:     started branch gamma
   |
-  @  changeset:   1:3baa67317a4d
+  o  changeset:   1:3baa67317a4d
   |  user:        test
   |  date:        Mon Jan 01 00:00:11 2007 +0000
   |  summary:     rename alpha to beta

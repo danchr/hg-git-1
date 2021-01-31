@@ -161,10 +161,10 @@ lets you do that, though.
   extra commit
 
   $ cd ..
-  $ hg clone -q gitrepo hgrepo2
+  $ hg clone -qU gitrepo hgrepo2
   $ cd hgrepo2
   $ hg log --graph --template "{rev} {node} {desc|firstline}\n{join(extras, ' ')}\n\n"
-  @  7 e003ec989aaae23b3eb30d4423419fb4dc346089 test filename with arrow 2
+  o  7 e003ec989aaae23b3eb30d4423419fb4dc346089 test filename with arrow 2
   |  branch=default
   |
   o  6 a2e276bd9458cb7dc309230ec8064d544e4f0c68 test filename with arrow
