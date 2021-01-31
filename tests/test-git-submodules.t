@@ -187,8 +187,9 @@ replace subrepo with symlink
 
   $ cd ..
 
-  $ hg clone gitrepo2 hgrepo | grep -v '^updating'
+  $ hg clone gitrepo2 hgrepo
   importing git objects into hg
+  updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
   $ hg log --graph
@@ -352,8 +353,9 @@ replace subrepo with symlink
 test with rename detection enabled -- simply checking that the Mercurial hashes
 are the same is enough
   $ cd ../../..
-  $ hg --config git.similarity=100 clone gitrepo2 hgreporenames | grep -v '^updating'
+  $ hg --config git.similarity=100 clone gitrepo2 hgreporenames
   importing git objects into hg
+  updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgreporenames
   $ hg log --graph

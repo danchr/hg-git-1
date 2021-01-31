@@ -10,8 +10,9 @@ Load commonly used test logic
   $ git init --bare gitrepo2
   Initialized empty Git repository in $TESTTMP/gitrepo2/
 
-  $ hg clone gitrepo hgrepo | grep -v '^updating'
+  $ hg clone gitrepo hgrepo
   importing git objects into hg
+  updating to branch default
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
   $ hg log -r tip --template 'files: {files}\n'

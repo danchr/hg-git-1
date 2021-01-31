@@ -53,8 +53,9 @@ resolve using first parent
   added 4 commits with 3 trees and 3 blobs
   $ cd ..
 
-  $ hg clone gitrepo hgrepo2 | grep -v '^updating'
+  $ hg clone gitrepo hgrepo2
   importing git objects into hg
+  updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 expect the same revision ids as above
   $ hg -R hgrepo2 log --graph --style compact | sed 's/\[.*\]//g'

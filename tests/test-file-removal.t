@@ -98,8 +98,9 @@ final manifest in git is just beta
   $ git init --bare gitrepo2
   Initialized empty Git repository in $TESTTMP/gitrepo2/
 
-  $ hg clone gitrepo hgrepo | grep -v '^updating'
+  $ hg clone gitrepo hgrepo
   importing git objects into hg
+  updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
   $ hg log --graph
@@ -228,8 +229,9 @@ make sure that only beta is in the manifest
       add alpha
 
 test with rename detection enabled
-  $ hg --config git.similarity=100 clone gitrepo hgreporenames | grep -v '^updating'
+  $ hg --config git.similarity=100 clone gitrepo hgreporenames
   importing git objects into hg
+  updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgreporenames

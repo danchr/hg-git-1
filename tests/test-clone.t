@@ -19,8 +19,9 @@ Load commonly used test logic
 
   $ cd ..
 clone a tag
-  $ hg clone -r alpha gitrepo hgrepo-a | grep -v '^updating'
+  $ hg clone -r alpha gitrepo hgrepo-a
   importing git objects into hg
+  updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo-a log --graph
   @  changeset:   0:ff7a2f2d8d70
@@ -37,8 +38,9 @@ Make sure this is still draft since we didn't pull remote's HEAD
   0: draft
 
 clone a branch
-  $ hg clone -r beta gitrepo hgrepo-b | grep -v '^updating'
+  $ hg clone -r beta gitrepo hgrepo-b
   importing git objects into hg
+  updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo-b log --graph
   @  changeset:   1:7fe02317c63d

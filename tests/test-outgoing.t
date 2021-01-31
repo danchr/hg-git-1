@@ -13,8 +13,9 @@ Load commonly used test logic
   7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 refs/heads/master
 
   $ cd ..
-  $ hg clone gitrepo hgrepo | grep -v '^updating'
+  $ hg clone gitrepo hgrepo
   importing git objects into hg
+  updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgrepo

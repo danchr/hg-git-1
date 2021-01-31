@@ -26,8 +26,9 @@ The warning message changed in Git 1.8.0
   $ git init --bare gitrepo2
   Initialized empty Git repository in $TESTTMP/gitrepo2/
 
-  $ hg clone gitrepo hgrepo | grep -v '^updating'
+  $ hg clone gitrepo hgrepo
   importing git objects into hg
+  updating to branch default
   4 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
 

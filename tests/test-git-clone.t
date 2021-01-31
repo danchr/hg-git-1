@@ -13,8 +13,9 @@ Load commonly used test logic
 
   $ cd ..
 
-  $ hg clone gitrepo hgrepo | grep -v '^updating'
+  $ hg clone gitrepo hgrepo
   importing git objects into hg
+  updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo log --graph
   @  changeset:   1:7fe02317c63d

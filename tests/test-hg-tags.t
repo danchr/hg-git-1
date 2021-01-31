@@ -58,8 +58,9 @@ git should have the tag alpha
    * [new tag]         alpha      -> alpha
   $ cd ..
 
-  $ hg clone repo.git hgrepo2 | grep -v '^updating'
+  $ hg clone repo.git hgrepo2
   importing git objects into hg
+  updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo2 log --graph
   @  changeset:   1:e8b150f84560

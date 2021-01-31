@@ -19,8 +19,9 @@ Load commonly used test logic
   summary:     add alpha
   
 
-  $ hg clone gitrepo hgrepo | grep -v '^updating'
+  $ hg clone gitrepo hgrepo
   importing git objects into hg
+  updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ hg -R hgrepo incoming | grep -v 'no changes found'

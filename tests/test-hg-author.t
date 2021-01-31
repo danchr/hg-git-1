@@ -18,8 +18,9 @@ Load commonly used test logic
   Branch 'master' set up to track remote branch 'master' from 'origin'.
 
   $ cd ..
-  $ hg clone repo.git hgrepo | grep -v '^updating'
+  $ hg clone repo.git hgrepo
   importing git objects into hg
+  updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgrepo
