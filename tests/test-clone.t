@@ -107,6 +107,19 @@ test shared repositories
   git commit map cleaned
   $ rm -rf hgrepo-base hgrepo-shared
 
+test cloning HEAD
+
+  $ cd gitrepo
+  $ git checkout -q master
+  $ cd ..
+  $ hg clone gitrepo hgrepo-2
+  importing git objects into hg
+  updating to bookmark master (hg57 !)
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved (hg57 !)
+  updating to branch default (no-hg57 !)
+  2 files updated, 0 files merged, 0 files removed, 0 files unresolved (no-hg57 !)
+  $ rm -rf hgrepo-2
+
 clone empty repo
   $ git init empty
   Initialized empty Git repository in $TESTTMP/empty/.git/
