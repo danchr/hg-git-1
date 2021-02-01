@@ -126,6 +126,15 @@ To import new changesets into the Git repository just rerun the hg
 push command and then use git merge or git rebase in your Git
 repository.
 
+``.gitignore`` and ``.hgignore``
+--------------------------------
+
+If present, ``.gitignore`` will be taken into account provided that there is
+no ``.hgignore``. In the latter case, the rules from ``.hgignore`` apply,
+regardless of what ``.gitignore`` prescribes.
+
+This has been so since version 0.5.0, released in 2013.
+
 Commands
 ========
 

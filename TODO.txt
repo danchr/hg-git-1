@@ -29,5 +29,3 @@ SPEED/EFFICIENCY
 MAYBE
 ==========
 * submodules?
-* .gitignore, etc - try to convert?
-  - (probably not automatically, but perhaps a generator?)
