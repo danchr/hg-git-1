@@ -359,15 +359,17 @@ test for ssh vulnerability
 
   $ hg init a
   $ cd a
-  $ hg pull 'git+ssh://-oProxyCommand=rm${IFS}nonexistent/path' 2>&1 >/dev/null
+  $ hg pull -q 'git+ssh://-oProxyCommand=rm${IFS}nonexistent/path'
   abort: potentially unsafe hostname: '-oProxyCommand=rm${IFS}nonexistent'
   [255]
-  $ hg pull 'git+ssh://-oProxyCommand=rm%20nonexistent/path' 2>&1 >/dev/null
+  $ hg pull -q 'git+ssh://-oProxyCommand=rm%20nonexistent/path'
   abort: potentially unsafe hostname: '-oProxyCommand=rm nonexistent'
   [255]
-  $ hg pull 'git+ssh://fakehost|shellcommand/path' 2>&1 >/dev/null | grep -v ^devel-warn:
+  $ hg pull -q 'git+ssh://fakehost|shellcommand/path'
   ssh: * fakehost%7?shellcommand* (glob)
   abort: git remote error: The remote server unexpectedly closed the connection.
-  $ hg pull 'git+ssh://fakehost%7Cshellcommand/path' 2>&1 >/dev/null | grep -v ^devel-warn:
+  [255]
+  $ hg pull -q 'git+ssh://fakehost%7Cshellcommand/path'
   ssh: * fakehost%7?shellcommand* (glob)
   abort: git remote error: The remote server unexpectedly closed the connection.
+  [255]
