@@ -8,11 +8,15 @@ except:
     from distutils.core import setup
 
 
-def get_version(relpath):
+def get_file(relpath):
     root = dirname(__file__)
-    with open(join(root, relpath), 'rb') as fp:
-        for line in fp:
-            line = line.decode('utf-8')
+    with open(join(root, relpath)) as fp:
+        return fp.read().strip()
+
+
+def get_version(relpath):
+    for line in get_file(relpath).splitlines():
+            line = line
             if '__version__' in line:
                 return line.split("'")[1]
 
@@ -25,11 +29,7 @@ setup(
     maintainer_email='kbullock+mercurial@ringworld.org',
     url='https://hg-git.github.io/',
     description='push to and pull from a Git repository using Mercurial',
-    long_description="""
-This extension lets you communicate (push and pull) with a Git server.
-This way you can use Git hosting for your project or collaborate with a
-project that is in Git.  A bridger of worlds, this plugin be.
-    """.strip(),
+    long_description=get_file("README.rst"),
     keywords='hg git mercurial',
     license='GPLv2',
     packages=['hggit'],
