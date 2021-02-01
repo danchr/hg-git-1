@@ -27,7 +27,7 @@ setup(
     author='The hg-git Authors',
     maintainer='Kevin Bullock',
     maintainer_email='kbullock+mercurial@ringworld.org',
-    url='https://hg-git.github.io/',
+    url='http://foss.heptapod.net/mercurial/hg-git',
     description='push to and pull from a Git repository using Mercurial',
     long_description=get_file("README.rst"),
     keywords='hg git mercurial',
