@@ -381,6 +381,31 @@ def getgitversion():
     return (int(m.group(1)), int(m.group(2)))
 
 
+@check("dulwich", "Dulwich Python library")
+def has_dulwich():
+    try:
+        from dulwich import client
+
+        client.ZERO_SHA  # silence unused import
+        return True
+    except ImportError:
+        return False
+
+@checkvers(
+    "dulwich", "Dulwich >= %s", [
+        '%d.%d.%d' % vers
+        for vers in (
+            (0, 20, 0),
+            (0, 20, 3),
+        )
+    ]
+)
+def has_dulwich_range(v):
+    import dulwich
+
+    return dulwich.__version__ >= tuple(map(int, v.split('.')))
+
+
 @check("pygit2", "pygit2 Python library")
 def has_git():
     try:
