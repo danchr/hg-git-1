@@ -147,7 +147,6 @@ Release images:
       --dockerfile $CI_PROJECT_DIR/contrib/docker/Dockerfile.alpine
       --build-arg PYTHON=$PYTHON
       --build-arg HG=$HG
-      --reproducible
       --single-snapshot
       --cleanup
       --destination registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
