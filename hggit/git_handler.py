@@ -302,8 +302,6 @@ class GitHandler(object):
         remote_name = self.remote_name(remote.path, False)
 
         # if remote returns a symref for HEAD, then let's store that
-        rhead = None
-        rnode = None
         oldheads = self.repo.changelog.heads()
         imported = 0
         if result.refs:
@@ -311,18 +309,7 @@ class GitHandler(object):
                 remote_name, result.refs, heads=heads,
             )
 
-            try:
-                symref = result.symrefs[b'HEAD']
-                if symref.startswith(LOCAL_BRANCH_PREFIX):
-                    rhead = symref.replace(LOCAL_BRANCH_PREFIX, b'')
-
-                rnode = result.refs[LOCAL_BRANCH_PREFIX + rhead]
-                rnode = self._map_git[rnode]
-                rnode = self.repo[rnode].node()
-            except KeyError:
-                # if there is any error make sure to clear the variables
-                rhead = None
-                rnode = None
+            headname, headnode = self.get_result_head(result)
 
             if (
                 not remote_name and
@@ -335,13 +322,13 @@ class GitHandler(object):
                 bms = self.repo[b'tip'].bookmarks()
 
                 # override the 'tipmost' behavior if we know the remote HEAD
-                if rnode:
+                if headnode is not None and headname is not None:
                     # make sure the bookmark exists; at the point the remote
                     # branches has already been set up
                     suffix = self.branch_bookmark_suffix or b''
-                    changes = [(rhead + suffix, rnode)]
+                    changes = [(headname + suffix, headnode)]
                     util.updatebookmarks(self.repo, changes)
-                    bms = [rhead + suffix]
+                    bms = [headname + suffix]
 
                 if bms:
                     bookmarks.activate(self.repo, bms[0])
@@ -834,6 +821,25 @@ class GitHandler(object):
         tr.addfinalize(b'hg-git-save', lambda tr: self.save_map(self.map_file))
 
         return tr
+
+    def get_result_head(self, result):
+        symref = result.symrefs.get(b'HEAD')
+
+        if symref and symref.startswith(LOCAL_BRANCH_PREFIX):
+            rhead = symref[len(LOCAL_BRANCH_PREFIX):]
+
+            if symref in result.refs:
+                rsha = result.refs.get(symref)
+            else:
+                rsha = None
+        else:
+            rhead = None
+            rsha = result.refs.get(b'HEAD')
+
+        if rsha is not None and rsha in self._map_git:
+            return rhead, bin(self._map_git[rsha])
+        else:
+            return None, None
 
     def import_git_objects(self, remote_name, refs, heads=None):
         filteredrefs = self.filter_min_date(refs)
