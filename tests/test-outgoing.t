@@ -20,6 +20,9 @@ Load commonly used test logic
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgrepo
+  $ hg book
+     alpha                     0:ff7a2f2d8d70
+   * master                    0:ff7a2f2d8d70
   $ hg update -q master
   $ echo beta > beta
   $ hg add beta
@@ -33,7 +36,7 @@ Load commonly used test logic
   $ hg book -r 1 beta
 
   $ hg outgoing | grep -v 'searching for changes'
-  comparing with */gitrepo (glob)
+  comparing with $TESTTMP/gitrepo
   changeset:   1:47580592d3d6
   bookmark:    beta
   user:        test
@@ -47,16 +50,18 @@ Load commonly used test logic
   date:        Mon Jan 01 00:00:12 2007 +0000
   summary:     add gamma
   
-  $ hg outgoing -r beta | grep -v 'searching for changes'
-  comparing with */gitrepo (glob)
+  $ hg outgoing -r beta
+  comparing with $TESTTMP/gitrepo
+  searching for changes
   changeset:   1:47580592d3d6
   bookmark:    beta
   user:        test
   date:        Mon Jan 01 00:00:11 2007 +0000
   summary:     add beta
   
-  $ hg outgoing -r master | grep -v 'searching for changes'
-  comparing with */gitrepo (glob)
+  $ hg outgoing -r master
+  comparing with $TESTTMP/gitrepo
+  searching for changes
   changeset:   1:47580592d3d6
   bookmark:    beta
   user:        test
@@ -92,16 +97,45 @@ Check state of refs after outgoing
   $ cd hgrepo
 this will fail # maybe we should try to make it work
   $ hg outgoing
-  comparing with */gitrepo (glob)
+  comparing with $TESTTMP/gitrepo
   abort: branch 'refs/heads/master' changed on the server, please pull and merge before pushing
   [255]
 let's pull and try again
-  $ hg pull 2>&1 | grep -v 'divergent bookmark'
+  $ hg pull
   pulling from */gitrepo (glob)
   importing git objects into hg
   (run 'hg heads' to see heads, 'hg merge' to merge)
-  $ hg outgoing | grep -v 'searching for changes'
-  comparing with */gitrepo (glob)
+  $ hg log --graph
+  o  changeset:   3:25eed24f5e8f
+  |  tag:         default/master
+  |  tag:         tip
+  |  parent:      0:ff7a2f2d8d70
+  |  user:        test <test@example.org>
+  |  date:        Mon Jan 01 00:00:13 2007 +0000
+  |  summary:     add delta
+  |
+  | @  changeset:   2:953796e1cfd8
+  | |  bookmark:    master
+  | |  user:        test
+  | |  date:        Mon Jan 01 00:00:12 2007 +0000
+  | |  summary:     add gamma
+  | |
+  | o  changeset:   1:47580592d3d6
+  |/   bookmark:    beta
+  |    user:        test
+  |    date:        Mon Jan 01 00:00:11 2007 +0000
+  |    summary:     add beta
+  |
+  o  changeset:   0:ff7a2f2d8d70
+     bookmark:    alpha
+     tag:         default/alpha
+     user:        test <test@example.org>
+     date:        Mon Jan 01 00:00:10 2007 +0000
+     summary:     add alpha
+  
+  $ hg outgoing
+  comparing with $TESTTMP/gitrepo
+  searching for changes
   changeset:   1:47580592d3d6
   bookmark:    beta
   user:        test
@@ -114,16 +148,18 @@ let's pull and try again
   date:        Mon Jan 01 00:00:12 2007 +0000
   summary:     add gamma
   
-  $ hg outgoing -r beta | grep -v 'searching for changes'
-  comparing with */gitrepo (glob)
+  $ hg outgoing -r beta
+  comparing with $TESTTMP/gitrepo
+  searching for changes
   changeset:   1:47580592d3d6
   bookmark:    beta
   user:        test
   date:        Mon Jan 01 00:00:11 2007 +0000
   summary:     add beta
   
-  $ hg outgoing -r master | grep -v 'searching for changes'
-  comparing with */gitrepo (glob)
+  $ hg outgoing -r master
+  comparing with $TESTTMP/gitrepo
+  searching for changes
   changeset:   1:47580592d3d6
   bookmark:    beta
   user:        test
