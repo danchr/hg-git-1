@@ -258,6 +258,5 @@ def reposetup(ui, repo):
     if isinstance(repo, gitrepo.gitrepo):
         return
 
-    if getattr(dirstate, 'rootcache', False) and git_handler.has_gitrepo(repo):
-        # only install our dirstate wrapper if it has a hope of working
+    if git_handler.has_gitrepo(repo):
         dirstate.dirstate = gitdirstate
