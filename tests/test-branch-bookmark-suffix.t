@@ -104,7 +104,7 @@ make sure the commit doesn't have an HG:rename-source annotation
   $ hg log --graph
   o  changeset:   4:faf44fc3a4e8
   |  bookmark:    branch3_bookmark
-  |  tag:         default/branch3
+  |  tag:         default/branch3 (with-path !)
   |  tag:         tip
   |  user:        test <test@example.org>
   |  date:        Mon Jan 01 00:00:14 2007 +0000
@@ -112,7 +112,7 @@ make sure the commit doesn't have an HG:rename-source annotation
   |
   o  changeset:   3:ae8eb55f7090
   |  bookmark:    branch2_bookmark
-  |  tag:         default/branch2
+  |  tag:         default/branch2 (with-path !)
   |  parent:      1:600de9b6d498
   |  user:        test <test@example.org>
   |  date:        Mon Jan 01 00:00:13 2007 +0000
@@ -120,7 +120,7 @@ make sure the commit doesn't have an HG:rename-source annotation
   |
   | o  changeset:   2:8211cade99e4
   | |  bookmark:    branch1_bookmark
-  | |  tag:         default/branch1
+  | |  tag:         default/branch1 (with-path !)
   | |  parent:      0:40a840c1f8ae
   | |  user:        test <test@example.org>
   | |  date:        Mon Jan 01 00:00:12 2007 +0000

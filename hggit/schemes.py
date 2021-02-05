@@ -17,6 +17,7 @@ from . import gitrepo
 from . import util
 
 from mercurial import (
+    bookmarks,
     exthelper,
     hg,
     localrepo,
@@ -84,6 +85,17 @@ def peer(orig, uiorrepo, *args, **opts):
         if isinstance(uiorrepo, localrepo.localrepository):
             newpeer.localrepo = uiorrepo
     return newpeer
+
+
+@eh.wrapfunction(hg, b'clone')
+def clone(orig, *args, **opts):
+    srcpeer, destpeer = orig(*args, **opts)
+
+    # HACK: suppress bookmark activation with `--noupdate`
+    if isinstance(srcpeer, gitrepo.gitrepo) and not opts.get('update'):
+        bookmarks.deactivate(destpeer._repo)
+
+    return srcpeer, destpeer
 
 
 @eh.wrapfunction(compat.path, b'_isvalidlocalpath')

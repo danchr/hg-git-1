@@ -97,7 +97,6 @@ public bookmark not pushed is not published after pull
 
   $ hg update 0
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  (leaving bookmark master)
   $ echo delta > delta
   $ hg bookmark not-pushed
   $ hg add delta

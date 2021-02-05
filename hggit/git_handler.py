@@ -301,40 +301,33 @@ class GitHandler(object):
         result = self.fetch_pack(remote.path, heads)
         remote_name = self.remote_name(remote.path, False)
 
-        # if remote returns a symref for HEAD, then let's store that
         oldheads = self.repo.changelog.heads()
-        imported = 0
+
         if result.refs:
             imported = self.import_git_objects(
                 remote_name, result.refs, heads=heads,
             )
-
-            headname, headnode = self.get_result_head(result)
-
-            if (
-                not remote_name and
-                not self.git.refs.as_dict(REMOTE_BRANCH_PREFIX)
-            ):
-                # intial cloning
-                self.update_remote_branches(b'default', result.refs)
-
-                # "Activate" a tipmost bookmark.
-                bms = self.repo[b'tip'].bookmarks()
-
-                # override the 'tipmost' behavior if we know the remote HEAD
-                if headnode is not None and headname is not None:
-                    # make sure the bookmark exists; at the point the remote
-                    # branches has already been set up
-                    suffix = self.branch_bookmark_suffix or b''
-                    changes = [(headname + suffix, headnode)]
-                    util.updatebookmarks(self.repo, changes)
-                    bms = [headname + suffix]
-
-                if bms:
-                    bookmarks.activate(self.repo, bms[0])
+        else:
+            imported = 0
 
         if imported == 0:
             return 0
+
+        if self.is_clone:
+            headname, headnode = self.get_result_head(result)
+
+            if headnode is not None and headname is not None:
+                # activate the bookmark corresponding to HEAD
+                suffix = self.branch_bookmark_suffix or b''
+                changes = [(headname + suffix, headnode)]
+                util.updatebookmarks(self.repo, changes)
+                bms = [headname + suffix]
+            else:
+                # activate a tipmost bookmark.
+                bms = self.repo[b'tip'].bookmarks()
+
+            if bms:
+                bookmarks.activate(self.repo, bms[0])
 
         # code taken from localrepo.py:addchangegroup
         dh = 0
@@ -1874,6 +1867,11 @@ class GitHandler(object):
         return []
 
     def remote_name(self, remote, push):
+        url = compat.url(remote)
+
+        if url.islocal() and not url.isabs():
+            remote = os.path.abspath(url.localpath())
+
         for name, paths in self.ui.paths.items():
             # paths became lists in mercurial 5.9
             if not isinstance(paths, list):

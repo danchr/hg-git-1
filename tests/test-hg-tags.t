@@ -24,6 +24,7 @@ Load commonly used test logic
   $ cd hgrepo
   $ hg co master
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  (activating bookmark master)
   $ fn_hg_tag alpha
   $ hg push
   pushing to $TESTTMP/repo.git
