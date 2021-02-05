@@ -1,8 +1,7 @@
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
-  $ git init --bare repo.git
-  Initialized empty Git repository in $TESTTMP/repo.git/
+  $ git init -q --bare repo.git
 
   $ git clone repo.git gitrepo
   Cloning into 'gitrepo'...

@@ -6,11 +6,10 @@ Load commonly used test logic
   $ echo "[git]" >> $HGRCPATH
   $ echo "branch_bookmark_suffix=_bookmark" >> $HGRCPATH
 
-  $ git init --bare gitrepo1
-  Initialized empty Git repository in $TESTTMP/gitrepo1/
+  $ git init -q --bare repo.git
 
 #if with-path
-  $ hg clone gitrepo1 hgrepo
+  $ hg clone repo.git hgrepo
   updating to branch default
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
 #else
@@ -45,8 +44,8 @@ Load commonly used test logic
   
 
 
-  $ hg push ../gitrepo1
-  pushing to ../gitrepo1
+  $ hg push ../repo.git
+  pushing to ../repo.git
   searching for changes
   adding objects
   added 2 commits with 2 trees and 2 blobs
@@ -55,17 +54,17 @@ Load commonly used test logic
 
   $ cd ..
 
-  $ cd gitrepo1
+  $ cd repo.git
   $ git symbolic-ref HEAD refs/heads/branch1
   $ git branch
   * branch1
     branch2
   $ cd ..
 
-  $ git clone gitrepo1 gitrepo2
-  Cloning into 'gitrepo2'...
+  $ git clone repo.git gitrepo
+  Cloning into 'gitrepo'...
   done.
-  $ cd gitrepo2
+  $ cd gitrepo
   $ git checkout -q branch1
   $ echo g1 >> f1
   $ git add f1
@@ -80,7 +79,7 @@ Load commonly used test logic
   $ git add f3
   $ fn_git_commit -m "append f3"
   $ git push origin branch1 branch2 branch3
-  To $TESTTMP/gitrepo1
+  To $TESTTMP/repo.git
      bbfe79a..d8aef79  branch1 -> branch1
      288e92b..f8f8de5  branch2 -> branch2
    * [new branch]      branch3 -> branch3
@@ -96,9 +95,9 @@ make sure the commit doesn't have an HG:rename-source annotation
 
   $ cd hgrepo
   $ hg paths
-  default = $TESTTMP/gitrepo1 (with-path !)
-  $ hg pull ../gitrepo1
-  pulling from ../gitrepo1
+  default = $TESTTMP/repo.git (with-path !)
+  $ hg pull ../repo.git
+  pulling from ../repo.git
   importing 3 git commits
   new changesets 8211cade99e4:faf44fc3a4e8 (3 drafts)
   (run 'hg heads' to see heads)
@@ -144,7 +143,7 @@ make sure the commit doesn't have an HG:rename-source annotation
 Try cloning a bookmark, and make sure it gets checked out:
 
   $ rm -r hgrepo
-  $ hg clone -r branch3 gitrepo1 hgrepo
+  $ hg clone -r branch3 repo.git hgrepo
   importing 4 git commits
   new changesets 40a840c1f8ae:faf44fc3a4e8 (4 drafts)
   updating to bookmark branch3_bookmark (hg57 !)
@@ -190,7 +189,7 @@ but the branch get checked out. Although this does seem a bit odd, so
 does the scenario.
 
   $ rm -r hgrepo
-  $ hg clone -r branch1 gitrepo1 hgrepo
+  $ hg clone -r branch1 repo.git hgrepo
   importing 2 git commits
   new changesets 40a840c1f8ae:8211cade99e4 (2 drafts)
   updating to branch branch1

@@ -9,7 +9,7 @@ Load commonly used test logic
   > evolution.createmarkers = yes
   > EOF
 
-  $ git init --bare --quiet repo.git
+  $ git init -q --bare repo.git
   $ git clone repo.git gitrepo > /dev/null 2>&1
   $ cd gitrepo
   $ echo alpha > alpha

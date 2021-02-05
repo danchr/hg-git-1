@@ -28,8 +28,7 @@ clean merge
    create mode 100644 beta
 
   $ cd ..
-  $ git init --bare gitrepo2
-  Initialized empty Git repository in $TESTTMP/gitrepo2/
+  $ git init -q --bare repo.git
 
   $ hg clone gitrepo hgrepo
   importing 4 git commits
@@ -42,8 +41,8 @@ clean merge
 clear the cache to be sure it is regenerated correctly
   $ hg gclear
   clearing out the git cache data
-  $ hg push ../gitrepo2
-  pushing to ../gitrepo2
+  $ hg push ../repo.git
+  pushing to ../repo.git
   searching for changes
   adding objects
   added 4 commits with 4 trees and 3 blobs
@@ -52,7 +51,7 @@ clear the cache to be sure it is regenerated correctly
 
   $ cd ..
 git log in repo pushed from hg
-  $ git --git-dir=gitrepo2 log --pretty=medium master | sed 's/\.\.\.//g'
+  $ git --git-dir=repo.git log --pretty=medium master | sed 's/\.\.\.//g'
   commit 5806851511aaf3bfe813ae3a86c5027165fa9b96
   Merge: e5023f9 9497a4e
   Author: test <test@example.org>
@@ -77,7 +76,7 @@ git log in repo pushed from hg
   Date:   Mon Jan 1 00:00:10 2007 +0000
   
       add alpha
-  $ git --git-dir=gitrepo2 log --pretty=medium beta | sed 's/\.\.\.//g'
+  $ git --git-dir=repo.git log --pretty=medium beta | sed 's/\.\.\.//g'
   commit 9497a4ee62e16ee641860d7677cdb2589ea15554
   Author: test <test@example.org>
   Date:   Mon Jan 1 00:00:11 2007 +0000

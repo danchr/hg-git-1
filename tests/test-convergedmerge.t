@@ -43,20 +43,19 @@ Load commonly used test logic
 
   $ cd ..
 
-  $ git init --bare gitrepo
-  Initialized empty Git repository in $TESTTMP/gitrepo/
+  $ git init -q --bare repo.git
 
   $ cd hgrepo1
   $ hg bookmark -r4 master
-  $ hg push -r master ../gitrepo
-  pushing to ../gitrepo
+  $ hg push -r master ../repo.git
+  pushing to ../repo.git
   searching for changes
   adding objects
   added 5 commits with 3 trees and 3 blobs
   adding reference refs/heads/master
   $ cd ..
 
-  $ hg clone gitrepo hgrepo2
+  $ hg clone repo.git hgrepo2
   importing 5 git commits
   new changesets 5d1a6b64f9d0:eaa21d002113 (5 drafts)
   updating to bookmark master (hg57 !)

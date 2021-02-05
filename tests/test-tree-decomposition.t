@@ -21,8 +21,7 @@ Load commonly used test logic
 
 
   $ cd ..
-  $ git init --bare gitrepo2
-  Initialized empty Git repository in $TESTTMP/gitrepo2/
+  $ git init -q --bare repo.git
 
   $ hg clone gitrepo hgrepo
   importing 3 git commits
@@ -41,15 +40,15 @@ Load commonly used test logic
 
   $ hg gclear
   clearing out the git cache data
-  $ hg push ../gitrepo2
-  pushing to ../gitrepo2
+  $ hg push ../repo.git
+  pushing to ../repo.git
   searching for changes
   adding objects
   added 3 commits with 6 trees and 3 blobs
   adding reference refs/heads/master
   $ cd ..
 
-  $ git --git-dir=gitrepo2 log --pretty=medium
+  $ git --git-dir=repo.git log --pretty=medium
   commit 6e0dbd8cd92ed4823c69cb48d8a2b81f904e6e69
   Author: test <test@example.org>
   Date:   Mon Jan 1 00:00:12 2007 +0000

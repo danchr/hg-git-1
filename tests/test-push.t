@@ -196,9 +196,9 @@ fails:
 
 Push empty Hg repo to empty Git repo (issue #58)
   $ hg init hgrepo2
-  $ git init -q --bare gitrepo2
-  $ hg -R hgrepo2 push gitrepo2
-  pushing to gitrepo2
+  $ git init -q --bare repo.git
+  $ hg -R hgrepo2 push repo.git
+  pushing to repo.git
   searching for changes
   abort: no bookmarks or tags to push to git
   (see "hg help bookmarks" for details on creating them)
@@ -212,8 +212,8 @@ The remote repo is empty and the local one doesn't have any bookmarks/tags
   $ fn_hg_commit -m init
   $ hg update null
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
-  $ hg push ../gitrepo2
-  pushing to ../gitrepo2
+  $ hg push ../repo.git
+  pushing to ../repo.git
   searching for changes
   abort: no bookmarks or tags to push to git
   (see "hg help bookmarks" for details on creating them)

@@ -39,8 +39,7 @@ The warning message changed in Git 1.8.0
   variable i18n.commitencoding to the encoding your project uses.
 
   $ cd ..
-  $ git init --bare gitrepo2
-  Initialized empty Git repository in $TESTTMP/gitrepo2/
+  $ git init -q --bare repo.git
 
   $ hg clone gitrepo hgrepo
   importing 4 git commits
@@ -113,15 +112,15 @@ The warning message changed in Git 1.8.0
 
   $ hg gclear
   clearing out the git cache data
-  $ hg push ../gitrepo2
-  pushing to ../gitrepo2
+  $ hg push ../repo.git
+  pushing to ../repo.git
   searching for changes
   adding objects
   added 4 commits with 4 trees and 4 blobs
   adding reference refs/heads/master
 
   $ cd ..
-  $ git --git-dir=gitrepo2 log --pretty=medium
+  $ git --git-dir=repo.git log --pretty=medium
   commit e85fef6b515d555e45124a5dc39a019cf8db9ff0
   Author: t\xe9st \xe8nc\xf6d\xeeng <test@example.org> (esc)
   Date:   Mon Jan 1 00:00:13 2007 +0000

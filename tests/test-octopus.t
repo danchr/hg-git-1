@@ -59,8 +59,7 @@ Load commonly used test logic
    create mode 100644 zeta
 
   $ cd ..
-  $ git init --bare gitrepo2
-  Initialized empty Git repository in $TESTTMP/gitrepo2/
+  $ git init -q --bare repo.git
 
   $ hg clone gitrepo hgrepo
   importing 8 git commits
@@ -109,8 +108,8 @@ Load commonly used test logic
 
   $ hg gclear
   clearing out the git cache data
-  $ hg push ../gitrepo2
-  pushing to ../gitrepo2
+  $ hg push ../repo.git
+  pushing to ../repo.git
   searching for changes
   adding objects
   added 8 commits with 8 trees and 6 blobs
@@ -121,7 +120,7 @@ Load commonly used test logic
   adding reference refs/heads/master
   $ cd ..
 
-  $ git --git-dir=gitrepo2 log --pretty=medium | sed s/\\.\\.\\.//g
+  $ git --git-dir=repo.git log --pretty=medium | sed s/\\.\\.\\.//g
   commit b32ff845df61df998206b630e4370a44f9b36845
   Merge: 9ac68f9 7e9cd9f e695849
   Author: test <test@example.org>

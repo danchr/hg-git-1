@@ -41,20 +41,19 @@ resolve using first parent
 
   $ cd ..
 
-  $ git init --bare gitrepo
-  Initialized empty Git repository in $TESTTMP/gitrepo/
+  $ git init -q --bare repo.git
 
   $ cd hgrepo1
   $ hg bookmark -r tip master
-  $ hg push -r master ../gitrepo
-  pushing to ../gitrepo
+  $ hg push -r master ../repo.git
+  pushing to ../repo.git
   searching for changes
   adding objects
   added 4 commits with 3 trees and 3 blobs
   adding reference refs/heads/master
   $ cd ..
 
-  $ hg clone gitrepo hgrepo2
+  $ hg clone repo.git hgrepo2
   importing 4 git commits
   new changesets 5d1a6b64f9d0:6c53bc0f062f (4 drafts)
   updating to bookmark master (hg57 !)

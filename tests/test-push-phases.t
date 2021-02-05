@@ -6,8 +6,7 @@ Load commonly used test logic
   > usephases = yes
   > EOF
 
-  $ git init --bare repo.git
-  Initialized empty Git repository in $TESTTMP/repo.git/
+  $ git init -q --bare repo.git
 
   $ hg clone repo.git hgrepo
   updating to branch default

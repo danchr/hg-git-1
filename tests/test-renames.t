@@ -88,8 +88,7 @@ Remove the submodule and rename the file back:
   $ git mv gamma-new gamma
   $ fn_git_commit -m 'remove submodule and rename back'
 
-  $ git init --bare ../repo.git
-  Initialized empty Git repository in $TESTTMP/repo.git/
+  $ git init -q --bare ../repo.git
   $ git push ../repo.git master
   To ../repo.git
    * [new branch]      master -> master

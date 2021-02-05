@@ -95,8 +95,7 @@ final manifest in git is just beta
       add alpha
 
   $ cd ..
-  $ git init --bare gitrepo2
-  Initialized empty Git repository in $TESTTMP/gitrepo2/
+  $ git init -q --bare repo.git
 
   $ hg clone gitrepo hgrepo
   importing 9 git commits
@@ -168,15 +167,15 @@ make sure that only beta is in the manifest
   clearing out the git cache data
   $ ls .hg | grep git
   [1]
-  $ hg push ../gitrepo2
-  pushing to ../gitrepo2
+  $ hg push ../repo.git
+  pushing to ../repo.git
   searching for changes
   adding objects
   added 9 commits with 8 trees and 5 blobs
   adding reference refs/heads/master
 
   $ cd ..
-  $ git --git-dir=gitrepo2 log --pretty=medium
+  $ git --git-dir=repo.git log --pretty=medium
   commit 5ee11eeae239d6a99df5a99901ec00ffafbcc46b
   Author: test <test@example.org>
   Date:   Mon Jan 1 00:00:18 2007 +0000
