@@ -6,7 +6,7 @@
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 
-'''push and pull from a Git server
+r'''push and pull from a Git server
 
 This extension lets you communicate (push and pull) with a Git server.
 This way you can use Git hosting for your project or collaborate with a
