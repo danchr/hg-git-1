@@ -134,8 +134,8 @@ regardless of what ``.gitignore`` prescribes.
 
 This has been so since version 0.5.0, released in 2013.
 
-Commands
-========
+Further reading
+===============
 
 See ``hg help -e hggit``.
 

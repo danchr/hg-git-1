@@ -33,8 +33,8 @@ setup(
     keywords='hg git mercurial',
     license='GPLv2',
     packages=['hggit'],
-    package_data={'hggit': ['help/git.rst']},
     include_package_data=True,
+    zip_safe=True,
     install_requires=[
         'dulwich>=0.19.0;python_version>="3.0"',
         'dulwich>=0.19.0,<0.20.0;python_version<"3.0"',
