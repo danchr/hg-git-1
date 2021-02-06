@@ -139,6 +139,34 @@ Further reading
 
 See ``hg help -e hggit``.
 
+Alternatives
+============
+
+Since version 5.4, Mercurial includes an extension called ``git``. It
+interacts with a Git repository directly, avoiding the intermediate
+conversion. This has certain advantages:
+
+ * Each commit only has one node ID, which is the Git hash.
+ * Data is stored only once, so the on-disk footprint is much lower.
+
+The extension has certain drawbacks, however:
+
+ * It cannot handle all Git repositories. In particular, it cannot
+   handle `octopus merges`_, i.e. merge commits with more than two
+   parents. If any such commit is included in the history, conversion
+   will fail.
+ * You cannot interact with Mercurial repositories.
+
+.. octopus merges_: https://git-scm.com/docs/git-merge
+
+Another extension packaged with Mercurial, the ``convert`` extension,
+also has Git support.
+
+Other alternatives exist for Git users wanting to access Mercurial
+repositories, such as `git-remote-hg`_.
+
+.. git-remote-hg_: https://pypi.org/project/git-remote-hg/
+
 Configuration
 =============
 
