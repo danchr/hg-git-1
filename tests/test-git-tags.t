@@ -29,7 +29,7 @@ Verify that annotated tags are unaffected by reexports:
   beta            added tag beta
   $ hg gexport
   $ GIT_DIR=.hg/git git tag -ln
-  beta            add beta
+  beta            added tag beta
 
 Error checking on tag creation
 
@@ -217,6 +217,7 @@ Try to overwrite an annotated tag:
   $ hg tag -f beta
   $ hg push
   pushing to $TESTTMP/gitrepo
+  warning: not overwriting annotated tag 'beta'
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
