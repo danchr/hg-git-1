@@ -23,6 +23,14 @@ Load commonly used test logic
 
   $ cd hgrepo
 
+Verify that annotated tags are unaffected by reexports:
+
+  $ GIT_DIR=.hg/git git tag -ln
+  beta            added tag beta
+  $ hg gexport
+  $ GIT_DIR=.hg/git git tag -ln
+  beta            add beta
+
 Error checking on tag creation
 
   $ hg tag --git beta --remove
@@ -190,3 +198,35 @@ Create a git tag from hg, but pointing to a new commit:
   detached
   gamma
   $ cd ..
+
+Try to overwrite an annotated tag:
+
+  $ cd hgrepo
+#if hg57
+  $ hg tags -v
+  tip                                4:dfeaa5393d25
+  gamma                              4:dfeaa5393d25 git
+  default/master                     4:dfeaa5393d25 git-remote
+  detached                           2:7aa44ff368c7 git
+  beta                               1:7fe02317c63d git
+  alpha                              0:ff7a2f2d8d70 git
+#endif
+  $ hg tag beta
+  abort: tag 'beta' already exists (use -f to force)
+  [255]
+  $ hg tag -f beta
+  $ hg push
+  pushing to $TESTTMP/gitrepo
+  searching for changes
+  adding objects
+  added 1 commits with 1 trees and 1 blobs
+  updating reference refs/heads/master
+#if hg57
+  $ hg tags -v
+  tip                                5:97a843c5e338
+  default/master                     5:97a843c5e338 git-remote
+  gamma                              4:dfeaa5393d25 git
+  detached                           2:7aa44ff368c7 git
+  beta                               1:7fe02317c63d git
+  alpha                              0:ff7a2f2d8d70 git
+#endif
