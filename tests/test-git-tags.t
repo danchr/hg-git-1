@@ -226,7 +226,7 @@ Try to overwrite an annotated tag:
   tip                                5:97a843c5e338
   default/master                     5:97a843c5e338 git-remote
   gamma                              4:dfeaa5393d25 git
+  beta                               4:dfeaa5393d25
   detached                           2:7aa44ff368c7 git
-  beta                               1:7fe02317c63d git
   alpha                              0:ff7a2f2d8d70 git
 #endif
