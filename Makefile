@@ -1,6 +1,6 @@
 PYTHON=python
 HG=$(shell which hg)
-HGPYTHON=$(shell $(HG) hg debuginstall -T '{pythonexe}')
+HGPYTHON=$(shell $(HG) debuginstall -T '{pythonexe}')
 TESTFLAGS ?= $(shell echo $$HGTESTFLAGS)
 
 help:

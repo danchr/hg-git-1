@@ -1149,7 +1149,7 @@ class GitHandler(object):
         # the future.)
         if not refs or next(iter(refs.keys())) == b'capabilities^{}':
             if not exportable:
-                tip = self.repo.lookup(b'tip')
+                tip = self.repo.filtered(b'served').lookup(b'tip')
                 if tip != nullid:
                     if b'capabilities^{}' in new_refs:
                         del new_refs[b'capabilities^{}']

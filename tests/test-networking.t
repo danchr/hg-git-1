@@ -56,8 +56,8 @@ Clone using the git protocol:
   >    --config auth.git.username=git \
   >    http://git-server/repo.git repo-http
   http authorization required for http://git-server/repo.git
-  realm: Git Access (?)
-  realm: Git (?)
+  realm: Git (no-dulwich0203 !)
+  realm: Git Access (dulwich0203 !)
   user: git
   password: nope
   abort: authorization failed
@@ -67,8 +67,8 @@ Clone using the git protocol:
   > git
   > EOF
   http authorization required for http://git-server/repo.git
-  realm: Git Access (?)
-  realm: Git (?)
+  realm: Git (no-dulwich0203 !)
+  realm: Git Access (dulwich0203 !)
   user: git
   password: git
   updating to branch default
@@ -123,7 +123,7 @@ But we can specify authentication in the configuration:
   importing git objects into hg
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
-#if py3
+#if dulwich0200
 Try using git credentials, only supported on Dulwich 0.20+
 
 NB: the use of printf is deliberate; otherwise the test fails due to

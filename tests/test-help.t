@@ -6,10 +6,3 @@ Load commonly used test logic
   $ hg help | grep 'git' | sed 's/  */ /g'
    git-cleanup clean up Git commit map after history editing (?)
    hggit push and pull from a Git server
-   git Working with Git Repositories
-
-Mercurial 3.7+ uses single quotes
-  $ hg help hggit | grep 'help git'
-  For more information and instructions, see 'hg help git'
-  $ hg help git | grep 'Working with Git Repositories'
-  Working with Git Repositories
