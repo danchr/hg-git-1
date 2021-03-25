@@ -33,23 +33,59 @@ relatively recent Dulwich.
 Installing
 ==========
 
-Clone this repository somewhere and make the 'extensions' section in
-your ``~/.hgrc`` file look something like this::
+A common way to install Mercurial extensions is from their Mercurial repository.  I.e. 
+clone this repository somewhere and make the ``[extensions]`` section in your ``~/.hgrc``::
+
 
    [extensions]
    hggit = [path-to]/hg-git/hggit
 
 That will enable the Hg-Git extension for you.
 
-You can also install the plugin using your favourite package manager,
-e.g. pip::
+Alternatively, you can install the plugin using your favourite package manager,
+e.g. ``pip3 install hg-git``, but note that you must make sure to use the version of
+python that is used by mercurial.  Thus, the safest way to do this with ``pip`` is:
 
-  pip3 install hggit
+.. code-block:: bash
+  
+   PYTHON="$(hg debuginstall -T'{pythonexe}')"  # Point PYTHON to the version used by hg
+   "$PYTHON" -m pip install --user hg-git       # Drop the --user if you want a system install
 
-And enable it from somewhere in your ``$PYTHONPATH``::
+With ``hg-git`` visible to mercurial, it can simply be enabled in your ``~/.hgrc`` with::
 
    [extensions]
    hggit =
+
+.. note::
+   
+   ``hg-git`` is an extension and can be used with versions of mercurial already
+   installed on your system, but, as mentioned above,  needs to be installed so that
+   mercurial can find it.  The version of python mercurial uses is listed by::
+
+      hg debuginstall -T'{pythonexe}'
+
+   This is the reason for setting ``PYTHON`` above.  This will work, for example, if you
+   are using a version of mercurial installed by the system, which might depends on
+   Python 2.7.  Keep in mind that python 2 reached its end of life in April 2020 and
+   will not be supported with versions of ``hg-git`` 0.11 and higher (see `issue #349
+   <https://foss.heptapod.net/mercurial/hg-git/-/issues/349>`_.
+
+   Perhaps better, install a more recent version of Mercurial along with ``hg-git`` in
+   your working python environment using something like::
+
+      python3 -m pip install mercurial hg-git hg-evolve
+
+   This will also ensure that the |evolve_extension|_ is installed, allowing you to use
+   topics as outlined in the `Heptapod workflow <https://octobus.net/blog/2019-09-04-heptapod-workflow.html>`_::
+
+      [extensions]
+      hggit =
+      evolve =
+      topics =
+
+.. |evolve_extension| replace:: ``evolve`` extension
+.. _evolve_extension: https://www.mercurial-scm.org/wiki/EvolveExtension
+
 
 Contributing
 ============
@@ -142,9 +178,12 @@ See ``hg help -e hggit``.
 Alternatives
 ============
 
-Since version 5.4, Mercurial includes an extension called ``git``. It
+Since version 5.4, Mercurial includes an |extension_called_git|_. It
 interacts with a Git repository directly, avoiding the intermediate
 conversion. This has certain advantages:
+
+.. |extension_called_git| replace:: extension called ``git``
+.. _extension_called_git: https://www.mercurial-scm.org/wiki/GitExtension
 
  * Each commit only has one node ID, which is the Git hash.
  * Data is stored only once, so the on-disk footprint is much lower.
@@ -156,8 +195,9 @@ The extension has certain drawbacks, however:
    parents. If any such commit is included in the history, conversion
    will fail.
  * You cannot interact with Mercurial repositories.
+ * Experimental status.
 
-.. octopus merges_: https://git-scm.com/docs/git-merge
+.. _octopus merges: https://git-scm.com/docs/git-merge
 
 Another extension packaged with Mercurial, the ``convert`` extension,
 also has Git support.
@@ -165,7 +205,7 @@ also has Git support.
 Other alternatives exist for Git users wanting to access Mercurial
 repositories, such as `git-remote-hg`_.
 
-.. git-remote-hg_: https://pypi.org/project/git-remote-hg/
+.. _git-remote-hg: https://pypi.org/project/git-remote-hg/
 
 Configuration
 =============
