@@ -3,13 +3,8 @@ from __future__ import generator_stop
 from mercurial import error
 from mercurial import revset
 from mercurial.i18n import _
-from mercurial.node import hex
-
-
-def extsetup(ui):
-    revset.symbols.update({
-        b'fromgit': revset_fromgit, b'gitnode': revset_gitnode
-    })
+from mercurial.node import bin, hex
+from mercurial.utils import stringutil
 
 
 def revset_fromgit(repo, subset, x):
@@ -46,4 +41,53 @@ def revset_gitnode(repo, subset, x):
 
     raise error.AmbiguousPrefixLookupError(
         rev, git.map_file, _(b'ambiguous identifier'),
+    )
+
+
+def revset_gittag(repo, subset, x):
+    """``gittag([name])``
+
+    The specified Git tag by name, or all revisions tagged with Git if
+    no name is given.
+
+    Pattern matching is supported for `name`. See
+    :hg:`help revisions.patterns`.
+
+    """
+    # mostly copied from tag() mercurial/revset.py
+
+    # i18n: "tag" is a keyword
+    args = revset.getargs(x, 0, 1, _(b"tag takes one or no arguments"))
+    cl = repo.changelog
+    git = repo.githandler
+
+    if args:
+        pattern = revset.getstring(
+            args[0],
+            # i18n: "tag" is a keyword
+            _(b'the argument to tag must be a string'),
+        )
+        kind, pattern, matcher = stringutil.stringmatcher(pattern)
+        if kind == b'literal':
+            # avoid resolving all tags
+            tn = git.tags.get(pattern, None)
+            if tn is None:
+                raise error.RepoLookupError(
+                    _(b"git tag '%s' does not exist") % pattern
+                )
+            s = {repo[bin(tn)].rev()}
+        else:
+            s = {cl.rev(bin(n)) for t, n in git.tags.items() if matcher(t)}
+    else:
+        s = {cl.rev(bin(n)) for t, n in git.tags.items()}
+    return subset & s
+
+
+def extsetup(ui):
+    revset.symbols.update(
+        {
+            b"fromgit": revset_fromgit,
+            b"gitnode": revset_gitnode,
+            b"gittag": revset_gittag,
+        }
     )
