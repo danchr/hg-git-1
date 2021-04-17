@@ -89,7 +89,9 @@ Ubuntu:
         apt-get -qq install --no-install-recommends
         gnupg gnupg-agent git unzip ssh
         mercurial python3-dulwich python3-setuptools pyflakes3
-      - python3 tests/run-tests.py -v --xunit $PWD/tests-ubuntu.xml --color=always
+      - >
+        python3 tests/run-tests.py -v
+        --xunit $PWD/tests-ubuntu.xml --color=always --timeout 300
     artifacts:
       reports:
         junit: tests-ubuntu.xml
