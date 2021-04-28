@@ -98,7 +98,15 @@ Ubuntu:
 Development:
   extends: .base
   stage: upcoming
-  allow_failure: true
+  rules:
+    # we don't want to prevent merging unrelated work, so allow
+    # failures for normal builds
+    - if: '$CI_PIPELINE_SOURCE != "schedule"'
+      allow_failure: true
+    # but disallow them for scheduled builds, so we get a nice
+    # notification
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      allow_failure: false
   parallel:
     matrix:
       - PYTHON:
