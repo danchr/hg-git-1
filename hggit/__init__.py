@@ -130,6 +130,7 @@ from . import hgrepo
 from . import overlay
 from . import revsets
 from . import schemes
+from . import templates
 from . import util
 
 from mercurial.node import bin
@@ -160,7 +161,7 @@ buglink = b'https://foss.heptapod.net/mercurial/hg-git/issues'
 cmdtable = commands.cmdtable
 configtable = {}
 configitem = registrar.configitem(configtable)
-templatekeyword = registrar.templatekeyword()
+templatekeyword = templates.templatekeyword
 
 compat.registerconfigs(configitem)
 
@@ -308,20 +309,3 @@ def exchangepush(orig, repo, remote, force=False, revs=None, newbranch=False,
 
 extensions.wrapfunction(exchange, b'push', exchangepush)
 
-
-def _gitnodekw(node, repo):
-    if not hasattr(repo, 'githandler'):
-        return None
-    gitnode = repo.githandler.map_git_get(node.hex())
-    if gitnode is None:
-        gitnode = b''
-    return gitnode
-
-
-@templatekeyword(b'gitnode', requires={b'ctx', b'repo'})
-def gitnodekw(context, mapping):
-    """:gitnode: String. The Git changeset identification hash, as a
-        40 hexadecimal digit string."""
-    node = context.resource(mapping, b'ctx')
-    repo = context.resource(mapping, b'repo')
-    return _gitnodekw(node, repo)
