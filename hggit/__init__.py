@@ -150,6 +150,8 @@ from . import revsets
 from . import schemes
 from . import templates
 
+import dulwich
+
 from mercurial import (
     demandimport,
     exthelper,
@@ -159,8 +161,6 @@ from mercurial import (
 demandimport.IGNORES |= {
     b'collections',
 }
-
-__version__ = b'0.11.0dev'
 
 testedwith = (b'5.2 5.3 5.4 5.5 5.6 5.7 5.8 5.9 6.0')
 minimumhgversion = b'5.2'
@@ -194,6 +194,28 @@ for _mod in (
 
 def getversion():
     """return version with dependencies for hg --version -v"""
-    import dulwich
-    dulver = b'.'.join(pycompat.sysbytes(str(i)) for i in dulwich.__version__)
-    return __version__ + (b" (dulwich %s)" % dulver)
+    # first, try to get a built version
+    try:
+        from .__version__ import version
+    except ImportError:
+        version = None
+
+    # if that fails, try to determine the version from the checkout
+    if version is None:
+        try:
+            from setuptools_scm import get_version
+
+            version = get_version(
+                root='..',
+                relative_to=__file__,
+                version_scheme="release-branch-semver",
+            )
+        except:
+            # something went wrong, but we need to provide something
+            version = "unknown"
+
+    # include the dulwich version, as it's fairly important for the
+    # level of functionality
+    dulver = '.'.join(map(str, dulwich.__version__))
+
+    return pycompat.sysbytes("%s (dulwich %s)" % (version, dulver))

@@ -1,3 +1,6 @@
+syntax: re
+^hggit/__version__\.py$
+
 syntax: glob
 *.pyc
 tests/*.err
