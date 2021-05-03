@@ -263,6 +263,7 @@ extensions.wrapfunction(hg, b'addbranchrevs', safebranchrevs)
 
 
 def extsetup(ui):
+    commands.extsetup(ui)
     revsets.extsetup(ui)
 
 

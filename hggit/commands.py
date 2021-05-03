@@ -180,11 +180,12 @@ def tag(orig, ui, repo, *names, **opts):
         repo.githandler.add_tag(target, *names)
 
 
-commands.table[b'tag'][1].append((b'', b'git', False,
+def extsetup(ui):
+    commands.table[b'tag'][1].append((b'', b'git', False,
                                   b'make it a git tag'))
-extensions.wrapcommand(
-    commands.table,
-    b'tag',
-    tag,
-    docstring='\n\n    ' + tag.__doc__.strip(),
-)
+    extensions.wrapcommand(
+        commands.table,
+        b'tag',
+        tag,
+        docstring='\n\n    ' + tag.__doc__.strip(),
+    )
