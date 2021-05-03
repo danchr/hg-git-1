@@ -1,6 +1,6 @@
 from __future__ import generator_stop
 
-from .util import isgitsshuri
+from . import util
 from . import compat
 from mercurial import (
     error,
@@ -139,7 +139,7 @@ instance = gitrepo
 
 
 def islocal(path):
-    if isgitsshuri(path):
+    if util.isgitsshuri(path):
         return True
 
     u = compat.url(path)
