@@ -133,7 +133,6 @@ from . import schemes
 from . import templates
 from . import util
 
-from mercurial.node import bin
 from mercurial import (
     bundlerepo,
     demandimport,
@@ -142,7 +141,6 @@ from mercurial import (
     extensions,
     pycompat,
     registrar,
-    repoview,
 )
 
 demandimport.IGNORES |= {
@@ -173,6 +171,7 @@ def getversion():
 def extsetup(ui):
     commands.extsetup(ui)
     gitrepo.extsetup(ui)
+    hgrepo.extsetup(ui)
     overlay.extsetup(ui)
     revsets.extsetup(ui)
     schemes.extsetup(ui)
@@ -220,22 +219,6 @@ def getremotechanges(orig, ui, repo, other, *args, **opts):
 
 
 extensions.wrapfunction(bundlerepo, b'getremotechanges', getremotechanges)
-
-
-def pinnedrevs(orig, repo):
-    pinned = orig(repo)
-
-    # Mercurial pins bookmarks, even if obsoleted, so that they always
-    # appear in e.g. log; do the same with git tags and remotes.
-    if repo.local() and hasattr(repo, 'githandler'):
-        rev = repo.changelog.rev
-
-        pinned.update(rev(bin(r)) for r in repo.githandler.tags.values())
-        pinned.update(rev(r) for r in repo.githandler.remote_refs.values())
-
-    return pinned
-
-extensions.wrapfunction(repoview, b'pinnedrevs', pinnedrevs)
 
 
 @util.transform_notgit

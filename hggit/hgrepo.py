@@ -1,5 +1,7 @@
 from __future__ import generator_stop
 
+from mercurial import extensions
+from mercurial import repoview
 from mercurial import util as hgutil
 from mercurial.node import bin
 
@@ -57,3 +59,20 @@ def reposetup(ui, repo):
 
     repo.__class__ = hgrepo
 
+
+def pinnedrevs(orig, repo):
+    pinned = orig(repo)
+
+    # Mercurial pins bookmarks, even if obsoleted, so that they always
+    # appear in e.g. log; do the same with git tags and remotes.
+    if repo.local() and hasattr(repo, 'githandler'):
+        rev = repo.changelog.rev
+
+        pinned.update(rev(bin(r)) for r in repo.githandler.tags.values())
+        pinned.update(rev(r) for r in repo.githandler.remote_refs.values())
+
+    return pinned
+
+
+def extsetup(ui):
+    extensions.wrapfunction(repoview, b'pinnedrevs', pinnedrevs)
