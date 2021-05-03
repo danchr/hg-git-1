@@ -124,8 +124,8 @@ from __future__ import generator_stop
 # local modules
 from . import commands
 from . import compat
+from . import gitdirstate
 from . import gitrepo
-from . import git_handler
 from . import hgrepo
 from . import overlay
 from . import revsets
@@ -137,7 +137,6 @@ from mercurial.node import bin
 from mercurial import (
     bundlerepo,
     demandimport,
-    dirstate,
     discovery,
     exchange,
     extensions,
@@ -198,12 +197,7 @@ def extsetup(ui):
 
 def reposetup(ui, repo):
     if not isinstance(repo, gitrepo.gitrepo):
-        if (getattr(dirstate, 'rootcache', False) and
-            git_handler.has_gitrepo(repo)):
-            # only install our dirstate wrapper if it has a hope of working
-            from . import gitdirstate
-            dirstate.dirstate = gitdirstate.gitdirstate
-
+        gitdirstate.reposetup(ui, repo)
         hgrepo.reposetup(ui, repo)
 
 

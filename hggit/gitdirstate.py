@@ -5,6 +5,8 @@ import stat
 import re
 import errno
 
+from . import git_handler
+
 from mercurial import (
     dirstate,
     error,
@@ -249,3 +251,9 @@ class gitdirstate(dirstate.dirstate):
             raise dirstate.rustmod.FallbackError
         else:
             return super(gitdirstate, self)._rust_status(*args, **kwargs)
+
+
+def reposetup(ui, repo):
+    if getattr(dirstate, 'rootcache', False) and git_handler.has_gitrepo(repo):
+        # only install our dirstate wrapper if it has a hope of working
+        dirstate.dirstate = gitdirstate
