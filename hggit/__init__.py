@@ -140,7 +140,6 @@ from mercurial import (
     discovery,
     exchange,
     extensions,
-    hg,
     pycompat,
     registrar,
     repoview,
@@ -171,25 +170,9 @@ def getversion():
     return __version__ + (b" (dulwich %s)" % dulver)
 
 
-# defend against tracebacks if we specify -r in 'hg pull'
-def safebranchrevs(orig, lrepo, otherrepo, branches, revs):
-    revs, co = orig(lrepo, otherrepo, branches, revs)
-    if isinstance(otherrepo, gitrepo.gitrepo):
-        # FIXME: Unless it's None, the 'co' result is passed to the lookup()
-        # remote command. Since our implementation of the lookup() remote
-        # command is incorrect, we set it to None to avoid a crash later when
-        # the incorect result of the lookup() remote command would otherwise be
-        # used. This can, in undocumented corner-cases, result in that a
-        # different revision is updated to when passing both -u and -r to
-        # 'hg pull'. An example of such case is in tests/test-addbranchrevs.t
-        # (for the non-hg-git case).
-        co = None
-    return revs, co
-extensions.wrapfunction(hg, b'addbranchrevs', safebranchrevs)
-
-
 def extsetup(ui):
     commands.extsetup(ui)
+    gitrepo.extsetup(ui)
     overlay.extsetup(ui)
     revsets.extsetup(ui)
     schemes.extsetup(ui)

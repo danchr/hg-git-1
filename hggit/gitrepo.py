@@ -4,6 +4,8 @@ from .util import isgitsshuri
 from . import compat
 from mercurial import (
     error,
+    extensions,
+    hg,
 )
 from mercurial.wireprotov1peer import (
         batchable,
@@ -142,3 +144,23 @@ def islocal(path):
 
     u = compat.url(path)
     return not u.scheme or u.scheme == b'file'
+
+
+# defend against tracebacks if we specify -r in 'hg pull'
+def safebranchrevs(orig, lrepo, otherrepo, branches, revs):
+    revs, co = orig(lrepo, otherrepo, branches, revs)
+    if isinstance(otherrepo, gitrepo):
+        # FIXME: Unless it's None, the 'co' result is passed to the lookup()
+        # remote command. Since our implementation of the lookup() remote
+        # command is incorrect, we set it to None to avoid a crash later when
+        # the incorect result of the lookup() remote command would otherwise be
+        # used. This can, in undocumented corner-cases, result in that a
+        # different revision is updated to when passing both -u and -r to
+        # 'hg pull'. An example of such case is in tests/test-addbranchrevs.t
+        # (for the non-hg-git case).
+        co = None
+    return revs, co
+
+
+def extsetup(ui):
+    extensions.wrapfunction(hg, b'addbranchrevs', safebranchrevs)
