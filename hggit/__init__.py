@@ -204,8 +204,7 @@ def reposetup(ui, repo):
             from . import gitdirstate
             dirstate.dirstate = gitdirstate.gitdirstate
 
-        klass = hgrepo.generate_repo_subclass(repo.__class__)
-        repo.__class__ = klass
+        hgrepo.reposetup(ui, repo)
 
 
 extensions.wrapfunction(manifest.manifestdict, b'diff',

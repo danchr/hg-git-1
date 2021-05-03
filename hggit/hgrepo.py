@@ -7,9 +7,8 @@ from .git_handler import GitHandler
 from .gitrepo import gitrepo
 from . import util
 
-
-def generate_repo_subclass(baseclass):
-    class hgrepo(baseclass):
+def reposetup(ui, repo):
+    class hgrepo(repo.__class__):
         @util.transform_notgit
         def findoutgoing(self, remote, base=None, heads=None, force=False):
             if isinstance(remote, gitrepo):
@@ -56,4 +55,5 @@ def generate_repo_subclass(baseclass):
 
             return tagscache
 
-    return hgrepo
+    repo.__class__ = hgrepo
+
