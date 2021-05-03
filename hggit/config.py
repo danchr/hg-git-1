@@ -1,9 +1,8 @@
 from __future__ import generator_stop
 
-from mercurial import registrar
+from mercurial import exthelper
 
-configtable = {}
-configitem = registrar.configitem(configtable)
+eh = exthelper.exthelper()
 
 CONFIG_DEFAULTS = {
     b'git': {
@@ -26,4 +25,4 @@ CONFIG_DEFAULTS = {
 
 for section, items in CONFIG_DEFAULTS.items():
     for item, default in items.items():
-        configitem(section, item, default=default)
+        eh.configitem(section, item, default=default)

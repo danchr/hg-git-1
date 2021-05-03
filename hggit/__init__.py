@@ -98,6 +98,24 @@ For example::
 Revsets are accepted by several Mercurial commands for specifying
 revisions. See :hg:`help revsets` for details.
 
+
+Creating Git tags
+-----------------
+
+You can create a lightweight Git tag using using :hg:`tag --git`.
+Please note that this requires an explicit -r/--rev, and does not
+support any of the other flags for :hg:`hg tag`.
+
+Support for Git tags is somewhat minimal. The Git documentation
+heavily discourages changing tags once pushed, and suggests that users
+always create a new one instead. (Unlike Mercurial, Git does not track
+and version its tags within the repository.) As result, there's no
+support for removing and changing preexisting tags. Similarly, there's
+no support for annotated tags, i.e. tags with messages, nor for
+signing tags. For those, either use Git directly or use the integrated
+web interface for tags and releases offered by most hosting solutions,
+including GitHub and GitLab.
+
 Invalid and dangerous paths
 ---------------------------
 
@@ -134,6 +152,7 @@ from . import templates
 
 from mercurial import (
     demandimport,
+    exthelper,
     pycompat,
 )
 
@@ -147,10 +166,30 @@ testedwith = (b'5.2 5.3 5.4 5.5 5.6 5.7 5.8')
 minimumhgversion = b'5.2'
 buglink = b'https://foss.heptapod.net/mercurial/hg-git/issues'
 
-cmdtable = commands.cmdtable
-configtable = config.configtable
-configitem = config.configitem
-templatekeyword = templates.templatekeyword
+eh = exthelper.exthelper()
+
+cmdtable = eh.cmdtable
+configtable = eh.configtable
+filesetpredicate = eh.filesetpredicate
+revsetpredicate = eh.revsetpredicate
+templatekeyword = eh.templatekeyword
+uisetup = eh.finaluisetup
+extsetup = eh.finalextsetup
+reposetup = eh.finalreposetup
+uipopulate = eh.finaluipopulate
+
+for _mod in (
+    commands,
+    config,
+    gitdirstate,
+    gitrepo,
+    hgrepo,
+    overlay,
+    revsets,
+    templates,
+    schemes,
+):
+    eh.merge(_mod.eh)
 
 
 def getversion():
@@ -158,19 +197,3 @@ def getversion():
     import dulwich
     dulver = b'.'.join(pycompat.sysbytes(str(i)) for i in dulwich.__version__)
     return __version__ + (b" (dulwich %s)" % dulver)
-
-
-def extsetup(ui):
-    commands.extsetup(ui)
-    gitrepo.extsetup(ui)
-    hgrepo.extsetup(ui)
-    overlay.extsetup(ui)
-    revsets.extsetup(ui)
-    schemes.extsetup(ui)
-
-
-def reposetup(ui, repo):
-    if not isinstance(repo, gitrepo.gitrepo):
-        gitdirstate.reposetup(ui, repo)
-        hgrepo.reposetup(ui, repo)
-

@@ -17,10 +17,12 @@ from . import gitrepo
 from . import util
 
 from mercurial import (
-    extensions,
+    exthelper,
     hg,
     localrepo,
 )
+
+eh = exthelper.exthelper()
 
 # support for `hg clone localgitrepo`
 _oldlocal = hg.schemes[b'file']
@@ -79,6 +81,7 @@ def defaultdest(source):
     return hgdefaultdest(source)
 
 
+@eh.wrapfunction(hg, b'peer')
 def peer(orig, uiorrepo, *args, **opts):
     newpeer = orig(uiorrepo, *args, **opts)
     if isinstance(newpeer, gitrepo.gitrepo):
@@ -87,33 +90,31 @@ def peer(orig, uiorrepo, *args, **opts):
     return newpeer
 
 
+@eh.wrapfunction(compat.path, b'_isvalidlocalpath')
 def isvalidlocalpath(orig, self, path):
     return orig(self, path) or isgitdir(path)
 
 
+@eh.wrapfunction(compat.url, b'islocal')
 def isurllocal(orig, path):
     # recognise git scp-style paths when cloning
     return orig(path) and not util.isgitsshuri(path._origpath)
 
 
+@eh.wrapfunction(hg, b'islocal')
 def islocal(orig, path):
     # recognise git scp-style paths when cloning
     return orig(path) and not util.isgitsshuri(path)
 
 
-
+@eh.wrapfunction(compat.urlutil, b'hasscheme')
 def hasscheme(orig, path):
     # recognise git scp-style paths
     return orig(path) or util.isgitsshuri(path)
 
 
+@eh.extsetup
 def extsetup(ui):
-    extensions.wrapfunction(hg, b'peer', peer)
-    extensions.wrapfunction(hg, b'islocal', islocal)
-    extensions.wrapfunction(compat.url, b'islocal', isurllocal)
-    extensions.wrapfunction(compat.urlutil, b'hasscheme', hasscheme)
-    extensions.wrapfunction(compat.path, b'_isvalidlocalpath', isvalidlocalpath)
-
     hg.schemes[b'https'] = _httpgitwrapper(hg.schemes[b'https'])
     hg.schemes[b'http'] = _httpgitwrapper(hg.schemes[b'http'])
     hg.schemes[b'file'] = _local

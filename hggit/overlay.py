@@ -10,7 +10,7 @@ from mercurial import (
     ancestor,
     changelog,
     context,
-    extensions,
+    exthelper,
     manifest,
     match as matchmod,
     namespaces,
@@ -21,6 +21,8 @@ from mercurial.utils import stringutil
 from mercurial.node import bin, hex, nullid
 
 from . import compat
+
+eh = exthelper.exthelper()
 
 
 def _maybehex(n):
@@ -152,6 +154,7 @@ class overlaymanifest(object):
         del self._map[path]
 
 
+@eh.wrapfunction(manifest.manifestdict, b'diff')
 def wrapmanifestdictdiff(orig, self, m2, match=None, clean=False):
     '''avoid calling into lazymanifest code if m2 is an overlaymanifest'''
     # Older mercurial clients used diff(m2, clean=False). If a caller failed
@@ -533,8 +536,3 @@ class overlayrepo(object):
 
     def narrowmatch(self, *args, **kwargs):
         return self.handler.repo.narrowmatch(*args, **kwargs)
-
-
-def extsetup(ui):
-    extensions.wrapfunction(manifest.manifestdict, b'diff',
-                            wrapmanifestdictdiff)

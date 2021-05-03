@@ -1,6 +1,6 @@
 from __future__ import generator_stop
 
-from mercurial import extensions
+from mercurial import exthelper
 from mercurial import repoview
 from mercurial import util as hgutil
 from mercurial.node import bin
@@ -9,7 +9,14 @@ from .git_handler import GitHandler
 from .gitrepo import gitrepo
 from . import util
 
+eh = exthelper.exthelper()
+
+
+@eh.reposetup
 def reposetup(ui, repo):
+    if isinstance(repo, gitrepo):
+        return
+
     class hgrepo(repo.__class__):
         @util.transform_notgit
         def findoutgoing(self, remote, base=None, heads=None, force=False):
@@ -60,6 +67,7 @@ def reposetup(ui, repo):
     repo.__class__ = hgrepo
 
 
+@eh.wrapfunction(repoview, b'pinnedrevs')
 def pinnedrevs(orig, repo):
     pinned = orig(repo)
 
@@ -72,7 +80,3 @@ def pinnedrevs(orig, repo):
         pinned.update(rev(r) for r in repo.githandler.remote_refs.values())
 
     return pinned
-
-
-def extsetup(ui):
-    extensions.wrapfunction(repoview, b'pinnedrevs', pinnedrevs)

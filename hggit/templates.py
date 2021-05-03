@@ -8,9 +8,9 @@
 
 from __future__ import generator_stop
 
-from mercurial import registrar
+from mercurial import exthelper
 
-templatekeyword = registrar.templatekeyword()
+eh = exthelper.exthelper()
 
 
 def _gitnodekw(node, repo):
@@ -22,7 +22,7 @@ def _gitnodekw(node, repo):
     return gitnode
 
 
-@templatekeyword(b'gitnode', requires={b'ctx', b'repo'})
+@eh.templatekeyword(b'gitnode', requires={b'ctx', b'repo'})
 def gitnodekw(context, mapping):
     """:gitnode: String. The Git changeset identification hash, as a
         40 hexadecimal digit string."""

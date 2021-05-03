@@ -6,10 +6,12 @@ import re
 import errno
 
 from . import git_handler
+from . import gitrepo
 
 from mercurial import (
     dirstate,
     error,
+    exthelper,
     match as matchmod,
     pathutil,
     pycompat,
@@ -17,6 +19,8 @@ from mercurial import (
 )
 
 from mercurial.i18n import _
+
+eh = exthelper.exthelper()
 
 
 def gignorepats(orig, lines, root=None):
@@ -253,7 +257,11 @@ class gitdirstate(dirstate.dirstate):
             return super(gitdirstate, self)._rust_status(*args, **kwargs)
 
 
+@eh.reposetup
 def reposetup(ui, repo):
+    if isinstance(repo, gitrepo.gitrepo):
+        return
+
     if getattr(dirstate, 'rootcache', False) and git_handler.has_gitrepo(repo):
         # only install our dirstate wrapper if it has a hope of working
         dirstate.dirstate = gitdirstate

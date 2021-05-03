@@ -1,12 +1,16 @@
 from __future__ import generator_stop
 
 from mercurial import error
+from mercurial import exthelper
 from mercurial import revset
 from mercurial.i18n import _
 from mercurial.node import bin, hex
 from mercurial.utils import stringutil
 
+eh = exthelper.exthelper()
 
+
+@eh.revsetpredicate(b'fromgit')
 def revset_fromgit(repo, subset, x):
     '''``fromgit()``
     Select changesets that originate from Git.
@@ -18,6 +22,7 @@ def revset_fromgit(repo, subset, x):
                           if git.map_git_get(hex(node(r))) is not None)
 
 
+@eh.revsetpredicate(b'gitnode')
 def revset_gitnode(repo, subset, x):
     '''``gitnode(hash)``
     Select the changeset that originates in the given Git revision. The hash
@@ -44,6 +49,7 @@ def revset_gitnode(repo, subset, x):
     )
 
 
+@eh.revsetpredicate(b'gittag')
 def revset_gittag(repo, subset, x):
     """``gittag([name])``
 
@@ -81,13 +87,3 @@ def revset_gittag(repo, subset, x):
     else:
         s = {cl.rev(bin(n)) for t, n in git.tags.items()}
     return subset & s
-
-
-def extsetup(ui):
-    revset.symbols.update(
-        {
-            b"fromgit": revset_fromgit,
-            b"gitnode": revset_gitnode,
-            b"gittag": revset_gittag,
-        }
-    )

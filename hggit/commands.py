@@ -18,18 +18,16 @@ from . import verify
 from mercurial.node import hex, nullhex
 from mercurial.i18n import _
 from mercurial import (
-    commands,
     error,
-    extensions,
+    exthelper,
     pycompat,
-    registrar,
     scmutil,
 )
 
-cmdtable = {}
-command = registrar.command(cmdtable)
+eh = exthelper.exthelper()
 
-@command(b'gimport')
+
+@eh.command(b'gimport')
 def gimport(ui, repo, remote_name=None):
     '''import commits from Git to Mercurial (ADVANCED)
 
@@ -43,7 +41,7 @@ def gimport(ui, repo, remote_name=None):
     repo.githandler.import_commits(remote_name)
 
 
-@command(b'gexport')
+@eh.command(b'gexport')
 def gexport(ui, repo):
     '''export commits from Mercurial to Git (ADVANCED)
 
@@ -58,7 +56,7 @@ def gexport(ui, repo):
     repo.githandler.export_commits()
 
 
-@command(b'gclear')
+@eh.command(b'gclear')
 def gclear(ui, repo):
     '''clear out the Git cached data (ADVANCED)
 
@@ -71,13 +69,13 @@ def gclear(ui, repo):
     repo.githandler.clear()
 
 
-@command(b'debuggitdir')
+@eh.command(b'debuggitdir')
 def gitdir(ui, repo):
     '''get the root of the git repository'''
     repo.ui.write(os.path.normpath(repo.githandler.gitdir), b'\n')
 
 
-@command(b'gverify',
+@eh.command(b'gverify',
          [(b'r', b'rev', b'', _(b'revision to verify'), _(b'REV'))],
          _(b'[-r REV]'))
 def gverify(ui, repo, **opts):
@@ -92,7 +90,7 @@ def gverify(ui, repo, **opts):
     return verify.verify(ui, repo, ctx)
 
 
-@command(b'git-cleanup')
+@eh.command(b'git-cleanup')
 def git_cleanup(ui, repo):
     '''clean up Git commit map after history editing'''
     new_map = []
@@ -107,23 +105,19 @@ def git_cleanup(ui, repo):
     ui.status(_(b'git commit map cleaned\n'))
 
 
+@eh.wrapcommand(
+    b'tag',
+    opts=[
+        (
+            b'',
+            b'git',
+            False,
+            b'''create a lightweight Git tag; this requires an explicit -r/--rev,
+        and does not support any of the other flags''',
+        )
+    ],
+)
 def tag(orig, ui, repo, *names, **opts):
-    '''You can also use --git to create a lightweight Git tag. Please note
-    that this requires an explicit -r/--rev, and does not support any
-    of the other flags.
-
-    Support for Git tags is somewhat minimal. The Git documentation
-    heavily discourages changing tags once pushed, and suggests that
-    users always create a new one instead. (Unlike Mercurial, Git does
-    not track and version its tags within the repository.) As result,
-    there's no support for removing and changing preexisting tags.
-    Similarly, there's no support for annotated tags, i.e. tags with
-    messages, nor for signing tags. For those, either use Git directly
-    or use the integrated web interface for tags and releases offered
-    by most hosting solutions, including GitHub and GitLab.
-
-    '''
-
     if not opts.get('git'):
         return orig(ui, repo, *names, **opts)
 
@@ -178,14 +172,3 @@ def tag(orig, ui, repo, *names, **opts):
             )
 
         repo.githandler.add_tag(target, *names)
-
-
-def extsetup(ui):
-    commands.table[b'tag'][1].append((b'', b'git', False,
-                                  b'make it a git tag'))
-    extensions.wrapcommand(
-        commands.table,
-        b'tag',
-        tag,
-        docstring='\n\n    ' + tag.__doc__.strip(),
-    )

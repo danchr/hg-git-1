@@ -7,7 +7,7 @@ from mercurial import (
     discovery,
     error,
     exchange,
-    extensions,
+    exthelper,
     hg,
     pycompat,
 )
@@ -17,6 +17,8 @@ from mercurial.wireprotov1peer import (
         peerexecutor,
 )
 from mercurial.interfaces.repository import peer as peerrepository
+
+eh = exthelper.exthelper()
 
 
 class basegitrepo(peerrepository):
@@ -151,6 +153,7 @@ def islocal(path):
 
 
 # defend against tracebacks if we specify -r in 'hg pull'
+@eh.wrapfunction(hg, b'addbranchrevs')
 def safebranchrevs(orig, lrepo, otherrepo, branches, revs):
     revs, co = orig(lrepo, otherrepo, branches, revs)
     if isinstance(otherrepo, gitrepo):
@@ -166,6 +169,7 @@ def safebranchrevs(orig, lrepo, otherrepo, branches, revs):
     return revs, co
 
 
+@eh.wrapfunction(discovery, b'findcommonoutgoing')
 def findcommonoutgoing(orig, repo, other, *args, **kwargs):
     if isinstance(other, gitrepo):
         heads = repo.githandler.get_refs(other.path)[0]
@@ -186,6 +190,7 @@ def findcommonoutgoing(orig, repo, other, *args, **kwargs):
     return orig(repo, other, *args, **kwargs)
 
 
+@eh.wrapfunction(bundlerepo, b'getremotechanges')
 def getremotechanges(orig, ui, repo, other, *args, **opts):
     if isinstance(other, gitrepo):
         if args:
@@ -200,6 +205,7 @@ def getremotechanges(orig, ui, repo, other, *args, **opts):
     return orig(ui, repo, other, *args, **opts)
 
 
+@eh.wrapfunction(exchange, b'pull')
 @util.transform_notgit
 def exchangepull(
     orig, repo, remote, heads=None, force=False, bookmarks=(), **kwargs
@@ -227,6 +233,7 @@ def exchangepull(
 
 
 # TODO figure out something useful to do with the newbranch param
+@eh.wrapfunction(exchange, b'push')
 @util.transform_notgit
 def exchangepush(
     orig,
@@ -262,11 +269,3 @@ def exchangepush(
             opargs=None,
             **kwargs,
         )
-
-
-def extsetup(ui):
-    extensions.wrapfunction(hg, b'addbranchrevs', safebranchrevs)
-    extensions.wrapfunction(discovery, b'findcommonoutgoing', findcommonoutgoing)
-    extensions.wrapfunction(bundlerepo, b'getremotechanges', getremotechanges)
-    extensions.wrapfunction(exchange, b'pull', exchangepull)
-    extensions.wrapfunction(exchange, b'push', exchangepush)
