@@ -131,14 +131,9 @@ from . import overlay
 from . import revsets
 from . import schemes
 from . import templates
-from . import util
 
 from mercurial import (
-    bundlerepo,
     demandimport,
-    discovery,
-    exchange,
-    extensions,
     pycompat,
     registrar,
 )
@@ -181,86 +176,4 @@ def reposetup(ui, repo):
     if not isinstance(repo, gitrepo.gitrepo):
         gitdirstate.reposetup(ui, repo)
         hgrepo.reposetup(ui, repo)
-
-
-def findcommonoutgoing(orig, repo, other, *args, **kwargs):
-    if isinstance(other, gitrepo.gitrepo):
-        heads = repo.githandler.get_refs(other.path)[0]
-        kw = {}
-        kw.update(kwargs)
-        for val, k in zip(args,
-                          ('onlyheads', 'force', 'commoninc', 'portable')):
-            kw[k] = val
-        force = kw.get('force', False)
-        commoninc = kw.get('commoninc', None)
-        if commoninc is None:
-            commoninc = discovery.findcommonincoming(repo, other, heads=heads,
-                                                     force=force)
-            kw['commoninc'] = commoninc
-        return orig(repo, other, **kw)
-    return orig(repo, other, *args, **kwargs)
-
-
-extensions.wrapfunction(discovery, b'findcommonoutgoing', findcommonoutgoing)
-
-
-def getremotechanges(orig, ui, repo, other, *args, **opts):
-    if isinstance(other, gitrepo.gitrepo):
-        if args:
-            revs = args[0]
-        else:
-            revs = opts.get('onlyheads', opts.get('revs'))
-        r, c, cleanup = repo.githandler.getremotechanges(other, revs)
-        # ugh. This is ugly even by mercurial API compatibility standards
-        if 'onlyheads' not in orig.__code__.co_varnames:
-            cleanup = None
-        return r, c, cleanup
-    return orig(ui, repo, other, *args, **opts)
-
-
-extensions.wrapfunction(bundlerepo, b'getremotechanges', getremotechanges)
-
-
-@util.transform_notgit
-def exchangepull(orig, repo, remote, heads=None, force=False, bookmarks=(),
-                 **kwargs):
-    if isinstance(remote, gitrepo.gitrepo):
-        pullop = exchange.pulloperation(repo, remote, heads, force,
-                                        bookmarks=bookmarks)
-        pullop.trmanager = exchange.transactionmanager(repo, b'pull',
-                                                       remote.url())
-
-        wlock = repo.wlock()
-        lock = repo.lock()
-        try:
-            pullop.cgresult = repo.githandler.fetch(remote.path, heads)
-            pullop.trmanager.close()
-            return pullop
-        finally:
-            pullop.trmanager.release()
-            lock.release()
-            wlock.release()
-    else:
-        return orig(repo, remote, heads, force, bookmarks=bookmarks, **kwargs)
-
-
-extensions.wrapfunction(exchange, b'pull', exchangepull)
-
-
-# TODO figure out something useful to do with the newbranch param
-@util.transform_notgit
-def exchangepush(orig, repo, remote, force=False, revs=None, newbranch=False,
-                 bookmarks=(), opargs=None, **kwargs):
-    if isinstance(remote, gitrepo.gitrepo):
-        pushop = exchange.pushoperation(repo, remote, force, revs, newbranch,
-                                        bookmarks,
-                                        **pycompat.strkwargs(opargs or {}))
-        pushop.cgresult = repo.githandler.push(remote.path, revs, force)
-        return pushop
-    else:
-        return orig(repo, remote, force, revs, newbranch, bookmarks=bookmarks,
-                    opargs=None, **kwargs)
-
-
-extensions.wrapfunction(exchange, b'push', exchangepush)
 
