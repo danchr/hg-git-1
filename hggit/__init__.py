@@ -123,7 +123,7 @@ from __future__ import generator_stop
 
 # local modules
 from . import commands
-from . import compat
+from . import config
 from . import gitdirstate
 from . import gitrepo
 from . import hgrepo
@@ -135,7 +135,6 @@ from . import templates
 from mercurial import (
     demandimport,
     pycompat,
-    registrar,
 )
 
 demandimport.IGNORES |= {
@@ -149,11 +148,9 @@ minimumhgversion = b'5.2'
 buglink = b'https://foss.heptapod.net/mercurial/hg-git/issues'
 
 cmdtable = commands.cmdtable
-configtable = {}
-configitem = registrar.configitem(configtable)
+configtable = config.configtable
+configitem = config.configitem
 templatekeyword = templates.templatekeyword
-
-compat.registerconfigs(configitem)
 
 
 def getversion():
