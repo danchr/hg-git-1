@@ -142,7 +142,6 @@ from mercurial import (
     exchange,
     extensions,
     hg,
-    manifest,
     pycompat,
     registrar,
     repoview,
@@ -192,6 +191,7 @@ extensions.wrapfunction(hg, b'addbranchrevs', safebranchrevs)
 
 def extsetup(ui):
     commands.extsetup(ui)
+    overlay.extsetup(ui)
     revsets.extsetup(ui)
     schemes.extsetup(ui)
 
@@ -205,10 +205,6 @@ def reposetup(ui, repo):
             dirstate.dirstate = gitdirstate.gitdirstate
 
         hgrepo.reposetup(ui, repo)
-
-
-extensions.wrapfunction(manifest.manifestdict, b'diff',
-                        overlay.wrapmanifestdictdiff)
 
 
 def findcommonoutgoing(orig, repo, other, *args, **kwargs):

@@ -10,6 +10,7 @@ from mercurial import (
     ancestor,
     changelog,
     context,
+    extensions,
     manifest,
     match as matchmod,
     namespaces,
@@ -533,3 +534,7 @@ class overlayrepo(object):
     def narrowmatch(self, *args, **kwargs):
         return self.handler.repo.narrowmatch(*args, **kwargs)
 
+
+def extsetup(ui):
+    extensions.wrapfunction(manifest.manifestdict, b'diff',
+                            wrapmanifestdictdiff)
