@@ -12,12 +12,7 @@ else
     PIPDEPENDS="https://www.mercurial-scm.org/repo/hg/archive/$HG.tar.gz"
 fi
 
-PIPDEPENDS="$PIPDEPENDS dulwich pyflakes"
-
-if test "$PYTHON" -gt 3.5
-then
-    PIPDEPENDS="$PIPDEPENDS black==20.8b1"
-fi
+PIPDEPENDS="$PIPDEPENDS dulwich pyflakes black==20.8b1"
 
 set -xe
 

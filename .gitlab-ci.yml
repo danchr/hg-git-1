@@ -23,7 +23,7 @@ stages:
 
 # First, test with the latest and greatest Mercurial, across the
 # versions Python supported. We generally assume that if e.g. CPython
-# 3.5 and 3.8 work, anything in between will work as well.
+# 3.6 and 3.9 work, anything in between will work as well.
 Latest:
   extends: .base
   stage: current
@@ -31,7 +31,7 @@ Latest:
     matrix:
       - &latest-versions
         PYTHON:
-          - "3.5"
+          - "3.6"
           - "3.9"
         HG:
           - "5.8"
@@ -250,12 +250,8 @@ x86 Wheels:
       - wheelhouse
   parallel:
     matrix:
-      - PLATFORM: manylinux2010_x86_64
-        ABI:
-          - cp27
       - PLATFORM: manylinux2014_x86_64
         ABI:
-          - cp35
           - cp36
           - cp37
           - cp38
@@ -269,7 +265,6 @@ ARM Wheels:
     matrix:
       - PLATFORM: manylinux2014_aarch64
         ABI:
-          - cp35
           - cp36
           - cp37
           - cp38
