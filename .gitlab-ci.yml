@@ -29,7 +29,8 @@ Latest:
   stage: current
   parallel:
     matrix:
-      - PYTHON:
+      - &latest-versions
+        PYTHON:
           - "3.5"
           - "3.9"
         HG:
@@ -50,7 +51,8 @@ Supported:
   retry: 1
   parallel:
     matrix:
-      - PYTHON: "3.9"
+      - &supported-versions
+        PYTHON: "3.9"
         HG:
           - "5.2"
           - "5.3"
@@ -96,7 +98,8 @@ Development:
       allow_failure: false
   parallel:
     matrix:
-      - PYTHON:
+      - &development-versions
+        PYTHON:
           - "3.9"
         HG:
           - "stable"
@@ -104,7 +107,7 @@ Development:
 
 # Build images for the above tasks; this should be a scheduled job, as
 # it is quite unnecessary to run on every invocation.
-Release images:
+CI images:
   stage: images
   tags:
     - container-registry-push
@@ -136,31 +139,9 @@ Release images:
       --destination registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
   parallel:
     matrix:
-      - PYTHON:
-          - "3.9"
-        HG:
-          - "5.2"
-          - "5.3"
-          - "5.4"
-          - "5.5"
-          - "5.6"
-          - "5.7"
-      - PYTHON:
-          - "3.5"
-          - "3.9"
-        HG:
-          - "5.8"
-
-# Build branch images; factored out so it may be invoked separately
-Current images:
-  extends: Release images
-  parallel:
-    matrix:
-      - PYTHON:
-          - "3.9"
-        HG:
-          - "default"
-          - "stable"
+      - *latest-versions
+      - *supported-versions
+      - *development-versions
 
 # Builds the image used by tests/test-networking.t
 Git service image:
