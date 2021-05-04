@@ -146,6 +146,8 @@ CI images:
 # Builds the image used by tests/test-networking.t
 Git service image:
   stage: images
+  tags:
+    - container-registry-push
   rules:
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
     - if: '$CI_BUILD_IMAGES == "1"'
