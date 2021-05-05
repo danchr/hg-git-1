@@ -88,6 +88,8 @@ So, that went well; now push...
   $ hg add thefile
   $ fn_hg_commit -m 'add the file'
   $ hg book -r tip master
+  $ hg path default
+  git@git-server:/srv/repo.git
   $ hg push
   Warning: Permanently added * (glob) (?)
   pushing to git@git-server:/srv/repo.git

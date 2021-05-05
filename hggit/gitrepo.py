@@ -1,9 +1,9 @@
 from __future__ import generator_stop
 
 from .util import isgitsshuri
+from . import compat
 from mercurial import (
     error,
-    util
 )
 from mercurial.wireprotov1peer import (
         batchable,
@@ -140,5 +140,5 @@ def islocal(path):
     if isgitsshuri(path):
         return True
 
-    u = util.url(path)
+    u = compat.url(path)
     return not u.scheme or u.scheme == b'file'

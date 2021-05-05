@@ -33,6 +33,7 @@ from mercurial import (
 )
 
 from . import _ssh
+from . import compat
 from . import git2hg
 from . import hg2git
 from . import util
@@ -1851,7 +1852,7 @@ class GitHandler(object):
 
             # not available in dulwich 0.19, used on Python 2.7
             if hasattr(client, 'get_credentials_from_store'):
-                urlobj = hgutil.url(uri)
+                urlobj = compat.url(uri)
                 auth = client.get_credentials_from_store(
                     urlobj.scheme,
                     urlobj.host,
@@ -1885,7 +1886,7 @@ class GitHandler(object):
             )
 
         if uri.startswith(b'file://'):
-            return client.LocalGitClient(), hgutil.url(uri).path
+            return client.LocalGitClient(), compat.url(uri).path
 
         # if its not git or git+ssh, try a local url..
         return client.SubprocessGitClient(), uri

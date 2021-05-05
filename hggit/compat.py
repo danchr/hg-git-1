@@ -4,7 +4,20 @@ from mercurial.i18n import _
 from mercurial import (
     error,
     pycompat,
+    ui,
+    util as hgutil,
 )
+
+try:
+    # added in 5.8
+    from mercurial.utils import urlutil
+
+    url = urlutil.url
+    path = urlutil.path
+except ImportError:
+    urlutil = hgutil
+    url = hgutil.url
+    path = ui.path
 
 try:
     from mercurial.cmdutil import check_at_most_one_arg
