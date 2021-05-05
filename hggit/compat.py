@@ -3,10 +3,27 @@ from __future__ import generator_stop
 from mercurial.i18n import _
 from mercurial import (
     error,
+    node,
     pycompat,
     ui,
     util as hgutil,
 )
+
+try:
+    # added in 5.9
+    from mercurial.node import sha1nodeconstants
+except ImportError:
+    class sha1nodeconstants(object):
+        nodelen = len(node.nullid)
+
+        nullid = node.nullid
+        nullhex = node.nullhex
+        newnodeid = node.newnodeid
+        addednodeid = node.addednodeid
+        modifiednodeid = node.modifiednodeid
+        wdirfilenodeids = node.wdirfilenodeids
+        wdirid = node.wdirid
+        wdirhex = node.wdirhex
 
 try:
     # added in 5.8

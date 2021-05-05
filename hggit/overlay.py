@@ -19,6 +19,9 @@ from mercurial import (
 from mercurial.utils import stringutil
 from mercurial.node import bin, hex, nullid
 
+from . import compat
+
+
 def _maybehex(n):
     if len(n) == 20:
         return hex(n)
@@ -435,6 +438,7 @@ class overlayrepo(object):
 
         self.changelog = overlaychangelog(self, handler.repo.changelog)
         self.manifestlog = overlaymanifestlog(self)
+        self.nodeconstants = compat.sha1nodeconstants
 
         # for incoming -p
         self.root = handler.repo.root
