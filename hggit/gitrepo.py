@@ -3,7 +3,6 @@ from __future__ import absolute_import, print_function
 from .util import isgitsshuri
 from mercurial import (
     error,
-    util
 )
 
 from . import compat
@@ -158,5 +157,5 @@ def islocal(path):
     if isgitsshuri(path):
         return True
 
-    u = util.url(path)
+    u = compat.url(path)
     return not u.scheme or u.scheme == b'file'

@@ -127,7 +127,6 @@ from mercurial import (
     exchange,
     extensions,
     hg,
-    ui as hgui,
     util as hgutil,
     localrepo,
     manifest,
@@ -200,7 +199,7 @@ def _isgitdir(path):
 
 
 def _local(path):
-    p = hgutil.url(path).localpath()
+    p = compat.url(path).localpath()
     if _isgitdir(p):
         return gitrepo
     # detect git ssh urls (which mercurial thinks is a file-like path)
@@ -520,9 +519,15 @@ def isvalidlocalpath(orig, self, path):
     return orig(self, path) or _isgitdir(path)
 
 
-if (hgutil.safehasattr(hgui, b'path') and
-    hgutil.safehasattr(hgui.path, b'_isvalidlocalpath')):
-    extensions.wrapfunction(hgui.path, b'_isvalidlocalpath', isvalidlocalpath)
+extensions.wrapfunction(compat.path, b'_isvalidlocalpath', isvalidlocalpath)
+
+
+def isurllocal(orig, path):
+    # recognise git scp-style paths when cloning
+    return orig(path) and not util.isgitsshuri(path._origpath)
+
+
+extensions.wrapfunction(compat.url, b'islocal', isurllocal)
 
 
 def islocal(orig, path):
@@ -538,7 +543,7 @@ def hasscheme(orig, path):
     return orig(path) or util.isgitsshuri(path)
 
 
-extensions.wrapfunction(hgutil, b'hasscheme', hasscheme)
+extensions.wrapfunction(compat.urlutil, b'hasscheme', hasscheme)
 
 
 @util.transform_notgit
