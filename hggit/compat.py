@@ -7,6 +7,7 @@ from mercurial import (
     context,
     error,
     hg,
+    node,
     pycompat,
     templatekw,
     ui,
@@ -47,6 +48,24 @@ except ImportError:
     assert not pycompat.ispy3
     iteritems = lambda x: x.iteritems()
     itervalues = lambda x: x.itervalues()
+
+try:
+    # added in 5.9
+    from mercurial.node import sha1nodeconstants
+except ImportError:
+    class sha1nodeconstants(object):
+        nodelen = len(node.nullid)
+
+        nullid = node.nullid
+        nullhex = node.nullhex
+        newnodeid = node.newnodeid
+        addednodeid = node.addednodeid
+        modifiednodeid = node.modifiednodeid
+        # added in 4.6
+        if hasattr(node, 'wdirfilenodeids'):
+            wdirfilenodeids = node.wdirfilenodeids
+        wdirid = node.wdirid
+        wdirhex = node.wdirhex
 
 try:
     # added in 5.8

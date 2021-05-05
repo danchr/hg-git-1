@@ -436,6 +436,7 @@ class overlayrepo(object):
 
         self.changelog = overlaychangelog(self, handler.repo.changelog)
         self.manifestlog = overlaymanifestlog(self)
+        self.nodeconstants = compat.sha1nodeconstants
 
         # for incoming -p
         self.root = handler.repo.root
