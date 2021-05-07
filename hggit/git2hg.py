@@ -28,6 +28,28 @@ def get_public(ui, refs, remote_names):
         # paths became lists in mercurial 5.9
         paths = list(itertools.chain.from_iterable(paths))
 
+    # we may have multiple paths listed, so parse their configuration
+    # and deduplicate it
+    configs = {path.hggit_publish for path in paths}
+
+    # and if we find more then one, we don't know which is correct
+    # (but if we actually had the original path object somehow, we
+    # wouldn't have to do this)
+    if len(configs) > 1:
+        raise error.Abort(
+            b'different publishing configurations for the same remote '
+            b'location',
+            hint=(b'conflicting paths: ' + b", ".join(sorted(remote_names))),
+        )
+
+    if configs and configs != {None}:
+        cfg = configs.pop()
+
+    use_phases, publish_defaults, refs_to_publish = cfg
+
+    if not use_phases:
+        return {}
+
     to_publish = set()
 
     use_phases, publish_defaults, refs_to_publish = cfg

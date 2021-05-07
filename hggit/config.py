@@ -3,6 +3,9 @@ from __future__ import generator_stop
 import collections
 
 from mercurial import exthelper
+from mercurial.utils import stringutil
+
+from . import compat
 
 eh = exthelper.exthelper()
 
@@ -43,3 +46,18 @@ def get_publishing_option(ui):
     refs = set(ui.configlist(b'git', b'public'))
 
     return publishoption(ui.configbool(b'hggit', b'usephases'), not refs, refs)
+
+
+@eh.extsetup
+def extsetup(ui):
+    @compat.pathsuboption(b'hg-git.publish', b'hggit_publish')
+    def pathsuboption(ui, path, value):
+        b = stringutil.parsebool(value)
+        if b is True:
+            return publishoption(True, True, frozenset())
+        elif b is False:
+            return publishoption(False, False, frozenset())
+        else:
+            return publishoption(
+                True, False, frozenset(compat.parselist(value))
+            )

@@ -19,6 +19,13 @@ Enhancements:
 * Pushing an unknown bookmark with the ``-B/--bookmark`` option now
   has the same effect as when pushing to a Mercurial repository, and
   will delete the remote Git branch.
+* You can now specify what to publish with the ``paths`` section. For
+  example::
+
+    [paths]
+    default = https://github.com/example/test
+    default:pushurl = git+ssh://git@github.com/example
+    default:hg-git.publish = yes
 
 hg-git 1.0.0 (2022-04-01)
 =========================
