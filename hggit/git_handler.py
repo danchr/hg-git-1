@@ -1330,13 +1330,14 @@ class GitHandler(object):
                 else:
                     r = [pair[0] for pair in stripped_refs if pair[1] == h]
                     if not r:
-                        raise error.Abort(b"ref %s not found on remote server"
-                                          % h)
+                        msg = _(b"unknown revision '%s'") % h
+                        raise error.RepoLookupError(msg)
                     elif len(r) == 1:
                         filteredrefs.append(r[0])
                     else:
-                        raise error.Abort(b"ambiguous reference %s: %r"
-                                          % (h, r))
+                        msg = _(b"ambiguous reference %s: %s")
+                        msg %= (h, b', '.join(sorted(r)),)
+                        raise error.RepoLookupError(msg)
         else:
             for ref, sha in refs.items():
                 if (not ref.endswith(b'^{}') and
