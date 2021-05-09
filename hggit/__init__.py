@@ -143,11 +143,13 @@ try:
     demandimport.IGNORES |= {
         b'collections',
         b'brotli',  # only needed in Python 2.7
+        b'ipaddress',  # only needed in Python 2.7
     }
 except AttributeError:  # pre 4.7 API
     demandimport.ignore.extend([
         b'collections',
         b'brotli',
+        b'ipaddress',
     ])
 
 __version__ = b'0.10.0'
