@@ -65,16 +65,11 @@ Create a Mercurial clone
 
   $ hg clone -U git.bare hg
   importing git objects into hg
-NB: this is wrong
   $ hg outgoing -R hg
   comparing with $TESTTMP/git.bare
   searching for changes
-  changeset:   2:7b35eb0afb3f
-  tag:         the_tag
-  user:        test <test@example.org>
-  date:        Mon Jan 01 00:00:12 2007 +0000
-  summary:     add foo3
-  
+  no changes found
+  [1]
   $ hg push --debug -R hg | grep -e reference -e found
   unchanged reference default::refs/heads/master => GIT:996e5084
   unchanged reference default::refs/tags/the_tag => GIT:e4338156
@@ -105,11 +100,10 @@ them (#358)
   list of commits:
   added 1 commits with 1 trees and 0 blobs
   unchanged reference default::refs/heads/master => GIT:996e5084
-  adding reference default::refs/tags/the_tag => GIT:e1285232
+  adding reference default::refs/tags/the_tag => GIT:e4338156
   $ cd ../git
   $ git fetch
   From $TESTTMP/git.bare
    * [new tag]         the_tag    -> the_tag
-NB: this is wrong
   $ git tag -ln
-  the_tag         add foo3
+  the_tag         Tag message

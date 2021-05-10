@@ -404,12 +404,30 @@ class GitHandler(object):
 
             changed_refs = [ref for ref, sha in compat.iteritems(new_refs)
                             if sha != old_refs.get(ref)]
-            new = [bin(self.map_hg_get(new_refs[ref])) for ref in changed_refs]
+
+            new = [
+                bin(sha) for sha in map(self.map_hg_get, changed_refs) if sha
+            ]
             old = {}
-            for r in old_refs:
-                old_ref = self.map_hg_get(old_refs[r])
-                if old_ref:
-                    old[bin(old_ref)] = 1
+
+            for ref, sha in compat.iteritems(old_refs):
+                try:
+                    gittag = self.git.get_object(sha)
+                except KeyError:
+                    gittag = None
+
+                # make sure we don't accidentally dereference and lose
+                # annotated tags
+                if isinstance(gittag, Tag):
+                    sha = gittag.object[1]
+
+                old_target = self.map_hg_get(sha)
+
+                if old_target:
+                    self.ui.debug(b'unchanged ref %s: %s\n' % (ref, old_target))
+                    old[bin(old_target)] = 1
+                else:
+                    self.ui.debug(b'changed ref %s\n' % (ref))
 
             return old, new
         except (HangupException, GitProtocolError) as e:
@@ -1192,7 +1210,11 @@ class GitHandler(object):
 
             for ref in rev_refs:
                 if ref not in refs:
-                    new_refs[ref] = self.map_git_get(ctx.hex())
+                    gitobj = self.git.get_object(self.git.refs[ref])
+                    if isinstance(gitobj, Tag):
+                        new_refs[ref] = gitobj.id
+                    else:
+                        new_refs[ref] = self.map_git_get(ctx.hex())
                 elif new_refs[ref] in self._map_git:
                     rctx = unfiltered[self.map_hg_get(new_refs[ref])]
                     if rctx.ancestor(ctx) == rctx or force:
