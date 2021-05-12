@@ -85,7 +85,7 @@ Development:
   rules:
     # we don't want to prevent merging unrelated work, so allow
     # failures for normal builds
-    - if: '$CI_PIPELINE_SOURCE != "schedule"'
+    - if: '$CI_COMMIT_BRANCH'
       allow_failure: true
     # but disallow them for scheduled builds, so we get a nice
     # notification
