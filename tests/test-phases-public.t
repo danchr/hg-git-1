@@ -90,7 +90,7 @@ pulling publishes the branch
   3: draft
   2: draft
 
-public bookmark not pushed is incorrectly published after pull
+public bookmark not pushed is not published after pull
 
   $ hg update 0
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -106,14 +106,12 @@ public bookmark not pushed is incorrectly published after pull
   no changes found
   $ hg phase -r 'all()' > $TESTTMP/after
   $ cmp -s $TESTTMP/before $TESTTMP/after
-  [1]
-NB: this is wrong
   $ hg phase -r not-pushed
-  4: public
-  $ hg phase -fd not-pushed
+  4: draft
   $ rm $TESTTMP/before $TESTTMP/after
 
-pushing public bookmark does not publish local changesets, yet
+pushing public bookmark publishes local changesets, but only those
+actually pushed
 
   $ hg update master
   1 files updated, 0 files merged, 1 files removed, 0 files unresolved
@@ -144,4 +142,5 @@ pushing public bookmark does not publish local changesets, yet
   $ diff $TESTTMP/before $TESTTMP/after | tr '<>' '-+'
 NB: we'd expect this to be published
   $ hg phase -r master
-  5: draft
+  5: draft (publish-defaults !)
+  5: public (publish-specific !)

@@ -345,17 +345,6 @@ class GitHandler(object):
 
         self.save_map(self.map_file)
 
-        # also mark public any branches the user specified
-        blist = [self.repo._bookmarks[branch] for branch in
-                 self.ui.configlist(b'git', b'public')]
-        if rnode and self.ui.configbool(b'hggit', b'usephases'):
-            blist.append(rnode)
-
-        if blist:
-            with self.repo.lock(), self.repo.transaction(b"phase") as tr:
-                phases.advanceboundary(self.repo, tr, phases.public,
-                                       blist)
-
         if imported == 0:
             return 0
 
@@ -1560,6 +1549,7 @@ class GitHandler(object):
 
     def update_remote_branches(self, remote_name, refs):
         remote_refs = self.remote_refs
+
         if self.ui.configbool(b'git', b'pull-prune-remote-branches'):
             # since we re-write all refs for this remote each time,
             # prune all entries matching this remote from our refs
@@ -1571,19 +1561,49 @@ class GitHandler(object):
                     if LOCAL_BRANCH_PREFIX + t[len(remote_name) + 1:] not in refs:
                         del self.git.refs[REMOTE_BRANCH_PREFIX + t]
 
+        use_phases = self.ui.configbool(b'hggit', b'usephases')
+        refs_to_publish = self.ui.configlist(b'git', b'public')
+
+        # if nothing is requested, fall back to defaults, meaning HEAD
+        publish_defaults = use_phases and not refs_to_publish
+
+        nodeids_to_publish = []
+
         for ref_name, sha in refs.items():
-            if ref_name.startswith(LOCAL_BRANCH_PREFIX):
-                hgsha = self.map_hg_get(sha)
-                if hgsha is None or hgsha not in self.repo:
-                    continue
+            hgsha = self.map_hg_get(sha)
+
+            if (
+                ref_name.startswith(LOCAL_BRANCH_PREFIX) and
+                hgsha is not None and hgsha in self.repo
+            ):
                 head = ref_name[11:]
-                remote_refs[b'/'.join((remote_name, head))] = bin(hgsha)
+                remote_head = b'/'.join((remote_name, head))
+
+                # mark public any branches the user specified
+                if head in refs_to_publish:
+                    self.ui.note(
+                        b'publishing remote branch %s\n' % remote_head,
+                    )
+                    nodeids_to_publish.append(bin(hgsha))
+
+                remote_refs[remote_head] = bin(hgsha)
                 # TODO(durin42): what is this doing?
-                new_ref = b'%s%s/%s' % (REMOTE_BRANCH_PREFIX, remote_name, head)
+                new_ref = REMOTE_BRANCH_PREFIX + remote_head
                 self.git.refs[new_ref] = sha
             elif (ref_name.startswith(LOCAL_TAG_PREFIX) and not
                   ref_name.endswith(b'^{}')):
                 self.git.refs[ref_name] = sha
+            elif (
+                ref_name == b'HEAD' and publish_defaults and hgsha is not None
+            ):
+                    self.ui.note(b'publishing remote HEAD\n')
+                    nodeids_to_publish.append(bin(hgsha))
+
+        if use_phases and nodeids_to_publish:
+            with self.repo.lock(), self.repo.transaction(b"phase") as tr:
+                phases.advanceboundary(
+                    self.repo, tr, phases.public, nodeids_to_publish,
+                )
 
     # UTILITY FUNCTIONS
 
