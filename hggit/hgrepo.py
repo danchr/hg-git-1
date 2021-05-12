@@ -25,9 +25,10 @@ def generate_repo_subclass(baseclass):
             (tags, tagtypes) = super(hgrepo, self)._findtags()
 
             for tag, rev in self.githandler.tags.items():
-                assert isinstance(tag, bytes)
-                tags[tag] = bin(rev)
-                tagtypes[tag] = b'git'
+                if tag not in tags:
+                    assert isinstance(tag, bytes)
+                    tags[tag] = bin(rev)
+                    tagtypes[tag] = b'git'
             for tag, rev in self.githandler.remote_refs.items():
                 assert isinstance(tag, bytes)
                 tags[tag] = rev
