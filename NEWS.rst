@@ -14,6 +14,22 @@ Other changes:
 * TBD
 
 
+hg-git 0.10.1 (2020-05-12)
+==========================
+
+This is a minor release, focusing on bugs and compatibility.
+
+Enhancements:
+
+* Add support for Mercurial 5.8.
+
+Bug fixes:
+
+* Fix some documentation issues.
+* Don't overwrite annotated tags on push.
+* Fix an issue where pushing a repository without any bookmarks would
+  push secret changesets.
+
 hg-git 0.10.0 (2020-02-01)
 ==========================
 

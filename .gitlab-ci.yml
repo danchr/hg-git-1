@@ -33,7 +33,7 @@ Latest:
           - "3.5"
           - "3.9"
         HG:
-          - "5.7"
+          - "5.8"
 
 # This is the authoritative list of versions of Mercurial that this
 # extension is supported and tested with; it should be kept in sync
@@ -57,6 +57,7 @@ Supported:
           - "5.4"
           - "5.5"
           - "5.6"
+          - "5.7"
 
 # Test that it is possible to use and run hg-git on Ubuntu without
 # compiling any C code, i.e. with stock Dulwich, Mercurial and
@@ -73,7 +74,9 @@ Ubuntu:
         apt-get -qq install --no-install-recommends
         gnupg gnupg-agent git unzip ssh
         mercurial python3-dulwich python3-setuptools pyflakes3
-      - python3 tests/run-tests.py -v --xunit $PWD/tests-ubuntu.xml --color=always
+      - >
+        python3 tests/run-tests.py -v
+        --xunit $PWD/tests-ubuntu.xml --color=always --timeout 300
     artifacts:
       reports:
         junit: tests-ubuntu.xml
@@ -105,8 +108,9 @@ Release images:
   stage: images
   tags:
     - container-registry-push
-  only:
-    - schedules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_BUILD_IMAGES == "1"'
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -127,7 +131,6 @@ Release images:
       --dockerfile $CI_PROJECT_DIR/contrib/docker/Dockerfile.alpine
       --build-arg PYTHON=$PYTHON
       --build-arg HG=$HG
-      --reproducible
       --single-snapshot
       --cleanup
       --destination registry.heptapod.net:443/mercurial/hg-git/ci:py$PYTHON-hg-$HG
@@ -140,17 +143,17 @@ Release images:
           - "5.3"
           - "5.4"
           - "5.5"
+          - "5.6"
+          - "5.7"
       - PYTHON:
           - "3.5"
           - "3.9"
         HG:
-          - "5.6"
+          - "5.8"
 
 # Build branch images; factored out so it may be invoked separately
 Current images:
   extends: Release images
-  only:
-    - schedules
   parallel:
     matrix:
       - PYTHON:
@@ -162,8 +165,9 @@ Current images:
 # Builds the image used by tests/test-networking.t
 Git service image:
   stage: images
-  only:
-    - schedules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_BUILD_IMAGES == "1"'
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]

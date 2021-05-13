@@ -160,7 +160,7 @@ demandimport.IGNORES |= {
 
 __version__ = b'0.11.0dev'
 
-testedwith = (b'5.2 5.3 5.4 5.5 5.6 5.7')
+testedwith = (b'5.2 5.3 5.4 5.5 5.6 5.7 5.8')
 minimumhgversion = b'5.2'
 buglink = b'https://foss.heptapod.net/mercurial/hg-git/issues'
 
