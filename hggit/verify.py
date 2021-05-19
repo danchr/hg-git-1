@@ -38,6 +38,13 @@ def verify(ui, repo, hgctx):
     except KeyError:
         raise error.Abort(_(b'git equivalent %s for rev %s not found!') %
                           (gitsha, hgctx))
+    except Exception:
+        ui.traceback()
+        raise error.Abort(
+            _(b'git equivalent %s for rev %s is corrupt!') % (gitsha, hgctx),
+            hint=b're-run with --traceback for details',
+        )
+
     if not isinstance(gitcommit, Commit):
         raise error.Abort(_(b'git equivalent %s for rev %s is not a commit!') %
                           (gitsha, hgctx))

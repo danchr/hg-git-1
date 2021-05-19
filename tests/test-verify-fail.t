@@ -81,3 +81,8 @@ corrupt git repository
   $ hg gverify
   abort: git equivalent 6dff77b710b6f0961ac0b6d91d85902195133d74 for rev 5c2eb98af3e2 is not a commit!
   [255]
+  $ echo 42 > .hg/git/objects/6d/ff77b710b6f0961ac0b6d91d85902195133d74
+  $ hg gverify
+  abort: git equivalent 6dff77b710b6f0961ac0b6d91d85902195133d74 for rev 5c2eb98af3e2 is corrupt!
+  (re-run with --traceback for details)
+  [255]
