@@ -15,6 +15,8 @@ import os
 from . import compat
 from . import verify
 
+from dulwich import porcelain
+
 from mercurial.node import hex, nullhex
 from mercurial.i18n import _
 from mercurial import (
@@ -75,9 +77,14 @@ def gitdir(ui, repo):
     repo.ui.write(os.path.normpath(repo.githandler.gitdir), b'\n')
 
 
-@eh.command(b'gverify',
-         [(b'r', b'rev', b'', _(b'revision to verify'), _(b'REV'))],
-         _(b'[-r REV]'))
+@eh.command(
+    b'gverify',
+    [
+        (b'r', b'rev', b'', _(b'revision to verify'), _(b'REV')),
+        (b'c', b'fsck', False, _(b'verify repository integrity as well')),
+    ],
+    _(b'[-r REV]'),
+)
 def gverify(ui, repo, **opts):
     '''verify that a Mercurial rev matches the corresponding Git rev
 
@@ -86,6 +93,11 @@ def gverify(ui, repo, **opts):
     the corresponding Git revision.
 
     '''
+
+    if opts.get('fsck'):
+        for badsha, e in porcelain.fsck(repo.githandler.git):
+            raise error.Abort(b'git repository is corrupt!')
+
     ctx = scmutil.revsingle(repo, opts.get('rev'), b'.')
     return verify.verify(ui, repo, ctx)
 

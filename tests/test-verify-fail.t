@@ -68,3 +68,16 @@ this gets the tree pointed to by the commit at HEAD
   $ hg gverify
   abort: git equivalent f477b00e4a9907617f346a529cc0fe9ba5d6f6d3 for rev 5c2eb98af3e2 is not a commit!
   [255]
+
+corrupt git repository
+
+  $ hg gclear
+  clearing out the git cache data
+  $ hg gexport
+  $ mv .hg/git/objects/82/166b4cbde0f025d20aacb93fd085aa1462cd4e .hg/git/objects/6d/ff77b710b6f0961ac0b6d91d85902195133d74
+  $ hg gverify --fsck
+  abort: git repository is corrupt!
+  [255]
+  $ hg gverify
+  abort: git equivalent 6dff77b710b6f0961ac0b6d91d85902195133d74 for rev 5c2eb98af3e2 is not a commit!
+  [255]
