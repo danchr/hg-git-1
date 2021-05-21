@@ -200,7 +200,7 @@ class GitHandler(object):
         self.author_map = {}
         authors_path = compat.config(self.ui, b'string', b'git', b'authors')
         if authors_path:
-            with open(self.repo.wvfs.join(authors_path)) as f:
+            with open(self.repo.wvfs.join(authors_path), 'rb') as f:
                 for line in f:
                     line = line.strip()
                     if not line or line.startswith(b'#'):
