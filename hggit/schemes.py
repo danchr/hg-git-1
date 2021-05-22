@@ -27,7 +27,6 @@ eh = exthelper.exthelper()
 # support for `hg clone localgitrepo`
 _oldlocal = hg.schemes[b'file']
 
-hgdefaultdest = hg.defaultdest
 
 def isgitdir(path):
     """True if the given file path is a git repo."""
@@ -70,15 +69,12 @@ def _httpgitwrapper(orig):
     return httpgitscheme
 
 
-def defaultdest(source):
-    for scheme in util.gitschemes:
-        if source.startswith(b'%s://' % scheme) and source.endswith(b'.git'):
-            return hgdefaultdest(source[:-4])
-
+@eh.wrapfunction(hg, b'defaultdest')
+def defaultdest(orig, source):
     if source.endswith(b'.git'):
-        return hgdefaultdest(source[:-4])
+        return orig(source[:-4])
 
-    return hgdefaultdest(source)
+    return orig(source)
 
 
 @eh.wrapfunction(hg, b'peer')
@@ -118,8 +114,6 @@ def extsetup(ui):
     hg.schemes[b'https'] = _httpgitwrapper(hg.schemes[b'https'])
     hg.schemes[b'http'] = _httpgitwrapper(hg.schemes[b'http'])
     hg.schemes[b'file'] = _local
-
-    hg.defaultdest = defaultdest
 
     # support for `hg clone git://github.com/defunkt/facebox.git`
     # also hg clone git+ssh://git@github.com/schacon/simplegit.git
