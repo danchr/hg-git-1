@@ -1756,11 +1756,14 @@ class GitHandler(object):
         return []
 
     def remote_name(self, remote, push):
-        for path in compat.itervalues(self.ui.paths):
-            if push and path.pushloc == remote:
-                return path.name
-            if path.loc == remote:
-                return path.name
+        for name, paths in compat.iteritems(self.ui.paths):
+            # paths became lists in mercurial 5.9
+            if not isinstance(paths, list):
+                paths = [paths]
+
+            for path in paths:
+                if push and path.pushloc == remote or path.loc == remote:
+                    return name
 
     def audit_hg_path(self, path):
         if b'.hg' in path.split(b'/'):
