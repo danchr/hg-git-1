@@ -23,8 +23,10 @@ Create two commits, one secret:
   $ touch beta
   $ hg add beta
   $ fn_hg_commit --secret -m beta
+  $ hg book -r . secret
   $ hg push
   pushing to $TESTTMP/repo.git
+  warning: not exporting secret bookmark 'secret'
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
@@ -32,6 +34,7 @@ Create two commits, one secret:
   $ cd ..
   $ hg -R hgrepo log --graph --template phases
   @  changeset:   1:62966756ea96
+  |  bookmark:    secret
   |  tag:         tip
   |  phase:       secret
   |  user:        test
@@ -46,6 +49,15 @@ Create two commits, one secret:
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     alpha
   
+
+What happens when we push the secret?
+
+  $ hg -R hgrepo push -B secret
+  pushing to $TESTTMP/repo.git
+  warning: not exporting secret bookmark 'secret'
+  searching for changes
+  abort: revision 62966756ea96 cannot be pushed since it doesn't have a bookmark
+  [255]
 
 Only one changeset was pushed:
 

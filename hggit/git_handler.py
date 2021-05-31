@@ -1491,16 +1491,18 @@ class GitHandler(object):
                 self.git.refs[tag_refname] = target
                 self.tags[tag] = hex(sha)
 
-    def _filter_for_bookmarks(self, bms):
+    def get_filtered_bookmarks(self):
+        bms = self.repo._bookmarks
+
         if not self.branch_bookmark_suffix:
-            return [(bm, bm) for bm in bms]
+            return [(bm, bm, n) for bm, n in bms.items()]
         else:
             def _filter_bm(bm):
                 if bm.endswith(self.branch_bookmark_suffix):
                     return bm[0:-(len(self.branch_bookmark_suffix))]
                 else:
                     return bm
-            return [(_filter_bm(bm), bm) for bm in bms]
+            return [(_filter_bm(bm), bm, n) for bm, n in bms.items()]
 
     def get_exportable(self):
         class heads_tags(object):
@@ -1516,11 +1518,16 @@ class GitHandler(object):
 
         res = collections.defaultdict(heads_tags)
 
-        bms = self.repo._bookmarks
-        for filtered_bm, bm in self._filter_for_bookmarks(bms):
+        for filtered_bm, bm, node in self.get_filtered_bookmarks():
             ref_name = LOCAL_BRANCH_PREFIX + filtered_bm
-            if check_ref_format(ref_name):
-                res[hex(bms[bm])].heads.add(ref_name)
+            if node not in self.repo.filtered(b'served'):
+                # technically, we don't _know_ that it's secret,
+                # but it's a very good guess
+                self.repo.ui.warn(
+                    b"warning: not exporting secret bookmark '%s'\n" % bm
+                )
+            elif check_ref_format(ref_name):
+                res[hex(node)].heads.add(ref_name)
             else:
                 self.repo.ui.warn(b"warning: not exporting bookmark '%s' "
                                   b"due to invalid name\n" % bm)
