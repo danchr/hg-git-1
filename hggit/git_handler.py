@@ -347,16 +347,9 @@ class GitHandler(object):
             blist.append(rnode)
 
         if blist:
-            lock = self.repo.lock()
-            try:
-                tr = self.repo.transaction(b"phase")
+            with self.repo.lock(), self.repo.transaction(b"phase") as tr:
                 phases.advanceboundary(self.repo, tr, phases.public,
                                        blist)
-                tr.close()
-            finally:
-                if tr is not None:
-                    tr.release()
-                lock.release()
 
         if imported == 0:
             return 0
