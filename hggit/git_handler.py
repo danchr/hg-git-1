@@ -1675,7 +1675,9 @@ class GitHandler(object):
                         changes.append((head + suffix, hgsha))
 
             if changes:
-                util.updatebookmarks(self.repo, changes)
+                with self.repo.wlock(), self.repo.lock():
+                    with self.repo.transaction(b"hg-git") as tr:
+                        bms.applychanges(self.repo, tr, changes)
 
         except AttributeError:
             self.ui.warn(_(b'creating bookmarks failed, do you have'

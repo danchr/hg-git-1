@@ -10,7 +10,6 @@ from dulwich import errors
 from mercurial.i18n import _
 from mercurial import (
     error,
-    lock as lockmod,
     util as hgutil,
 )
 
@@ -100,20 +99,6 @@ def isgitsshuri(uri):
         if re.match(fqdn_re, giturl):
             return True
     return False
-
-
-def updatebookmarks(repo, changes, name=b'git_handler'):
-    """abstract writing bookmarks for backwards compatibility"""
-    bms = repo._bookmarks
-    tr = lock = wlock = None
-    try:
-        wlock = repo.wlock()
-        lock = repo.lock()
-        tr = repo.transaction(name)
-        bms.applychanges(repo, tr, changes)
-        tr.close()
-    finally:
-        lockmod.release(tr, lock, wlock)
 
 
 def checksafessh(host):
