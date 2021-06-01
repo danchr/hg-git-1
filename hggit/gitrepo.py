@@ -218,16 +218,9 @@ def exchangepull(
             repo, b'pull', remote.url()
         )
 
-        wlock = repo.wlock()
-        lock = repo.lock()
-        try:
+        with repo.wlock(), repo.lock(), pullop.trmanager:
             pullop.cgresult = repo.githandler.fetch(remote.path, heads)
-            pullop.trmanager.close()
             return pullop
-        finally:
-            pullop.trmanager.release()
-            lock.release()
-            wlock.release()
     else:
         return orig(repo, remote, heads, force, bookmarks=bookmarks, **kwargs)
 
