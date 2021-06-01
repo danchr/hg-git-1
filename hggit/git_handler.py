@@ -599,7 +599,8 @@ class GitHandler(object):
                 else:
                     timezone = -int(timezone)
                 commit.commit_timezone = timezone
-            except:    # extra is essentially user-supplied, we must be careful
+            except ValueError:
+                self.ui.traceback()
                 self.set_commiter_from_author(commit)
         else:
             self.set_commiter_from_author(commit)
