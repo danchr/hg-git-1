@@ -99,12 +99,8 @@ class gitdirstate(dirstate.dirstate):
                 files.append(util.expandpath(path))
         patterns = []
         # Only use .gitignore if there's no .hgignore
-        try:
-            fp = open(files[0], 'rb')
-            fp.close()
-        except:
-            fns = self._finddotgitignores()
-            for fn in fns:
+        if not os.access(files[0], os.R_OK):
+            for fn in self._finddotgitignores():
                 d = os.path.dirname(fn)
                 fn = self.pathto(fn)
                 if not os.path.exists(fn):
