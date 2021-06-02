@@ -17,6 +17,13 @@ def reposetup(ui, repo):
     if isinstance(repo, gitrepo):
         return
 
+    if hasattr(repo, '_wlockfreeprefix'):
+        repo._wlockfreeprefix |= {
+            GitHandler.map_file,
+            GitHandler.remote_refs_file,
+            GitHandler.tags_file,
+        }
+
     class hgrepo(repo.__class__):
         @util.transform_notgit
         def findoutgoing(self, remote, base=None, heads=None, force=False):

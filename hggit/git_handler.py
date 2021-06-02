@@ -240,7 +240,7 @@ class GitHandler(object):
     def save_map(self, map_file):
         self.ui.debug(_(b"saving git map to %s\n") % self.vfs.join(map_file))
 
-        with self.store_repo.wlock():
+        with self.repo.lock():
             map_hg = self._map_hg
             with self.vfs(map_file, b'wb+', atomictemp=True) as buf:
                 bwrite = buf.write
@@ -255,7 +255,7 @@ class GitHandler(object):
                 self.tags[name] = sha
 
     def save_tags(self):
-        with self.repo.wlock(), self.store_repo.wlock():
+        with self.repo.lock():
             with self.vfs(self.tags_file, b'w+', atomictemp=True) as fp:
                 for name, sha in sorted(self.tags.items()):
                     if not self.repo.tagtype(name) == b'global':
