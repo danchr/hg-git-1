@@ -1442,9 +1442,8 @@ class GitHandler(object):
             def __iter__(self):
                 return itertools.chain(self.heads, self.tags)
 
-            def __nonzero__(self):
+            def __bool__(self):
                 return bool(self.heads) or bool(self.tags)
-            __bool__ = __nonzero__
 
         res = collections.defaultdict(heads_tags)
 

@@ -297,9 +297,8 @@ class overlaychangectx(context.changectx):
         mf = self.manifest()
         return mf.flags(path)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return True
-    __bool__ = __nonzero__
 
     def phase(self):
         try:
