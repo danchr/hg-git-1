@@ -1262,8 +1262,7 @@ class GitHandler(object):
 
         func = getattr(clientobj, method)
 
-        # dulwich 0.19, used in python 2.7, does not offer a specific
-        # exception class
+        # dulwich 0.19 does not offer a specific exception class
         HTTPUnauthorized = getattr(
             client, 'HTTPUnauthorized', type('<dummy>', (Exception,), {}),
         )
@@ -1300,7 +1299,7 @@ class GitHandler(object):
             except HTTPUnauthorized:
                 raise error.Abort(_(b'authorization failed'))
             except GitProtocolError as e:
-                # python 2.7
+                # dulwich 0.19
                 if 'unexpected http resp 401' in e.args[0]:
                     raise error.Abort(_(b'authorization failed'))
                 else:
@@ -1893,7 +1892,7 @@ class GitHandler(object):
 
             pwmgr = url.passwordmgr(self.ui, self.ui.httppasswordmgrdb)
 
-            # not available in dulwich 0.19, used on Python 2.7
+            # not available in dulwich 0.19
             if hasattr(client, 'get_credentials_from_store'):
                 urlobj = compat.url(uri)
                 auth = client.get_credentials_from_store(
