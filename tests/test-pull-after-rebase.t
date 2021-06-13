@@ -73,7 +73,7 @@ Now switch back to git and create a new commit based on what we just rebased
   $ git add delta
   $ fn_git_commit -m 'add gamma'
   $ git push --quiet --set-upstream origin otherbranch
-  Branch 'otherbranch' set up to track remote branch 'otherbranch' from 'origin'.
+  Branch 'otherbranch' set up to track remote branch 'otherbranch' from 'origin'. (?)
   $ cd ..
 
 Pull that
