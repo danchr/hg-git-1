@@ -161,12 +161,14 @@ class GitHandler(object):
 
     @property
     def _map_git(self):
+        """mapping of `git-sha` to `hg-sha`"""
         if self._map_git_real is None:
             self.load_map()
         return self._map_git_real
 
     @property
     def _map_hg(self):
+        """mapping of `hg-sha` to `git-sha`"""
         if self._map_hg_real is None:
             self.load_map()
         return self._map_hg_real
