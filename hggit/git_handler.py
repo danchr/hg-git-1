@@ -1518,25 +1518,30 @@ class GitHandler(object):
         self.export_commits()
         self.save_tags()
 
+    def _get_heads(self, refs):
+        """get a {head → hg-bin-sha} mapping
+
+        (This function return binary node id)"""
+        heads = {}
+        for ref, git_sha in refs.items():
+            if not ref.startswith(LOCAL_BRANCH_PREFIX):
+                continue
+            h = ref[len(LOCAL_BRANCH_PREFIX):]
+            hg_sha = self.map_hg_get(git_sha)
+            # refs contains all the refs in the server,
+            # not just the ones we are pulling
+            if hg_sha is not None:
+                heads[h] = bin(hg_sha)
+
+        return heads
+
     def update_hg_bookmarks(self, refs):
         try:
             bms = self.repo._bookmarks
 
-            heads = {
-                ref[len(LOCAL_BRANCH_PREFIX):]: refs[ref]
-                for ref in refs
-                if ref.startswith(LOCAL_BRANCH_PREFIX)
-            }
-
             suffix = self.branch_bookmark_suffix or b''
             changes = []
-            for head, sha in heads.items():
-                # refs contains all the refs in the server, not just
-                # the ones we are pulling
-                hgsha = self.map_hg_get(sha)
-                if hgsha is None:
-                    continue
-                hgsha = bin(hgsha)
+            for head, hgsha in self._get_heads(refs).items():
                 if head not in bms:
                     # new branch
                     changes.append((head + suffix, hgsha))
