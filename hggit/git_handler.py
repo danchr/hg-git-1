@@ -1544,7 +1544,7 @@ class GitHandler(object):
                         # fast forward
                         changes.append((head + suffix, hgsha))
 
-            if heads:
+            if changes:
                 util.updatebookmarks(self.repo, changes)
 
         except AttributeError:
