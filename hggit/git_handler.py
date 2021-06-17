@@ -294,8 +294,8 @@ class GitHandler(object):
             self.save_map(self.map_file)
 
     def fetch(self, remote, heads):
-        result = self.fetch_pack(remote, heads)
-        remote_name = self.remote_name(remote, False)
+        result = self.fetch_pack(remote.path, heads)
+        remote_name = self.remote_name(remote.path, False)
 
         # if remote returns a symref for HEAD, then let's store that
         rhead = None

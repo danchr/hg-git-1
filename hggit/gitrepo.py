@@ -220,7 +220,7 @@ def exchangepull(
         )
 
         with repo.wlock(), repo.lock(), pullop.trmanager:
-            pullop.cgresult = repo.githandler.fetch(remote.path, heads)
+            pullop.cgresult = repo.githandler.fetch(remote, heads)
             return pullop
     else:
         return orig(repo, remote, heads, force, bookmarks=bookmarks, **kwargs)
