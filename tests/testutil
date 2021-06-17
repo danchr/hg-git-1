@@ -47,6 +47,13 @@ fn_git_commit() {
     count=`expr $count + 1`
 }
 
+fn_git_rebase() {
+    GIT_AUTHOR_DATE="2007-01-01 00:00:$count +0000"
+    GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE"
+    git rebase "$@" >/dev/null || echo "git rebase error"
+    count=`expr $count + 1`
+}
+
 fn_hg_commit() {
     HGDATE="2007-01-01 00:00:$count +0000"
     hg commit -d "$HGDATE" "$@" >/dev/null || echo "hg commit error"
