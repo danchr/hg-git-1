@@ -66,7 +66,7 @@ same thing here
 #if publish-specific
   $ cat >>$HGRCPATH <<EOF
   > [git]
-  > public = master
+  > public = default/master
   > EOF
 #endif
 
@@ -79,8 +79,11 @@ pulling publishes the branch
   importing git objects into hg
   (run 'hg update' to get a working copy)
   $ hg phase -r master
-  1: public
+  1: draft (publish-specific !)
+  1: public (publish-defaults !)
+#if publish-defaults
   $ hg phase -fd master
+#endif
   $ hg pull
   pulling from $TESTTMP/gitrepo
   importing git objects into hg

@@ -1580,7 +1580,7 @@ class GitHandler(object):
                 remote_head = b'/'.join((remote_name, head))
 
                 # mark public any branches the user specified
-                if head in refs_to_publish:
+                if head in refs_to_publish or remote_head in refs_to_publish:
                     self.ui.note(
                         b'publishing remote branch %s\n' % remote_head,
                     )
