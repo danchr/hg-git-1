@@ -109,7 +109,7 @@ Create a git tag from hg
 
 Verify that amending commits known to remotes doesn't break anything
 
-  $ cat >> .hg/hgrc << EOF
+  $ cat >> $HGRCPATH << EOF
   > [experimental]
   > evolution = createmarkers
   > evolution.createmarkers = yes
@@ -244,3 +244,4 @@ Try to overwrite an annotated tag:
   detached                           2:7aa44ff368c7 git
   alpha                              0:ff7a2f2d8d70 git
 #endif
+  $ cd ..
