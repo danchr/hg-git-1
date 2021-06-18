@@ -1565,6 +1565,7 @@ class GitHandler(object):
         refs_to_publish = self.ui.configlist(b'git', b'public')
 
         # if nothing is requested, fall back to defaults, meaning HEAD
+        # and tags
         publish_defaults = use_phases and not refs_to_publish
 
         nodeids_to_publish = []
@@ -1592,6 +1593,14 @@ class GitHandler(object):
                 self.git.refs[new_ref] = sha
             elif (ref_name.startswith(LOCAL_TAG_PREFIX) and not
                   ref_name.endswith(b'^{}')):
+                tag = ref_name[10:]
+                if (
+                    hgsha is not None and
+                    (publish_defaults or tag in refs_to_publish)
+                ):
+                    msg = b'publishing remote tag %s/%s\n' % (remote_name, tag)
+                    self.ui.note(msg)
+                    nodeids_to_publish.append(bin(hgsha))
                 self.git.refs[ref_name] = sha
             elif (
                 ref_name == b'HEAD' and publish_defaults and hgsha is not None

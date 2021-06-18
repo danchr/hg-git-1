@@ -60,13 +60,13 @@ pulled changesets are public
 
   $ hg phase -fd 'all()'
 
-we can restrict publishing to the remote HEAD, which happens to be the
-same thing here
+we can restrict publishing to the remote HEAD and that tag, which
+happens to be the same thing here
 
 #if publish-specific
   $ cat >>$HGRCPATH <<EOF
   > [git]
-  > public = default/master
+  > public = default/master, thetag
   > EOF
 #endif
 
@@ -91,7 +91,7 @@ pulling publishes the branch
   $ hg phase -r master -r not-master -r thetag
   1: public
   3: draft
-  2: draft
+  2: public
 
 public bookmark not pushed is not published after pull
 

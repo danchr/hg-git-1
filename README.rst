@@ -362,10 +362,16 @@ work well, even if the initial clone requires a some patience.
 
 When converting Git revisions to Mercurial, place them in the 'public'
 phase as appropriate. Namely, revisions that are reachable from the
-remote Git repository's ``HEAD`` will be marked *public*. For most
-repositories, this means the remote ``master`` branch will be
-converted as public. Publishing commits prevents their modification,
-and speeds up many local Mercurial operations, such as ``hg shelve``.
+remote Git repository's default branch, or ``HEAD``, will be marked
+*public*. For most repositories, this means the remote ``master``
+branch will be converted as public. The same applies to any commits
+tagged in the remote.
+
+To restrict publishing to specific branches or tags, use the
+``git.public`` option.
+
+Publishing commits prevents their modification, and speeds up many
+local Mercurial operations, such as ``hg shelve``.
 
 ``hggit.invalidpaths``
 -------------------
