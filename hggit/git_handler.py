@@ -10,6 +10,7 @@ import shutil
 from dulwich.errors import HangupException, GitProtocolError
 from dulwich.objects import Blob, Commit, Tag, Tree, parse_timezone
 from dulwich.pack import create_delta, apply_delta
+from dulwich.refs import LOCAL_BRANCH_PREFIX, LOCAL_TAG_PREFIX
 from dulwich.repo import Repo, check_ref_format
 from dulwich import client
 from dulwich import config as dul_config
@@ -39,6 +40,8 @@ from . import hg2git
 from . import util
 from .overlay import overlayrepo
 
+
+REMOTE_BRANCH_PREFIX = b'refs/remotes/'
 
 RE_GIT_AUTHOR = re.compile(br'^(.*?) ?\<(.*?)(?:\>(.*))?$')
 
@@ -306,10 +309,10 @@ class GitHandler(object):
 
             try:
                 symref = result.symrefs[b'HEAD']
-                if symref.startswith(b'refs/heads'):
-                    rhead = symref.replace(b'refs/heads/', b'')
+                if symref.startswith(LOCAL_BRANCH_PREFIX):
+                    rhead = symref.replace(LOCAL_BRANCH_PREFIX, b'')
 
-                rnode = result.refs[b'refs/heads/%s' % rhead]
+                rnode = result.refs[LOCAL_BRANCH_PREFIX + rhead]
                 rnode = self._map_git[rnode]
                 rnode = self.repo[rnode].node()
             except KeyError:
@@ -319,7 +322,7 @@ class GitHandler(object):
 
             if remote_name:
                 self.update_remote_branches(remote_name, result.refs)
-            elif not self.git.refs.as_dict(b'refs/remotes/'):
+            elif not self.git.refs.as_dict(REMOTE_BRANCH_PREFIX):
                 # intial cloning
                 self.update_remote_branches(b'default', result.refs)
 
@@ -482,7 +485,7 @@ class GitHandler(object):
         if revs:
             reqrefs = {}
             for rev in revs:
-                for n in (b'refs/heads/' + rev, b'refs/tags/' + rev):
+                for n in (LOCAL_BRANCH_PREFIX + rev, LOCAL_TAG_PREFIX + rev):
                     if n in result.refs:
                         reqrefs[n] = result.refs[n]
         else:
@@ -1161,7 +1164,9 @@ class GitHandler(object):
                     commands.bookmark(self.ui, self.repo, b'master',
                                       rev=tip, force=True)
                     bookmarks.activate(self.repo, b'master')
-                    new_refs[b'refs/heads/master'] = self.map_git_get(tip)
+                    new_refs[LOCAL_BRANCH_PREFIX + b'master'] = (
+                        self.map_git_get(tip)
+                    )
 
         # mapped nodes might be hidden
         unfiltered = self.repo.unfiltered()
@@ -1224,8 +1229,8 @@ class GitHandler(object):
         # can't just do 'refs/' here because the tag class doesn't have a
         # parents function for walking, and older versions of dulwich don't
         # like that.
-        haveheads = list(self.git.refs.as_dict(b'refs/remotes/').values())
-        haveheads.extend(self.git.refs.as_dict(b'refs/heads/').values())
+        haveheads = list(self.git.refs.as_dict(REMOTE_BRANCH_PREFIX).values())
+        haveheads.extend(self.git.refs.as_dict(LOCAL_BRANCH_PREFIX).values())
         graphwalker = self.git.get_graph_walker(heads=haveheads)
 
         def determine_wants(refs):
@@ -1341,8 +1346,8 @@ class GitHandler(object):
         else:
             for ref, sha in refs.items():
                 if (not ref.endswith(b'^{}') and
-                    (ref.startswith(b'refs/heads/') or
-                     ref.startswith(b'refs/tags/'))):
+                    (ref.startswith(LOCAL_BRANCH_PREFIX) or
+                     ref.startswith(LOCAL_TAG_PREFIX))):
                     filteredrefs.append(ref)
             filteredrefs.sort()
 
@@ -1396,7 +1401,7 @@ class GitHandler(object):
                                       b"revision\n" % tag)
                     continue
 
-                tag_refname = b'refs/tags/' + tag
+                tag_refname = LOCAL_TAG_PREFIX + tag
 
                 if not check_ref_format(tag_refname):
                     self.repo.ui.warn(b"warning: not exporting tag '%s' "
@@ -1449,7 +1454,7 @@ class GitHandler(object):
 
         bms = self.repo._bookmarks
         for filtered_bm, bm in self._filter_for_bookmarks(bms):
-            ref_name = b'refs/heads/' + filtered_bm
+            ref_name = LOCAL_BRANCH_PREFIX + filtered_bm
             if check_ref_format(ref_name):
                 res[hex(bms[bm])].heads.add(ref_name)
             else:
@@ -1457,7 +1462,7 @@ class GitHandler(object):
                                   b"due to invalid name\n" % bm)
 
         for tag, sha in self.tags.items():
-            res[sha].tags.add(b'refs/tags/' + tag)
+            res[sha].tags.add(LOCAL_TAG_PREFIX + tag)
         return res
 
     def import_tags(self, refs):
@@ -1501,7 +1506,7 @@ class GitHandler(object):
             if scmutil.isrevsymbol(self.repo, tag):
                 raise error.Abort(b"the name '%s' already exists" % tag)
 
-            if check_ref_format(b'refs/tags/' + tag):
+            if check_ref_format(LOCAL_TAG_PREFIX + tag):
                 self.ui.debug(b'adding git tag %s\n' % tag)
                 self.tags[tag] = target
             else:
@@ -1516,9 +1521,9 @@ class GitHandler(object):
             bms = self.repo._bookmarks
 
             heads = {
-                ref[11:]: refs[ref]
+                ref[len(LOCAL_BRANCH_PREFIX):]: refs[ref]
                 for ref in refs
-                if ref.startswith(b'refs/heads/')
+                if ref.startswith(LOCAL_BRANCH_PREFIX)
             }
 
             suffix = self.branch_bookmark_suffix or b''
@@ -1556,20 +1561,20 @@ class GitHandler(object):
             for t in list(remote_refs):
                 if t.startswith(remote_name + b'/'):
                     del remote_refs[t]
-                    if b'refs/heads/' + t[len(remote_name) + 1:] not in refs:
-                        del self.git.refs[b'refs/remotes/' + t]
+                    if LOCAL_BRANCH_PREFIX + t[len(remote_name) + 1:] not in refs:
+                        del self.git.refs[REMOTE_BRANCH_PREFIX + t]
 
         for ref_name, sha in refs.items():
-            if ref_name.startswith(b'refs/heads'):
+            if ref_name.startswith(LOCAL_BRANCH_PREFIX):
                 hgsha = self.map_hg_get(sha)
                 if hgsha is None or hgsha not in self.repo:
                     continue
                 head = ref_name[11:]
                 remote_refs[b'/'.join((remote_name, head))] = bin(hgsha)
                 # TODO(durin42): what is this doing?
-                new_ref = b'refs/remotes/%s/%s' % (remote_name, head)
+                new_ref = b'%s%s/%s' % (REMOTE_BRANCH_PREFIX, remote_name, head)
                 self.git.refs[new_ref] = sha
-            elif (ref_name.startswith(b'refs/tags') and not
+            elif (ref_name.startswith(LOCAL_TAG_PREFIX) and not
                   ref_name.endswith(b'^{}')):
                 self.git.refs[ref_name] = sha
 

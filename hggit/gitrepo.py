@@ -2,6 +2,7 @@ from __future__ import generator_stop
 
 from . import util
 from . import compat
+from dulwich.refs import LOCAL_BRANCH_PREFIX
 from mercurial import (
     bundlerepo,
     discovery,
@@ -65,9 +66,9 @@ class basegitrepo(peerrepository):
                 result = handler.fetch_pack(self.path, heads=[])
                 # map any git shas that exist in hg to hg shas
                 stripped_refs = {
-                    ref[11:]: handler.map_hg_get(val) or val
+                    ref[len(LOCAL_BRANCH_PREFIX):]: handler.map_hg_get(val) or val
                     for ref, val in result.refs.items()
-                    if ref.startswith(b'refs/heads/')
+                    if ref.startswith(LOCAL_BRANCH_PREFIX)
                 }
                 return stripped_refs
         return {}

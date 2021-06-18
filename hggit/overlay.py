@@ -20,6 +20,11 @@ from mercurial import (
 from mercurial.utils import stringutil
 from mercurial.node import bin, hex, nullid
 
+from dulwich.refs import (
+    LOCAL_BRANCH_PREFIX,
+    LOCAL_TAG_PREFIX,
+)
+
 from . import compat
 
 eh = exthelper.exthelper()
@@ -526,11 +531,11 @@ class overlayrepo(object):
         self.refmap = {}
         self.tagmap = {}
         for ref in refs:
-            if ref.startswith(b'refs/heads/'):
-                refname = ref[11:]
+            if ref.startswith(LOCAL_BRANCH_PREFIX):
+                refname = ref[len(LOCAL_BRANCH_PREFIX):]
                 self.refmap.setdefault(bin(refs[ref]), []).append(refname)
-            elif ref.startswith(b'refs/tags/'):
-                tagname = ref[10:]
+            elif ref.startswith(LOCAL_TAG_PREFIX):
+                tagname = ref[len(LOCAL_TAG_PREFIX):]
                 self.tagmap.setdefault(bin(refs[ref]), []).append(tagname)
 
     def narrowmatch(self, *args, **kwargs):
