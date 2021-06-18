@@ -445,7 +445,19 @@ class GitHandler(object):
                     self.ui.debug(b"unchanged reference %s::%s => GIT:%s\n" %
                                   (remote_name, ref, new_sha[0:8]))
 
-            self.update_remote_branches(remote_name, new_refs)
+            # make sure that we know the remote head, for possible
+            # publishing
+            new_refs_with_head = new_refs.copy()
+
+            try:
+                new_refs_with_head.update(
+                    self.fetch_pack(remote, [b'HEAD']).refs,
+                )
+            except (error.RepoLookupError):
+                self.ui.debug(b'remote repository has no HEAD\n')
+
+            self.update_remote_branches(remote_name, new_refs_with_head)
+
         if old_refs == new_refs:
             self.ui.status(_(b"no changes found\n"))
             ret = None

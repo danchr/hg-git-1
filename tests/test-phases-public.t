@@ -143,7 +143,5 @@ actually pushed
   updating reference refs/heads/master
   $ hg phase -r 'all() - master' > $TESTTMP/after
   $ diff $TESTTMP/before $TESTTMP/after | tr '<>' '-+'
-NB: we'd expect this to be published
   $ hg phase -r master
-  5: draft (publish-defaults !)
-  5: public (publish-specific !)
+  5: public
