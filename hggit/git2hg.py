@@ -15,7 +15,6 @@ def find_incoming(git_object_store, git_map, refs):
     '''
 
     done = set()
-    commit_cache = {}
 
     # sort by commit date
     def commitdate(sha):
@@ -53,11 +52,7 @@ def find_incoming(git_object_store, git_map, refs):
                 todo.pop()
                 continue
             assert isinstance(sha, bytes)
-            if sha in commit_cache:
-                obj = commit_cache[sha]
-            else:
-                obj = git_object_store[sha]
-                commit_cache[sha] = obj
+            obj = git_object_store[sha]
             assert isinstance(obj, Commit)
             for p in obj.parents:
                 if p not in done and p not in git_map:
@@ -75,14 +70,7 @@ def find_incoming(git_object_store, git_map, refs):
     todo = get_heads(refs)
     commits = get_unseen_commits(todo)
 
-    return GitIncomingResult(commits, commit_cache)
-
-
-class GitIncomingResult(object):
-    '''struct to store result from find_incoming'''
-    def __init__(self, commits, commit_cache):
-        self.commits = commits
-        self.commit_cache = commit_cache
+    return commits
 
 
 def extract_hg_metadata(message, git_extra):

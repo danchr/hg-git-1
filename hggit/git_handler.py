@@ -498,7 +498,7 @@ class GitHandler(object):
         else:
             reqrefs = result.refs
 
-        commits = [bin(c) for c in self.get_git_incoming(reqrefs).commits]
+        commits = [bin(c) for c in self.get_git_incoming(reqrefs)]
 
         b = overlayrepo(self, commits, result.refs)
 
@@ -839,9 +839,7 @@ class GitHandler(object):
         return tr
 
     def import_git_objects(self, remote_name, refs):
-        result = self.get_git_incoming(refs)
-        commits = result.commits
-        commit_cache = result.commit_cache
+        commits = self.get_git_incoming(refs)
         # import each of the commits, oldest first
         total = len(commits)
         if total:
@@ -867,7 +865,7 @@ class GitHandler(object):
                 with self.get_transaction(b"gimport"):
                     for csha in commits[offset:offset + chunksize]:
                         progress.increment()
-                        self.import_git_commit(commit_cache[csha])
+                        self.import_git_commit(self.git[csha])
 
         # TODO if the tags cache is used, remove any dangling tag references
         return total
