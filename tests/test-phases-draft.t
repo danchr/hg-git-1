@@ -36,10 +36,11 @@ pulling without hggit.usephases does not publish local changesets
   $ hg phase -r master
   1: draft
 
-pulling with git.public publishes local changesets
+pulling with git.public incorrectly publishes local changesets
   $ hg --config git.public=master pull
   pulling from $TESTTMP/gitrepo
   no changes found
+NB: this is wrong
   $ hg phase -r master
   1: public
 
