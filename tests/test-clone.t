@@ -69,8 +69,9 @@ clone a branch
 clone with mapsavefreq set
   $ rm -rf hgrepo-b
   $ hg clone -r beta gitrepo hgrepo-b --config hggit.mapsavefrequency=1 --debug | grep saving
-  saving mapfile
-  saving mapfile
+  saving git map to $TESTTMP/hgrepo-b/.hg/git-mapfile
+  saving git map to $TESTTMP/hgrepo-b/.hg/git-mapfile
+  saving git map to $TESTTMP/hgrepo-b/.hg/git-mapfile
 
 Make sure that a deleted .hgsubstate does not confuse hg-git
 

@@ -238,6 +238,8 @@ class GitHandler(object):
         self._map_hg_real = map_hg_real
 
     def save_map(self, map_file):
+        self.ui.debug(_(b"saving git map to %s\n") % self.vfs.join(map_file))
+
         with self.store_repo.wlock():
             map_hg = self._map_hg
             with self.vfs(map_file, b'wb+', atomictemp=True) as buf:
@@ -556,7 +558,6 @@ class GitHandler(object):
                 progress.update(i, total=total)
                 self.export_hg_commit(ctx.node(), exporter)
                 if mapsavefreq and i % mapsavefreq == 0:
-                    self.ui.debug(_(b"saving mapfile\n"))
                     self.save_map(self.map_file)
 
     def set_commiter_from_author(self, commit):
@@ -841,7 +842,6 @@ class GitHandler(object):
                 commit = commit_cache[csha]
                 self.import_git_commit(commit)
                 if mapsavefreq and i % mapsavefreq == 0:
-                    self.ui.debug(_(b"saving mapfile\n"))
                     self.save_map(self.map_file)
 
         # TODO if the tags cache is used, remove any dangling tag references
