@@ -554,8 +554,8 @@ class GitHandler(object):
 
         mapsavefreq = self.ui.configint(b'hggit', b'mapsavefrequency')
         with self.repo.ui.makeprogress(b'exporting', total=total) as progress:
-            for i, ctx in enumerate(export):
-                progress.update(i, total=total)
+            for i, ctx in enumerate(export, 1):
+                progress.increment()
                 self.export_hg_commit(ctx.node(), exporter)
                 if mapsavefreq and i % mapsavefreq == 0:
                     self.save_map(self.map_file)
