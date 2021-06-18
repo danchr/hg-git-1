@@ -27,8 +27,14 @@ Dependencies
 
 This plugin is implemented entirely in Python — there are no Git
 binary dependencies, and you do not need to have Git installed on your
-system. The only dependencies are Mercurial 4.4 or later and a
-relatively recent Dulwich.
+system. The only dependencies are:
+
+* Mercurial 5.2
+* Dulwich 0.19.3
+* Python 3.6
+
+Please note that these are the earliest versions known to work; later
+versions generally work better.
 
 Installing
 ==========

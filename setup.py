@@ -37,6 +37,6 @@ setup(
     zip_safe=True,
     python_requires='>=3.6',
     install_requires=[
-        'dulwich>=0.19.0',
+        'dulwich>=0.19.3',
     ],
 )
