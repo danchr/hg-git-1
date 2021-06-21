@@ -289,11 +289,8 @@ class GitHandler(object):
     def import_commits(self, remote_name):
         refs = self.git.refs.as_dict()
         filteredrefs = self.filter_min_date(refs)
-        try:
-            self.import_git_objects(remote_name, filteredrefs)
-            self.update_hg_bookmarks(refs)
-        finally:
-            self.save_map(self.map_file)
+        self.import_git_objects(remote_name, filteredrefs)
+        self.update_hg_bookmarks(refs)
 
     def fetch(self, remote, heads):
         result = self.fetch_pack(remote.path, heads)
@@ -344,8 +341,6 @@ class GitHandler(object):
 
                 if bms:
                     bookmarks.activate(self.repo, bms[0])
-
-        self.save_map(self.map_file)
 
         if imported == 0:
             return 0

@@ -31,7 +31,7 @@ clone with mapsavefreq set
 
   $ hg clone gitrepo hgrepo --config hggit.mapsavefrequency=10 --debug \
   > | grep -c saving
-  11
+  10
   $ rm -rf hgrepo
 
 pull with mapsavefreq set
@@ -43,7 +43,7 @@ pull with mapsavefreq set
   > EOF
   $ hg -R hgrepo --config hggit.mapsavefrequency=10 pull --debug \
   > | grep -c saving
-  11
+  10
   $ rm -rf hgrepo
 
 Interruptions
