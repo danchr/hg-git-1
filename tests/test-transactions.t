@@ -68,44 +68,32 @@ Test an error in a pull:
   $ ABORT_AFTER=99 hg pull
   pulling from $TESTTMP/gitrepo
   importing git objects into hg
+  transaction abort!
+  rollback completed
   abort: aborted after 99 commits!
   [255]
   $ hg log -l 10 -T '{rev} {gitnode}\n'
-  99 
-  98 
-  97 
-  96 
-  95 
-  94 
-  93 
-  92 
-  91 
-  90 
-
-Reset the repository
-
-  $ hg strip --no-backup 'all()'
-  $ hg gclear
-  clearing out the git cache data
 
 How does map save interval work?
 
   $ EXIT_AFTER=15 hg --config hggit.mapsavefrequency=10 pull
   pulling from $TESTTMP/gitrepo
   importing git objects into hg
+  transaction abort!
+  rollback completed
   interrupted!
   [255]
   $ hg log -l 10 -T '{rev} {gitnode}\n'
-  15 
-  14 
-  13 
-  12 
-  11 
-  10 
   9 1d6b9d3de3098d28bb786d18849f5790a08a9a08
   8 42da70ed92bbecf9f348ba59c93646be723d0bf2
   7 17e841146e5744b81af9959634d82c20a5d7df52
   6 c31065bf97bf014815e37cdfbdef2c32c687f314
+  5 fcf21b8e0520ec1cced1d7593d13f9ee54721269
+  4 46acd02d0352e4b92bd6a099bb0490305d847a18
+  3 61eeda444b37b8aa3892d5f04c66c5441d21dd66
+  2 e55db11bb0472791c7af3fc636772174cdea4a36
+  1 17a2672b3c24c02d568f99d8d55ccae2bf362d5c
+  0 4e195b4c6e77604b70a8ad3b01306adbb9b1c7e7
 
 Reset the repository
 
@@ -118,19 +106,21 @@ Test the user exiting in the middle of a conversion:
   $ EXIT_AFTER=15 hg --config hggit.mapsavefrequency=10 pull
   pulling from $TESTTMP/gitrepo
   importing git objects into hg
+  transaction abort!
+  rollback completed
   interrupted!
   [255]
   $ hg log -l 10 -T '{rev} {gitnode}\n'
-  15 
-  14 
-  13 
-  12 
-  11 
-  10 
   9 1d6b9d3de3098d28bb786d18849f5790a08a9a08
   8 42da70ed92bbecf9f348ba59c93646be723d0bf2
   7 17e841146e5744b81af9959634d82c20a5d7df52
   6 c31065bf97bf014815e37cdfbdef2c32c687f314
+  5 fcf21b8e0520ec1cced1d7593d13f9ee54721269
+  4 46acd02d0352e4b92bd6a099bb0490305d847a18
+  3 61eeda444b37b8aa3892d5f04c66c5441d21dd66
+  2 e55db11bb0472791c7af3fc636772174cdea4a36
+  1 17a2672b3c24c02d568f99d8d55ccae2bf362d5c
+  0 4e195b4c6e77604b70a8ad3b01306adbb9b1c7e7
   $ cd ..
   $ rm -rf hgrepo
 
@@ -142,6 +132,8 @@ And with a clone into an in-tree repository
   > --config extensions.breakage=$TESTDIR/testlib/ext-break-git-import.py \
   > clone gitrepo hgrepo
   importing git objects into hg
+  transaction abort!
+  rollback completed
   interrupted!
   [255]
   $ hg id hgrepo

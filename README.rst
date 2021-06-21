@@ -333,12 +333,15 @@ the file has stayed the same. The default is "0" (disabled).
 ``hggit.mapsavefrequency``
 --------------------------
 
-Controls how often the mapping between Git and Mercurial commit hashes
-gets saved when importing or exporting changesets. Set this to a number
-greater than 0 to save the mapping after converting that many commits.
-This can help when the conversion encounters an error partway through a
-large batch of changes. Defaults to 0, so that the mapping is saved once
-at the end.
+By default, hg-git only saves the results of a conversion at the end.
+Use this option to enable resuming long-running pulls and pushes. Set
+this to a number greater than 0 to allow resuming after converting
+that many commits. This can help when the conversion encounters an
+error partway through a large batch of changes. Otherwise, an error or
+interruption will roll back the transaction, similar to regular
+Mercurial.
+
+Defaults to 0, so that the mapping is saved once at the end.
 
 Please note that this is meaningless for an initial clone, as any
 error or interruption will delete the destination. So instead of

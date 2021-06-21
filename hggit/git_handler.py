@@ -824,6 +824,18 @@ class GitHandler(object):
     def get_git_incoming(self, refs):
         return git2hg.find_incoming(self.git.object_store, self._map_git, refs)
 
+    def get_transaction(self, desc=b"hg-git"):
+        """obtain a transaction specific for the repository
+
+        this ensures that we only save the map on close
+
+        """
+        tr = self.repo.transaction(desc)
+
+        tr.addfinalize(b'hg-git-save', lambda tr: self.save_map(self.map_file))
+
+        return tr
+
     def import_git_objects(self, remote_name, refs):
         result = self.get_git_incoming(refs)
         commits = result.commits
@@ -836,13 +848,18 @@ class GitHandler(object):
             self.ui.status(_(b"no changes found\n"))
 
         mapsavefreq = self.ui.configint(b'hggit', b'mapsavefrequency')
-        with self.ui.makeprogress(b'importing', unit=b'commits', total=total) as progress:
-            for i, csha in enumerate(commits, 1):
-                progress.increment()
-                commit = commit_cache[csha]
-                self.import_git_commit(commit)
-                if mapsavefreq and i % mapsavefreq == 0:
-                    self.save_map(self.map_file)
+        chunksize = max(mapsavefreq or total, 1)
+        progress = self.ui.makeprogress(b'importing', unit=b'commits', total=total)
+
+        self.ui.note(b"processing commits in batches of %d\n" % chunksize)
+
+        with progress, self.repo.lock():
+            for offset in range(0, total, chunksize):
+                # speed up conversion by batching commits in a transaction
+                with self.get_transaction(b"gimport"):
+                    for csha in commits[offset:offset + chunksize]:
+                        progress.increment()
+                        self.import_git_commit(commit_cache[csha])
 
         # TODO if the tags cache is used, remove any dangling tag references
         return total
