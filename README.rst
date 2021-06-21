@@ -343,7 +343,7 @@ Mercurial.
 
 Defaults to 0, so that the mapping is saved once at the end.
 
-Please note that this is meaningless for an initial clone, as any
+Please note that this is disregarded for an initial clone, as any
 error or interruption will delete the destination. So instead of
 cloning a large Git repository, you might want to pull instead::
 

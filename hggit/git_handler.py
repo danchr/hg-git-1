@@ -160,6 +160,12 @@ class GitHandler(object):
         return self.store_repo.vfs
 
     @property
+    def is_clone(self):
+        """detect whether the current operation is an 'hg clone'"""
+        # a bit of a hack, but it has held true for quite some time
+        return self.ui.configsource(b'paths', b'default') == b'clone'
+
+    @property
     def _map_git(self):
         """mapping of `git-sha` to `hg-sha`"""
         if self._map_git_real is None:
@@ -842,7 +848,13 @@ class GitHandler(object):
         else:
             self.ui.status(_(b"no changes found\n"))
 
-        mapsavefreq = self.ui.configint(b'hggit', b'mapsavefrequency')
+        # don't bother saving the map if we're in a clone, as Mercurial
+        # deletes the repository on errors
+        if self.is_clone:
+            mapsavefreq = 0
+        else:
+            mapsavefreq = self.ui.configint(b'hggit', b'mapsavefrequency')
+
         chunksize = max(mapsavefreq or total, 1)
         progress = self.ui.makeprogress(b'importing', unit=b'commits', total=total)
 
