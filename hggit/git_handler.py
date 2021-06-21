@@ -161,6 +161,8 @@ class GitHandler(object):
         self.load_tags()
         self._remote_refs = None
 
+        self._pwmgr = url.passwordmgr(self.ui, self.ui.httppasswordmgrdb)
+
         # the HTTP authentication realm -- this specifies that we've
         # tried an unauthenticated request, gotten a realm, and are now
         # ready to prompt the user, if necessary
@@ -1385,49 +1387,35 @@ class GitHandler(object):
                 os.remove(f.name)
 
     def _call_client(self, remote, method, *args, **kwargs):
-        clientobj, path = self._get_transport_and_path(remote)
-
-        func = getattr(clientobj, method)
-
-        try:
-            return func(path, *args, **kwargs)
-        except (compat.HTTPUnauthorized, GitProtocolError) as e:
-            self.ui.traceback()
-
-            if isinstance(e, compat.HTTPUnauthorized):
-                # this is a fallback just in case the header isn't
-                # specified
-                self._http_auth_realm = 'Git'
-                if e.www_authenticate:
-                    m = re.search(r'realm="([^"]*)"', e.www_authenticate)
-                    if m:
-                        self._http_auth_realm = m.group(1)
-
-            elif 'unexpected http resp 407' in e.args[0]:
-                raise error.Abort(
-                    b'HTTP proxy requires authentication',
-                )
-            # dulwich 0.19
-            elif 'unexpected http resp 401' in e.args[0]:
-                self._http_auth_realm = 'Git'
-            else:
-                raise
-
+        for ignored in range(self.ui.configint(b'hggit', b'retries')):
             clientobj, path = self._get_transport_and_path(remote)
             func = getattr(clientobj, method)
 
             try:
                 return func(path, *args, **kwargs)
-            except compat.HTTPUnauthorized:
-                raise error.Abort(_(b'authorization failed'))
-            except GitProtocolError as e:
+            except (compat.HTTPUnauthorized, GitProtocolError) as e:
+                self.ui.traceback()
+
+                if isinstance(e, compat.HTTPUnauthorized):
+                    # this is a fallback just in case the header isn't
+                    # specified
+                    self._http_auth_realm = 'Git'
+                    if e.www_authenticate:
+                        m = re.search(r'realm="([^"]*)"', e.www_authenticate)
+                        if m:
+                            self._http_auth_realm = m.group(1)
+
+                elif 'unexpected http resp 407' in e.args[0]:
+                    raise error.Abort(
+                        b'HTTP proxy requires authentication',
+                    )
                 # dulwich 0.19
-                if 'unexpected http resp 401' in e.args[0]:
-                    raise error.Abort(_(b'authorization failed'))
+                elif 'unexpected http resp 401' in e.args[0]:
+                    self._http_auth_realm = 'Git'
                 else:
                     raise
 
-
+        raise error.Abort(_(b'authorization failed'))
 
     # REFERENCES HANDLING
 
@@ -2004,6 +1992,9 @@ class GitHandler(object):
         ...    def __init__(self):
         ...         self.ui = ui.ui()
         ...         self._http_auth_realm = None
+        ...         self._pwmgr = url.passwordmgr(
+        ...             self.ui, self.ui.httppasswordmgrdb,
+        ...         )
         >>> tp = SubHandler()._get_transport_and_path
         >>> client, url = tp(b'http://fqdn.com/test.git')
         >>> print(isinstance(client, HttpGitClient))
@@ -2058,6 +2049,7 @@ class GitHandler(object):
             config.set(b'http', b'useragent', ua)
 
             proxy = self.ui.config(b'http_proxy', b'host')
+
             if proxy:
                 config.set(b'http', b'proxy', b'http://' + proxy)
 
@@ -2067,8 +2059,6 @@ class GitHandler(object):
                     )
 
             str_uri = uri.decode('utf-8')
-            pwmgr = url.passwordmgr(self.ui, self.ui.httppasswordmgrdb)
-
             # not available in dulwich 0.19
             if hasattr(client, 'get_credentials_from_store'):
                 urlobj = compat.url(uri)
@@ -2084,7 +2074,7 @@ class GitHandler(object):
                 # since we've tried an unauthenticated request, and
                 # obtain a realm, we can do a "full" search, including
                 # a prompt
-                username, password = pwmgr.find_user_password(
+                username, password = self._pwmgr.find_user_password(
                     self._http_auth_realm, str_uri,
                 )
             elif auth is not None:
@@ -2092,7 +2082,7 @@ class GitHandler(object):
                 username = username.decode('utf-8')
                 password = password.decode('utf-8')
             else:
-                username, password = pwmgr.find_stored_password(str_uri)
+                username, password = self._pwmgr.find_stored_password(str_uri)
 
             return (
                 client.HttpGitClient(

@@ -383,6 +383,13 @@ Data fetched from Git is buffered in memory, unless it exceeds the
 given limit, in megabytes. By default, flush the buffer to disk when
 it exceeds 100MB.
 
+``hggit.retries``
+-------------------
+
+Interacting with a remote Git repository may require authentication.
+Normally, this will trigger a prompt and a retry, and this option
+restricts the amount of retries. Defaults to 3.
+
 ``hggit.invalidpaths``
 -------------------
 

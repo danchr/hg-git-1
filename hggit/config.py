@@ -21,6 +21,7 @@ CONFIG_DEFAULTS = {
         b'fetchbuffer': 100,
         b'mapsavefrequency': 1000,
         b'usephases': False,
+        b'retries': 3,
         b'invalidpaths': b'skip',
     }
 }
