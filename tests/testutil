@@ -40,42 +40,49 @@ GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE"; export GIT_COMMITTER_DATE
 # Functions to commit and tag in Mercurial and Git in a predictable manner
 count=10
 
+fn_get_date() {
+    h=$(expr $count / 60 / 60)
+    m=$(expr $count / 60 % 60)
+    s=$(expr $count % 60)
+    printf "2007-01-01 %02d:%02d:%02d +0000" $h $m $s
+}
+
 fn_git_commit() {
-    GIT_AUTHOR_DATE="2007-01-01 00:00:$count +0000"
+    GIT_AUTHOR_DATE="$(fn_get_date)"
     GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE"
     git commit "$@" >/dev/null || echo "git commit error"
     count=`expr $count + 1`
 }
 
 fn_git_rebase() {
-    GIT_AUTHOR_DATE="2007-01-01 00:00:$count +0000"
+    GIT_AUTHOR_DATE="$(fn_get_date)"
     GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE"
     git rebase --quiet "$@" >/dev/null || echo "git rebase error"
     count=`expr $count + 1`
 }
 
 fn_hg_commit() {
-    HGDATE="2007-01-01 00:00:$count +0000"
+    HGDATE="$(fn_get_date)"
     hg commit -d "$HGDATE" "$@" >/dev/null || echo "hg commit error"
     count=`expr $count + 1`
 }
 
 fn_hg_commitextra() {
-    HGDATE="2007-01-01 00:00:$count +0000"
+    HGDATE="$(fn_get_date)"
     hg --config extensions.commitextra=$TESTDIR/testlib/ext-commit-extra.py \
        commitextra -d "$HGDATE" "$@" >/dev/null || echo "hg commit error"
     count=`expr $count + 1`
 }
 
 fn_git_tag() {
-    GIT_AUTHOR_DATE="2007-01-01 00:00:$count +0000"
+    GIT_AUTHOR_DATE="$(fn_get_date)"
     GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE"
     git tag "$@" >/dev/null || echo "git tag error"
     count=`expr $count + 1`
 }
 
 fn_hg_tag() {
-    HGDATE="2007-01-01 00:00:$count +0000"
+    HGDATE="$(fn_get_date)"
     hg tag -d "$HGDATE" "$@" >/dev/null || echo "hg tag error"
     count=`expr $count + 1`
 }
