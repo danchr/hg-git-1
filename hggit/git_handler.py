@@ -1242,17 +1242,16 @@ class GitHandler(object):
             filteredrefs = self.filter_refs(refs, heads)
             return [x for x in filteredrefs.values() if x not in self.git]
 
-        try:
-            progress = GitProgress(self.ui)
-            f = io.BytesIO()
+        progress = GitProgress(self.ui)
+        f = io.BytesIO()
 
+        try:
             ret = self._call_client(remote_name, 'fetch_pack', determine_wants,
                                     graphwalker, f.write, progress.progress)
 
             if(f.tell() != 0):
                 f.seek(0)
                 self.git.object_store.add_thin_pack(f.read, None)
-            progress.flush()
 
             # For empty repos dulwich gives us None, but since later
             # we want to iterate over this, we really want an empty
@@ -1264,6 +1263,9 @@ class GitHandler(object):
         except (HangupException, GitProtocolError) as e:
             raise error.Abort(_(b"git remote error: ")
                               + pycompat.sysbytes(str(e)))
+        finally:
+            progress.flush()
+            f.close()
 
     def _call_client(self, remote_name, method, *args, **kwargs):
         clientobj, path = self._get_transport_and_path(remote_name)
