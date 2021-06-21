@@ -101,7 +101,7 @@ How does map save interval work?
   13 
   12 
   11 
-  10 b18e34c1c0afbb0d8406d4cc9c160e8bf3beaf80
+  10 
   9 1d6b9d3de3098d28bb786d18849f5790a08a9a08
   8 42da70ed92bbecf9f348ba59c93646be723d0bf2
   7 17e841146e5744b81af9959634d82c20a5d7df52
@@ -126,7 +126,7 @@ Test the user exiting in the middle of a conversion:
   13 
   12 
   11 
-  10 b18e34c1c0afbb0d8406d4cc9c160e8bf3beaf80
+  10 
   9 1d6b9d3de3098d28bb786d18849f5790a08a9a08
   8 42da70ed92bbecf9f348ba59c93646be723d0bf2
   7 17e841146e5744b81af9959634d82c20a5d7df52

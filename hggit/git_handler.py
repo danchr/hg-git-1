@@ -837,8 +837,8 @@ class GitHandler(object):
 
         mapsavefreq = self.ui.configint(b'hggit', b'mapsavefrequency')
         with self.ui.makeprogress(b'importing', unit=b'commits', total=total) as progress:
-            for i, csha in enumerate(commits):
-                progress.update(i)
+            for i, csha in enumerate(commits, 1):
+                progress.increment()
                 commit = commit_cache[csha]
                 self.import_git_commit(commit)
                 if mapsavefreq and i % mapsavefreq == 0:
