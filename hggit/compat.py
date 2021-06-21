@@ -78,6 +78,13 @@ except ImportError:
     pathsuboption = ui.pathsuboption
 
 try:
+    from dulwich.client import HTTPUnauthorized
+except ImportError:
+    # added in dulwich 0.20.3; just create a dummy class for catching
+    class HTTPUnauthorized(Exception):
+        pass
+
+try:
     from mercurial.cmdutil import check_at_most_one_arg
 except (ImportError, AttributeError):
     # added in 5.3

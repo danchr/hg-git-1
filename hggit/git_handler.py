@@ -1389,17 +1389,12 @@ class GitHandler(object):
 
         func = getattr(clientobj, method)
 
-        # dulwich 0.19 does not offer a specific exception class
-        HTTPUnauthorized = getattr(
-            client, 'HTTPUnauthorized', type('<dummy>', (Exception,), {}),
-        )
-
         try:
             return func(path, *args, **kwargs)
-        except (HTTPUnauthorized, GitProtocolError) as e:
+        except (compat.HTTPUnauthorized, GitProtocolError) as e:
             self.ui.traceback()
 
-            if isinstance(e, HTTPUnauthorized):
+            if isinstance(e, compat.HTTPUnauthorized):
                 # this is a fallback just in case the header isn't
                 # specified
                 self._http_auth_realm = 'Git'
@@ -1423,7 +1418,7 @@ class GitHandler(object):
 
             try:
                 return func(path, *args, **kwargs)
-            except HTTPUnauthorized:
+            except compat.HTTPUnauthorized:
                 raise error.Abort(_(b'authorization failed'))
             except GitProtocolError as e:
                 # dulwich 0.19
