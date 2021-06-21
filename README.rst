@@ -376,6 +376,13 @@ To restrict publishing to specific branches or tags, use the
 Publishing commits prevents their modification, and speeds up many
 local Mercurial operations, such as ``hg shelve``.
 
+``hggit.fetchbuffer``
+-------------------
+
+Data fetched from Git is buffered in memory, unless it exceeds the
+given limit, in megabytes. By default, flush the buffer to disk when
+it exceeds 100MB.
+
 ``hggit.invalidpaths``
 -------------------
 

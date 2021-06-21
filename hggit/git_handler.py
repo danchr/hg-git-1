@@ -5,6 +5,7 @@ import itertools
 import io
 import os
 import re
+import tempfile
 import shutil
 
 from dulwich.errors import HangupException, GitProtocolError
@@ -1267,7 +1268,13 @@ class GitHandler(object):
             return [x for x in filteredrefs.values() if x not in self.git]
 
         progress = GitProgress(self.ui)
-        f = io.BytesIO()
+        max_size = self.ui.configint(b'hggit', b'fetchbuffer') * 1e6
+        f = tempfile.SpooledTemporaryFile(
+            prefix=b'hg-git-fetch-',
+            suffix=b'.pack',
+            dir=self.gitdir,
+            max_size=max_size,
+        )
 
         try:
             ret = self._call_client(remote_name, 'fetch_pack', determine_wants,
