@@ -18,7 +18,7 @@ CONFIG_DEFAULTS = {
         b'pull-prune-remote-branches': True,
     },
     b'hggit': {
-        b'mapsavefrequency': 0,
+        b'mapsavefrequency': 1000,
         b'usephases': False,
         b'invalidpaths': b'skip',
     }

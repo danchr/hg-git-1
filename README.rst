@@ -341,7 +341,7 @@ error partway through a large batch of changes. Otherwise, an error or
 interruption will roll back the transaction, similar to regular
 Mercurial.
 
-Defaults to 0, so that the mapping is saved once at the end.
+Defaults to 1000.
 
 Please note that this is disregarded for an initial clone, as any
 error or interruption will delete the destination. So instead of
