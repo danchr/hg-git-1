@@ -50,7 +50,7 @@ fn_git_commit() {
 fn_git_rebase() {
     GIT_AUTHOR_DATE="2007-01-01 00:00:$count +0000"
     GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE"
-    git rebase "$@" >/dev/null || echo "git rebase error"
+    git rebase --quiet "$@" >/dev/null || echo "git rebase error"
     count=`expr $count + 1`
 }
 
