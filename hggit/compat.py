@@ -31,10 +31,12 @@ try:
 
     url = urlutil.url
     path = urlutil.path
+    pathsuboption = urlutil.pathsuboption
 except ImportError:
     urlutil = hgutil
     url = hgutil.url
     path = ui.path
+    pathsuboption = ui.pathsuboption
 
 try:
     from mercurial.cmdutil import check_at_most_one_arg
