@@ -10,6 +10,12 @@ from mercurial import (
 )
 
 try:
+    # moved in 5.9
+    from mercurial.utils.stringutils import parselist
+except ImportError:
+    from mercurial.config import parselist
+
+try:
     # added in 5.9
     from mercurial.node import sha1nodeconstants
 except ImportError:
