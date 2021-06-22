@@ -8,6 +8,10 @@
 # Windows
 export MSYS=winsymlinks:nativestrict
 
+# Always trust root - which may own the repository we're working off
+echo "[trusted]" >> $HGRCPATH
+echo "users=root" >> $HGRCPATH
+
 # silence some output related to templates
 mkdir -p $TESTTMP/gittemplates
 export GIT_TEMPLATE_DIR=$TESTTMP/gittemplates
