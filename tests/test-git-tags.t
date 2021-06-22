@@ -312,7 +312,7 @@ This used to die:
   $ hg -R hgrepo-2 gexport
   $ rm -rf hgrepo-2
 
-Check that pulling will update phases only — which it doesn't, yet:
+Check that pulling will update phases only:
 
   $ cd hgrepo
   $ hg phase -fs gamma detached
@@ -320,7 +320,6 @@ Check that pulling will update phases only — which it doesn't, yet:
   pulling from $TESTTMP/gitrepo
   no changes found
   $ hg log -T shorttags -r gamma -r detached
-  4:0eb1ab0073a8 secret beta gamma
-  2:61175962e488 secret detached X
-  $ hg phase -d 'all()'
+  4:0eb1ab0073a8 draft beta gamma
+  2:61175962e488 draft detached X
   $ cd ..

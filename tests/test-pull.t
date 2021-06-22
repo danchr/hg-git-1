@@ -105,6 +105,15 @@ pull a branch
      summary:     add alpha
   
 
+no-op pull should affect phases
+  $ hg -R hgrepo phase -fs beta
+  $ hg -R hgrepo pull -r beta
+  pulling from $TESTTMP/gitrepo
+  no changes found
+  $ hg -R hgrepo phase beta
+  1: draft
+
+
 add another commit and tag to the git repo
   $ cd gitrepo
   $ git checkout -q beta

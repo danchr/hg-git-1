@@ -1709,6 +1709,8 @@ class GitHandler(object):
                     if LOCAL_BRANCH_PREFIX + t[len(remote_name) + 1:] not in refs:
                         del self.git.refs[REMOTE_BRANCH_PREFIX + t]
 
+        all_remote_nodeids = []
+
         for ref_name, sha in refs.items():
             hgsha = self.map_hg_get(sha)
 
@@ -1727,8 +1729,18 @@ class GitHandler(object):
                   ref_name.endswith(b'^{}')):
                 self.git.refs[ref_name] = sha
 
-        # ensure that we update phases on push and no-op pulls
-        with self.repo.lock(), self.repo.transaction(b"phase") as tr:
+            if hgsha:
+                all_remote_nodeids.append(bin(hgsha))
+
+        with self.repo.lock(), self.repo.transaction(b"hg-git-phases") as tr:
+            if all_remote_nodeids:
+                # sanity check: ensure that all corresponding commits
+                # are at least draft; this can happen on no-op pulls
+                # where the commit already exists, but is secret
+                phases.advanceboundary(
+                    self.repo, tr, phases.draft, all_remote_nodeids,
+                )
+            # ensure that we update phases on push and no-op pulls
             phases.advanceboundary(
                 self.repo,
                 tr,
