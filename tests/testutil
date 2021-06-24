@@ -62,8 +62,8 @@ fn_hg_commit() {
 
 fn_hg_commitextra() {
     HGDATE="2007-01-01 00:00:$count +0000"
-    hg --config extensions.commitextra=$TESTDIR/commitextra.py commitextra \
-        -d "$HGDATE" "$@" >/dev/null || echo "hg commit error"
+    hg --config extensions.commitextra=$TESTDIR/testlib/ext-commit-extra.py \
+       commitextra -d "$HGDATE" "$@" >/dev/null || echo "hg commit error"
     count=`expr $count + 1`
 }
 
