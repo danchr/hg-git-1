@@ -295,10 +295,7 @@ class GitHandler(object):
 
     def import_commits(self, remote_name):
         refs = self.git.refs.as_dict()
-        filteredrefs = self.filter_min_date(refs)
-        self.import_git_objects(remote_name, filteredrefs)
-        self.import_tags(refs)
-        self.update_hg_bookmarks(refs)
+        self.import_git_objects(remote_name, refs)
 
     def fetch(self, remote, heads):
         result = self.fetch_pack(remote.path, heads)
@@ -310,11 +307,9 @@ class GitHandler(object):
         oldheads = self.repo.changelog.heads()
         imported = 0
         if result.refs:
-            filteredrefs = self.filter_min_date(self.filter_refs(result.refs,
-                                                                 heads))
-            imported = self.import_git_objects(remote_name, filteredrefs)
-            self.import_tags(result.refs)
-            self.update_hg_bookmarks(result.refs)
+            imported = self.import_git_objects(
+                remote_name, result.refs, heads=heads,
+            )
 
             try:
                 symref = result.symrefs[b'HEAD']
@@ -329,9 +324,10 @@ class GitHandler(object):
                 rhead = None
                 rnode = None
 
-            if remote_name:
-                self.update_remote_branches(remote_name, result.refs)
-            elif not self.git.refs.as_dict(REMOTE_BRANCH_PREFIX):
+            if (
+                not remote_name and
+                not self.git.refs.as_dict(REMOTE_BRANCH_PREFIX)
+            ):
                 # intial cloning
                 self.update_remote_branches(b'default', result.refs)
 
@@ -839,8 +835,11 @@ class GitHandler(object):
 
         return tr
 
-    def import_git_objects(self, remote_name, refs):
-        commits = self.get_git_incoming(refs)
+    def import_git_objects(self, remote_name, refs, heads=None):
+        filteredrefs = self.filter_min_date(refs)
+        if heads is not None:
+            filteredrefs = self.filter_refs(filteredrefs, heads)
+        commits = self.get_git_incoming(filteredrefs)
         # import each of the commits, oldest first
         total = len(commits)
         if total:
@@ -867,6 +866,12 @@ class GitHandler(object):
                     for csha in commits[offset:offset + chunksize]:
                         progress.increment()
                         self.import_git_commit(self.git[csha])
+
+        self.import_tags(refs)
+        self.update_hg_bookmarks(refs)
+
+        if remote_name is not None:
+            self.update_remote_branches(remote_name, refs)
 
         # TODO if the tags cache is used, remove any dangling tag references
         return total
