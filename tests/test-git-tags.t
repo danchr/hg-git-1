@@ -247,3 +247,15 @@ Try to overwrite an annotated tag:
   alpha                              0:ff7a2f2d8d70 git
 #endif
   $ cd ..
+
+Check whether `gimport` handles tags (it does not)
+
+  $ cd hgrepo
+  $ rm .hg/git-tags .hg/git-mapfile
+  $ hg gimport
+  importing git objects into hg
+  $ hg tags -q
+  tip
+  default/master
+  beta
+  $ cd ..
