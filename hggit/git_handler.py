@@ -297,6 +297,7 @@ class GitHandler(object):
         refs = self.git.refs.as_dict()
         filteredrefs = self.filter_min_date(refs)
         self.import_git_objects(remote_name, filteredrefs)
+        self.import_tags(refs)
         self.update_hg_bookmarks(refs)
 
     def fetch(self, remote, heads):

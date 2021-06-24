@@ -248,7 +248,7 @@ Try to overwrite an annotated tag:
 #endif
   $ cd ..
 
-Check whether `gimport` handles tags (it does not)
+Check whether `gimport` handles tags
 
   $ cd hgrepo
   $ rm .hg/git-tags .hg/git-mapfile
@@ -257,5 +257,8 @@ Check whether `gimport` handles tags (it does not)
   $ hg tags -q
   tip
   default/master
+  gamma
   beta
+  detached
+  alpha
   $ cd ..
