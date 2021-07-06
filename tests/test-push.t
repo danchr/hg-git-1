@@ -195,8 +195,9 @@ Push empty Hg repo to empty Git repo (issue #58)
   $ hg -R hgrepo2 push gitrepo2
   pushing to gitrepo2
   searching for changes
-  no changes found
-  [1]
+  abort: no bookmarks or tags to push to git
+  (see "hg help bookmarks" for details on creating them)
+  [255]
 
 The remote repo is empty and the local one doesn't have any bookmarks/tags
   $ cd hgrepo2
@@ -209,18 +210,18 @@ The remote repo is empty and the local one doesn't have any bookmarks/tags
   $ hg push ../gitrepo2
   pushing to ../gitrepo2
   searching for changes
-  adding objects
-  added 1 commits with 1 trees and 1 blobs
-  adding reference refs/heads/master
+  abort: no bookmarks or tags to push to git
+  (see "hg help bookmarks" for details on creating them)
+  [255]
   $ hg summary
   parent: -1:000000000000  (no revision checked out)
   branch: default
   commit: (clean)
   update: 1 new changesets (update)
   phases: 1 draft
-Only one bookmark 'master' should be created
+That should not create any bookmarks
   $ hg bookmarks
-   * master                    0:8aded40be5af
+  no bookmarks set
 
 test for ssh vulnerability
 

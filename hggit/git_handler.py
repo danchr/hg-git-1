@@ -22,7 +22,6 @@ from mercurial.node import hex, bin, nullid
 from mercurial.utils import dateutil
 from mercurial import (
     bookmarks,
-    commands,
     context,
     encoding,
     error,
@@ -1177,26 +1176,11 @@ class GitHandler(object):
     def get_changed_refs(self, refs, exportable, force):
         new_refs = refs.copy()
 
-        # The remote repo is empty and the local one doesn't have
-        # bookmarks/tags
-        #
-        # (older dulwich versions return the proto-level
-        # capabilities^{} key when the dict should have been
-        # empty. That check can probably be removed at some point in
-        # the future.)
-        if not refs or next(iter(refs.keys())) == b'capabilities^{}':
-            if not exportable:
-                tip = self.repo.filtered(b'served').lookup(b'tip')
-                if tip != nullid:
-                    if b'capabilities^{}' in new_refs:
-                        del new_refs[b'capabilities^{}']
-                    tip = hex(tip)
-                    commands.bookmark(self.ui, self.repo, b'master',
-                                      rev=tip, force=True)
-                    bookmarks.activate(self.repo, b'master')
-                    new_refs[LOCAL_BRANCH_PREFIX + b'master'] = (
-                        self.map_git_get(tip)
-                    )
+        if not exportable:
+            raise error.Abort(
+                b'no bookmarks or tags to push to git',
+                hint=b'see "hg help bookmarks" for details on creating them',
+            )
 
         # mapped nodes might be hidden
         unfiltered = self.repo.unfiltered()

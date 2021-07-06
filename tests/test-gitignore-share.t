@@ -19,6 +19,7 @@ Load commonly used test logic
   $ echo ignored > .gitignore
   $ hg add .gitignore
   $ hg ci -m ignore
+  $ hg book master
   $ hg push
   pushing to $TESTTMP/repo.git
   searching for changes

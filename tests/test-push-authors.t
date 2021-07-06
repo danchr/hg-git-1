@@ -12,6 +12,7 @@ Create a Mercurial repository
   updating to branch default
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
+  $ hg book master
 
 Configure an author map
 

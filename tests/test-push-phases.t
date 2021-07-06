@@ -20,6 +20,7 @@ Create two commits, one secret:
   $ touch alpha
   $ hg add alpha
   $ fn_hg_commit -m alpha
+  $ hg book -r . master
   $ touch beta
   $ hg add beta
   $ fn_hg_commit --secret -m beta
