@@ -881,18 +881,20 @@ class GitHandler(object):
         self.ui.note(b"processing commits in batches of %d\n" % chunksize)
 
         with progress, self.repo.lock():
-            for offset in range(0, total, chunksize):
-                # speed up conversion by batching commits in a transaction
+            # the weird range below speeds up conversion by batching
+            # commits in a transaction, while ensuring that we always
+            # get at least one chunk
+            for offset in range(0, max(total, 1), chunksize):
                 with self.get_transaction(b"gimport"):
                     for csha in commits[offset:offset + chunksize]:
                         progress.increment()
                         self.import_git_commit(self.git[csha])
 
-        self.import_tags(refs)
-        self.update_hg_bookmarks(refs)
+                    self.import_tags(refs)
+                    self.update_hg_bookmarks(refs)
 
-        if remote_name is not None:
-            self.update_remote_branches(remote_name, refs)
+                    if remote_name is not None:
+                        self.update_remote_branches(remote_name, refs)
 
         # TODO if the tags cache is used, remove any dangling tag references
         return total
