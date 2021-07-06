@@ -312,21 +312,45 @@ class GitHandler(object):
         if imported == 0:
             return 0
 
+        # determine whether to activate a bookmark on clone
         if self.is_clone:
-            headname, headnode = self.get_result_head(result)
-
-            if headnode is not None and headname is not None:
-                # activate the bookmark corresponding to HEAD
-                suffix = self.branch_bookmark_suffix or b''
-                changes = [(headname + suffix, headnode)]
-                util.updatebookmarks(self.repo, changes)
-                bms = [headname + suffix]
+            if heads:
+                # -r/--rev was specified, so try to activate any first
+                # bookmark specified, which is what mercurial would
+                # update to -- _except_ if that also happens to
+                # resolve to a branch or tag. that seems fairly
+                # esoteric, though, so we can live with that
+                activate = heads[0]
             else:
-                # activate a tipmost bookmark.
-                bms = self.repo[b'tip'].bookmarks()
+                # no heads means no -r/--rev and that everything was
+                # pulled, so activate the remote HEAD
+                headname, headnode = self.get_result_head(result)
 
-            if bms:
-                bookmarks.activate(self.repo, bms[0])
+                if headname is not None:
+                    # head is a symref, pick the corresponding
+                    # bookmark
+                    activate = headname
+                elif headnode is not None and self.repo[headnode].bookmarks():
+                    # head is detached, but there's a bookmark
+                    # pointing to it
+                    activate = self.repo[headnode].bookmarks()[0]
+                else:
+                    # head is fully detached, so don't do anything
+                    # special other than issue a warning (at some
+                    # point in the furture, we could convert HEAD into
+                    # @)
+                    self.ui.warn(
+                        b"warning: the git source repository has a "
+                        b"detached head\n"
+                        b"(you may want to update to a bookmark)\n"
+                    )
+                    activate = None
+
+            if activate is not None:
+                activate += self.branch_bookmark_suffix or b''
+
+                if activate in self.repo._bookmarks:
+                    bookmarks.activate(self.repo, activate)
 
         # code taken from localrepo.py:addchangegroup
         dh = 0

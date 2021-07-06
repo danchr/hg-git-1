@@ -27,11 +27,10 @@ Load commonly used test logic
 clone a tag
   $ hg clone -r alpha gitrepo hgrepo-a
   importing git objects into hg
-  updating to bookmark master (hg57 !)
-  updating to branch default (no-hg57 !)
+  updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo-a bookmarks
-   * master                    0:ff7a2f2d8d70
+     master                    0:ff7a2f2d8d70
   $ hg -R hgrepo-a log --graph
   @  changeset:   0:ff7a2f2d8d70
      bookmark:    master
@@ -140,27 +139,32 @@ clone empty repo
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ rm -rf empty emptyhg
 
-test cloning detached HEAD, but pointing to a branch; this leads
-somewhat counterintuitively to a completely different bookmark being
-activated
+test cloning detached HEAD, but pointing to a branch; we detect this
+and activate the corresponding bookmark
 
   $ cd gitrepo
   $ git checkout -q -d master
   $ cd ..
+#if hg57
   $ hg clone gitrepo hgrepo-2
   importing git objects into hg
-  updating to bookmark beta
+  updating to bookmark master
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+#else
+  $ hg clone gitrepo hgrepo-2
+  importing git objects into hg
+  updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  updating to branch default (no-hg57 !)
-  2 files updated, 0 files merged, 0 files removed, 0 files unresolved (no-hg57 !)
+#endif
   $ hg -R hgrepo-2 book
-   * beta                      4:47d12948785d
+     beta                      4:47d12948785d
      gamma                     2:ca33a262eb46
-     master                    0:ff7a2f2d8d70
+   * master                    0:ff7a2f2d8d70
   $ rm -rf hgrepo-2
 
 test cloning fully detached HEAD; we don't convert the
-anonymous/detached head, so we get the tipmost bookmark
+anonymous/detached head, so we just issue a warning and don't do
+anything special
 
   $ cd gitrepo
   $ git checkout -q -d master
@@ -170,10 +174,12 @@ anonymous/detached head, so we get the tipmost bookmark
   $ cd ..
   $ hg clone gitrepo hgrepo-2
   importing git objects into hg
-  updating to bookmark beta
+  warning: the git source repository has a detached head
+  (you may want to update to a bookmark)
+  updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo-2 book
-   * beta                      4:47d12948785d
+     beta                      4:47d12948785d
      gamma                     2:ca33a262eb46
      master                    0:ff7a2f2d8d70
   $ hg -R hgrepo-2 id --tags
