@@ -40,7 +40,8 @@ def gimport(ui, repo, remote_name=None):
     somehow, use this command to import those changes.
 
     '''
-    repo.githandler.import_commits(remote_name)
+    with repo.wlock():
+        repo.githandler.import_commits(remote_name)
 
 
 @eh.command(b'gexport')
