@@ -3,38 +3,9 @@
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
-bail if the user does not have dulwich
-  $ python -c 'import dulwich, dulwich.repo' || exit 80
-
-  $ echo "[extensions]" >> $HGRCPATH
-  $ echo "hggit=$(echo $(dirname $TESTDIR))/hggit" >> $HGRCPATH
-  $ echo 'hgext.graphlog =' >> $HGRCPATH
   $ echo "[git]" >> $HGRCPATH
   $ echo "branch_bookmark_suffix=_bookmark" >> $HGRCPATH
 
-  $ GIT_AUTHOR_NAME='test'; export GIT_AUTHOR_NAME
-  $ GIT_AUTHOR_EMAIL='test@example.org'; export GIT_AUTHOR_EMAIL
-  $ GIT_AUTHOR_DATE="2007-01-01 00:00:00 +0000"; export GIT_AUTHOR_DATE
-  $ GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"; export GIT_COMMITTER_NAME
-  $ GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"; export GIT_COMMITTER_EMAIL
-  $ GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE"; export GIT_COMMITTER_DATE
-
-  $ count=10
-  $ commit()
-  > {
-  >     GIT_AUTHOR_DATE="2007-01-01 00:00:$count +0000"
-  >     GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE"
-  >     git commit "$@" >/dev/null 2>/dev/null || echo "git commit error"
-  >     count=`expr $count + 1`
-  > }
-  $ hgcommit()
-  > {
-  >     HGDATE="2007-01-01 00:00:$count +0000"
-  >     hg commit -d "$HGDATE" "$@" >/dev/null 2>/dev/null || echo "hg commit error"
-  >     count=`expr $count + 1`
-  > }
-
-  $ git config --global push.default matching
   $ git init --bare gitrepo1
   Initialized empty Git repository in $TESTTMP/gitrepo1/
 
@@ -50,12 +21,12 @@ bail if the user does not have dulwich
   $ hg bookmark branch1_bookmark
   $ echo f1 > f1
   $ hg add f1
-  $ hgcommit -m "add f1"
+  $ fn_hg_commit -m "add f1"
   $ hg branch -q branch2
   $ hg bookmark branch2_bookmark
   $ echo f2 > f2
   $ hg add f2
-  $ hgcommit -m "add f2"
+  $ fn_hg_commit -m "add f2"
   $ hg log --graph
   @  changeset:   1:600de9b6d498
   |  branch:      branch2
@@ -96,12 +67,12 @@ bail if the user does not have dulwich
   $ git checkout -q branch1
   $ echo g1 >> f1
   $ git add f1
-  $ commit -m "append f1"
+  $ fn_git_commit -m "append f1"
   $ git checkout -q branch2
   $ echo g2 >> f2
   $ git add f2
-  $ commit -m "append f2"
-  $ git push origin
+  $ fn_git_commit -m "append f2"
+  $ git push origin branch1 branch2
   To $TESTTMP/gitrepo1
      bbfe79a..d8aef79  branch1 -> branch1
      288e92b..f8f8de5  branch2 -> branch2
