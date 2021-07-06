@@ -50,6 +50,8 @@ Load commonly used test logic
   searching for changes
   adding objects
   added 2 commits with 2 trees and 2 blobs
+  adding reference refs/heads/branch1
+  adding reference refs/heads/branch2
 
   $ cd ..
 

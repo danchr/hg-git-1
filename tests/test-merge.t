@@ -46,6 +46,8 @@ clear the cache to be sure it is regenerated correctly
   searching for changes
   adding objects
   added 4 commits with 4 trees and 3 blobs
+  adding reference refs/heads/beta
+  adding reference refs/heads/master
 
   $ cd ..
 git log in repo pushed from hg

@@ -66,6 +66,7 @@ Hg clone it
   searching for changes
   adding objects
   added 1 commits with 1 trees and 0 blobs
+  adding reference refs/heads/signed
   $ cd ..
 
 Verify the commit

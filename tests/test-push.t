@@ -211,6 +211,7 @@ The remote repo is empty and the local one doesn't have any bookmarks/tags
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
+  adding reference refs/heads/master
   $ hg summary
   parent: -1:000000000000  (no revision checked out)
   branch: default

@@ -28,6 +28,7 @@ Load commonly used test logic
   searching for changes
   adding objects
   added 1 commits with 1 trees and 0 blobs
+  adding reference refs/heads/master
   $ cd ..
   $ git --git-dir=gitrepo2 log --pretty=medium
   commit 678256865a8c85ae925bf834369264193c88f8de

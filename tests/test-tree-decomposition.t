@@ -45,6 +45,7 @@ Load commonly used test logic
   searching for changes
   adding objects
   added 3 commits with 6 trees and 3 blobs
+  adding reference refs/heads/master
   $ cd ..
 
   $ git --git-dir=gitrepo2 log --pretty=medium

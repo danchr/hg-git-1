@@ -406,31 +406,32 @@ class GitHandler(object):
     def push(self, remote, revs, force):
         old_refs, new_refs = self.upload_pack(remote, revs, force)
         remote_name = self.remote_name(remote, True)
+        remote_desc = remote_name or remote
 
         if not isinstance(new_refs, dict):
             # dulwich 0.20.6 changed the API and deprectated treating
             # the result as a dictionary
             new_refs = new_refs.refs
 
-        if remote_name and new_refs:
-            for ref, new_sha in sorted(new_refs.items()):
-                old_sha = old_refs.get(ref)
-                if old_sha is None:
-                    if self.ui.verbose:
-                        self.ui.note(b"adding reference %s::%s => GIT:%s\n" %
-                                     (remote_name, ref, new_sha[0:8]))
-                    else:
-                        self.ui.status(b"adding reference %s\n" % ref)
-                elif new_sha != old_sha:
-                    if self.ui.verbose:
-                        self.ui.note(b"updating reference %s::%s => GIT:%s\n" %
-                                     (remote_name, ref, new_sha[0:8]))
-                    else:
-                        self.ui.status(b"updating reference %s\n" % ref)
+        for ref, new_sha in sorted(new_refs.items()):
+            old_sha = old_refs.get(ref)
+            if old_sha is None:
+                if self.ui.verbose:
+                    self.ui.note(b"adding reference %s::%s => GIT:%s\n" %
+                                 (remote_desc, ref, new_sha[0:8]))
                 else:
-                    self.ui.debug(b"unchanged reference %s::%s => GIT:%s\n" %
-                                  (remote_name, ref, new_sha[0:8]))
+                    self.ui.status(b"adding reference %s\n" % ref)
+            elif new_sha != old_sha:
+                if self.ui.verbose:
+                    self.ui.note(b"updating reference %s::%s => GIT:%s\n" %
+                                 (remote_desc, ref, new_sha[0:8]))
+                else:
+                    self.ui.status(b"updating reference %s\n" % ref)
+            else:
+                self.ui.debug(b"unchanged reference %s::%s => GIT:%s\n" %
+                              (remote_desc, ref, new_sha[0:8]))
 
+        if new_refs and remote_name:
             # make sure that we know the remote head, for possible
             # publishing
             new_refs_with_head = new_refs.copy()

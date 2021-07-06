@@ -117,6 +117,7 @@ The warning message changed in Git 1.8.0
   searching for changes
   adding objects
   added 4 commits with 4 trees and 4 blobs
+  adding reference refs/heads/master
 
   $ cd ..
   $ git --git-dir=gitrepo2 log --pretty=medium
