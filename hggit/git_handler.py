@@ -484,7 +484,33 @@ class GitHandler(object):
                 self.update_remote_branches(remote_name, new_refs_with_head)
 
         if old_refs == new_refs:
-            self.ui.status(_(b"no changes found\n"))
+            if revs or not old_refs:
+                # fast path to skip the check below
+                self.ui.status(_(b"no changes found\n"))
+            else:
+                # check whether any commits were skipped due to
+                # missing names; this is equivalent to the stock
+                # (ignoring %d secret commits) message, but specific
+                # to pushing to Git, which doesn't have anonymous
+                # heads
+                served = self.repo.filtered(b'served')
+                exported = set(filter(None, (
+                    self.map_hg_get(sha, deref=True)
+                    for sha in old_refs.values()
+                )))
+                unexported = served.revs(
+                    b"not ancestors(%s)" % b" or ".join(exported),
+                )
+
+                if not unexported:
+                    self.ui.status(_(b"no changes found\n"))
+                else:
+                    self.ui.status(
+                        b"no changes found "
+                        b"(ignoring %d changesets without bookmarks or tags)\n"
+                        % len(unexported),
+                    )
+
             ret = None
         elif len(new_refs) > len(old_refs):
             ret = 1 + (len(new_refs) - len(old_refs))
