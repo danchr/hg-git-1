@@ -72,10 +72,16 @@ Load commonly used test logic
   $ echo g2 >> f2
   $ git add f2
   $ fn_git_commit -m "append f2"
-  $ git push origin branch1 branch2
+  $ git checkout -b branch3
+  Switched to a new branch 'branch3'
+  $ echo g3 >> f3
+  $ git add f3
+  $ fn_git_commit -m "append f3"
+  $ git push origin branch1 branch2 branch3
   To $TESTTMP/gitrepo1
      bbfe79a..d8aef79  branch1 -> branch1
      288e92b..f8f8de5  branch2 -> branch2
+   * [new branch]      branch3 -> branch3
 make sure the commit doesn't have an HG:rename-source annotation
   $ git cat-file commit d8aef79
   tree b5644d8071b8a5963b8d1fd089fb3fdfb14b1203
@@ -94,10 +100,17 @@ make sure the commit doesn't have an HG:rename-source annotation
   importing git objects into hg
   (run 'hg heads' to see heads)
   $ hg log --graph
+  o  changeset:   4:faf44fc3a4e8
+  |  bookmark:    branch3_bookmark
+  |  tag:         default/branch3
+  |  tag:         tip
+  |  user:        test <test@example.org>
+  |  date:        Mon Jan 01 00:00:14 2007 +0000
+  |  summary:     append f3
+  |
   o  changeset:   3:ae8eb55f7090
   |  bookmark:    branch2_bookmark
   |  tag:         default/branch2
-  |  tag:         tip
   |  parent:      1:600de9b6d498
   |  user:        test <test@example.org>
   |  date:        Mon Jan 01 00:00:13 2007 +0000
@@ -123,6 +136,77 @@ make sure the commit doesn't have an HG:rename-source annotation
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add f1
   
-
-
   $ cd ..
+
+Try cloning a bookmark, and make sure it gets checked out:
+
+  $ rm -r hgrepo
+  $ hg clone -r branch3 gitrepo1 hgrepo
+  importing git objects into hg
+  updating to bookmark branch3_bookmark (hg57 !)
+  updating to branch default (no-hg57 !)
+  3 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ cd hgrepo
+  $ hg bookmarks
+     branch2_bookmark          2:ae8eb55f7090
+   * branch3_bookmark          3:faf44fc3a4e8
+  $ hg log --graph
+  @  changeset:   3:faf44fc3a4e8
+  |  bookmark:    branch3_bookmark
+  |  tag:         default/branch3
+  |  tag:         tip
+  |  user:        test <test@example.org>
+  |  date:        Mon Jan 01 00:00:14 2007 +0000
+  |  summary:     append f3
+  |
+  o  changeset:   2:ae8eb55f7090
+  |  bookmark:    branch2_bookmark
+  |  tag:         default/branch2
+  |  user:        test <test@example.org>
+  |  date:        Mon Jan 01 00:00:13 2007 +0000
+  |  summary:     append f2
+  |
+  o  changeset:   1:600de9b6d498
+  |  branch:      branch2
+  |  user:        test
+  |  date:        Mon Jan 01 00:00:11 2007 +0000
+  |  summary:     add f2
+  |
+  o  changeset:   0:40a840c1f8ae
+     branch:      branch1
+     user:        test
+     date:        Mon Jan 01 00:00:10 2007 +0000
+     summary:     add f1
+  
+  $ cd ..
+
+Try cloning something that's both a bookmark and a branch, and see the
+results. They're a bit suprising as the bookmark does get activated,
+but the branch get checked out. Although this does seem a bit odd, so
+does the scenario.
+
+  $ rm -r hgrepo
+  $ hg clone -r branch1 gitrepo1 hgrepo
+  importing git objects into hg
+  updating to branch branch1
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ cd hgrepo
+  $ hg bookmarks
+   * branch1_bookmark          1:8211cade99e4
+  $ hg log --graph
+  o  changeset:   1:8211cade99e4
+  |  bookmark:    branch1_bookmark
+  |  tag:         default/branch1
+  |  tag:         tip
+  |  user:        test <test@example.org>
+  |  date:        Mon Jan 01 00:00:12 2007 +0000
+  |  summary:     append f1
+  |
+  @  changeset:   0:40a840c1f8ae
+     branch:      branch1
+     user:        test
+     date:        Mon Jan 01 00:00:10 2007 +0000
+     summary:     add f1
+  
+  $ cd ..
+
