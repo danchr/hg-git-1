@@ -1,3 +1,5 @@
+#testcases with-path without-path
+
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
@@ -36,7 +38,13 @@ bail if the user does not have dulwich
   $ git init --bare gitrepo1
   Initialized empty Git repository in $TESTTMP/gitrepo1/
 
+#if with-path
+  $ hg clone gitrepo1 hgrepo
+  updating to branch default
+  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+#else
   $ hg init hgrepo
+#endif
   $ cd hgrepo
   $ hg branch -q branch1
   $ hg bookmark branch1_bookmark
@@ -108,6 +116,8 @@ make sure the commit doesn't have an HG:rename-source annotation
   $ cd ..
 
   $ cd hgrepo
+  $ hg paths
+  default = $TESTTMP/gitrepo1 (with-path !)
   $ hg pull ../gitrepo1
   pulling from ../gitrepo1
   importing git objects into hg
