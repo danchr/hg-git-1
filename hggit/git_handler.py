@@ -231,7 +231,16 @@ class GitHandler(object):
         self._map_git[gitsha] = hgsha
         self._map_hg[hgsha] = gitsha
 
-    def map_hg_get(self, gitsha):
+    def map_hg_get(self, gitsha, deref=False):
+        if deref:
+            try:
+                gitobj = self.git.get_object(gitsha)
+            except KeyError:
+                gitobj = None
+
+            if isinstance(gitobj, Tag):
+                gitsha = gitobj.object[1]
+
         return self._map_git.get(gitsha)
 
     def map_git_get(self, hgsha):
@@ -408,17 +417,9 @@ class GitHandler(object):
             old = {}
 
             for ref, sha in old_refs.items():
-                try:
-                    gittag = self.git.get_object(sha)
-                except KeyError:
-                    gittag = None
-
                 # make sure we don't accidentally dereference and lose
                 # annotated tags
-                if isinstance(gittag, Tag):
-                    sha = gittag.object[1]
-
-                old_target = self.map_hg_get(sha)
+                old_target = self.map_hg_get(sha, deref=True)
 
                 if old_target:
                     self.ui.debug(b'unchanged ref %s: %s\n' % (ref, old_target))
@@ -1572,20 +1573,10 @@ class GitHandler(object):
                 if ref_name[-3:] == b'^{}':
                     ref_name = ref_name[:-3]
                 if ref_name not in repotags:
-                    obj = self.git.get_object(refs[k])
-                    sha = None
-                    if isinstance(obj, Commit):  # lightweight
-                        sha = self.map_hg_get(refs[k])
-                        if sha is not None:
-                            self.tags[ref_name] = sha
-                    elif isinstance(obj, Tag):  # annotated
-                        (obj_type, obj_sha) = obj.object
-                        obj = self.git.get_object(obj_sha)
-                        if isinstance(obj, Commit):
-                            sha = self.map_hg_get(obj_sha)
-                            # TODO: better handling for annotated tags
-                            if sha is not None:
-                                self.tags[ref_name] = sha
+                    sha = self.map_hg_get(refs[k], deref=True)
+                    if sha is not None:
+                        self.tags[ref_name] = sha
+
         self.save_tags()
 
     def add_tag(self, target, *tags):
