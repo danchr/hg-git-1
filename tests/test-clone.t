@@ -139,3 +139,43 @@ clone empty repo
   updating to branch default
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ rm -rf empty emptyhg
+
+test cloning detached HEAD, but pointing to a branch; this leads
+somewhat counterintuitively to a completely different bookmark being
+activated
+
+  $ cd gitrepo
+  $ git checkout -q -d master
+  $ cd ..
+  $ hg clone gitrepo hgrepo-2
+  importing git objects into hg
+  updating to bookmark beta
+  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  updating to branch default (no-hg57 !)
+  2 files updated, 0 files merged, 0 files removed, 0 files unresolved (no-hg57 !)
+  $ hg -R hgrepo-2 book
+   * beta                      4:47d12948785d
+     gamma                     2:ca33a262eb46
+     master                    0:ff7a2f2d8d70
+  $ rm -rf hgrepo-2
+
+test cloning fully detached HEAD; we don't convert the
+anonymous/detached head, so we get the tipmost bookmark
+
+  $ cd gitrepo
+  $ git checkout -q -d master
+  $ echo delta > delta
+  $ git add delta
+  $ fn_git_commit -m 'add delta'
+  $ cd ..
+  $ hg clone gitrepo hgrepo-2
+  importing git objects into hg
+  updating to bookmark beta
+  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg -R hgrepo-2 book
+   * beta                      4:47d12948785d
+     gamma                     2:ca33a262eb46
+     master                    0:ff7a2f2d8d70
+  $ hg -R hgrepo-2 id --tags
+  default/beta tip
+  $ rm -rf hgrepo-2
