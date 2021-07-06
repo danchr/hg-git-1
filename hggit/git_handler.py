@@ -354,18 +354,17 @@ class GitHandler(object):
         try:
             self.export_git_objects()
             self.export_hg_tags()
-            self.update_references()
+            return self.update_references()
         finally:
             self.save_map(self.map_file)
 
     def get_refs(self, remote):
-        self.export_commits()
+        exportable = self.export_commits()
         old_refs = {}
         new_refs = {}
 
         def changed(refs):
             old_refs.update(refs)
-            exportable = self.get_exportable()
             new_refs.update(self.get_changed_refs(refs, exportable, True))
             return refs  # always return the same refs to make the send a no-op
 
@@ -405,7 +404,6 @@ class GitHandler(object):
                               + pycompat.sysbytes(str(e)))
 
     def push(self, remote, revs, force):
-        self.export_commits()
         old_refs, new_refs = self.upload_pack(remote, revs, force)
         remote_name = self.remote_name(remote, True)
 
@@ -1113,13 +1111,13 @@ class GitHandler(object):
     # PACK UPLOADING AND FETCHING
 
     def upload_pack(self, remote, revs, force):
+        all_exportable = self.export_commits()
         old_refs = {}
         change_totals = {}
 
         def changed(refs):
             self.ui.status(_(b"searching for changes\n"))
             old_refs.update(refs)
-            all_exportable = self.get_exportable()
             if revs is None:
                 exportable = all_exportable
             else:
@@ -1452,6 +1450,8 @@ class GitHandler(object):
                 git_sha = self.map_git_get(hg_sha)
                 if git_sha:
                     self.git.refs[git_ref] = git_sha
+
+        return exportable
 
     def export_hg_tags(self):
         for tag, sha in self.repo.tags().items():
