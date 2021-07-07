@@ -1272,16 +1272,33 @@ class GitHandler(object):
         tempargs = dict(
             prefix=b'hg-git-fetch-', suffix=b'.pack', dir=self.gitdir,
         )
-        max_size = self.ui.configint(b'hggit', b'fetchbuffer') * 1e6
-        f = tempfile.SpooledTemporaryFile(**tempargs, max_size=max_size)
+
+        if self.is_clone and self.gitdir.startswith(self.repo.root):
+            # if we're in a clone, and the git directory is within the
+            # repository just created, so we can use a named temporary
+            # file, suitable for moving into the git repository
+            move = delete = True
+            f = tempfile.NamedTemporaryFile(**tempargs, delete=False)
+        else:
+            move = delete = False
+            max_size = self.ui.configint(b'hggit', b'fetchbuffer') * 1e6
+            f = tempfile.SpooledTemporaryFile(**tempargs, max_size=max_size)
 
         try:
             ret = self._call_client(remote_name, 'fetch_pack', determine_wants,
                                     graphwalker, f.write, progress.progress)
 
             if(f.tell() != 0):
-                f.seek(0)
-                self.git.object_store.add_thin_pack(f.read, None)
+                if move:
+                    self.ui.debug(b'moving git pack into %s\n' % self.gitdir)
+                    # windows might have issues moving an open file?
+                    f.close()
+                    self.git.object_store.move_in_pack(f.name)
+                    delete = False
+                else:
+                    self.ui.debug(b'adding git pack to %s\n' % self.gitdir)
+                    f.seek(0)
+                    self.git.object_store.add_thin_pack(f.read, None)
 
             # For empty repos dulwich gives us None, but since later
             # we want to iterate over this, we really want an empty
@@ -1296,6 +1313,8 @@ class GitHandler(object):
         finally:
             progress.flush()
             f.close()
+            if delete:
+                os.remove(f.name)
 
     def _call_client(self, remote_name, method, *args, **kwargs):
         clientobj, path = self._get_transport_and_path(remote_name)

@@ -34,6 +34,49 @@ files. We also have 10 tags.
   > done
   $ cd ..
 
+Moving or adding the Git pack
+-----------------------------
+
+As an optimisation, we want to move in the Git pack when it is safe to
+do so. In a normal pull, the pack might be thin so you have to add it.
+However, we know that we always created the repository in an initial
+clone, so we can avoid the extra overhead.
+
+Cloning into a new repository is definitely safe:
+
+  $ rm -rf hgrepo
+  $ hg clone -r v1 gitrepo hgrepo --debug \
+  > | grep -e "git pack"
+  moving git pack into $TESTTMP/hgrepo/.hg/git
+  $ rm -rf hgrepo
+
+Pulling isn't safe:
+
+  $ hg clone -r v1 gitrepo hgrepo --quiet
+  $ hg -R hgrepo pull -r v2 --debug \
+  > | grep -e "git pack"
+  adding git pack to $TESTTMP/hgrepo/.hg/git
+  $ rm -rf hgrepo
+
+Cloning with git.intree is also safe:
+
+  $ hg clone -r v1 gitrepo --config git.intree=yes hgrepo --debug \
+  > | grep -e "git pack"
+  moving git pack into $TESTTMP/hgrepo/.git
+  $ rm -rf hgrepo
+
+The sanity check below shows why it's safe, as a preexisting git
+repository prevents cloning into the directory:
+
+  $ git init -q hgrepo
+  $ hg clone gitrepo --config git.intree=yes hgrepo
+  abort: destination 'hgrepo' is not empty
+  [255]
+  $ hg clone $TESTTMP/gitrepo --config git.intree=yes --cwd hgrepo .
+  abort: destination '.' is not empty
+  [255]
+  $ rm -rf hgrepo
+
 Map saving
 ----------
 
