@@ -1,3 +1,16 @@
+hg-git 0.10.2 (unreleased)
+==========================
+
+This is a minor release, focusing on bugs and compatibility.
+
+Enhancements:
+
+* Add support for Mercurial 5.9.
+
+Bug fixes:
+
+* Fix the ``git.authors`` configuration option, broken in Python 3.
+
 hg-git 0.10.1 (2020-05-12)
 ==========================
 
