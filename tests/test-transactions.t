@@ -7,18 +7,30 @@ conversion fails or is interrupted.
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
-Create a git repository with lots of commits, that touches lots of
-different files.
+Enable a few other extensions:
+
+  $ cat >> $HGRCPATH <<EOF
+  > [extensions]
+  > breakage = $TESTDIR/testlib/ext-break-git-import.py
+  > strip =
+  > EOF
+
+Create a git repository with 100 commits, that touches 10 different
+files. We also have 10 tags.
 
   $ git init gitrepo
   Initialized empty Git repository in $TESTTMP/gitrepo/.git/
   $ cd gitrepo
-  $ for i in $(seq 100)
+  $ for i in $(seq 10)
   > do
-  >   f=$(expr $i % 10)
-  >   echo $i > $f
-  >   git add $f
-  >   fn_git_commit -m $i
+  >   for f in $(seq 10)
+  >   do
+  >     n=$(expr $i \* $f)
+  >     echo $n > $f
+  >     git add $f
+  >     fn_git_commit -m $n
+  >   done
+  >   fn_git_tag -m $i v$i
   > done
   $ cd ..
 
@@ -57,9 +69,6 @@ Ideally, we would always save the results of whatever happened
   $ cat >> hgrepo/.hg/hgrc <<EOF
   > [paths]
   > default = $TESTTMP/gitrepo
-  > [extensions]
-  > breakage = $TESTDIR/testlib/ext-break-git-import.py
-  > strip =
   > EOF
   $ cd hgrepo
 
@@ -84,7 +93,7 @@ How does map save interval work?
   interrupted!
   [255]
   $ hg log -l 10 -T '{rev} {gitnode}\n'
-  9 1d6b9d3de3098d28bb786d18849f5790a08a9a08
+  9 7cbb16ec981b308e1e2b181f8e1f22c8f409f44e
   8 42da70ed92bbecf9f348ba59c93646be723d0bf2
   7 17e841146e5744b81af9959634d82c20a5d7df52
   6 c31065bf97bf014815e37cdfbdef2c32c687f314
@@ -111,7 +120,7 @@ Test the user exiting in the middle of a conversion:
   interrupted!
   [255]
   $ hg log -l 10 -T '{rev} {gitnode}\n'
-  9 1d6b9d3de3098d28bb786d18849f5790a08a9a08
+  9 7cbb16ec981b308e1e2b181f8e1f22c8f409f44e
   8 42da70ed92bbecf9f348ba59c93646be723d0bf2
   7 17e841146e5744b81af9959634d82c20a5d7df52
   6 c31065bf97bf014815e37cdfbdef2c32c687f314
@@ -133,7 +142,6 @@ current behaviour.
   $ mkdir hgrepo
   $ EXIT_AFTER=15 \
   > hg --config hggit.mapsavefrequency=10 --config git.intree=yes \
-  > --config extensions.breakage=$TESTDIR/testlib/ext-break-git-import.py \
   > --cwd hgrepo \
   > clone -U $TESTTMP/gitrepo .
   importing git objects into hg
