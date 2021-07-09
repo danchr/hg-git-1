@@ -89,6 +89,7 @@ And finally, pull the new commit:
   $ hg -R repo-git pull -u
   pulling from git://git-server/repo.git
   importing 1 git commits
+  adding bookmark master
   new changesets fa22339f4ab8 (1 drafts)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
@@ -108,6 +109,7 @@ But we can specify authentication in the configuration:
   >    pull -u
   pulling from http://git-server/repo.git
   importing 1 git commits
+  adding bookmark master
   new changesets fa22339f4ab8 (1 drafts)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 

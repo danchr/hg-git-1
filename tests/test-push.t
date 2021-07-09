@@ -74,6 +74,7 @@ this should fail
   $ hg pull 2>&1 | grep -v 'divergent bookmark'
   pulling from $TESTTMP/gitrepo
   importing 1 git commits
+  not updating diverged bookmark master
   new changesets 25eed24f5e8f (1 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
 TODO shouldn't need to do this since we're (in theory) pushing master explicitly,

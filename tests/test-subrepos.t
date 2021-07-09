@@ -102,6 +102,7 @@ bring working copy to HEAD state (it's not bare repo)
   $ hg pull
   pulling from $TESTTMP/gitrepo1
   importing 1 git commits
+  updating bookmark master
   new changesets [0-9a-f]{12,12} \(1 drafts\) (re)
   (run 'hg update' to get a working copy)
   $ hg checkout -C

@@ -51,6 +51,7 @@ do some work
 get things back to hg
   $ hg gimport
   importing 1 git commits
+  updating bookmark master
   new changesets 9f124f3c1fc2 (1 drafts)
   $ hg log --graph --debug | grep -v phase:
   o  changeset:   1:9f124f3c1fc29a14f5eb027c24811b0ac9d5ff10
@@ -117,6 +118,7 @@ gimport support for git.mindate
   > git commit -m newcommit > /dev/null || echo "git commit error"
   $ hg gimport
   importing 2 git commits
+  updating bookmark master
   new changesets befdecd14df5:3d10b7289d79 (2 drafts)
   $ hg log --graph
   o  changeset:   3:3d10b7289d79

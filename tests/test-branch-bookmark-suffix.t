@@ -98,6 +98,9 @@ make sure the commit doesn't have an HG:rename-source annotation
   $ hg pull ../repo.git
   pulling from ../repo.git
   importing 3 git commits
+  updating bookmark branch1_bookmark
+  updating bookmark branch2_bookmark
+  adding bookmark branch3_bookmark
   new changesets 8211cade99e4:faf44fc3a4e8 (3 drafts)
   (run 'hg heads' to see heads)
   $ hg log --graph
@@ -226,6 +229,9 @@ Now try pulling a diverged bookmark:
   $ hg -R hgrepo pull repo.git
   pulling from repo.git
   importing 5 git commits
+  adding bookmark branch1_bookmark
+  adding bookmark branch2_bookmark
+  adding bookmark branch3_bookmark
   new changesets 40a840c1f8ae:faf44fc3a4e8 (5 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
 #endif
@@ -239,6 +245,7 @@ Now try pulling a diverged bookmark:
   $ hg pull ../repo.git
   pulling from ../repo.git
   importing 1 git commits
+  not updating diverged bookmark branch1_bookmark
   new changesets 895d0307f8b7 (1 drafts)
   (run 'hg update' to get a working copy)
   $ hg log --graph

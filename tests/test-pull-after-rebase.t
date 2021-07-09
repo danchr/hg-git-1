@@ -87,6 +87,7 @@ Pull that
   $ hg pull
   pulling from $TESTTMP/repo.git
   importing 1 git commits
+  adding bookmark otherbranch
   1 new orphan changesets
   new changesets f4bd265a9d39 (1 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
@@ -118,6 +119,7 @@ Now try rebasing that branch, from the Git side of things
   $ hg pull
   pulling from $TESTTMP/repo.git
   no changes found
+  not updating diverged bookmark otherbranch
   $ hg state
   *  otherbranch tip 4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5
   |  add gamma

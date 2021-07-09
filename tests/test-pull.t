@@ -35,6 +35,7 @@ pull a tag
   $ hg -R hgrepo pull -r t_alpha
   pulling from $TESTTMP/gitrepo
   importing 1 git commits
+  adding bookmark master
   new changesets ff7a2f2d8d70 (1 drafts)
   (run 'hg update' to get a working copy)
   $ hg -R hgrepo update t_alpha
@@ -62,6 +63,7 @@ no-op pull with added bookmark
   $ hg -R hgrepo pull -r epsilon
   pulling from $TESTTMP/gitrepo
   no changes found
+  adding bookmark epsilon
 
 pull something that doesn't exist
   $ hg -R hgrepo pull -r kaflaflibob
@@ -81,6 +83,7 @@ pull a branch
   $ hg -R hgrepo pull -r beta
   pulling from $TESTTMP/gitrepo
   importing 1 git commits
+  adding bookmark beta
   new changesets 7fe02317c63d (1 drafts)
   (run 'hg update' to get a working copy)
   $ hg -R hgrepo log --graph --template=phases
@@ -128,6 +131,8 @@ pull everything else
   $ hg -R hgrepo pull
   pulling from $TESTTMP/gitrepo
   importing 2 git commits
+  adding bookmark delta
+  updating bookmark master
   new changesets 678ebee93e38:6f898ad1f3e1 (2 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
   $ hg -R hgrepo log --graph --template=phases
@@ -181,6 +186,7 @@ pull the merge
   $ hg -R hgrepo pull --config git.pull-prune-remote-branches=false
   pulling from $TESTTMP/gitrepo
   importing 1 git commits
+  updating bookmark master
   new changesets a02330f767a4 (1 drafts)
   (run 'hg update' to get a working copy)
   $ hg -R hgrepo tags | grep default/beta
@@ -250,6 +256,8 @@ ensure that releases/v1 and releases/v2 are pulled but not notreleases/v1
   $ hg -R hgrepo pull -r 'releases/*'
   pulling from $TESTTMP/gitrepo
   importing 2 git commits
+  adding bookmark releases/v1
+  adding bookmark releases/v2
   new changesets 218b2d0660d3:a3f95e150b0a (2 drafts)
   (run 'hg heads .' to see heads, 'hg merge' to merge)
   $ hg -R hgrepo log --graph
@@ -359,6 +367,7 @@ also add an annotated tag
   $ hg -R hgrepo pull
   pulling from $TESTTMP/gitrepo
   importing 3 git commits
+  updating bookmark master
   new changesets 49713da8f665:e103a73f33be (3 drafts)
   (run 'hg heads .' to see heads, 'hg merge' to merge)
   $ hg -R hgrepo heads

@@ -79,6 +79,7 @@ pulling publishes the branch
   $ hg pull -r master other
   pulling from $TESTTMP/gitrepo/.git
   importing 1 git commits
+  updating bookmark master
   new changesets 7fe02317c63d
   1 local changesets published
   (run 'hg update' to get a working copy)
@@ -86,6 +87,7 @@ pulling publishes the branch
   $ hg pull -r master other
   pulling from $TESTTMP/gitrepo/.git
   importing 1 git commits
+  updating bookmark master
   new changesets 7fe02317c63d (1 drafts)
   (run 'hg update' to get a working copy)
 #endif
@@ -97,6 +99,7 @@ pulling publishes the branch
   $ hg pull
   pulling from $TESTTMP/gitrepo
   importing 2 git commits
+  adding bookmark not-master
   new changesets ca33a262eb46:03769a650ded (1 drafts)
   1 local changesets published
   (run 'hg update' to get a working copy)
@@ -104,6 +107,7 @@ pulling publishes the branch
   $ hg pull
   pulling from $TESTTMP/gitrepo
   importing 2 git commits
+  adding bookmark not-master
   new changesets ca33a262eb46:03769a650ded (1 drafts)
   2 local changesets published
   (run 'hg update' to get a working copy)

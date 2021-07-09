@@ -1651,12 +1651,26 @@ class GitHandler(object):
             for head, hgsha in self._get_heads(refs).items():
                 bm = head + (self.branch_bookmark_suffix or b'')
 
-                if bm not in bms:
+                if bms.get(bm) == hgsha:
+                    self.ui.note(_(b"bookmark %s is up-to-date\n") % bm)
+
+                elif bm not in bms:
                     # new branch
                     changes.append((bm, hgsha))
+
+                    # only log additions on subsequent pulls
+                    if not self.is_clone:
+                        self.ui.status(_("adding bookmark %s\n") % bm)
+
                 elif self.repo[bms[bm]].isancestorof(self.repo[hgsha]):
                     # fast forward
                     changes.append((bm, hgsha))
+                    self.ui.status(_("updating bookmark %s\n") % bm)
+
+                else:
+                    self.ui.status(
+                        _("not updating diverged bookmark %s\n") % bm,
+                    )
 
             if changes:
                 with self.repo.wlock(), self.repo.lock():

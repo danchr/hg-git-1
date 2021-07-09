@@ -124,6 +124,7 @@ A low save interval causes a lot of reports:
   new changesets 1c8407413fa3:abc468b9e51b (25 drafts)
   new changesets 217c308baf47:d5d14eeedd08 (25 drafts)
   new changesets d9807ef6abcb:4678067bd500 (25 drafts)
+  adding bookmark master
   new changesets c31a154888bb:eda59117ba04 (25 drafts)
   (run 'hg update' to get a working copy)
 
@@ -142,6 +143,7 @@ during the conversion:
   new changesets 1c8407413fa3:abc468b9e51b
   new changesets 217c308baf47:d5d14eeedd08
   new changesets d9807ef6abcb:4678067bd500
+  updating bookmark master
   new changesets c31a154888bb:eda59117ba04
   (run 'hg update' to get a working copy)
 
