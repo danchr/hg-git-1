@@ -8,14 +8,13 @@ Load commonly used test logic
 
   $ git init -q --bare repo.git
 
-#if with-path
   $ hg clone repo.git hgrepo
   updating to branch default
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
-#else
-  $ hg init hgrepo
-#endif
   $ cd hgrepo
+#if without-path
+  $ rm .hg/hgrc
+#endif
   $ hg branch -q branch1
   $ hg bookmark branch1_bookmark
   $ echo f1 > f1
@@ -212,4 +211,74 @@ does the scenario.
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add f1
   
+
   $ cd ..
+
+Now try pulling a diverged bookmark:
+
+  $ rm -r hgrepo
+#if with-path
+  $ hg clone -U repo.git hgrepo
+  importing 5 git commits
+  new changesets 40a840c1f8ae:faf44fc3a4e8 (5 drafts)
+#else
+  $ hg init hgrepo
+  $ hg -R hgrepo pull repo.git
+  pulling from repo.git
+  importing 5 git commits
+  new changesets 40a840c1f8ae:faf44fc3a4e8 (5 drafts)
+  (run 'hg heads' to see heads, 'hg merge' to merge)
+#endif
+  $ cd gitrepo
+  $ git checkout -q branch1
+  $ fn_git_rebase branch3
+  $ git push -f
+  To $TESTTMP/repo.git
+   + d8aef79...ce1d1c5 branch1 -> branch1 (forced update)
+  $ cd ../hgrepo
+  $ hg pull ../repo.git
+  pulling from ../repo.git
+  importing 1 git commits
+  new changesets 895d0307f8b7 (1 drafts)
+  (run 'hg update' to get a working copy)
+  $ hg log --graph
+  o  changeset:   5:895d0307f8b7
+  |  bookmark:    branch1_bookmark
+  |  tag:         default/branch1 (with-path !)
+  |  tag:         tip
+  |  user:        test <test@example.org>
+  |  date:        Mon Jan 01 00:00:12 2007 +0000
+  |  summary:     append f1
+  |
+  o  changeset:   4:faf44fc3a4e8
+  |  bookmark:    branch3_bookmark
+  |  tag:         default/branch3 (with-path !)
+  |  user:        test <test@example.org>
+  |  date:        Mon Jan 01 00:00:14 2007 +0000
+  |  summary:     append f3
+  |
+  o  changeset:   3:ae8eb55f7090
+  |  bookmark:    branch2_bookmark
+  |  tag:         default/branch2 (with-path !)
+  |  user:        test <test@example.org>
+  |  date:        Mon Jan 01 00:00:13 2007 +0000
+  |  summary:     append f2
+  |
+  o  changeset:   2:600de9b6d498
+  |  branch:      branch2
+  |  parent:      0:40a840c1f8ae
+  |  user:        test
+  |  date:        Mon Jan 01 00:00:11 2007 +0000
+  |  summary:     add f2
+  |
+  | o  changeset:   1:8211cade99e4
+  |/   user:        test <test@example.org>
+  |    date:        Mon Jan 01 00:00:12 2007 +0000
+  |    summary:     append f1
+  |
+  o  changeset:   0:40a840c1f8ae
+     branch:      branch1
+     user:        test
+     date:        Mon Jan 01 00:00:10 2007 +0000
+     summary:     add f1
+  

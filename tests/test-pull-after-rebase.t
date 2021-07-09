@@ -101,3 +101,59 @@ Pull that
   |/   add beta
   o    0:ff7a2f2d8d7099694ae1e8b03838d40575bebb63
      add alpha
+
+  $ cd ..
+
+Now try rebasing that branch, from the Git side of things
+
+  $ cd gitrepo
+  $ git checkout -q otherbranch
+  $ fn_git_rebase --onto branch otherbranch
+  $ git push -f
+  To $TESTTMP/repo.git
+   + c4cfa5e...e5023f9 otherbranch -> otherbranch (forced update)
+  $ cd ..
+
+  $ cd hgrepo
+  $ hg pull
+  pulling from $TESTTMP/repo.git
+  no changes found
+  $ hg state
+  *  otherbranch tip 4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5
+  |  add gamma
+  | @  branch default/branch 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
+  | |  add gamma
+  x |   default/otherbranch 2:205a004356ef32b8da782afb89d9179d12ca31e9
+  | |  add gamma
+  | o  master default/master 1:7fe02317c63d9ee324d4b5df7c9296085162da1b
+  |/   add beta
+  o    0:ff7a2f2d8d7099694ae1e8b03838d40575bebb63
+     add alpha
+
+  $ cd ..
+
+And finally, delete it:
+
+  $ cd gitrepo
+  $ git push origin :otherbranch
+  To $TESTTMP/repo.git
+   - [deleted]         otherbranch
+  $ cd ..
+
+And pull that:
+
+  $ cd hgrepo
+  $ hg pull
+  pulling from $TESTTMP/repo.git
+  no changes found
+  $ hg state
+  *  otherbranch tip 4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5
+  |  add gamma
+  | @  branch default/branch 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
+  | |  add gamma
+  x |    2:205a004356ef32b8da782afb89d9179d12ca31e9
+  | |  add gamma
+  | o  master default/master 1:7fe02317c63d9ee324d4b5df7c9296085162da1b
+  |/   add beta
+  o    0:ff7a2f2d8d7099694ae1e8b03838d40575bebb63
+     add alpha
