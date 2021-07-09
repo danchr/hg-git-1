@@ -7,8 +7,6 @@ import os
 import re
 import sys
 
-ispy3 = (sys.version_info[0] >= 3)
-
 # add hggit/ to sys.path
 sys.path.insert(0, os.path.join(os.environ["TESTDIR"], ".."))
 
@@ -35,9 +33,7 @@ def testmod(name, optionflags=0, testtarget=None):
 
     # minimal copy of doctest.testmod()
     finder = doctest.DocTestFinder()
-    checker = None
-    if ispy3:
-        checker = py3docchecker()
+    checker = py3docchecker()
     runner = doctest.DocTestRunner(checker=checker, optionflags=optionflags)
     for test in finder.find(mod, name):
         runner.run(test)

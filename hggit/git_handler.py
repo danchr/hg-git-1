@@ -2023,13 +2023,7 @@ class GitHandler(object):
                         b"warning: proxy authentication is unsupported\n",
                     )
 
-            if pycompat.ispy3:
-                # urllib3.util.url._encode_invalid_chars() converts the path
-                # back to bytes using the utf-8 codec
-                str_uri = uri.decode('utf-8')
-            else:
-                str_uri = uri
-
+            str_uri = uri.decode('utf-8')
             pwmgr = url.passwordmgr(self.ui, self.ui.httppasswordmgrdb)
 
             # not available in dulwich 0.19
