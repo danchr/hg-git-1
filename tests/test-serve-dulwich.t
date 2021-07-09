@@ -44,8 +44,8 @@ Make sure that clone over unauthenticated HTTP doesn't break
   counting objects 6 [       <=>                            ]\r (no-eol) (esc) (dulwich0204 !)
                                                               \r (no-eol) (esc)
   \r (no-eol) (esc)
-  importing commits 1/2 b25024701bfd086f4a9b [======>       ]\r (no-eol) (esc)
-  importing commits 2/2 c84662ecfc72be38756d [=============>]\r (no-eol) (esc)
+  importing commits 1/2 b23744d34f97         [======>       ]\r (no-eol) (esc)
+  importing commits 2/2 3af9773036a9         [=============>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
   importing 2 git commits
   new changesets c4d188f6e13d:221dd250e933 (2 drafts)
@@ -64,10 +64,10 @@ Make sure that clone over unauthenticated HTTP doesn't break
   $ fn_hg_commit -A -m baz
   $ hg push
   \r (no-eol) (esc)
-  searching commits 1/1 152c456b0da423597ed2 [=============>]\r (no-eol) (esc)
+  searching commits 1/1 daf1ae153bf8         [=============>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
   \r (no-eol) (esc)
-  exporting 1/1 152c456b0da423597ed2 [=====================>]\r (no-eol) (esc)
+  exporting 1/1 daf1ae153bf8         [=====================>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
   \r (no-eol) (esc)
   counting objects 4 [ <=>                                  ]\r (no-eol) (esc)

@@ -18,7 +18,7 @@ from dulwich import config as dul_config
 from dulwich import diff_tree
 
 from mercurial.i18n import _
-from mercurial.node import hex, bin, nullid
+from mercurial.node import hex, bin, nullid, short
 from mercurial.utils import dateutil
 from mercurial import (
     bookmarks,
@@ -542,8 +542,7 @@ class GitHandler(object):
         with repo.ui.makeprogress(topic, unit, todo_total) as progress:
             export = []
             for ctx in to_export:
-                item = hex(ctx.node())
-                progress.increment(item=item, total=todo_total)
+                progress.increment(item=short(ctx.node()))
                 if ctx.extra().get(b'hg-git', None) != b'octopus':
                     export.append(ctx)
 
@@ -577,7 +576,7 @@ class GitHandler(object):
         mapsavefreq = self.ui.configint(b'hggit', b'mapsavefrequency')
         with self.repo.ui.makeprogress(b'exporting', total=total) as progress:
             for i, ctx in enumerate(export, 1):
-                progress.increment(item=ctx.hex())
+                progress.increment(item=short(ctx.node()))
                 self.export_hg_commit(ctx.node(), exporter)
                 if mapsavefreq and i % mapsavefreq == 0:
                     self.save_map(self.map_file)
@@ -909,7 +908,7 @@ class GitHandler(object):
             for offset in range(0, max(total, 1), chunksize):
                 with self.get_transaction(b"gimport"):
                     for csha in commits[offset:offset + chunksize]:
-                        progress.increment(item=csha)
+                        progress.increment(item=short(bin(csha)))
                         self.import_git_commit(self.git[csha])
 
                     self.import_tags(refs)

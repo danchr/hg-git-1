@@ -52,8 +52,8 @@ Make sure that clone over the old git protocol doesn't break
   Compressing objects 3/3 [================================>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
   \r (no-eol) (esc)
-  importing commits 1/2 b25024701bfd086f4a9b [======>       ]\r (no-eol) (esc)
-  importing commits 2/2 c84662ecfc72be38756d [=============>]\r (no-eol) (esc)
+  importing commits 1/2 b23744d34f97         [======>       ]\r (no-eol) (esc)
+  importing commits 2/2 3af9773036a9         [=============>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
   importing 2 git commits
   new changesets c4d188f6e13d:221dd250e933 (2 drafts)
