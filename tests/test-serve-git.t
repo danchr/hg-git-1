@@ -3,23 +3,22 @@
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
-  $ git init test
-  Initialized empty Git repository in $TESTTMP/test/.git/
+Create a dummy repository and serve it
+
+  $ git init -q test
   $ cd test
   $ echo foo > foo
   $ git add foo
   $ fn_git_commit -m test
-  $ cd $TESTTMP
   $ git daemon --listen=localhost --port=$HGPORT \
   > --pid-file=$DAEMON_PIDS --detach --export-all --verbose \
   > --base-path=$TESTTMP \
   > || exit 80
+  $ cd ..
 
 Make sure that clone over the old git protocol doesn't break
 
-  $ hg clone git://localhost:$HGPORT/test copy 2>&1
+  $ hg clone -U git://localhost:$HGPORT/test copy 2>&1
   importing git objects into hg
-  updating to branch default
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  $ ls copy
-  foo
+  $ hg id -r tip copy
+  c4d188f6e13d default/master/tip master
