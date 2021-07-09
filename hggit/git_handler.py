@@ -1647,17 +1647,16 @@ class GitHandler(object):
         try:
             bms = self.repo._bookmarks
 
-            suffix = self.branch_bookmark_suffix or b''
             changes = []
             for head, hgsha in self._get_heads(refs).items():
-                if head not in bms:
+                bm = head + (self.branch_bookmark_suffix or b'')
+
+                if bm not in bms:
                     # new branch
-                    changes.append((head + suffix, hgsha))
-                else:
-                    bm = self.repo[bms[head]]
-                    if bm.ancestor(self.repo[hgsha]) == bm:
-                        # fast forward
-                        changes.append((head + suffix, hgsha))
+                    changes.append((bm, hgsha))
+                elif self.repo[bms[bm]].isancestorof(self.repo[hgsha]):
+                    # fast forward
+                    changes.append((bm, hgsha))
 
             if changes:
                 with self.repo.wlock(), self.repo.lock():

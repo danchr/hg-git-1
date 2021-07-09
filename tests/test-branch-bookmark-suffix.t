@@ -243,7 +243,6 @@ Now try pulling a diverged bookmark:
   (run 'hg update' to get a working copy)
   $ hg log --graph
   o  changeset:   5:895d0307f8b7
-  |  bookmark:    branch1_bookmark
   |  tag:         default/branch1 (with-path !)
   |  tag:         tip
   |  user:        test <test@example.org>
@@ -272,7 +271,8 @@ Now try pulling a diverged bookmark:
   |  summary:     add f2
   |
   | o  changeset:   1:8211cade99e4
-  |/   user:        test <test@example.org>
+  |/   bookmark:    branch1_bookmark
+  |    user:        test <test@example.org>
   |    date:        Mon Jan 01 00:00:12 2007 +0000
   |    summary:     append f1
   |
