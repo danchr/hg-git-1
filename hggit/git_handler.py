@@ -577,7 +577,7 @@ class GitHandler(object):
         mapsavefreq = self.ui.configint(b'hggit', b'mapsavefrequency')
         with self.repo.ui.makeprogress(b'exporting', total=total) as progress:
             for i, ctx in enumerate(export, 1):
-                progress.increment()
+                progress.increment(item=ctx.hex())
                 self.export_hg_commit(ctx.node(), exporter)
                 if mapsavefreq and i % mapsavefreq == 0:
                     self.save_map(self.map_file)
@@ -909,7 +909,7 @@ class GitHandler(object):
             for offset in range(0, max(total, 1), chunksize):
                 with self.get_transaction(b"gimport"):
                     for csha in commits[offset:offset + chunksize]:
-                        progress.increment()
+                        progress.increment(item=csha)
                         self.import_git_commit(self.git[csha])
 
                     self.import_tags(refs)
