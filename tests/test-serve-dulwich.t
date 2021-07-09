@@ -6,6 +6,17 @@ Dulwich. The script uses `os.fork()`, so this doesn't work on Windows.
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
+Enable progress debugging:
+
+  $ cat >> $HGRCPATH <<EOF
+  > [progress]
+  > delay = 0
+  > refresh = 0
+  > width = 60
+  > format = topic unit total number item bar
+  > assume-tty = yes
+  > EOF
+
 Create a dummy repository and serve it
 
   $ git init -q test
@@ -22,6 +33,10 @@ Create a dummy repository and serve it
 Make sure that clone over unauthenticated HTTP doesn't break
 
   $ hg clone -U git+http://localhost:$HGPORT copy 2>&1
+  \r (no-eol) (esc)
+  importing commits 1/2 [================>                  ]\r (no-eol) (esc)
+  importing commits 2/2 [==================================>]\r (no-eol) (esc)
+                                                              \r (no-eol) (esc)
   importing git objects into hg
   $ hg log -T 'HG:{node|short} GIT:{gitnode|short}\n' -R copy
   HG:221dd250e933 GIT:3af9773036a9
@@ -29,11 +44,20 @@ Make sure that clone over unauthenticated HTTP doesn't break
 
   $ cd copy
   $ hg up master
+  \r (no-eol) (esc)
+  updating files 2/2 foo                  [================>]\r (no-eol) (esc)
+                                                              \r (no-eol) (esc)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   (activating bookmark master)
   $ echo baz > baz
   $ fn_hg_commit -A -m baz
   $ hg push
+  \r (no-eol) (esc)
+  find commits to export commits 1/1 152c456b0da423597ed2 [>]\r (no-eol) (esc)
+                                                              \r (no-eol) (esc)
+  \r (no-eol) (esc)
+  exporting 1/1 [==========================================>]\r (no-eol) (esc)
+                                                              \r (no-eol) (esc)
   pushing to git+http://localhost:$HGPORT/
   searching for changes
   adding objects
