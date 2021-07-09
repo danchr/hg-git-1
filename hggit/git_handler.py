@@ -527,7 +527,7 @@ class GitHandler(object):
     # CHANGESET CONVERSION METHODS
 
     def export_git_objects(self):
-        self.ui.note(_(b"finding hg commits to export\n"))
+        self.ui.note(_(b"finding unexported changesets\n"))
         repo = self.repo
         clnode = repo.changelog.node
 
@@ -536,7 +536,7 @@ class GitHandler(object):
                      self._map_hg)
 
         todo_total = len(repo) - len(self._map_hg)
-        topic = b'find commits to export'
+        topic = b'searching'
         unit = b'commits'
 
         with repo.ui.makeprogress(topic, unit, todo_total) as progress:
@@ -551,7 +551,7 @@ class GitHandler(object):
             if not total:
                 return
 
-        self.ui.note(_(b"exporting hg objects to git\n"))
+        self.ui.note(_(b"exporting %d changesets\n") % total)
 
         # By only exporting deltas, the assertion is that all previous objects
         # for all other changesets are already present in the Git repository.

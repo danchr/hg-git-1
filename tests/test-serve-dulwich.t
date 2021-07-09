@@ -64,7 +64,7 @@ Make sure that clone over unauthenticated HTTP doesn't break
   $ fn_hg_commit -A -m baz
   $ hg push
   \r (no-eol) (esc)
-  find commits to export commits 1/1 152c456b0da423597ed2 [>]\r (no-eol) (esc)
+  searching commits 1/1 152c456b0da423597ed2 [=============>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
   \r (no-eol) (esc)
   exporting 1/1 [==========================================>]\r (no-eol) (esc)

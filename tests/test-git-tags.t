@@ -81,7 +81,7 @@ Create a git tag from hg
 
   $ hg tag --git alpha --debug -r 0
   adding git tag alpha
-  finding hg commits to export
+  finding unexported changesets
   saving git map to $TESTTMP/hgrepo/.hg/git-mapfile
   $ hg log --graph
   @  changeset:   1:7fe02317c63d
@@ -196,8 +196,8 @@ Create a git tag from hg, but pointing to a new commit:
 
   $ hg tag --git gamma --debug -r tip
   adding git tag gamma
-  finding hg commits to export
-  exporting hg objects to git
+  finding unexported changesets
+  exporting 1 changesets
   converting revision dfeaa5393d25ea2c143fff73f448bfeab0b90ed6
   saving git map to $TESTTMP/hgrepo/.hg/git-mapfile
   $ hg push

@@ -57,8 +57,8 @@ symref, should publish it.
 
   $ hg push -v --config hggit.usephases=yes
   pushing to $TESTTMP/gitrepo
-  finding hg commits to export
-  exporting hg objects to git
+  finding unexported changesets
+  exporting 1 changesets
   converting revision 47580592d3d6492421a1e6cebc5c2d701a2e858b
   searching for changes
   1 commits found
