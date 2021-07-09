@@ -12,7 +12,7 @@ across from hg to git
 
   $ cd ..
   $ hg clone gitrepo hgrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets aa9eb6424386 (1 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark not-master (hg57 !)

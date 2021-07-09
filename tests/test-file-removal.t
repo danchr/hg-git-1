@@ -99,7 +99,7 @@ final manifest in git is just beta
   Initialized empty Git repository in $TESTTMP/gitrepo2/
 
   $ hg clone gitrepo hgrepo
-  importing git objects into hg
+  importing 9 git commits
   new changesets ff7a2f2d8d70:0995b8a0a943 (9 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)
@@ -233,7 +233,7 @@ make sure that only beta is in the manifest
 
 test with rename detection enabled
   $ hg --config git.similarity=100 clone gitrepo hgreporenames
-  importing git objects into hg
+  importing 9 git commits
   new changesets ff7a2f2d8d70:0995b8a0a943 (9 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)

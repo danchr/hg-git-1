@@ -12,7 +12,7 @@ Load commonly used test logic
 cloning without hggit.usephases does not publish local changesets
   $ cd ..
   $ hg clone gitrepo hgrepo | grep -v '^updating'
-  importing git objects into hg
+  importing 1 git commits
   new changesets ff7a2f2d8d70 (1 drafts)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
@@ -32,7 +32,7 @@ pulling without hggit.usephases does not publish local changesets
   $ cd hgrepo
   $ hg pull
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets 7fe02317c63d (1 drafts)
   (run 'hg update' to get a working copy)
   $ hg phase -r master

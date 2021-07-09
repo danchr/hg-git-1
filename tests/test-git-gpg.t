@@ -55,7 +55,7 @@ Add a signed commit to the first clone.
 Hg clone it
 
   $ hg clone gitrepo hgrepo
-  importing git objects into hg
+  importing 2 git commits
   new changesets ab60c5e55bd6:[0-9a-f]{12,12} \(2 drafts\) (re)
   updating to branch default (no-hg57 !)
   updating to bookmark signed (hg57 !)

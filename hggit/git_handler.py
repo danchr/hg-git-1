@@ -886,7 +886,7 @@ class GitHandler(object):
         # import each of the commits, oldest first
         total = len(commits)
         if total:
-            self.ui.status(_(b"importing git objects into hg\n"))
+            self.ui.status(_(b"importing %d git commits\n") % total)
         else:
             self.ui.status(_(b"no changes found\n"))
 

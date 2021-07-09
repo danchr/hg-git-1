@@ -11,7 +11,7 @@ Load commonly used test logic
   Initialized empty Git repository in $TESTTMP/gitrepo2/
 
   $ hg clone gitrepo hgrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets 01708ca54a8f (1 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)

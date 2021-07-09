@@ -64,7 +64,7 @@ Delete the temporary branch
 Create a Mercurial clone
 
   $ hg clone -U git.bare hg
-  importing git objects into hg
+  importing 4 git commits
   new changesets b8e77484829b:387d03400596 (4 drafts)
   $ hg outgoing -R hg
   comparing with $TESTTMP/git.bare
@@ -95,10 +95,15 @@ them (#358)
   date:        Mon Jan 01 00:00:12 2007 +0000
   summary:     add foo3
   
-  $ hg push --debug | grep -e reference -e commits
-  finding hg commits to export
+  $ hg push --debug
+  pushing to $TESTTMP/git.bare
+  finding unexported changesets
+  saving git map to $TESTTMP/hg/.hg/git-mapfile
+  searching for changes
   1 commits found
   list of commits:
+  e12852326ef72772e9696b008ad6546b5266ff13
+  adding objects
   added 1 commits with 1 trees and 0 blobs
   unchanged reference default::refs/heads/master => GIT:996e5084
   adding reference default::refs/tags/the_tag => GIT:e4338156

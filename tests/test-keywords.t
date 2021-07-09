@@ -21,7 +21,7 @@ as commit alpha. This lets us test ambiguous abbreviated identifiers.
   $ cd ..
 
   $ hg clone gitrepo hgrepo
-  importing git objects into hg
+  importing 3 git commits
   new changesets ff7a2f2d8d70:8e3f0ecc9aef (3 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)

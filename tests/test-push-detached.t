@@ -40,7 +40,7 @@ HEAD is a symref. To prevent this, we specifically verify that pushing
 in this case continues to work.
 
   $ hg clone gitrepo hgrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets ff7a2f2d8d70 (1 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)

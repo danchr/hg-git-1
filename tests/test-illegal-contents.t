@@ -133,13 +133,13 @@ you can't check out.
   $ fn_git_commit -m 'add a Mercurial repository'
   $ cd ..
   $ hg clone --config hggit.invalidpaths=abort git hg
-  importing git objects into hg
+  importing 1 git commits
   abort: invalid path 'nested/.hg/00changelog.i' rejected by configuration
   (see 'hg help hggit' for details)
   [255]
   $ rm -rf hg
   $ hg clone --config hggit.invalidpaths=keep git hg
-  importing git objects into hg
+  importing 1 git commits
   warning: path 'nested/.hg/00changelog.i' contains an invalid path component
   warning: path 'nested/.hg/requires' contains an invalid path component
   new changesets [0-9a-f]{12,12} \(1 drafts\) (re)
@@ -149,7 +149,7 @@ you can't check out.
   [255]
   $ rm -rf hg
   $ hg clone git hg
-  importing git objects into hg
+  importing 1 git commits
   warning: skipping invalid path 'nested/.hg/00changelog.i'
   warning: skipping invalid path 'nested/.hg/requires'
   new changesets 3ea18a67c0e6 (1 drafts)
@@ -170,12 +170,12 @@ newline, which Mercurial expressly forbids
   $ fn_git_commit -m 'add files disallowed by mercurial'
   $ cd ..
   $ hg clone --config hggit.invalidpaths=abort git hg
-  importing git objects into hg
+  importing 1 git commits
   abort: invalid path 'Icon\r' rejected by configuration
   (see 'hg help hggit' for details)
   [255]
   $ hg clone --config hggit.invalidpaths=keep git hg
-  importing git objects into hg
+  importing 1 git commits
   warning: skipping invalid path 'Icon\r'
   warning: skipping invalid path 'the\nfile'
   new changesets 8354c06a5842 (1 drafts)
@@ -184,7 +184,7 @@ newline, which Mercurial expressly forbids
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ rm -rf hg
   $ hg clone git hg
-  importing git objects into hg
+  importing 1 git commits
   warning: skipping invalid path 'Icon\r'
   warning: skipping invalid path 'the\nfile'
   new changesets 8354c06a5842 (1 drafts)

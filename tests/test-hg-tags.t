@@ -19,7 +19,7 @@ Load commonly used test logic
 
   $ cd ..
   $ hg clone -U repo.git hgrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets ff7a2f2d8d70 (1 drafts)
 
   $ cd hgrepo
@@ -61,7 +61,7 @@ git should have the tag alpha
   $ cd ..
 
   $ hg clone repo.git hgrepo2
-  importing git objects into hg
+  importing 2 git commits
   new changesets ff7a2f2d8d70:e8b150f84560 (2 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)

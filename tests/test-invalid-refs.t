@@ -12,7 +12,7 @@ Load commonly used test logic
 
   $ cd ..
   $ hg clone -U gitrepo hgrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets ff7a2f2d8d70 (1 drafts)
 
   $ cd hgrepo
@@ -83,7 +83,7 @@ git should have only the valid tag alph#a but have full commit log including the
 
   $ cd ..
   $ hg clone -U gitrepo hgrepo2
-  importing git objects into hg
+  importing 4 git commits
   new changesets ff7a2f2d8d70:0950ab44ea23 (4 drafts)
   $ hg -R hgrepo2 log --graph
   o  changeset:   3:0950ab44ea23

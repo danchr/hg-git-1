@@ -489,7 +489,7 @@ Test findcopiesharder
 Clone without findcopiesharder does not find copies from unmodified files
 
   $ hg clone gitcopyharder hgnocopyharder
-  importing git objects into hg
+  importing 3 git commits
   new changesets b45d023c6842:ec77ccdbefe0 (3 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
@@ -536,7 +536,7 @@ Clone without findcopiesharder does not find copies from unmodified files
 findcopiesharder finds copies from unmodified files if similarity is met
 
   $ hg --config git.findcopiesharder=true clone gitcopyharder hgcopyharder0
-  importing git objects into hg
+  importing 3 git commits
   new changesets b45d023c6842:9b3099834272 (3 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
@@ -573,7 +573,7 @@ findcopiesharder finds copies from unmodified files if similarity is met
   +6
 
   $ hg --config git.findcopiesharder=true --config git.similarity=95 clone gitcopyharder hgcopyharder1
-  importing git objects into hg
+  importing 3 git commits
   new changesets b45d023c6842:d9d2e8cbf050 (3 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
@@ -612,12 +612,12 @@ findcopiesharder finds copies from unmodified files if similarity is met
 
 Config values out of range
   $ hg --config git.similarity=999 clone gitcopyharder hgcopyharder2
-  importing git objects into hg
+  importing 3 git commits
   abort: git.similarity must be between 0 and 100
   [255]
 Left-over on Windows with some pack files
   $ rm -rf hgcopyharder2
   $ hg --config git.renamelimit=-5 clone gitcopyharder hgcopyharder2
-  importing git objects into hg
+  importing 3 git commits
   abort: git.renamelimit must be non-negative
   [255]

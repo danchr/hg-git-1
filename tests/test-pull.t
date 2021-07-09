@@ -24,7 +24,7 @@ pull a tag
   $ echo "default=$TESTTMP/gitrepo" >> hgrepo/.hg/hgrc
   $ hg -R hgrepo pull -r t_alpha
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets ff7a2f2d8d70 (1 drafts)
   (run 'hg update' to get a working copy)
   $ hg -R hgrepo update t_alpha
@@ -69,7 +69,7 @@ pull an ambiguous reference
 pull a branch
   $ hg -R hgrepo pull -r beta
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets 7fe02317c63d (1 drafts)
   (run 'hg update' to get a working copy)
   $ hg -R hgrepo log --graph
@@ -104,7 +104,7 @@ add another commit and tag to the git repo
 pull everything else
   $ hg -R hgrepo pull
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 2 git commits
   new changesets 678ebee93e38:6f898ad1f3e1 (2 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
   $ hg -R hgrepo log --graph
@@ -157,7 +157,7 @@ pull the merge
   default/beta                       1:7fe02317c63d
   $ hg -R hgrepo pull --config git.pull-prune-remote-branches=false
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets a02330f767a4 (1 drafts)
   (run 'hg update' to get a working copy)
   $ hg -R hgrepo tags | grep default/beta
@@ -226,7 +226,7 @@ ensure that releases/v1 and releases/v2 are pulled but not notreleases/v1
   $ cd ..
   $ hg -R hgrepo pull -r 'releases/*'
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 2 git commits
   new changesets 218b2d0660d3:a3f95e150b0a (2 drafts)
   (run 'hg heads .' to see heads, 'hg merge' to merge)
   $ hg -R hgrepo log --graph
@@ -335,7 +335,7 @@ also add an annotated tag
   $ cd ..
   $ hg -R hgrepo pull
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 3 git commits
   new changesets 49713da8f665:e103a73f33be (3 drafts)
   (run 'hg heads .' to see heads, 'hg merge' to merge)
   $ hg -R hgrepo heads

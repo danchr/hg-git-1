@@ -12,7 +12,7 @@ Load commonly used test logic
 
   $ cd ..
   $ hg clone -u tip gitrepo hgrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets ff7a2f2d8d70 (1 drafts)
   updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -73,7 +73,7 @@ this should fail
 
   $ hg pull 2>&1 | grep -v 'divergent bookmark'
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets 25eed24f5e8f (1 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
 TODO shouldn't need to do this since we're (in theory) pushing master explicitly,
@@ -167,7 +167,7 @@ NB: the triple slashes are intentional, due to windows
   $ cd ..
 
   $ hg clone -u tip gitrepo hgrepo-test
-  importing git objects into hg
+  importing 5 git commits
   new changesets ff7a2f2d8d70:ba0476ff1899 (5 drafts)
   updating to branch default
   5 files updated, 0 files merged, 0 files removed, 0 files unresolved

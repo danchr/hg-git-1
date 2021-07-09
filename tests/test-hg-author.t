@@ -19,7 +19,7 @@ Load commonly used test logic
 
   $ cd ..
   $ hg clone repo.git hgrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets ff7a2f2d8d70 (1 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)
@@ -158,7 +158,7 @@ Load commonly used test logic
 
   $ cd ..
   $ hg clone repo.git hgrepo2
-  importing git objects into hg
+  importing 9 git commits
   new changesets ff7a2f2d8d70:1fbf3aa91221 (9 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)

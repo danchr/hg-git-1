@@ -20,7 +20,7 @@ Load commonly used test logic
   
 
   $ hg clone gitrepo hgrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets ff7a2f2d8d70 (1 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)
@@ -139,7 +139,7 @@ nothing incoming after pull
 "adding remote bookmark" message was added in Mercurial 2.3
   $ hg pull | grep -v "adding remote bookmark"
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 3 git commits
   new changesets 7fe02317c63d:248d83ebf472 (3 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
   $ hg incoming | grep -v 'no changes found'

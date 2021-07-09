@@ -32,7 +32,7 @@ clean merge
   Initialized empty Git repository in $TESTTMP/gitrepo2/
 
   $ hg clone gitrepo hgrepo
-  importing git objects into hg
+  importing 4 git commits
   new changesets ff7a2f2d8d70:89ca4a68d6b9 (4 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)

@@ -14,7 +14,7 @@ Create a Git repository with a single, checked out commit in master:
 Clone it, and push back to master:
 
   $ hg clone gitrepo hgrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets ff7a2f2d8d70 (1 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)

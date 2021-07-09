@@ -55,7 +55,7 @@ resolve using first parent
   $ cd ..
 
   $ hg clone gitrepo hgrepo2
-  importing git objects into hg
+  importing 4 git commits
   new changesets 5d1a6b64f9d0:6c53bc0f062f (4 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)

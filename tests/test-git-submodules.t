@@ -188,7 +188,7 @@ replace subrepo with symlink
   $ cd ..
 
   $ hg clone gitrepo2 hgrepo
-  importing git objects into hg
+  importing 10 git commits
   new changesets ff7a2f2d8d70:9c3929c04f22 (10 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)
@@ -356,7 +356,7 @@ test with rename detection enabled -- simply checking that the Mercurial hashes
 are the same is enough
   $ cd ../../..
   $ hg --config git.similarity=100 clone gitrepo2 hgreporenames
-  importing git objects into hg
+  importing 10 git commits
   new changesets ff7a2f2d8d70:9c3929c04f22 (10 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)

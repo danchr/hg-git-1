@@ -43,7 +43,7 @@ The warning message changed in Git 1.8.0
   Initialized empty Git repository in $TESTTMP/gitrepo2/
 
   $ hg clone gitrepo hgrepo
-  importing git objects into hg
+  importing 4 git commits
   new changesets 87cd29b67a91:b8a0ac52f339 (4 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)

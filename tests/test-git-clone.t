@@ -14,7 +14,7 @@ Load commonly used test logic
   $ cd ..
 
   $ hg clone gitrepo hgrepo
-  importing git objects into hg
+  importing 2 git commits
   new changesets ff7a2f2d8d70:7fe02317c63d (2 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)

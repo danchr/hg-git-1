@@ -120,7 +120,7 @@ A low save interval causes a lot of reports:
 
   $ hg --config hggit.mapsavefrequency=25 pull
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 100 git commits
   new changesets 1c8407413fa3:abc468b9e51b (25 drafts)
   new changesets 217c308baf47:d5d14eeedd08 (25 drafts)
   new changesets d9807ef6abcb:4678067bd500 (25 drafts)
@@ -138,7 +138,7 @@ conversion, so the user will see a large batch at the end:
 
   $ hg --config hggit.mapsavefrequency=25 --config hggit.usephases=yes pull
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 100 git commits
   new changesets 1c8407413fa3:abc468b9e51b (25 drafts)
   new changesets 217c308baf47:d5d14eeedd08 (25 drafts)
   new changesets d9807ef6abcb:4678067bd500 (25 drafts)
@@ -165,7 +165,7 @@ Test an error in a pull:
 
   $ ABORT_AFTER=99 hg pull
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 100 git commits
   transaction abort!
   rollback completed
   abort: aborted after 99 commits!
@@ -176,7 +176,7 @@ Test the user exiting in the first transaction:
 
   $ EXIT_AFTER=5 hg --config hggit.mapsavefrequency=10 pull
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 100 git commits
   transaction abort!
   rollback completed
   interrupted!
@@ -195,7 +195,7 @@ transaction:
 
   $ EXIT_AFTER=15 hg --config hggit.mapsavefrequency=10 pull
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 100 git commits
   new changesets 1c8407413fa3:7c8c534a5fbe (10 drafts)
   transaction abort!
   rollback completed
@@ -226,7 +226,7 @@ current behaviour.
   > hg --config hggit.mapsavefrequency=10 --config git.intree=yes \
   > --cwd hgrepo \
   > clone -U $TESTTMP/gitrepo .
-  importing git objects into hg
+  importing 100 git commits
   transaction abort!
   rollback completed
   interrupted!

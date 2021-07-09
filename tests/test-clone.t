@@ -26,7 +26,7 @@ Load commonly used test logic
   $ cd ..
 clone a tag
   $ hg clone -r alpha gitrepo hgrepo-a
-  importing git objects into hg
+  importing 1 git commits
   new changesets ff7a2f2d8d70 (1 drafts)
   updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -48,7 +48,7 @@ Make sure this is still draft since we didn't pull remote's HEAD
 
 clone a branch
   $ hg clone -r beta gitrepo hgrepo-b
-  importing git objects into hg
+  importing 2 git commits
   new changesets ff7a2f2d8d70:7fe02317c63d (2 drafts)
   updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -84,7 +84,7 @@ Make sure that a deleted .hgsubstate does not confuse hg-git
   $ cd ..
 
   $ hg clone -r beta gitrepo hgrepo-c
-  importing git objects into hg
+  importing 4 git commits
   new changesets ff7a2f2d8d70:47d12948785d (4 drafts)
   updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -96,7 +96,7 @@ Make sure that a deleted .hgsubstate does not confuse hg-git
 test shared repositories
 
   $ hg clone gitrepo hgrepo-base
-  importing git objects into hg
+  importing 5 git commits
   new changesets ff7a2f2d8d70:47d12948785d (5 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark beta (hg57 !)
@@ -128,7 +128,7 @@ test cloning HEAD
   $ git checkout -q master
   $ cd ..
   $ hg clone gitrepo hgrepo-2
-  importing git objects into hg
+  importing 5 git commits
   new changesets ff7a2f2d8d70:47d12948785d (5 drafts)
   updating to bookmark master (hg57 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved (hg57 !)
@@ -152,13 +152,13 @@ and activate the corresponding bookmark
   $ cd ..
 #if hg57
   $ hg clone gitrepo hgrepo-2
-  importing git objects into hg
+  importing 5 git commits
   new changesets ff7a2f2d8d70:47d12948785d (5 drafts)
   updating to bookmark master
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 #else
   $ hg clone gitrepo hgrepo-2
-  importing git objects into hg
+  importing 5 git commits
   new changesets ff7a2f2d8d70:47d12948785d (5 drafts)
   updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -180,7 +180,7 @@ anything special
   $ fn_git_commit -m 'add delta'
   $ cd ..
   $ hg clone gitrepo hgrepo-2
-  importing git objects into hg
+  importing 5 git commits
   new changesets ff7a2f2d8d70:47d12948785d (5 drafts)
   warning: the git source repository has a detached head
   (you may want to update to a bookmark)

@@ -29,7 +29,7 @@ allow commits despite working copy presense
   $ cd ..
 Ensure gitlinks are transformed to .hgsubstate on hg pull from git
   $ hg clone -u tip gitrepo1 hgrepo 2>&1 | egrep -v '^(Cloning into|done)'
-  importing git objects into hg
+  importing 3 git commits
   new changesets e532b2bfda10:88c5e06a2a29 (3 drafts)
   updating to branch default
   cloning subrepo subrepo1 from $TESTTMP/gitsubrepo
@@ -101,7 +101,7 @@ bring working copy to HEAD state (it's not bare repo)
   $ cd ../hgrepo
   $ hg pull
   pulling from $TESTTMP/gitrepo1
-  importing git objects into hg
+  importing 1 git commits
   new changesets [0-9a-f]{12,12} \(1 drafts\) (re)
   (run 'hg update' to get a working copy)
   $ hg checkout -C

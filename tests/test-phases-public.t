@@ -24,7 +24,7 @@ Load commonly used test logic
 
 cloning with hggit.usephases publishes cloned HEAD
   $ hg --config hggit.usephases=True clone -U gitrepo hgrepo
-  importing git objects into hg
+  importing 1 git commits
   new changesets ff7a2f2d8d70
 
   $ cd hgrepo
@@ -78,14 +78,14 @@ pulling publishes the branch
 #if publish-defaults
   $ hg pull -r master other
   pulling from $TESTTMP/gitrepo/.git
-  importing git objects into hg
+  importing 1 git commits
   new changesets 7fe02317c63d
   1 local changesets published
   (run 'hg update' to get a working copy)
 #else
   $ hg pull -r master other
   pulling from $TESTTMP/gitrepo/.git
-  importing git objects into hg
+  importing 1 git commits
   new changesets 7fe02317c63d (1 drafts)
   (run 'hg update' to get a working copy)
 #endif
@@ -96,14 +96,14 @@ pulling publishes the branch
   $ hg phase -fd master
   $ hg pull
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 2 git commits
   new changesets ca33a262eb46:03769a650ded (1 drafts)
   1 local changesets published
   (run 'hg update' to get a working copy)
 #else
   $ hg pull
   pulling from $TESTTMP/gitrepo
-  importing git objects into hg
+  importing 2 git commits
   new changesets ca33a262eb46:03769a650ded (1 drafts)
   2 local changesets published
   (run 'hg update' to get a working copy)
