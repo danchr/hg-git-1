@@ -7,6 +7,10 @@ Load commonly used test logic
   > [experimental]
   > evolution = createmarkers
   > evolution.createmarkers = yes
+  > [templates]
+  > state = {bookmarks} {tags} {rev}:{node}\\n{desc}\\n
+  > [alias]
+  > state = log --graph --template state
   > EOF
 
   $ git init -q --bare repo.git
@@ -37,26 +41,26 @@ Clone it and rebase the branch
   importing 3 git commits
   new changesets ff7a2f2d8d70:205a004356ef (3 drafts)
   $ cd hgrepo
-  $ hg log --graph -T '{bookmarks} {rev}:{node}\n'
-  o  branch 2:205a004356ef32b8da782afb89d9179d12ca31e9
-  |
-  | o  master 1:7fe02317c63d9ee324d4b5df7c9296085162da1b
-  |/
-  o   0:ff7a2f2d8d7099694ae1e8b03838d40575bebb63
-  
+  $ hg state
+  o  branch default/branch tip 2:205a004356ef32b8da782afb89d9179d12ca31e9
+  |  add gamma
+  | o  master default/master 1:7fe02317c63d9ee324d4b5df7c9296085162da1b
+  |/   add beta
+  o    0:ff7a2f2d8d7099694ae1e8b03838d40575bebb63
+     add alpha
   $ hg up branch
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   (activating bookmark branch)
   $ hg rebase --quiet -d master
-  $ hg log --graph -T '{bookmarks} {rev}:{node}\n'
-  @  branch 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
-  |
-  | x   2:205a004356ef32b8da782afb89d9179d12ca31e9
-  | |
-  o |  master 1:7fe02317c63d9ee324d4b5df7c9296085162da1b
-  |/
-  o   0:ff7a2f2d8d7099694ae1e8b03838d40575bebb63
-  
+  $ hg state
+  @  branch tip 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
+  |  add gamma
+  | x   default/branch 2:205a004356ef32b8da782afb89d9179d12ca31e9
+  | |  add gamma
+  o |  master default/master 1:7fe02317c63d9ee324d4b5df7c9296085162da1b
+  |/   add beta
+  o    0:ff7a2f2d8d7099694ae1e8b03838d40575bebb63
+     add alpha
 
   $ hg push -fr tip
   pushing to $TESTTMP/repo.git
@@ -86,14 +90,14 @@ Pull that
   1 new orphan changesets
   new changesets f4bd265a9d39 (1 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
-  $ hg log --graph -T '{bookmarks} {rev}:{node}\n'
-  *  otherbranch 4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5
-  |
-  | @  branch 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
-  | |
-  x |   2:205a004356ef32b8da782afb89d9179d12ca31e9
-  | |
-  | o  master 1:7fe02317c63d9ee324d4b5df7c9296085162da1b
-  |/
-  o   0:ff7a2f2d8d7099694ae1e8b03838d40575bebb63
-  
+  $ hg state
+  *  otherbranch default/otherbranch tip 4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5
+  |  add gamma
+  | @  branch default/branch 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
+  | |  add gamma
+  x |    2:205a004356ef32b8da782afb89d9179d12ca31e9
+  | |  add gamma
+  | o  master default/master 1:7fe02317c63d9ee324d4b5df7c9296085162da1b
+  |/   add beta
+  o    0:ff7a2f2d8d7099694ae1e8b03838d40575bebb63
+     add alpha
