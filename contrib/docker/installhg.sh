@@ -9,7 +9,7 @@ if echo "$HG" | fgrep -q .
 then
     PIPDEPENDS="mercurial~=$HG.0"
 else
-    PIPDEPENDS="https://www.mercurial-scm.org/repo/hg/archive/$HG.tar.gz"
+    PIPDEPENDS="https://foss.heptapod.net/octobus/mercurial-devel/-/archive/branch/$HG.tar.gz"
 fi
 
 if echo "$PYTHON" | grep -q ^2
