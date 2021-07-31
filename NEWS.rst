@@ -1,4 +1,4 @@
-hg-git 0.10.2 (unreleased)
+hg-git 0.10.2 (2021-07-31)
 ==========================
 
 This is a minor release, focusing on bugs and compatibility.
@@ -11,7 +11,7 @@ Bug fixes:
 
 * Fix the ``git.authors`` configuration option, broken in Python 3.
 
-hg-git 0.10.1 (2020-05-12)
+hg-git 0.10.1 (2021-05-12)
 ==========================
 
 This is a minor release, focusing on bugs and compatibility.
@@ -27,7 +27,7 @@ Bug fixes:
 * Fix an issue where pushing a repository without any bookmarks would
   push secret changesets.
 
-hg-git 0.10.0 (2020-02-01)
+hg-git 0.10.0 (2021-02-01)
 ==========================
 
 The 0.10.x series will be the last one supporting Python 2.7 and
