@@ -43,7 +43,7 @@
 # completes fairly quickly, includes both shell and Python scripts, and
 # includes some scripts that run daemon processes.)
 
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 import argparse
 import collections

@@ -1,3 +1,18 @@
+hg-git 0.11.0 (unreleased)
+==========================
+
+Enhancements:
+
+* TBD
+
+Bug fixes:
+
+* TBD
+
+Other changes:
+
+* TBD
+
 hg-git 0.10.2 (2021-07-31)
 ==========================
 

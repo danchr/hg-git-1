@@ -1,21 +1,26 @@
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 import os
 import stat
 import re
 import errno
 
+from . import git_handler
+from . import gitrepo
+
 from mercurial import (
     dirstate,
     error,
+    exthelper,
     match as matchmod,
     pathutil,
     pycompat,
     util,
 )
 
-from . import compat
 from mercurial.i18n import _
+
+eh = exthelper.exthelper()
 
 
 def gignorepats(orig, lines, root=None):
@@ -52,7 +57,7 @@ def gignorepats(orig, lines, root=None):
             rootsuffixes = [b'', b'**/']
         for rootsuffix in rootsuffixes:
             pat = syntax + rootprefix + rootsuffix + line
-            for s, rels in compat.iteritems(syntaxes):
+            for s, rels in syntaxes.items():
                 if line.startswith(rels):
                     pat = line
                     break
@@ -94,12 +99,8 @@ class gitdirstate(dirstate.dirstate):
                 files.append(util.expandpath(path))
         patterns = []
         # Only use .gitignore if there's no .hgignore
-        try:
-            fp = open(files[0], 'rb')
-            fp.close()
-        except:
-            fns = self._finddotgitignores()
-            for fn in fns:
+        if not os.access(files[0], os.R_OK):
+            for fn in self._finddotgitignores():
                 d = os.path.dirname(fn)
                 fn = self.pathto(fn)
                 if not os.path.exists(fn):
@@ -172,10 +173,6 @@ class gitdirstate(dirstate.dirstate):
         while work:
             nd = work.pop()
             skip = None
-            if nd == b'.':
-                # <= hg-5.0 use "." for the root directory
-                # (see Mercurial-core27d6956d386b for details)
-                nd = b''
             if nd != b'':
                 skip = b'.hg'
             try:
@@ -254,3 +251,13 @@ class gitdirstate(dirstate.dirstate):
             raise dirstate.rustmod.FallbackError
         else:
             return super(gitdirstate, self)._rust_status(*args, **kwargs)
+
+
+@eh.reposetup
+def reposetup(ui, repo):
+    if isinstance(repo, gitrepo.gitrepo):
+        return
+
+    if getattr(dirstate, 'rootcache', False) and git_handler.has_gitrepo(repo):
+        # only install our dirstate wrapper if it has a hope of working
+        dirstate.dirstate = gitdirstate

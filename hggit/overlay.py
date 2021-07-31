@@ -4,21 +4,31 @@
 #
 # incomplete, implemented on demand
 
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 from mercurial import (
     ancestor,
     changelog,
     context,
+    exthelper,
     manifest,
     match as matchmod,
     namespaces,
     node,
     util,
 )
+from mercurial.utils import stringutil
 from mercurial.node import bin, hex, nullid
 
+from dulwich.refs import (
+    LOCAL_BRANCH_PREFIX,
+    LOCAL_TAG_PREFIX,
+)
+
 from . import compat
+
+eh = exthelper.exthelper()
+
 
 def _maybehex(n):
     if len(n) == 20:
@@ -37,7 +47,7 @@ class overlaymanifest(object):
         self.load()
         return {
             path
-            for path, flag in compat.iteritems(self._flags)
+            for path, flag in self._flags.items()
             if flag != b''
         }
 
@@ -67,7 +77,7 @@ class overlaymanifest(object):
                 return b''
 
         def addtree(tree, dirname):
-            for entry in compat.iteritems(tree):
+            for entry in tree.items():
                 if entry.mode & 0o40000:
                     # expand directory
                     subtree = self.repo.handler.git.get_object(entry.sha)
@@ -92,7 +102,7 @@ class overlaymanifest(object):
 
     def iteritems(self):
         self.load()
-        return compat.iteritems(self._map)
+        return self._map.items()
 
     def __iter__(self):
         self.load()
@@ -149,6 +159,7 @@ class overlaymanifest(object):
         del self._map[path]
 
 
+@eh.wrapfunction(manifest.manifestdict, b'diff')
 def wrapmanifestdictdiff(orig, self, m2, match=None, clean=False):
     '''avoid calling into lazymanifest code if m2 is an overlaymanifest'''
     # Older mercurial clients used diff(m2, clean=False). If a caller failed
@@ -205,7 +216,7 @@ class overlayfilectx(object):
         return blob.data
 
     def isbinary(self):
-        return compat.binary(self.data())
+        return stringutil.binary(self.data())
 
 
 class overlaychangectx(context.changectx):
@@ -214,7 +225,7 @@ class overlaychangectx(context.changectx):
         self._hgrepo = repo
         if isinstance(sha, bytes):
             pass
-        elif isinstance(sha, compat.unicode):
+        elif isinstance(sha, str):
             sha = sha.encode('ascii')
         else:
             sha = sha.hex()
@@ -291,9 +302,8 @@ class overlaychangectx(context.changectx):
         mf = self.manifest()
         return mf.flags(path)
 
-    def __nonzero__(self):
+    def __bool__(self):
         return True
-    __bool__ = __nonzero__
 
     def phase(self):
         try:
@@ -521,13 +531,12 @@ class overlayrepo(object):
         self.refmap = {}
         self.tagmap = {}
         for ref in refs:
-            if ref.startswith(b'refs/heads/'):
-                refname = ref[11:]
+            if ref.startswith(LOCAL_BRANCH_PREFIX):
+                refname = ref[len(LOCAL_BRANCH_PREFIX):]
                 self.refmap.setdefault(bin(refs[ref]), []).append(refname)
-            elif ref.startswith(b'refs/tags/'):
-                tagname = ref[10:]
+            elif ref.startswith(LOCAL_TAG_PREFIX):
+                tagname = ref[len(LOCAL_TAG_PREFIX):]
                 self.tagmap.setdefault(bin(refs[ref]), []).append(tagname)
 
     def narrowmatch(self, *args, **kwargs):
         return self.handler.repo.narrowmatch(*args, **kwargs)
-

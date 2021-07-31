@@ -27,65 +27,35 @@ Dependencies
 
 This plugin is implemented entirely in Python — there are no Git
 binary dependencies, and you do not need to have Git installed on your
-system. The only dependencies are Mercurial 4.4 or later and a
-relatively recent Dulwich.
+system. The only dependencies are:
+
+* Mercurial 5.2
+* Dulwich 0.19.3
+* Python 3.6
+
+Please note that these are the earliest versions known to work; later
+versions generally work better.
 
 Installing
 ==========
 
-A common way to install Mercurial extensions is from their Mercurial repository.  I.e. 
-clone this repository somewhere and make the ``[extensions]`` section in your ``~/.hgrc``::
-
+Clone this repository somewhere and make the 'extensions' section in
+your ``~/.hgrc`` file look something like this::
 
    [extensions]
    hggit = [path-to]/hg-git/hggit
 
 That will enable the Hg-Git extension for you.
 
-Alternatively, you can install the plugin using your favourite package manager,
-e.g. ``pip3 install hg-git``, but note that you must make sure to use the version of
-python that is used by mercurial.  Thus, the safest way to do this with ``pip`` is:
+You can also install the plugin using your favourite package manager,
+e.g. pip::
 
-.. code-block:: bash
-  
-   PYTHON="$(hg debuginstall -T'{pythonexe}')"  # Point PYTHON to the version used by hg
-   "$PYTHON" -m pip install --user hg-git       # Drop the --user if you want a system install
+  pip3 install hggit
 
-With ``hg-git`` visible to mercurial, it can simply be enabled in your ``~/.hgrc`` with::
+And enable it from somewhere in your ``$PYTHONPATH``::
 
    [extensions]
    hggit =
-
-.. note::
-   
-   ``hg-git`` is an extension and can be used with versions of mercurial already
-   installed on your system, but, as mentioned above,  needs to be installed so that
-   mercurial can find it.  The version of python mercurial uses is listed by::
-
-      hg debuginstall -T'{pythonexe}'
-
-   This is the reason for setting ``PYTHON`` above.  This will work, for example, if you
-   are using a version of mercurial installed by the system, which might depends on
-   Python 2.7.  Keep in mind that python 2 reached its end of life in April 2020 and
-   will not be supported with versions of ``hg-git`` 0.11 and higher (see `issue #349
-   <https://foss.heptapod.net/mercurial/hg-git/-/issues/349>`_.
-
-   Perhaps better, install a more recent version of Mercurial along with ``hg-git`` in
-   your working python environment using something like::
-
-      python3 -m pip install mercurial hg-git hg-evolve
-
-   This will also ensure that the |evolve_extension|_ is installed, allowing you to use
-   topics as outlined in the `Heptapod workflow <https://octobus.net/blog/2019-09-04-heptapod-workflow.html>`_::
-
-      [extensions]
-      hggit =
-      evolve =
-      topics =
-
-.. |evolve_extension| replace:: ``evolve`` extension
-.. _evolve_extension: https://www.mercurial-scm.org/wiki/EvolveExtension
-
 
 Contributing
 ============
@@ -178,12 +148,9 @@ See ``hg help -e hggit``.
 Alternatives
 ============
 
-Since version 5.4, Mercurial includes an |extension_called_git|_. It
+Since version 5.4, Mercurial includes an extension called ``git``. It
 interacts with a Git repository directly, avoiding the intermediate
 conversion. This has certain advantages:
-
-.. |extension_called_git| replace:: extension called ``git``
-.. _extension_called_git: https://www.mercurial-scm.org/wiki/GitExtension
 
  * Each commit only has one node ID, which is the Git hash.
  * Data is stored only once, so the on-disk footprint is much lower.
@@ -195,9 +162,8 @@ The extension has certain drawbacks, however:
    parents. If any such commit is included in the history, conversion
    will fail.
  * You cannot interact with Mercurial repositories.
- * Experimental status.
 
-.. _octopus merges: https://git-scm.com/docs/git-merge
+.. octopus merges_: https://git-scm.com/docs/git-merge
 
 Another extension packaged with Mercurial, the ``convert`` extension,
 also has Git support.
@@ -205,7 +171,7 @@ also has Git support.
 Other alternatives exist for Git users wanting to access Mercurial
 repositories, such as `git-remote-hg`_.
 
-.. _git-remote-hg: https://pypi.org/project/git-remote-hg/
+.. git-remote-hg_: https://pypi.org/project/git-remote-hg/
 
 Configuration
 =============
@@ -254,22 +220,6 @@ direction only*. Changesets coming from Git back to Mercurial will not
 translate back into Mercurial usernames, so it's best that the same
 username/email combination be used on both the Mercurial and Git sides; the
 author file is mostly useful for translating legacy changesets.
-
-
-``git.blockdotgit``
--------------------
-
-Blocks exporting revisions to Git that contain a directory named .git or
-any letter-case variation thereof. This prevents creating repositories
-that newer versions of Git and many Git hosting services block due to
-security concerns. Defaults to True.
-
-
-``git.blockdothg``
-------------------
-
-Blocks importing revisions from Git that contain a directory named .hg.
-Defaults to True.
 
 
 ``git.branch_bookmark_suffix``
@@ -349,6 +299,16 @@ A list of Git branches that should be considered "published", and
 therefore converted to Mercurial in the 'public' phase. This is only
 used if ``hggit.usephases`` is set.
 
+``git.pull-prune-remote-branches``
+--------------
+
+Before fetching, remove any remote-tracking references, or
+pseudo-tags, that no longer exist on the remote. This is equivalent to
+the ``--prune`` option to ``git fetch``, and means that pseudo-tags
+for remotes — such as ``default/master`` — always actually reflect
+what's on the remote.
+
+This option is enabled by default.
 
 ``git.renamelimit``
 -------------------
@@ -373,14 +333,17 @@ the file has stayed the same. The default is "0" (disabled).
 ``hggit.mapsavefrequency``
 --------------------------
 
-Controls how often the mapping between Git and Mercurial commit hashes
-gets saved when importing or exporting changesets. Set this to a number
-greater than 0 to save the mapping after converting that many commits.
-This can help when the conversion encounters an error partway through a
-large batch of changes. Defaults to 0, so that the mapping is saved once
-at the end.
+By default, hg-git only saves the results of a conversion at the end.
+Use this option to enable resuming long-running pulls and pushes. Set
+this to a number greater than 0 to allow resuming after converting
+that many commits. This can help when the conversion encounters an
+error partway through a large batch of changes. Otherwise, an error or
+interruption will roll back the transaction, similar to regular
+Mercurial.
 
-Please note that this is meaningless for an initial clone, as any
+Defaults to 1000.
+
+Please note that this is disregarded for an initial clone, as any
 error or interruption will delete the destination. So instead of
 cloning a large Git repository, you might want to pull instead::
 
@@ -402,7 +365,33 @@ work well, even if the initial clone requires a some patience.
 
 When converting Git revisions to Mercurial, place them in the 'public'
 phase as appropriate. Namely, revisions that are reachable from the
-remote Git repository's ``HEAD`` will be marked *public*. For most
-repositories, this means the remote ``master`` branch will be
-converted as public. Publishing commits prevents their modification,
-and speeds up many local Mercurial operations, such as ``hg shelve``.
+remote Git repository's default branch, or ``HEAD``, will be marked
+*public*. For most repositories, this means the remote ``master``
+branch will be converted as public. The same applies to any commits
+tagged in the remote.
+
+To restrict publishing to specific branches or tags, use the
+``git.public`` option.
+
+Publishing commits prevents their modification, and speeds up many
+local Mercurial operations, such as ``hg shelve``.
+
+``hggit.invalidpaths``
+-------------------
+
+Both Mercurial and Git consider paths as just bytestrings internally,
+and allow almost anything. The difference, however, is in the _almost_
+part. For example, many Git servers will reject a push for security
+reasons if it contains a nested Git repository. Similarly, Mercurial
+cannot checkout commits with a nested repository, and it cannot even
+store paths containing an embedded newline or carrage return
+character.
+
+The default is to issue a warning and skip these paths. You can
+change this by setting ``hggit.invalidpaths`` in ``.hgrc``::
+
+  [hggit]
+  invalidpaths = keep
+
+Possible values are ``keep``, ``skip`` or ``abort``. Prior to 0.11,
+the default was ``abort``.

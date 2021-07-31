@@ -41,7 +41,7 @@ Create two commits, one secret:
   o  changeset:   0:d4b83afc35d1
      bookmark:    master
      tag:         default/master
-     phase:       draft
+     phase:       public
      user:        test
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     alpha
@@ -56,14 +56,8 @@ Only one changeset was pushed:
     
         alpha
 
-  $ cd hgrepo
-  $ hg phase 'all()'
-  0: draft
-  1: secret
-  $ hg pull
-  pulling from $TESTTMP/repo.git
-  no changes found
-  $ hg phase 'all()'
+And this published the remote head:
+
+  $ hg -R hgrepo phase 'all()'
   0: public
   1: secret
-  $ cd ..

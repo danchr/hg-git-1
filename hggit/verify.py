@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 import stat
 
@@ -14,8 +14,6 @@ from mercurial.i18n import _
 
 from dulwich import diff_tree
 from dulwich.objects import Commit, S_IFGITLINK
-
-from . import compat
 
 
 def verify(ui, repo, hgctx):
@@ -40,6 +38,13 @@ def verify(ui, repo, hgctx):
     except KeyError:
         raise error.Abort(_(b'git equivalent %s for rev %s not found!') %
                           (gitsha, hgctx))
+    except Exception:
+        ui.traceback()
+        raise error.Abort(
+            _(b'git equivalent %s for rev %s is corrupt!') % (gitsha, hgctx),
+            hint=b're-run with --traceback for details',
+        )
+
     if not isinstance(gitcommit, Commit):
         raise error.Abort(_(b'git equivalent %s for rev %s is not a commit!') %
                           (gitsha, hgctx))
@@ -57,7 +62,7 @@ def verify(ui, repo, hgctx):
     hgfiles.discard(b'.hgsub')
     gitfiles = set()
 
-    with compat.makeprogress(ui, b'verify', total=len(hgfiles)) as progress:
+    with ui.makeprogress(b'verify', total=len(hgfiles)) as progress:
         for gitfile, dummy in diff_tree.walk_trees(handler.git.object_store,
                                                    gitcommit.tree, None):
             if gitfile.mode == dirkind:

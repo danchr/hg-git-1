@@ -81,6 +81,7 @@ Create a git tag from hg
   $ hg tag --git alpha --debug -r 0
   adding git tag alpha
   finding hg commits to export
+  saving git map to $TESTTMP/hgrepo/.hg/git-mapfile
   $ hg log --graph
   @  changeset:   1:7fe02317c63d
   |  bookmark:    master
@@ -109,7 +110,7 @@ Create a git tag from hg
 
 Verify that amending commits known to remotes doesn't break anything
 
-  $ cat >> .hg/hgrc << EOF
+  $ cat >> $HGRCPATH << EOF
   > [experimental]
   > evolution = createmarkers
   > evolution.createmarkers = yes
@@ -174,16 +175,30 @@ Now create a tag for the old, obsolete master
 
   $ cd ..
 
-Create a git tag from hg, but pointing to a new commit:
+Verify that revsets can point out git tags; for that we need an
+untagged commit.
 
   $ cd hgrepo
   $ touch gamma
   $ fn_hg_commit -A -m 'add gamma'
+  $ hg log -T '{node|short} {tags}\n' -r 'gittag()'
+  ff7a2f2d8d70 alpha
+  7fe02317c63d beta
+  7aa44ff368c7 detached
+  $ hg log -T '{node|short} {tags}\n' -r 'gittag(detached)'
+  7aa44ff368c7 detached
+  $ hg log -T '{node|short} {tags}\n' -r 'gittag("re:a$")'
+  ff7a2f2d8d70 alpha
+  7fe02317c63d beta
+
+Create a git tag from hg, but pointing to a new commit:
+
   $ hg tag --git gamma --debug -r tip
   adding git tag gamma
   finding hg commits to export
   exporting hg objects to git
   converting revision dfeaa5393d25ea2c143fff73f448bfeab0b90ed6
+  saving git map to $TESTTMP/hgrepo/.hg/git-mapfile
   $ hg push
   pushing to $TESTTMP/gitrepo
   searching for changes
@@ -231,3 +246,4 @@ Try to overwrite an annotated tag:
   detached                           2:7aa44ff368c7 git
   alpha                              0:ff7a2f2d8d70 git
 #endif
+  $ cd ..

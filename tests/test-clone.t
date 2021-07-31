@@ -15,6 +15,12 @@ Load commonly used test logic
   $ echo beta > beta
   $ git add beta
   $ fn_git_commit -m 'add beta'
+  $ git checkout -b gamma 2>&1 | sed s/\'/\"/g
+  Switched to a new branch "gamma"
+  $ echo gamma > gamma
+  $ git add gamma
+  $ fn_git_commit -m 'add gamma'
+  $ git checkout -q beta
 
 
   $ cd ..
@@ -66,12 +72,6 @@ clone a branch
      summary:     add alpha
   
 
-clone with mapsavefreq set
-  $ rm -rf hgrepo-b
-  $ hg clone -r beta gitrepo hgrepo-b --config hggit.mapsavefrequency=1 --debug | grep saving
-  saving mapfile
-  saving mapfile
-
 Make sure that a deleted .hgsubstate does not confuse hg-git
 
   $ cd gitrepo
@@ -87,7 +87,7 @@ Make sure that a deleted .hgsubstate does not confuse hg-git
   updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo-c bookmarks
-   * beta                      3:3a77db64d0e8
+   * beta                      3:47d12948785d
      master                    0:ff7a2f2d8d70
   $ hg --cwd hgrepo-c status
 
@@ -99,7 +99,8 @@ test shared repositories
   updating to bookmark beta (hg57 !)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo-base bookmarks
-   * beta                      3:3a77db64d0e8
+   * beta                      4:47d12948785d
+     gamma                     2:ca33a262eb46
      master                    0:ff7a2f2d8d70
   $ hg  --config extensions.share= share hgrepo-base hgrepo-shared
   updating working directory

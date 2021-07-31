@@ -3,8 +3,9 @@
 # repositories to Git repositories. Code in this file is meant to be a generic
 # library and should be usable outside the context of hg-git or an hg command.
 
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
+import collections
 import os
 import stat
 
@@ -14,70 +15,18 @@ from mercurial import (
     error,
 )
 
-from . import compat
 from . import util
 
 
 def parse_subrepos(ctx):
-    sub = util.OrderedDict()
+    sub = collections.OrderedDict()
     if b'.hgsub' in ctx:
         sub = util.parse_hgsub(ctx[b'.hgsub'].data().splitlines())
-    substate = util.OrderedDict()
+    substate = collections.OrderedDict()
     if b'.hgsubstate' in ctx:
         substate = util.parse_hgsubstate(
             ctx[b'.hgsubstate'].data().splitlines())
     return sub, substate
-
-
-def audit_git_path(ui, path):
-    r"""Check for path components that case-fold to .git.
-
-    >>> from mercurial import pycompat
-    >>> class fakeui(object):
-    ...     def configbool(*args):
-    ...         return False
-    ...     def warn(self, s):
-    ...         if pycompat.ispy3:
-    ...             import sys
-    ...             print(s.decode('utf-8', 'surrogatepass'))
-    ...         else:
-    ...             print(s)
-    >>> u = fakeui()
-    >>> audit_git_path(u, b'foo/git~100/wat')
-    ... # doctest: +ELLIPSIS
-    warning: path 'foo/git~100/wat' contains a potentially dangerous ...
-    It may not be legal to check out in Git.
-    It may also be rejected by some git server configurations.
-    <BLANKLINE>
-    >>> audit_git_path(u, u'foo/.gi\u200ct'.encode('utf-8'))
-    ... # doctest: +ELLIPSIS
-    warning: path 'foo/.gi‌t' contains a potentially dangerous ...
-    It may not be legal to check out in Git.
-    It may also be rejected by some git server configurations.
-    <BLANKLINE>
-    >>> audit_git_path(u, b'this/is/safe')
-    """
-    dangerous = False
-    for c in path.split(b'/'):
-        if encoding.hfsignoreclean(c) == b'.git':
-            dangerous = True
-            break
-        elif b'~' in c:
-            base, tail = c.split(b'~', 1)
-            if tail.isdigit() and base.upper().startswith(b'GIT'):
-                dangerous = True
-                break
-    if dangerous:
-        if compat.config(ui, b'bool', b'git', b'blockdotgit'):
-            raise error.Abort(
-                (b"Refusing to export likely-dangerous path '%s'" % path),
-                hint=(b"If you need to continue, read about CVE-2014-9390 and "
-                      b"then set '[git] blockdotgit = false' in your hgrc."))
-        ui.warn(b"warning: path '%s' contains a potentially dangerous path "
-                b'component.\n'
-                b'It may not be legal to check out in Git.\n'
-                b'It may also be rejected by some git server configurations.\n'
-                % path)
 
 
 class IncrementalChangesetExporter(object):
@@ -150,7 +99,7 @@ class IncrementalChangesetExporter(object):
         while todo:
             path, tree = todo.pop()
             self._dirs[path] = tree
-            for entry in compat.iteritems(tree):
+            for entry in tree.items():
                 if entry.mode == dirkind:
                     if path == b'':
                         newpath = entry.path
@@ -165,6 +114,68 @@ class IncrementalChangesetExporter(object):
         This is needed to construct a Git commit object.
         """
         return self._dirs[b''].id
+
+    def audit_path(self, path):
+        r"""Check for path components that case-fold to .git.
+
+        Returns ``True`` for normal paths. The results for insecure
+        paths depend on the ``hggit.invalidpaths`` configuration in
+        ``ui``:
+
+        ``abort`` means insecure paths abort the conversion —
+        this was the default prior to 0.11.
+
+        ``keep`` means issue a warning and keep the path,
+        returning ``True``.
+
+        Anything else, but documented as ``skip``, means issue a
+        warning and disregard the path, returning ``False``.
+
+        """
+        ui = self._hg.ui
+
+        dangerous = False
+        for c in path.split(b'/'):
+            if encoding.hfsignoreclean(c) == b'.git':
+                dangerous = True
+                break
+            elif b'~' in c:
+                base, tail = c.split(b'~', 1)
+                if tail.isdigit() and base.upper().startswith(b'GIT'):
+                    dangerous = True
+                    break
+        if dangerous:
+            opt = ui.config(b'hggit', b'invalidpaths')
+
+            # escape the path when printing it out
+            prettypath = path.decode('latin1').encode('unicode-escape')
+
+            if opt == b'abort':
+                raise error.Abort(
+                    b"invalid path '%s' rejected by configuration" % prettypath,
+                    hint=b"see 'hg help hggit' for details",
+                )
+            elif opt == b'keep':
+                ui.warn(
+                    b"warning: path '%s' contains an invalid path component\n"
+                    % prettypath,
+                )
+                return True
+            else:
+                # undocumented: just let anything else mean "skip"
+                ui.warn(b"warning: skipping invalid path '%s'\n" % prettypath)
+                return False
+        else:
+            return True
+
+    def filter_unsafe_paths(self, paths):
+        """Return a copy of the given list, with dangerous paths removed.
+
+        Please note that the configuration can suppress the removal;
+        see above.
+
+        """
+        return [path for path in paths if self.audit_path(path)]
 
     def update_changeset(self, newctx):
         """Set the tree to track a new Mercurial changeset.
@@ -201,10 +212,8 @@ class IncrementalChangesetExporter(object):
         # the full manifest. And, the easy way to compare two manifests is
         # localrepo.status().
         status = self._hg.status(self._ctx, newctx)
-        modified, added, removed = (
-            status.modified,
-            status.added,
-            status.removed,
+        modified, added, removed = map(
+            self.filter_unsafe_paths, (status.modified, status.added, status.removed),
         )
 
         # We track which directories/trees have modified in this update and we
@@ -239,7 +248,6 @@ class IncrementalChangesetExporter(object):
         # corresponding Git blob and its tree entry. We emit the blob
         # immediately and update trees to be aware of its presence.
         for path in set(modified) | set(added):
-            audit_git_path(self._hg.ui, path)
             if path == b'.hgsubstate' or path == b'.hgsub':
                 continue
 
@@ -402,7 +410,7 @@ class IncrementalChangesetExporter(object):
         def isgit(sub, path):
             return path not in sub or sub[path].startswith(b'[git]')
 
-        for path, sha in compat.iteritems(substate):
+        for path, sha in substate.items():
             if not isgit(sub, path):
                 # old = hg -- will be handled in next loop
                 continue
@@ -411,7 +419,7 @@ class IncrementalChangesetExporter(object):
                 # new = hg or no, case (2) or (3)
                 removed.append(path)
 
-        for path, sha in compat.iteritems(newsubstate):
+        for path, sha in newsubstate.items():
             if not isgit(newsub, path):
                 # new = hg or no; the only cases we care about are handled
                 # above

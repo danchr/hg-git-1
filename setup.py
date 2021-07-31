@@ -1,4 +1,4 @@
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
 from os.path import dirname, join
 
@@ -35,8 +35,8 @@ setup(
     packages=['hggit'],
     include_package_data=True,
     zip_safe=True,
+    python_requires='>=3.6',
     install_requires=[
-        'dulwich>=0.19.0;python_version>="3.0"',
-        'dulwich>=0.19.0,<0.20.0;python_version<"3.0"',
+        'dulwich>=0.19.3',
     ],
 )

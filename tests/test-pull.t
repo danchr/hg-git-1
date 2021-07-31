@@ -51,6 +51,20 @@ no-op pull with added bookmark
   pulling from $TESTTMP/gitrepo
   no changes found
 
+pull something that doesn't exist
+  $ hg -R hgrepo pull -r kaflaflibob
+  pulling from $TESTTMP/gitrepo
+  abort: unknown revision 'kaflaflibob'!? (re)
+  [255]
+
+pull an ambiguous reference
+  $ GIT_DIR=gitrepo/.git git branch t_alpha t_alpha
+  $ hg -R hgrepo pull -r t_alpha
+  pulling from $TESTTMP/gitrepo
+  abort: ambiguous reference t_alpha: refs/heads/t_alpha, refs/tags/t_alpha!? (re)
+  [255]
+  $ GIT_DIR=gitrepo/.git git branch -qD t_alpha
+
 pull a branch
   $ hg -R hgrepo pull -r beta
   pulling from $TESTTMP/gitrepo
@@ -124,20 +138,31 @@ pull everything else
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add alpha
   
-add a merge to the git repo
+add a merge to the git repo, and delete the branch
   $ cd gitrepo
   $ git merge -m "Merge branch 'beta'" beta | sed 's/|  */| /'
   Merge made by the 'recursive' strategy.
    beta | 1 +
    1 file changed, 1 insertion(+)
    create mode 100644 beta
+  $ git branch -d beta
+  Deleted branch beta (was 9497a4e).
   $ cd ..
 
 pull the merge
-  $ hg -R hgrepo pull
+  $ hg -R hgrepo tags | grep default/beta
+  default/beta                       1:7fe02317c63d
+  $ hg -R hgrepo pull --config git.pull-prune-remote-branches=false
   pulling from $TESTTMP/gitrepo
   importing git objects into hg
   (run 'hg update' to get a working copy)
+  $ hg -R hgrepo tags | grep default/beta
+  default/beta                       1:7fe02317c63d
+  $ hg -R hgrepo pull
+  pulling from $TESTTMP/gitrepo
+  no changes found
+  $ hg -R hgrepo tags | grep default/beta
+  [1]
   $ hg -R hgrepo log --graph
   o    changeset:   4:a02330f767a4
   |\   bookmark:    master
@@ -165,7 +190,6 @@ pull the merge
   | |
   o |  changeset:   1:7fe02317c63d
   |/   bookmark:    beta
-  |    tag:         default/beta
   |    tag:         t_beta
   |    user:        test <test@example.org>
   |    date:        Mon Jan 01 00:00:11 2007 +0000
@@ -242,7 +266,6 @@ ensure that releases/v1 and releases/v2 are pulled but not notreleases/v1
   | |
   o |  changeset:   1:7fe02317c63d
   |/   bookmark:    beta
-  |    tag:         default/beta
   |    tag:         t_beta
   |    user:        test <test@example.org>
   |    date:        Mon Jan 01 00:00:11 2007 +0000

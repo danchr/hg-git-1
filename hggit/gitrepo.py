@@ -1,22 +1,25 @@
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
-from .util import isgitsshuri
-from mercurial import (
-    error,
-)
-
+from . import util
 from . import compat
+from dulwich.refs import LOCAL_BRANCH_PREFIX
+from mercurial import (
+    bundlerepo,
+    discovery,
+    error,
+    exchange,
+    exthelper,
+    hg,
+    pycompat,
+)
+from mercurial.wireprotov1peer import (
+        batchable,
+        future,
+        peerexecutor,
+)
+from mercurial.interfaces.repository import peer as peerrepository
 
-peerapi = False
-try:
-    from mercurial.interfaces.repository import peer as peerrepository
-    peerapi = True
-except ImportError:
-    try:
-        from mercurial.repository import peer as peerrepository
-        peerapi = True
-    except ImportError:
-        from mercurial.peer import peerrepository
+eh = exthelper.exthelper()
 
 
 class basegitrepo(peerrepository):
@@ -63,9 +66,9 @@ class basegitrepo(peerrepository):
                 result = handler.fetch_pack(self.path, heads=[])
                 # map any git shas that exist in hg to hg shas
                 stripped_refs = {
-                    ref[11:]: handler.map_hg_get(val) or val
-                    for ref, val in compat.iteritems(result.refs)
-                    if ref.startswith(b'refs/heads/')
+                    ref[len(LOCAL_BRANCH_PREFIX):]: handler.map_hg_get(val) or val
+                    for ref, val in result.refs.items()
+                    if ref.startswith(LOCAL_BRANCH_PREFIX)
                 }
                 return stripped_refs
         return {}
@@ -73,89 +76,190 @@ class basegitrepo(peerrepository):
     def pushkey(self, namespace, key, old, new):
         return False
 
-    if peerapi:
-        def branchmap(self):
-            raise NotImplementedError
+    def branchmap(self):
+        raise NotImplementedError
 
-        def canpush(self):
-            return True
+    def canpush(self):
+        return True
 
-        def close(self):
-            pass
+    def close(self):
+        pass
 
-        def debugwireargs(self):
-            raise NotImplementedError
+    def debugwireargs(self):
+        raise NotImplementedError
 
-        def getbundle(self):
-            raise NotImplementedError
+    def getbundle(self):
+        raise NotImplementedError
 
-        def iterbatch(self):
-            raise NotImplementedError
+    def iterbatch(self):
+        raise NotImplementedError
 
-        def known(self):
-            raise NotImplementedError
+    def known(self):
+        raise NotImplementedError
 
-        def peer(self):
-            return self
+    def peer(self):
+        return self
 
-        def stream_out(self):
-            raise NotImplementedError
+    def stream_out(self):
+        raise NotImplementedError
 
-        def unbundle(self):
-            raise NotImplementedError
+    def unbundle(self):
+        raise NotImplementedError
 
-try:
-    from mercurial.wireprotov1peer import (
-        batchable,
-        future,
-        peerexecutor,
-    )
-except ImportError:
-    # compat with <= hg-4.8
-    gitrepo = basegitrepo
-else:
-    class gitrepo(basegitrepo):
 
-        @batchable
-        def lookup(self, key):
-            f = future()
-            yield {}, f
-            yield super(gitrepo, self).lookup(key)
+class gitrepo(basegitrepo):
+    @batchable
+    def lookup(self, key):
+        f = future()
+        yield {}, f
+        yield super(gitrepo, self).lookup(key)
 
-        @batchable
-        def heads(self):
-            f = future()
-            yield {}, f
-            yield super(gitrepo, self).heads()
+    @batchable
+    def heads(self):
+        f = future()
+        yield {}, f
+        yield super(gitrepo, self).heads()
 
-        @batchable
-        def listkeys(self, namespace):
-            f = future()
-            yield {}, f
-            yield super(gitrepo, self).listkeys(namespace)
+    @batchable
+    def listkeys(self, namespace):
+        f = future()
+        yield {}, f
+        yield super(gitrepo, self).listkeys(namespace)
 
-        @batchable
-        def pushkey(self, namespace, key, old, new):
-            f = future()
-            yield {}, f
-            yield super(gitrepo, self).pushkey(key, old, new)
+    @batchable
+    def pushkey(self, namespace, key, old, new):
+        f = future()
+        yield {}, f
+        yield super(gitrepo, self).pushkey(key, old, new)
 
-        def commandexecutor(self):
-            return peerexecutor(self)
+    def commandexecutor(self):
+        return peerexecutor(self)
 
-        def _submitbatch(self, req):
-            for op, argsdict in req:
-                yield None
+    def _submitbatch(self, req):
+        for op, argsdict in req:
+            yield None
 
-        def _submitone(self, op, args):
-            return None
+    def _submitone(self, op, args):
+        return None
 
 instance = gitrepo
 
 
 def islocal(path):
-    if isgitsshuri(path):
+    if util.isgitsshuri(path):
         return True
 
     u = compat.url(path)
     return not u.scheme or u.scheme == b'file'
+
+
+# defend against tracebacks if we specify -r in 'hg pull'
+@eh.wrapfunction(hg, b'addbranchrevs')
+def safebranchrevs(orig, lrepo, otherrepo, branches, revs):
+    revs, co = orig(lrepo, otherrepo, branches, revs)
+    if isinstance(otherrepo, gitrepo):
+        # FIXME: Unless it's None, the 'co' result is passed to the lookup()
+        # remote command. Since our implementation of the lookup() remote
+        # command is incorrect, we set it to None to avoid a crash later when
+        # the incorect result of the lookup() remote command would otherwise be
+        # used. This can, in undocumented corner-cases, result in that a
+        # different revision is updated to when passing both -u and -r to
+        # 'hg pull'. An example of such case is in tests/test-addbranchrevs.t
+        # (for the non-hg-git case).
+        co = None
+    return revs, co
+
+
+@eh.wrapfunction(discovery, b'findcommonoutgoing')
+def findcommonoutgoing(orig, repo, other, *args, **kwargs):
+    if isinstance(other, gitrepo):
+        heads = repo.githandler.get_refs(other.path)[0]
+        kw = {}
+        kw.update(kwargs)
+        for val, k in zip(
+            args, ('onlyheads', 'force', 'commoninc', 'portable')
+        ):
+            kw[k] = val
+        force = kw.get('force', False)
+        commoninc = kw.get('commoninc', None)
+        if commoninc is None:
+            commoninc = discovery.findcommonincoming(
+                repo, other, heads=heads, force=force
+            )
+            kw['commoninc'] = commoninc
+        return orig(repo, other, **kw)
+    return orig(repo, other, *args, **kwargs)
+
+
+@eh.wrapfunction(bundlerepo, b'getremotechanges')
+def getremotechanges(orig, ui, repo, other, *args, **opts):
+    if isinstance(other, gitrepo):
+        if args:
+            revs = args[0]
+        else:
+            revs = opts.get('onlyheads', opts.get('revs'))
+        r, c, cleanup = repo.githandler.getremotechanges(other, revs)
+        # ugh. This is ugly even by mercurial API compatibility standards
+        if 'onlyheads' not in orig.__code__.co_varnames:
+            cleanup = None
+        return r, c, cleanup
+    return orig(ui, repo, other, *args, **opts)
+
+
+@eh.wrapfunction(exchange, b'pull')
+@util.transform_notgit
+def exchangepull(
+    orig, repo, remote, heads=None, force=False, bookmarks=(), **kwargs
+):
+    if isinstance(remote, gitrepo):
+        pullop = exchange.pulloperation(
+            repo, remote, heads, force, bookmarks=bookmarks
+        )
+        pullop.trmanager = exchange.transactionmanager(
+            repo, b'pull', remote.url()
+        )
+
+        with repo.wlock(), repo.lock(), pullop.trmanager:
+            pullop.cgresult = repo.githandler.fetch(remote, heads)
+            return pullop
+    else:
+        return orig(repo, remote, heads, force, bookmarks=bookmarks, **kwargs)
+
+
+# TODO figure out something useful to do with the newbranch param
+@eh.wrapfunction(exchange, b'push')
+@util.transform_notgit
+def exchangepush(
+    orig,
+    repo,
+    remote,
+    force=False,
+    revs=None,
+    newbranch=False,
+    bookmarks=(),
+    opargs=None,
+    **kwargs
+):
+    if isinstance(remote, gitrepo):
+        pushop = exchange.pushoperation(
+            repo,
+            remote,
+            force,
+            revs,
+            newbranch,
+            bookmarks,
+            **pycompat.strkwargs(opargs or {}),
+        )
+        pushop.cgresult = repo.githandler.push(remote.path, revs, force)
+        return pushop
+    else:
+        return orig(
+            repo,
+            remote,
+            force,
+            revs,
+            newbranch,
+            bookmarks=bookmarks,
+            opargs=None,
+            **kwargs,
+        )

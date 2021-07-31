@@ -13,16 +13,9 @@ echo "[extensions]" >> $HGRCPATH
 echo "hggit=$(echo $(dirname $TESTDIR))/hggit" >> $HGRCPATH
 echo 'mq=' >> $HGRCPATH
 
-# Enable git subrepository for hg >= 4.4.1
+# Enable git subrepository
 echo '[subrepos]' >> $HGRCPATH
 echo 'git:allowed = yes' >> $HGRCPATH
-
-# Disable warnings on 4.6, specifically; clone triggers a warning
-if hg --version | fgrep -q 'version 4.6'
-then
-    echo "[devel]" >> $HGRCPATH
-    echo "all-warnings=no" >> $HGRCPATH
-fi
 
 # silence warning from recent git
 cat >> $TESTTMP/.gitconfig <<EOF
@@ -47,35 +40,60 @@ GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE"; export GIT_COMMITTER_DATE
 # Functions to commit and tag in Mercurial and Git in a predictable manner
 count=10
 
+fn_get_date() {
+    h=$(expr $count / 60 / 60)
+    m=$(expr $count / 60 % 60)
+    s=$(expr $count % 60)
+    printf "2007-01-01 %02d:%02d:%02d +0000" $h $m $s
+}
+
 fn_git_commit() {
-    GIT_AUTHOR_DATE="2007-01-01 00:00:$count +0000"
+    GIT_AUTHOR_DATE="$(fn_get_date)"
     GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE"
     git commit "$@" >/dev/null || echo "git commit error"
     count=`expr $count + 1`
 }
 
+fn_git_rebase() {
+    GIT_AUTHOR_DATE="$(fn_get_date)"
+    GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE"
+    git rebase --quiet "$@" >/dev/null || echo "git rebase error"
+    count=`expr $count + 1`
+}
+
 fn_hg_commit() {
-    HGDATE="2007-01-01 00:00:$count +0000"
+    HGDATE="$(fn_get_date)"
     hg commit -d "$HGDATE" "$@" >/dev/null || echo "hg commit error"
     count=`expr $count + 1`
 }
 
 fn_hg_commitextra() {
-    HGDATE="2007-01-01 00:00:$count +0000"
-    hg --config extensions.commitextra=$TESTDIR/commitextra.py commitextra \
-        -d "$HGDATE" "$@" >/dev/null || echo "hg commit error"
+    HGDATE="$(fn_get_date)"
+    hg --config extensions.commitextra=$TESTDIR/testlib/ext-commit-extra.py \
+       commitextra -d "$HGDATE" "$@" >/dev/null || echo "hg commit error"
     count=`expr $count + 1`
 }
 
 fn_git_tag() {
-    GIT_AUTHOR_DATE="2007-01-01 00:00:$count +0000"
+    GIT_AUTHOR_DATE="$(fn_get_date)"
     GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE"
     git tag "$@" >/dev/null || echo "git tag error"
     count=`expr $count + 1`
 }
 
 fn_hg_tag() {
-    HGDATE="2007-01-01 00:00:$count +0000"
+    HGDATE="$(fn_get_date)"
     hg tag -d "$HGDATE" "$@" >/dev/null || echo "hg tag error"
     count=`expr $count + 1`
+}
+
+fn_touch_escaped() {
+    python - "$@" <<EOF
+import os, sys
+for p in sys.argv[1:]:
+  p = p.encode('ascii').decode('unicode_escape').encode('utf-8')
+  if b'/' in p and not os.path.exists(os.path.dirname(p)):
+    os.makedirs(os.path.dirname(p))
+  open(p, 'w')
+EOF
 }

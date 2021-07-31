@@ -23,7 +23,7 @@ stages:
 
 # First, test with the latest and greatest Mercurial, across the
 # versions Python supported. We generally assume that if e.g. CPython
-# 3.5 and 3.8 work, anything in between will work as well.
+# 3.6 and 3.9 work, anything in between will work as well.
 Latest:
   extends: .base
   stage: current
@@ -31,8 +31,7 @@ Latest:
     matrix:
       - &latest-versions
         PYTHON:
-          - "2.7"
-          - "3.5"
+          - "3.6"
           - "3.9"
         HG:
           - "5.9"
@@ -43,34 +42,16 @@ Latest:
 #
 # Versions prior to the version that ships in the latest Ubuntu LTS
 # release (4.5.3 for 18.04; 5.3.1 for 20.04) may be dropped if they
-# interfere with new development. The latest released minor version
-# should be listed for each major version; earlier minor versions are
-# not needed.
+# are older than a year and interfere with new development. The latest
+# released minor version should be listed for each major version;
+# earlier minor versions are not needed.
 Supported:
   extends: .base
   stage: compat
   retry: 1
   parallel:
     matrix:
-      - &supported-versions-py2
-        PYTHON: "2.7"
-        HG:
-          - "4.4"
-          - "4.5"
-          - "4.6"
-          - "4.7"
-          - "4.8"
-          - "4.9"
-          - "5.0"
-          - "5.1"
-          - "5.2"
-          - "5.3"
-          - "5.4"
-          - "5.5"
-          - "5.6"
-          - "5.7"
-          - "5.8"
-      - &supported-versions-py3
+      - &supported-versions
         PYTHON: "3.9"
         HG:
           - "5.2"
@@ -124,7 +105,6 @@ Development:
     matrix:
       - &development-versions
         PYTHON:
-          - "2.7"
           - "3.9"
         HG:
           - "stable"
@@ -165,8 +145,7 @@ CI images:
   parallel:
     matrix:
       - *latest-versions
-      - *supported-versions-py2
-      - *supported-versions-py3
+      - *supported-versions
       - *development-versions
 
 # Builds the image used by tests/test-networking.t
@@ -276,12 +255,8 @@ x86 Wheels:
       - wheelhouse
   parallel:
     matrix:
-      - PLATFORM: manylinux2010_x86_64
-        ABI:
-          - cp27
       - PLATFORM: manylinux2014_x86_64
         ABI:
-          - cp35
           - cp36
           - cp37
           - cp38
@@ -295,7 +270,6 @@ ARM Wheels:
     matrix:
       - PLATFORM: manylinux2014_aarch64
         ABI:
-          - cp35
           - cp36
           - cp37
           - cp38

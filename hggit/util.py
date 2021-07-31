@@ -1,30 +1,25 @@
 """Compatibility functions for old Mercurial versions and other utility
 functions."""
 
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
+import collections
 import re
-
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict
 
 from dulwich import errors
 from mercurial.i18n import _
 from mercurial import (
     error,
     lock as lockmod,
+    util as hgutil,
 )
-
-from . import compat
 
 gitschemes = (b'git', b'git+ssh', b'git+http', b'git+https')
 
 
 def parse_hgsub(lines):
     """Fills OrderedDict with hgsub file content passed as list of lines"""
-    rv = OrderedDict()
+    rv = collections.OrderedDict()
     for l in lines:
         ls = l.strip()
         if not ls or ls[0] == b'#':
@@ -36,12 +31,12 @@ def parse_hgsub(lines):
 
 def serialize_hgsub(data):
     """Produces a string from OrderedDict hgsub content"""
-    return b''.join(b'%s = %s\n' % (n, v) for n, v in compat.iteritems(data))
+    return b''.join(b'%s = %s\n' % (n, v) for n, v in data.items())
 
 
 def parse_hgsubstate(lines):
     """Fills OrderedDict with hgsubtate file content passed as list of lines"""
-    rv = OrderedDict()
+    rv = collections.OrderedDict()
     for l in lines:
         ls = l.strip()
         if not ls or ls[0] == b'#':
@@ -131,7 +126,7 @@ def checksafessh(host):
 
     Raises an error.Abort when the url is unsafe.
     """
-    host = compat.unquote(host)
+    host = hgutil.urlreq.unquote(host)
     if host.startswith(b'-'):
         raise error.Abort(_(b"potentially unsafe hostname: '%s'") %
                           (host,))

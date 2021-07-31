@@ -1,16 +1,30 @@
-from __future__ import absolute_import, print_function
+from __future__ import generator_stop
 
+from mercurial import exthelper
+from mercurial import repoview
 from mercurial import util as hgutil
 from mercurial.node import bin
 
 from .git_handler import GitHandler
 from .gitrepo import gitrepo
-from . import compat
 from . import util
 
+eh = exthelper.exthelper()
 
-def generate_repo_subclass(baseclass):
-    class hgrepo(baseclass):
+
+@eh.reposetup
+def reposetup(ui, repo):
+    if isinstance(repo, gitrepo):
+        return
+
+    if hasattr(repo, '_wlockfreeprefix'):
+        repo._wlockfreeprefix |= {
+            GitHandler.map_file,
+            GitHandler.remote_refs_file,
+            GitHandler.tags_file,
+        }
+
+    class hgrepo(repo.__class__):
         @util.transform_notgit
         def findoutgoing(self, remote, base=None, heads=None, force=False):
             if isinstance(remote, gitrepo):
@@ -25,12 +39,12 @@ def generate_repo_subclass(baseclass):
         def _findtags(self):
             (tags, tagtypes) = super(hgrepo, self)._findtags()
 
-            for tag, rev in compat.iteritems(self.githandler.tags):
+            for tag, rev in self.githandler.tags.items():
                 if tag not in tags:
                     assert isinstance(tag, bytes)
                     tags[tag] = bin(rev)
                     tagtypes[tag] = b'git'
-            for tag, rev in compat.iteritems(self.githandler.remote_refs):
+            for tag, rev in self.githandler.remote_refs.items():
                 assert isinstance(tag, bytes)
                 tags[tag] = rev
                 tagtypes[tag] = b'git-remote'
@@ -49,7 +63,7 @@ def generate_repo_subclass(baseclass):
             # TODO consider using self._tagscache
             tagscache = super(hgrepo, self).tags()
             tagscache.update(self.githandler.remote_refs)
-            for tag, rev in compat.iteritems(self.githandler.tags):
+            for tag, rev in self.githandler.tags.items():
                 if tag in tagscache:
                     continue
 
@@ -57,4 +71,19 @@ def generate_repo_subclass(baseclass):
 
             return tagscache
 
-    return hgrepo
+    repo.__class__ = hgrepo
+
+
+@eh.wrapfunction(repoview, b'pinnedrevs')
+def pinnedrevs(orig, repo):
+    pinned = orig(repo)
+
+    # Mercurial pins bookmarks, even if obsoleted, so that they always
+    # appear in e.g. log; do the same with git tags and remotes.
+    if repo.local() and hasattr(repo, 'githandler'):
+        rev = repo.changelog.rev
+
+        pinned.update(rev(bin(r)) for r in repo.githandler.tags.values())
+        pinned.update(rev(r) for r in repo.githandler.remote_refs.values())
+
+    return pinned

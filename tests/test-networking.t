@@ -12,7 +12,7 @@ We assume the git server is unavailable elsewhere.
 Allow password prompts without a TTY:
 
   $ cat << EOF > get_pass.py
-  > from __future__ import print_function, absolute_import
+  > from __future__ import generator_stop
   > import getpass, os, sys
   > def newgetpass(args):
   >     try:
@@ -34,7 +34,7 @@ Create a silly SSH configuration:
 
   $ cat >> $HGRCPATH << EOF
   > [ui]
-  > ssh = ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i $TESTTMP/id_ed25519
+  > ssh = ssh -o UserKnownHostsFile=$TESTDIR/known_hosts -o StrictHostKeyChecking=no -i $TESTTMP/id_ed25519
   > EOF
   $ cp $RUNTESTDIR/../contrib/docker/git-server/ssh/id_ed25519 $TESTTMP
   $ chmod 0600 $TESTTMP/id_ed25519
@@ -91,9 +91,7 @@ So, that went well; now push...
   $ hg path default
   git@git-server:/srv/repo.git
   $ hg push
-  Warning: Permanently added * (glob) (?)
   pushing to git@git-server:/srv/repo.git
-  Warning: Permanently added * (glob) (?)
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs

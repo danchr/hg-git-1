@@ -4,18 +4,7 @@ set -e
 
 BUILDDEPENDS="curl jq coreutils gcc gettext musl-dev"
 RUNDEPENDS="git git-daemon unzip openssh gnupg"
-
-if echo "$PYTHON" | grep -q ^2
-then
-    PIPDEPENDS="$PIPDEPENDS dulwich~=0.19.0"
-else
-    PIPDEPENDS="$PIPDEPENDS dulwich pyflakes"
-fi
-
-if test "$PYTHON" -gt 3.5
-then
-    PIPDEPENDS="$PIPDEPENDS black==20.8b1"
-fi
+PIPDEPENDS="dulwich pyflakes black==20.8b1"
 
 set -xe
 
