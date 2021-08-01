@@ -211,7 +211,6 @@ class GitHandler(object):
         # ready to prompt the user, if necessary
         self._http_auth_realm = None
 
-
     def __bool__(self):
         return bool(self._map_git or self._map_hg)
 
@@ -325,26 +324,35 @@ class GitHandler(object):
         self.ui.debug(_(b"saving git map to %s\n") % self.vfs.join(map_file))
 
         with self.repo.lock():
-            map_hg = self._map_hg
-            with self.vfs(map_file, b'wb+', atomictemp=True) as buf:
-                bwrite = buf.write
-                for hgsha, gitsha in map_hg.items():
-                    bwrite(b"%s %s\n" % (gitsha, hgsha))
+            with self.vfs(map_file, b'wb+', atomictemp=True) as fp:
+                self._write_map_to(fp)
+
+    def _write_map_to(self, fp):
+        bwrite = fp.write
+        for hgsha, gitsha in self._map_hg.items():
+            bwrite(b"%s %s\n" % (gitsha, hgsha))
 
     def load_tags(self):
         self.tags = {}
         if os.path.exists(self.vfs.join(self.tags_file)):
-            for line in self.vfs(self.tags_file):
-                sha, name = line.strip().split(b' ', 1)
-                if sha in self.repo.unfiltered():
-                    self.tags[name] = sha
+            with self.vfs(self.tags_file) as fp:
+                self._read_tags_from(fp)
+
+    def _read_tags_from(self, fp):
+        for line in fp:
+            sha, name = line.strip().split(b' ', 1)
+            if sha in self.repo.unfiltered():
+                self.tags[name] = sha
 
     def save_tags(self):
         with self.repo.lock():
             with self.vfs(self.tags_file, b'w+', atomictemp=True) as fp:
-                for name, sha in sorted(self.tags.items()):
-                    if not self.repo.tagtype(name) == b'global':
-                        fp.write(b"%s %s\n" % (sha, name))
+                self._write_tags_to(fp)
+
+    def _write_tags_to(self, fp):
+        for name, sha in sorted(self.tags.items()):
+            if not self.repo.tagtype(name) == b'global':
+                fp.write(b"%s %s\n" % (sha, name))
 
     def load_remote_refs(self):
         self._remote_refs = {}
