@@ -211,6 +211,10 @@ class GitHandler(object):
         # ready to prompt the user, if necessary
         self._http_auth_realm = None
 
+
+    def __bool__(self):
+        return bool(self._map_git or self._map_hg)
+
     @property
     def vfs(self):
         return self.store_repo.vfs
