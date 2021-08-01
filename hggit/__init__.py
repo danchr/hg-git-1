@@ -149,6 +149,7 @@ from mercurial import (
 
 from . import commands
 from . import config
+from . import debugcommands
 from . import gitdirstate
 from . import gitrepo
 from . import hgrepo
@@ -181,6 +182,7 @@ uipopulate = eh.finaluipopulate
 for _mod in (
     commands,
     config,
+    debugcommands,
     gitdirstate,
     gitrepo,
     hgrepo,

@@ -7,13 +7,14 @@ available.
 
 from __future__ import generator_stop
 
-from mercurial import exthelper
-import time, os, tempfile
 import functools
+import os
+import tempfile
+import time
+
+from mercurial import exthelper
 
 eh = exthelper.exthelper()
-
-cmdtable = eh.cmdtable
 
 # the timer functions are copied from mercurial/contrib/perf.py
 def gettimer(ui, opts=None):
@@ -69,15 +70,19 @@ def _timer(fm, func, title=None):
     fm.plain(b'\n')
 
 
-@eh.command(b'perfgitloadmap')
+@eh.command(b'debugperfgitloadmap')
 def perfgitloadmap(ui, repo):
+    ui.status(b'timing map load from %s\n' % repo.path)
+
     timer, fm = gettimer(ui)
     timer(repo.githandler.load_map)
     fm.end()
 
 
-@eh.command(b'perfgitsavemap')
+@eh.command(b'debugperfgitsavemap')
 def perfgitsavemap(ui, repo):
+    ui.status(b'timing map save in %s\n' % repo.path)
+
     timer, fm = gettimer(ui)
     repo.githandler.load_map()
     fd, f = tempfile.mkstemp(prefix=b'.git-mapfile-', dir=repo.path)
