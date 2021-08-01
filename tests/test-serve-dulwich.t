@@ -34,6 +34,16 @@ Make sure that clone over unauthenticated HTTP doesn't break
 
   $ hg clone -U git+http://localhost:$HGPORT copy 2>&1
   \r (no-eol) (esc)
+  counting objects 6 [ <=>                                  ]\r (no-eol) (esc) (no-dulwich0204 !)
+  counting objects 1 [ <=>                                  ]\r (no-eol) (esc) (dulwich0204 !)
+  counting objects 2 [  <=>                                 ]\r (no-eol) (esc) (dulwich0204 !)
+  counting objects 3 [   <=>                                ]\r (no-eol) (esc) (dulwich0204 !)
+  counting objects 4 [    <=>                               ]\r (no-eol) (esc) (dulwich0204 !)
+  counting objects 5 [     <=>                              ]\r (no-eol) (esc) (dulwich0204 !)
+  counting objects 6 [      <=>                             ]\r (no-eol) (esc) (dulwich0204 !)
+  counting objects 6 [       <=>                            ]\r (no-eol) (esc) (dulwich0204 !)
+                                                              \r (no-eol) (esc)
+  \r (no-eol) (esc)
   importing commits 1/2 [================>                  ]\r (no-eol) (esc)
   importing commits 2/2 [==================================>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
@@ -58,6 +68,11 @@ Make sure that clone over unauthenticated HTTP doesn't break
                                                               \r (no-eol) (esc)
   \r (no-eol) (esc)
   exporting 1/1 [==========================================>]\r (no-eol) (esc)
+                                                              \r (no-eol) (esc)
+  \r (no-eol) (esc)
+  counting objects 4 [ <=>                                  ]\r (no-eol) (esc)
+  counting objects 5 [  <=>                                 ]\r (no-eol) (esc)
+  counting objects 6 [   <=>                                ]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
   pushing to git+http://localhost:$HGPORT/
   searching for changes

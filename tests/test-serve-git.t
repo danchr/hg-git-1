@@ -34,6 +34,9 @@ Make sure that clone over the old git protocol doesn't break
 
   $ hg clone -U git://localhost:$HGPORT/test copy 2>&1
   \r (no-eol) (esc)
+  Enumerating objects 6 [ <=>                               ]\r (no-eol) (esc)
+                                                              \r (no-eol) (esc)
+  \r (no-eol) (esc)
   Counting objects 1/6 [=====>                              ]\r (no-eol) (esc)
   Counting objects 2/6 [===========>                        ]\r (no-eol) (esc)
   Counting objects 3/6 [=================>                  ]\r (no-eol) (esc)

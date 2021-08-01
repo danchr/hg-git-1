@@ -30,6 +30,7 @@ The output is confusing, and this even more-so:
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
+  remote: error: refusing to update checked out branch: refs/heads/master
   added 1 commits with 1 trees and 1 blobs
   warning: failed to update refs/heads/master; branch is currently checked out
 
@@ -37,6 +38,7 @@ The output is confusing, and this even more-so:
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
+  remote: error: refusing to update checked out branch: refs/heads/master
   added 1 commits with 1 trees and 1 blobs
   warning: failed to update refs/heads/master; branch is currently checked out
 
@@ -47,6 +49,7 @@ This is a bit more sensible:
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
+  remote: error: refusing to update checked out branch: refs/heads/master
   abort: git remote error: refs/heads/master failed to update
   [255]
 #endif

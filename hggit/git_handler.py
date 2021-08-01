@@ -59,7 +59,8 @@ RE_GIT_URI = re.compile(
     br'(?P<sepr>[:/])(?P<path>.*)$')
 
 RE_NEWLINES = re.compile(br'[\r\n]')
-RE_GIT_PROGRESS = re.compile(br'\((\d+)/(\d+)\)')
+RE_GIT_DETERMINATE_PROGRESS = re.compile(br'\((\d+)/(\d+)\)')
+RE_GIT_INDETERMINATE_PROGRESS = re.compile(br'(\d+)')
 
 RE_AUTHOR_FILE = re.compile(br'\s*=\s*')
 
@@ -87,14 +88,20 @@ class GitProgress(object):
                 continue
             topic = td[0]
 
-            m = RE_GIT_PROGRESS.search(data)
-            if m:
+            determinate = RE_GIT_DETERMINATE_PROGRESS.search(data)
+            indeterminate = RE_GIT_INDETERMINATE_PROGRESS.search(data)
+
+            if determinate or indeterminate:
                 if self._progress and self._progress.topic != topic:
                     self.flush()
                 if not self._progress:
                     self._progress = self.ui.makeprogress(topic)
 
-                pos, total = map(int, m.group(1, 2))
+                if determinate:
+                    pos, total = map(int, determinate.group(1, 2))
+                else:
+                    pos = int(indeterminate.group(1))
+                    total = None
                 self._progress.update(pos, total=total)
             else:
                 self.flush(msg)
@@ -104,10 +111,13 @@ class GitProgress(object):
             return
         self._progress.complete()
         self._progress = None
-        if self.remote:
-            self.ui.status(b'remote: %s\n' % (msg or self.msgbuf))
-        elif msg is not None and msg.strip():
-            self.ui.note(msg + b'\n')
+        if msg is None:
+            msg = self.msgbuf
+        if msg is not None and msg.strip():
+            if self.remote:
+                self.ui.status(b'remote: %s\n' % msg)
+            else:
+                self.ui.note(msg + b'\n')
 
 
 def get_repo_and_gitdir(repo):
