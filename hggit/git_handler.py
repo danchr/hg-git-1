@@ -320,11 +320,13 @@ class GitHandler(object):
         self._map_git_real = map_git_real
         self._map_hg_real = map_hg_real
 
-    def save_map(self, map_file):
-        self.ui.debug(_(b"saving git map to %s\n") % self.vfs.join(map_file))
+    def save_map(self):
+        self.ui.debug(
+            _(b"saving git map to %s\n") % self.vfs.join(self.map_file),
+        )
 
         with self.repo.lock():
-            with self.vfs(map_file, b'wb+', atomictemp=True) as fp:
+            with self.vfs(self.map_file, b'wb+', atomictemp=True) as fp:
                 self._write_map_to(fp)
 
     def _write_map_to(self, fp):
@@ -463,7 +465,7 @@ class GitHandler(object):
             self.export_hg_tags()
             return self.update_references()
         finally:
-            self.save_map(self.map_file)
+            self.save_map()
 
     def get_refs(self, remote):
         exportable = self.export_commits()
@@ -705,7 +707,7 @@ class GitHandler(object):
                 progress.increment(item=short(ctx.node()))
                 self.export_hg_commit(ctx.node(), exporter)
                 if mapsavefreq and i % mapsavefreq == 0:
-                    self.save_map(self.map_file)
+                    self.save_map()
 
     # convert this commit into git objects
     # go through the manifest, convert all blobs/trees we don't have
@@ -1028,7 +1030,7 @@ class GitHandler(object):
         """
         tr = self.repo.transaction(desc)
 
-        tr.addfinalize(b'hg-git-save', lambda tr: self.save_map(self.map_file))
+        tr.addfinalize(b'hg-git-save', lambda tr: self.save_map())
         scmutil.registersummarycallback(self.repo, tr, b'pull')
 
         return tr

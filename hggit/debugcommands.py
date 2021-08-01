@@ -95,12 +95,15 @@ def perfgitsavemap(ui, repo):
 
     timer, fm = gettimer(ui)
     repo.githandler.load_map()
-    fd, f = tempfile.mkstemp(prefix=b'.git-mapfile-', dir=repo.path)
-    basename = os.path.basename(f)
-    try:
-        timer(lambda: repo.githandler.save_map(basename))
-    finally:
-        os.unlink(f)
+    tmpfp = tempfile.NamedTemporaryFile(prefix=b'.git-mapfile-', dir=repo.path)
+    with tmpfp:
+
+        def perf():
+            with open(tmpfp.name, 'wb') as fp:
+                repo.githandler._write_map_to(fp)
+
+        timer(perf)
+
     fm.end()
 
 
