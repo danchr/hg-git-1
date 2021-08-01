@@ -33,6 +33,13 @@ else:
 
         return wrapper
 
+def sysbytes(s):
+    # 5.2 does not check this
+    if isinstance(s, str):
+        return pycompat.sysbytes(s)
+    else:
+        return s
+
 try:
     # moved in 5.9
     from mercurial.utils.stringutil import parselist
@@ -81,10 +88,7 @@ except (ImportError, AttributeError):
         """
 
         def to_display(name):
-            # 5.2 does not check this
-            if isinstance(name, str):
-                name = pycompat.sysbytes(name)
-            return name.replace(b'_', b'-')
+            return sysbytes(name).replace(b'_', b'-')
 
         previous = None
         for x in args:
