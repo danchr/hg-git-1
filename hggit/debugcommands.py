@@ -92,3 +92,9 @@ def perfgitsavemap(ui, repo):
     finally:
         os.unlink(f)
     fm.end()
+
+
+@eh.command(b'debuggitdir')
+def gitdir(ui, repo):
+    '''get the root of the git repository'''
+    repo.ui.write(os.path.normpath(repo.githandler.gitdir), b'\n')

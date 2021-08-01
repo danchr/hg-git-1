@@ -9,8 +9,6 @@
 from __future__ import generator_stop
 
 # global modules
-import os
-
 from dulwich import porcelain
 
 from mercurial.node import hex, nullhex
@@ -77,12 +75,6 @@ def gclear(ui, repo):
     '''
     repo.ui.status(_(b"clearing out the git cache data\n"))
     repo.githandler.clear()
-
-
-@eh.command(b'debuggitdir')
-def gitdir(ui, repo):
-    '''get the root of the git repository'''
-    repo.ui.write(os.path.normpath(repo.githandler.gitdir), b'\n')
 
 
 @eh.command(
