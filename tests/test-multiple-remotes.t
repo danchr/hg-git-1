@@ -40,6 +40,10 @@ Load commonly used test logic
   git/master                         0:ff7a2f2d8d70
   bare/not-master                    0:ff7a2f2d8d70
   bare/master                        0:ff7a2f2d8d70
+  also-git/not-master                0:ff7a2f2d8d70
+  also-git/master                    0:ff7a2f2d8d70
+  also-bare/not-master               0:ff7a2f2d8d70
+  also-bare/master                   0:ff7a2f2d8d70
 
   $ hg up master
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -62,6 +66,10 @@ Load commonly used test logic
   tip                                1:47580592d3d6
   git/master                         1:47580592d3d6
   bare/master                        1:47580592d3d6
+  also-git/master                    1:47580592d3d6
+  also-bare/master                   1:47580592d3d6
   git/not-master                     0:ff7a2f2d8d70
   bare/not-master                    0:ff7a2f2d8d70
+  also-git/not-master                0:ff7a2f2d8d70
+  also-bare/not-master               0:ff7a2f2d8d70
 

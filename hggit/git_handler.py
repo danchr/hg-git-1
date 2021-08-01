@@ -295,17 +295,18 @@ class GitHandler(object):
 
     def import_commits(self, remote_name):
         refs = self.git.refs.as_dict()
-        self.import_git_objects(remote_name, refs)
+        remote_names = [remote_name] if remote_name else []
+        self.import_git_objects(remote_names, refs)
 
     def fetch(self, remote, heads):
         result = self.fetch_pack(remote.path, heads)
-        remote_name = self.remote_name(remote.path, False)
+        remote_names = self.remote_names(remote.path, False)
 
         oldheads = self.repo.changelog.heads()
 
         if result.refs:
             imported = self.import_git_objects(
-                remote_name, result.refs, heads=heads,
+                remote_names, result.refs, heads=heads,
             )
         else:
             imported = 0
@@ -422,8 +423,8 @@ class GitHandler(object):
 
     def push(self, remote, revs, force):
         old_refs, new_refs = self.upload_pack(remote, revs, force)
-        remote_name = self.remote_name(remote, True)
-        remote_desc = remote_name or remote
+        remote_names = self.remote_names(remote, True)
+        remote_desc = remote_names[0] if remote_names else remote
 
         if not isinstance(new_refs, dict):
             # dulwich 0.20.6 changed the API and deprectated treating
@@ -456,7 +457,7 @@ class GitHandler(object):
                 self.ui.debug(b"unchanged reference %s::%s => GIT:%s\n" %
                               (remote_desc, ref, new_sha[0:8]))
 
-        if new_refs and remote_name:
+        if new_refs and remote_names:
             # make sure that we know the remote head, for possible
             # publishing
             new_refs_with_head = new_refs.copy()
@@ -468,7 +469,8 @@ class GitHandler(object):
             except (error.RepoLookupError):
                 self.ui.debug(b'remote repository has no HEAD\n')
 
-            self.update_remote_branches(remote_name, new_refs_with_head)
+            for remote_name in remote_names:
+                self.update_remote_branches(remote_name, new_refs_with_head)
 
         if old_refs == new_refs:
             self.ui.status(_(b"no changes found\n"))
@@ -866,7 +868,7 @@ class GitHandler(object):
         else:
             return None, None
 
-    def import_git_objects(self, remote_name, refs, heads=None):
+    def import_git_objects(self, remote_names, refs, heads=None):
         filteredrefs = self.filter_min_date(refs)
         if heads is not None:
             filteredrefs = self.filter_refs(filteredrefs, heads)
@@ -903,7 +905,7 @@ class GitHandler(object):
                     self.import_tags(refs)
                     self.update_hg_bookmarks(refs)
 
-                    if remote_name is not None:
+                    for remote_name in remote_names:
                         self.update_remote_branches(remote_name, refs)
 
         # TODO if the tags cache is used, remove any dangling tag references
@@ -1266,7 +1268,7 @@ class GitHandler(object):
 
         return new_refs
 
-    def fetch_pack(self, remote_name, heads=None):
+    def fetch_pack(self, remote, heads=None):
         # The dulwich default walk only checks refs/heads/. We also want to
         # consider remotes when doing discovery, so we build our own list. We
         # can't just do 'refs/' here because the tag class doesn't have a
@@ -1300,7 +1302,7 @@ class GitHandler(object):
             f = tempfile.SpooledTemporaryFile(**tempargs, max_size=max_size)
 
         try:
-            ret = self._call_client(remote_name, 'fetch_pack', determine_wants,
+            ret = self._call_client(remote, 'fetch_pack', determine_wants,
                                     graphwalker, f.write, progress.progress)
 
             if(f.tell() != 0):
@@ -1331,8 +1333,8 @@ class GitHandler(object):
             if delete:
                 os.remove(f.name)
 
-    def _call_client(self, remote_name, method, *args, **kwargs):
-        clientobj, path = self._get_transport_and_path(remote_name)
+    def _call_client(self, remote, method, *args, **kwargs):
+        clientobj, path = self._get_transport_and_path(remote)
 
         func = getattr(clientobj, method)
 
@@ -1365,7 +1367,7 @@ class GitHandler(object):
             else:
                 raise
 
-            clientobj, path = self._get_transport_and_path(remote_name)
+            clientobj, path = self._get_transport_and_path(remote)
             func = getattr(clientobj, method)
 
             try:
@@ -1879,7 +1881,8 @@ class GitHandler(object):
             return content.splitlines()
         return []
 
-    def remote_name(self, remote, push):
+    def remote_names(self, remote, push):
+        names = set()
         url = compat.url(remote)
 
         if url.islocal() and not url.isabs():
@@ -1894,8 +1897,11 @@ class GitHandler(object):
                 # ignore aliases
                 if hasattr(path, 'raw_url') and path.raw_url.scheme == b'path':
                     continue
-                if push and path.pushloc == remote or path.loc == remote:
-                    return name
+                loc = push and path.pushloc or path.loc
+                if loc == remote:
+                    names.add(name)
+
+        return list(names)
 
     def audit_hg_path(self, path):
         if b'.hg' in path.split(b'/') or b'\r' in path or b'\n' in path:
