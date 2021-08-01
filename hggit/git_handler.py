@@ -63,13 +63,12 @@ RE_GIT_PROGRESS = re.compile(br'\((\d+)/(\d+)\)')
 
 RE_AUTHOR_FILE = re.compile(br'\s*=\s*')
 
-CALLBACK_BUFFER = b''
-
 
 class GitProgress(object):
     """convert git server progress strings into mercurial progress"""
-    def __init__(self, ui):
+    def __init__(self, ui, remote=False):
         self.ui = ui
+        self.remote = remote
 
         self._progress = None
         self.msgbuf = b''
@@ -105,7 +104,9 @@ class GitProgress(object):
             return
         self._progress.complete()
         self._progress = None
-        if msg:
+        if self.remote:
+            self.ui.status(b'remote: %s\n' % (msg or self.msgbuf))
+        elif msg is not None and msg.strip():
             self.ui.note(msg + b'\n')
 
 
@@ -1175,28 +1176,18 @@ class GitHandler(object):
                     self.ui.debug(b"%s\n" % commit)
                 self.ui.status(_(b"adding objects\n"))
             return self.git.object_store.generate_pack_data(
-                have, want, progress=progress, ofs_delta=ofs_delta)
+                have,
+                want,
+                progress=progress or progressfunc,
+                ofs_delta=ofs_delta,
+            )
 
-        def callback(remote_info):
-            # dulwich (perhaps git?) wraps remote output at a fixed width but
-            # signifies the end of transmission with a double new line
-            global CALLBACK_BUFFER
-            remote_info = compat.sysbytes(remote_info)
-            if remote_info and not remote_info.endswith(b'\n\n'):
-                CALLBACK_BUFFER += remote_info
-                return
-
-            remote_info = CALLBACK_BUFFER + remote_info
-            CALLBACK_BUFFER = b''
-            if not remote_info:
-                remote_info = b'\n'
-
-            for line in remote_info[:-1].split(b'\n'):
-                self.ui.status(_(b"remote: %s\n") % line)
+        progress = GitProgress(self.ui, remote=True)
+        progressfunc = progress.progress
 
         try:
             new_refs = self._call_client(remote, 'send_pack', changed, genpack,
-                                         progress=callback)
+                                         progress=progressfunc)
 
             if len(change_totals) > 0:
                 self.ui.status(_(b"added %d commits with %d trees"
@@ -1208,6 +1199,8 @@ class GitHandler(object):
         except (HangupException, GitProtocolError) as e:
             raise error.Abort(_(b"git remote error: ")
                               + pycompat.sysbytes(str(e)))
+        finally:
+            progress.flush()
 
     def get_changed_refs(self, refs, exportable, force):
         new_refs = refs.copy()

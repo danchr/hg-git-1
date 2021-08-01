@@ -190,6 +190,7 @@ fails:
   $ hg push
   pushing to file:///$TESTTMP/gitrepo
   searching for changes
+  warning: failed to update HEAD; unable to set b'HEAD' to b'7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03' (?)
   updating reference refs/heads/not-master
   $ cd ..
 
