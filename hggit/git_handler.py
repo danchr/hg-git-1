@@ -1891,6 +1891,9 @@ class GitHandler(object):
                 paths = [paths]
 
             for path in paths:
+                # ignore aliases
+                if hasattr(path, 'raw_url') and path.raw_url.scheme == b'path':
+                    continue
                 if push and path.pushloc == remote or path.loc == remote:
                     return name
 

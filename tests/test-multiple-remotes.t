@@ -36,8 +36,10 @@ Load commonly used test logic
   no changes found
   $ hg tags
   tip                                0:ff7a2f2d8d70
-  default/not-master                 0:ff7a2f2d8d70
-  default/master                     0:ff7a2f2d8d70
+  git/not-master                     0:ff7a2f2d8d70
+  git/master                         0:ff7a2f2d8d70
+  bare/not-master                    0:ff7a2f2d8d70
+  bare/master                        0:ff7a2f2d8d70
 
   $ hg up master
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -58,6 +60,8 @@ Load commonly used test logic
 
   $ hg tags
   tip                                1:47580592d3d6
-  default/master                     1:47580592d3d6
-  default/not-master                 0:ff7a2f2d8d70
+  git/master                         1:47580592d3d6
+  bare/master                        1:47580592d3d6
+  git/not-master                     0:ff7a2f2d8d70
+  bare/not-master                    0:ff7a2f2d8d70
 
