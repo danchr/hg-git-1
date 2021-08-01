@@ -22,13 +22,8 @@ Clone it, and push back to master:
   $ cd hgrepo
   $ echo beta > beta
   $ fn_hg_commit -A -m "add beta"
-  $ hg push
-  pushing to $TESTTMP/gitrepo
-  searching for changes
-  adding objects
-  added 1 commits with 1 trees and 1 blobs
-  updating reference refs/heads/master
 
+#if dulwich0204
 The output is confusing, and this even more-so:
 
   $ hg push
@@ -36,7 +31,25 @@ The output is confusing, and this even more-so:
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
-  updating reference refs/heads/master
+  warning: failed to update refs/heads/master; branch is currently checked out
+
+  $ hg push
+  pushing to $TESTTMP/gitrepo
+  searching for changes
+  adding objects
+  added 1 commits with 1 trees and 1 blobs
+  warning: failed to update refs/heads/master; branch is currently checked out
+
+#else
+This is a bit more sensible:
+
+  $ hg push
+  pushing to $TESTTMP/gitrepo
+  searching for changes
+  adding objects
+  abort: git remote error: refs/heads/master failed to update
+  [255]
+#endif
 
 Show that it really didn't get pushed:
 

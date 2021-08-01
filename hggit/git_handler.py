@@ -427,11 +427,19 @@ class GitHandler(object):
         if not isinstance(new_refs, dict):
             # dulwich 0.20.6 changed the API and deprectated treating
             # the result as a dictionary
+            ref_status = new_refs.ref_status
             new_refs = new_refs.refs
+        else:
+            ref_status = {}
 
         for ref, new_sha in sorted(new_refs.items()):
             old_sha = old_refs.get(ref)
-            if old_sha is None:
+            if ref_status.get(ref) is not None:
+                self.ui.warn(
+                    b'warning: failed to update %s; %s\n' %
+                    (ref, pycompat.sysbytes(ref_status[ref])),
+                )
+            elif old_sha is None:
                 if self.ui.verbose:
                     self.ui.note(b"adding reference %s::%s => GIT:%s\n" %
                                  (remote_desc, ref, new_sha[0:8]))
