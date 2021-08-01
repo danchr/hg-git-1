@@ -187,9 +187,10 @@ fails:
   $ cd hgrepo
   $ hg book -r master not-master
   moving bookmark 'not-master' forward from ff7a2f2d8d70
-  $ hg push 2>&1 | tail -1
-  TypeError: endswith first arg must be str or a tuple of str, not bytes (?)
-  updating reference refs/heads/not-master (?)
+  $ hg push
+  pushing to file:///$TESTTMP/gitrepo
+  searching for changes
+  updating reference refs/heads/not-master
   $ cd ..
 
 Push empty Hg repo to empty Git repo (issue #58)

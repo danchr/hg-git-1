@@ -77,7 +77,7 @@ class GitProgress(object):
     def progress(self, msg):
         # 'Counting objects: 33640, done.\n'
         # 'Compressing objects:   0% (1/9955)   \r
-        msgs = RE_NEWLINES.split(self.msgbuf + msg)
+        msgs = RE_NEWLINES.split(self.msgbuf + compat.sysbytes(msg))
         self.msgbuf = msgs.pop()
 
         for msg in msgs:
@@ -1173,6 +1173,7 @@ class GitHandler(object):
             # dulwich (perhaps git?) wraps remote output at a fixed width but
             # signifies the end of transmission with a double new line
             global CALLBACK_BUFFER
+            remote_info = compat.sysbytes(remote_info)
             if remote_info and not remote_info.endswith(b'\n\n'):
                 CALLBACK_BUFFER += remote_info
                 return
