@@ -1,5 +1,7 @@
 from __future__ import generator_stop
 
+import functools
+
 from mercurial.i18n import _
 from mercurial import (
     error,
@@ -7,7 +9,29 @@ from mercurial import (
     pycompat,
     ui,
     util as hgutil,
+    wireprotov1peer,
 )
+
+
+# 5.9 and earlier used a future-based API
+if hasattr(wireprotov1peer, 'future'):
+    def makebatchable(fn):
+        @functools.wraps(fn)
+        @wireprotov1peer.batchable
+        def wrapper(*args, **kwargs):
+            yield None, wireprotov1peer.future()
+            yield fn(*args, **kwargs)
+
+        return wrapper
+# 6.0 and later simplified the API
+else:
+    def makebatchable(fn):
+        @functools.wraps(fn)
+        @wireprotov1peer.batchable
+        def wrapper(*args, **kwargs):
+            return None, lambda v: fn(*args, **kwargs)
+
+        return wrapper
 
 try:
     # moved in 5.9

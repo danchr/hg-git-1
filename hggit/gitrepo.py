@@ -11,18 +11,14 @@ from mercurial import (
     exthelper,
     hg,
     pycompat,
-)
-from mercurial.wireprotov1peer import (
-        batchable,
-        future,
-        peerexecutor,
+    wireprotov1peer,
 )
 from mercurial.interfaces.repository import peer as peerrepository
 
 eh = exthelper.exthelper()
 
 
-class basegitrepo(peerrepository):
+class gitrepo(peerrepository):
     def __init__(self, ui, path, create, intents=None, **kwargs):
         if create:  # pragma: no cover
             raise error.Abort(b'Cannot create a git repository.')
@@ -45,6 +41,7 @@ class basegitrepo(peerrepository):
     def url(self):
         return self.path
 
+    @compat.makebatchable
     def lookup(self, key):
         assert isinstance(key, bytes)
         # FIXME: this method is supposed to return a 20-byte node hash
@@ -54,9 +51,11 @@ class basegitrepo(peerrepository):
         if not self.path:
             raise error.RepoError
 
+    @compat.makebatchable
     def heads(self):
         return []
 
+    @compat.makebatchable
     def listkeys(self, namespace):
         if namespace == b'namespaces':
             return {b'bookmarks': b''}
@@ -73,6 +72,7 @@ class basegitrepo(peerrepository):
                 return stripped_refs
         return {}
 
+    @compat.makebatchable
     def pushkey(self, namespace, key, old, new):
         return False
 
@@ -106,34 +106,8 @@ class basegitrepo(peerrepository):
     def unbundle(self):
         raise NotImplementedError
 
-
-class gitrepo(basegitrepo):
-    @batchable
-    def lookup(self, key):
-        f = future()
-        yield {}, f
-        yield super(gitrepo, self).lookup(key)
-
-    @batchable
-    def heads(self):
-        f = future()
-        yield {}, f
-        yield super(gitrepo, self).heads()
-
-    @batchable
-    def listkeys(self, namespace):
-        f = future()
-        yield {}, f
-        yield super(gitrepo, self).listkeys(namespace)
-
-    @batchable
-    def pushkey(self, namespace, key, old, new):
-        f = future()
-        yield {}, f
-        yield super(gitrepo, self).pushkey(key, old, new)
-
     def commandexecutor(self):
-        return peerexecutor(self)
+        return wireprotov1peer.peerexecutor(self)
 
     def _submitbatch(self, req):
         for op, argsdict in req:
