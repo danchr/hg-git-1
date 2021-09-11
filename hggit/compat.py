@@ -2,6 +2,8 @@ from __future__ import absolute_import, print_function
 
 import sys
 
+import functools
+
 from mercurial.i18n import _
 from mercurial import (
     context,
@@ -13,6 +15,39 @@ from mercurial import (
     ui,
     util as hgutil,
 )
+
+try:
+    from mercurial import wireprotov1peer
+    wireprotov1peer.batchable
+except ImportError:
+    wireprotov1peer = None
+
+
+# prior to 4.9, there was no batch support
+if wireprotov1peer is None:
+    def makebatchable(fn):
+        return fn
+
+# 4.9 to 5.9 used a future-based API
+elif hasattr(wireprotov1peer, 'future'):
+    def makebatchable(fn):
+        @functools.wraps(fn)
+        @wireprotov1peer.batchable
+        def wrapper(*args, **kwargs):
+            yield None, wireprotov1peer.future()
+            yield fn(*args, **kwargs)
+
+        return wrapper
+
+# 6.0 and later simplified the API
+else:
+    def makebatchable(fn):
+        @functools.wraps(fn)
+        @wireprotov1peer.batchable
+        def wrapper(*args, **kwargs):
+            return None, lambda v: fn(*args, **kwargs)
+
+        return wrapper
 
 try:
     from mercurial.utils import procutil, stringutil
