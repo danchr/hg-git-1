@@ -100,6 +100,7 @@ make sure the commit doesn't have an HG:rename-source annotation
   $ hg pull ../gitrepo1
   pulling from ../gitrepo1
   importing git objects into hg
+  new changesets 8211cade99e4:faf44fc3a4e8 (3 drafts)
   (run 'hg heads' to see heads)
   $ hg log --graph
   o  changeset:   4:faf44fc3a4e8
@@ -145,6 +146,7 @@ Try cloning a bookmark, and make sure it gets checked out:
   $ rm -r hgrepo
   $ hg clone -r branch3 gitrepo1 hgrepo
   importing git objects into hg
+  new changesets 40a840c1f8ae:faf44fc3a4e8 (4 drafts)
   updating to bookmark branch3_bookmark (hg57 !)
   updating to branch default (no-hg57 !)
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -190,6 +192,7 @@ does the scenario.
   $ rm -r hgrepo
   $ hg clone -r branch1 gitrepo1 hgrepo
   importing git objects into hg
+  new changesets 40a840c1f8ae:8211cade99e4 (2 drafts)
   updating to branch branch1
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo

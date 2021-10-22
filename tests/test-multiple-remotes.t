@@ -30,6 +30,7 @@ Load commonly used test logic
   $ hg pull
   pulling from $TESTTMP/gitrepo
   importing git objects into hg
+  new changesets ff7a2f2d8d70 (1 drafts)
   (run 'hg update' to get a working copy)
   pulling from $TESTTMP/repo.git
   no changes found

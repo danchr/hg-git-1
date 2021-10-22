@@ -20,6 +20,7 @@ Load commonly used test logic
   $ cd ..
   $ hg clone -U repo.git hgrepo
   importing git objects into hg
+  new changesets ff7a2f2d8d70 (1 drafts)
 
   $ cd hgrepo
   $ hg co master
@@ -61,6 +62,7 @@ git should have the tag alpha
 
   $ hg clone repo.git hgrepo2
   importing git objects into hg
+  new changesets ff7a2f2d8d70:e8b150f84560 (2 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved

@@ -490,6 +490,7 @@ Clone without findcopiesharder does not find copies from unmodified files
 
   $ hg clone gitcopyharder hgnocopyharder
   importing git objects into hg
+  new changesets b45d023c6842:ec77ccdbefe0 (3 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -536,6 +537,7 @@ findcopiesharder finds copies from unmodified files if similarity is met
 
   $ hg --config git.findcopiesharder=true clone gitcopyharder hgcopyharder0
   importing git objects into hg
+  new changesets b45d023c6842:9b3099834272 (3 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -572,6 +574,7 @@ findcopiesharder finds copies from unmodified files if similarity is met
 
   $ hg --config git.findcopiesharder=true --config git.similarity=95 clone gitcopyharder hgcopyharder1
   importing git objects into hg
+  new changesets b45d023c6842:d9d2e8cbf050 (3 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved

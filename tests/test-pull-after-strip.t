@@ -21,6 +21,7 @@ Load commonly used test logic
 clone a tag
   $ hg clone -r alpha gitrepo hgrepo-a
   importing git objects into hg
+  new changesets ff7a2f2d8d70 (1 drafts)
   updating to branch default
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo-a log --graph
@@ -36,6 +37,7 @@ clone a tag
 clone a branch
   $ hg clone -r beta gitrepo hgrepo-b
   importing git objects into hg
+  new changesets ff7a2f2d8d70:7fe02317c63d (2 drafts)
   updating to branch default
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo-b log --graph
@@ -76,6 +78,7 @@ pull works after 'hg git-cleanup'
   $ hg pull -r beta | grep -v "adding remote bookmark"
   pulling from $TESTTMP/gitrepo
   importing git objects into hg
+  new changesets 7fe02317c63d:cc1e605d90db (2 drafts)
   (run 'hg update' to get a working copy)
   $ hg log --graph
   o  changeset:   2:cc1e605d90db

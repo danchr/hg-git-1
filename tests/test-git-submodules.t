@@ -189,6 +189,7 @@ replace subrepo with symlink
 
   $ hg clone gitrepo2 hgrepo
   importing git objects into hg
+  new changesets ff7a2f2d8d70:9c3929c04f22 (10 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -356,6 +357,7 @@ are the same is enough
   $ cd ../../..
   $ hg --config git.similarity=100 clone gitrepo2 hgreporenames
   importing git objects into hg
+  new changesets ff7a2f2d8d70:9c3929c04f22 (10 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved

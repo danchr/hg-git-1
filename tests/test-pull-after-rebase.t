@@ -35,6 +35,7 @@ Clone it and rebase the branch
 
   $ hg clone -U repo.git hgrepo
   importing git objects into hg
+  new changesets ff7a2f2d8d70:205a004356ef (3 drafts)
   $ cd hgrepo
   $ hg log --graph -T '{bookmarks} {rev}:{node}\n'
   o  branch 2:205a004356ef32b8da782afb89d9179d12ca31e9
@@ -83,6 +84,7 @@ Pull that
   pulling from $TESTTMP/repo.git
   importing git objects into hg
   1 new orphan changesets
+  new changesets f4bd265a9d39 (1 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
   $ hg log --graph -T '{bookmarks} {rev}:{node}\n'
   *  otherbranch 4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5

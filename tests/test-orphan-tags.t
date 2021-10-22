@@ -65,6 +65,7 @@ Create a Mercurial clone
 
   $ hg clone -U git.bare hg
   importing git objects into hg
+  new changesets b8e77484829b:387d03400596 (4 drafts)
   $ hg outgoing -R hg
   comparing with $TESTTMP/git.bare
   searching for changes

@@ -13,6 +13,7 @@ across from hg to git
   $ cd ..
   $ hg clone gitrepo hgrepo
   importing git objects into hg
+  new changesets aa9eb6424386 (1 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark not-master (hg57 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved

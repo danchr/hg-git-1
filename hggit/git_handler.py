@@ -834,6 +834,7 @@ class GitHandler(object):
         tr = self.repo.transaction(desc)
 
         tr.addfinalize(b'hg-git-save', lambda tr: self.save_map(self.map_file))
+        scmutil.registersummarycallback(self.repo, tr, b'pull')
 
         return tr
 

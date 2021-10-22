@@ -56,6 +56,7 @@ resolve using second parent
 
   $ hg clone gitrepo hgrepo2
   importing git objects into hg
+  new changesets 5d1a6b64f9d0:120385945d08 (4 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved

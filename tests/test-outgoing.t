@@ -15,6 +15,7 @@ Load commonly used test logic
   $ cd ..
   $ hg clone gitrepo hgrepo
   importing git objects into hg
+  new changesets ff7a2f2d8d70 (1 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -104,6 +105,7 @@ let's pull and try again
   $ hg pull
   pulling from */gitrepo (glob)
   importing git objects into hg
+  new changesets 25eed24f5e8f (1 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
   $ hg log --graph
   o  changeset:   3:25eed24f5e8f

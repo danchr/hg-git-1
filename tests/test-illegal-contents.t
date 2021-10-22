@@ -142,6 +142,7 @@ you can't check out.
   importing git objects into hg
   warning: path 'nested/.hg/00changelog.i' contains an invalid path component
   warning: path 'nested/.hg/requires' contains an invalid path component
+  new changesets [0-9a-f]{12,12} \(1 drafts\) (re)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
   abort: path 'nested/.hg/00changelog.i' is inside nested repo 'nested'
@@ -151,6 +152,7 @@ you can't check out.
   importing git objects into hg
   warning: skipping invalid path 'nested/.hg/00changelog.i'
   warning: skipping invalid path 'nested/.hg/requires'
+  new changesets 3ea18a67c0e6 (1 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -176,6 +178,7 @@ newline, which Mercurial expressly forbids
   importing git objects into hg
   warning: skipping invalid path 'Icon\r'
   warning: skipping invalid path 'the\nfile'
+  new changesets 8354c06a5842 (1 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -184,6 +187,7 @@ newline, which Mercurial expressly forbids
   importing git objects into hg
   warning: skipping invalid path 'Icon\r'
   warning: skipping invalid path 'the\nfile'
+  new changesets 8354c06a5842 (1 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved

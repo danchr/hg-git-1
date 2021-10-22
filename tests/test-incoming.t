@@ -21,6 +21,7 @@ Load commonly used test logic
 
   $ hg clone gitrepo hgrepo
   importing git objects into hg
+  new changesets ff7a2f2d8d70 (1 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -139,6 +140,7 @@ nothing incoming after pull
   $ hg pull | grep -v "adding remote bookmark"
   pulling from $TESTTMP/gitrepo
   importing git objects into hg
+  new changesets 7fe02317c63d:248d83ebf472 (3 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
   $ hg incoming | grep -v 'no changes found'
   comparing with $TESTTMP/gitrepo

@@ -44,6 +44,7 @@ The warning message changed in Git 1.8.0
 
   $ hg clone gitrepo hgrepo
   importing git objects into hg
+  new changesets 87cd29b67a91:b8a0ac52f339 (4 drafts)
   updating to bookmark master (hg57 !)
   updating to branch default (no-hg57 !)
   4 files updated, 0 files merged, 0 files removed, 0 files unresolved

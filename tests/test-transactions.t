@@ -121,6 +121,10 @@ A low save interval causes a lot of reports:
   $ hg --config hggit.mapsavefrequency=25 pull
   pulling from $TESTTMP/gitrepo
   importing git objects into hg
+  new changesets 1c8407413fa3:abc468b9e51b (25 drafts)
+  new changesets 217c308baf47:d5d14eeedd08 (25 drafts)
+  new changesets d9807ef6abcb:4678067bd500 (25 drafts)
+  new changesets c31a154888bb:eda59117ba04 (25 drafts)
   (run 'hg update' to get a working copy)
 
 Reset the repository
@@ -135,6 +139,11 @@ conversion, so the user will see a large batch at the end:
   $ hg --config hggit.mapsavefrequency=25 --config hggit.usephases=yes pull
   pulling from $TESTTMP/gitrepo
   importing git objects into hg
+  new changesets 1c8407413fa3:abc468b9e51b (25 drafts)
+  new changesets 217c308baf47:d5d14eeedd08 (25 drafts)
+  new changesets d9807ef6abcb:4678067bd500 (25 drafts)
+  new changesets c31a154888bb:eda59117ba04
+  75 local changesets published
   (run 'hg update' to get a working copy)
 
 Reset the repository
@@ -187,6 +196,7 @@ transaction:
   $ EXIT_AFTER=15 hg --config hggit.mapsavefrequency=10 pull
   pulling from $TESTTMP/gitrepo
   importing git objects into hg
+  new changesets 1c8407413fa3:7c8c534a5fbe (10 drafts)
   transaction abort!
   rollback completed
   interrupted!
