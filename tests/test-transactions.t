@@ -101,12 +101,13 @@ pull with mapsavefreq set
   10
   $ rm -rf hgrepo
 
-Interruptions
--------------
+The user experience
+-------------------
 
-How does hg-git behave if a conversion fails or is interrupted?
+The map save interval affects how and when changes are reported to the
+user.
 
-Ideally, we would always save the results of whatever happened
+First, create a repository, set up to pull from git, and where we can interrupt the conversion.
 
   $ hg init hgrepo
   $ cat >> hgrepo/.hg/hgrc <<EOF
@@ -114,6 +115,42 @@ Ideally, we would always save the results of whatever happened
   > default = $TESTTMP/gitrepo
   > EOF
   $ cd hgrepo
+
+A low save interval causes a lot of reports:
+
+  $ hg --config hggit.mapsavefrequency=25 pull
+  pulling from $TESTTMP/gitrepo
+  importing git objects into hg
+  (run 'hg update' to get a working copy)
+
+Reset the repository
+
+  $ hg strip --no-backup 'all()'
+  $ hg gclear
+  clearing out the git cache data
+
+And with phases? We currently don't publish changes during the
+conversion, so the user will see a large batch at the end:
+
+  $ hg --config hggit.mapsavefrequency=25 --config hggit.usephases=yes pull
+  pulling from $TESTTMP/gitrepo
+  importing git objects into hg
+  (run 'hg update' to get a working copy)
+
+Reset the repository
+
+  $ hg strip --no-backup 'all()'
+  $ hg gclear
+  clearing out the git cache data
+
+Interruptions
+-------------
+
+How does hg-git behave if a conversion fails or is interrupted?
+
+Ideally, we would always save the results of whatever happened, but
+that causes a significant slowdown. Transactions are an important
+optimisation within Mercurial.
 
 Test an error in a pull:
 
@@ -126,9 +163,9 @@ Test an error in a pull:
   [255]
   $ hg log -l 10 -T '{rev} {gitnode}\n'
 
-How does map save interval work?
+Test the user exiting in the first transaction:
 
-  $ EXIT_AFTER=15 hg --config hggit.mapsavefrequency=10 pull
+  $ EXIT_AFTER=5 hg --config hggit.mapsavefrequency=10 pull
   pulling from $TESTTMP/gitrepo
   importing git objects into hg
   transaction abort!
@@ -136,24 +173,16 @@ How does map save interval work?
   interrupted!
   [255]
   $ hg log -l 10 -T '{rev} {gitnode}\n'
-  9 7cbb16ec981b308e1e2b181f8e1f22c8f409f44e
-  8 42da70ed92bbecf9f348ba59c93646be723d0bf2
-  7 17e841146e5744b81af9959634d82c20a5d7df52
-  6 c31065bf97bf014815e37cdfbdef2c32c687f314
-  5 fcf21b8e0520ec1cced1d7593d13f9ee54721269
-  4 46acd02d0352e4b92bd6a099bb0490305d847a18
-  3 61eeda444b37b8aa3892d5f04c66c5441d21dd66
-  2 e55db11bb0472791c7af3fc636772174cdea4a36
-  1 17a2672b3c24c02d568f99d8d55ccae2bf362d5c
-  0 4e195b4c6e77604b70a8ad3b01306adbb9b1c7e7
 
-Reset the repository
+Check that we have no state, but clear it just in case
 
-  $ hg strip --no-backup 'all()'
+  $ ls -d .hg/git*
+  .hg/git
   $ hg gclear
   clearing out the git cache data
 
-Test the user exiting in the middle of a conversion:
+Test the user exiting in the middle of a conversion, after the first
+transaction:
 
   $ EXIT_AFTER=15 hg --config hggit.mapsavefrequency=10 pull
   pulling from $TESTTMP/gitrepo
