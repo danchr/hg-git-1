@@ -197,7 +197,14 @@ def exchangepull(
             pullop.cgresult = repo.githandler.fetch(remote, heads)
             return pullop
     else:
-        return orig(repo, remote, heads, force, bookmarks=bookmarks, **kwargs)
+        return orig(
+            repo,
+            remote,
+            heads=heads,
+            force=force,
+            bookmarks=bookmarks,
+            **kwargs,
+        )
 
 
 # TODO figure out something useful to do with the newbranch param
