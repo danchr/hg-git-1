@@ -568,7 +568,14 @@ def exchangepull(orig, repo, remote, heads=None, force=False, bookmarks=(),
             lock.release()
             wlock.release()
     else:
-        return orig(repo, remote, heads, force, bookmarks=bookmarks, **kwargs)
+        return orig(
+            repo,
+            remote,
+            heads=heads,
+            force=force,
+            bookmarks=bookmarks,
+            **kwargs
+        )
 
 
 extensions.wrapfunction(exchange, b'pull', exchangepull)
