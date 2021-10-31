@@ -2,6 +2,7 @@
 
 from dulwich.objects import Commit, Tag
 
+from mercurial.node import bin, short
 from mercurial import util as hgutil
 
 def find_incoming(git_object_store, git_map, refs):
@@ -70,7 +71,31 @@ def find_incoming(git_object_store, git_map, refs):
     todo = get_heads(refs)
     commits = get_unseen_commits(todo)
 
-    return commits
+    return [
+        GitIncomingCommit(
+            sha,
+        )
+        for sha in commits
+    ]
+
+
+'''struct to store result from find_incoming'''
+class GitIncomingCommit:
+    __slots__ = 'sha',
+
+    def __init__(self, sha):
+        self.sha = sha
+
+    @property
+    def node(self):
+        return bin(self.sha)
+
+    @property
+    def short(self):
+        return short(self.node)
+
+    def __bytes__(self):
+        return self.sha
 
 
 def extract_hg_metadata(message, git_extra):

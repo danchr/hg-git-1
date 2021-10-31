@@ -518,7 +518,7 @@ class GitHandler(object):
         else:
             reqrefs = result.refs
 
-        commits = [bin(c) for c in self.get_git_incoming(reqrefs)]
+        commits = [c.node for c in self.get_git_incoming(reqrefs)]
 
         b = overlayrepo(self, commits, result.refs)
 
@@ -907,9 +907,11 @@ class GitHandler(object):
             # get at least one chunk
             for offset in range(0, max(total, 1), chunksize):
                 with self.get_transaction(b"gimport"):
-                    for csha in commits[offset:offset + chunksize]:
-                        progress.increment(item=short(bin(csha)))
-                        self.import_git_commit(self.git[csha])
+                    for commit in commits[offset:offset + chunksize]:
+                        progress.increment(item=commit.short)
+                        self.import_git_commit(
+                            self.git[commit.sha],
+                        )
 
                     self.import_tags(refs)
                     self.update_hg_bookmarks(refs)
