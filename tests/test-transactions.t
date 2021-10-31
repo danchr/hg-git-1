@@ -133,8 +133,8 @@ Reset the repository
   $ hg gclear
   clearing out the git cache data
 
-And with phases? We currently don't publish changes during the
-conversion, so the user will see a large batch at the end:
+And with phases? No mention of draft changesets, as we publish changes
+during the conversion:
 
   $ hg --config hggit.mapsavefrequency=25 --config hggit.usephases=yes pull
   pulling from $TESTTMP/gitrepo
