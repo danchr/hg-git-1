@@ -844,7 +844,12 @@ class GitHandler(object):
         return message, git_extra
 
     def get_git_incoming(self, refs):
-        return git2hg.find_incoming(self.git.object_store, self._map_git, refs)
+        return git2hg.find_incoming(
+            self.ui,
+            self.git.object_store,
+            self._map_git,
+            refs,
+        )
 
     def get_transaction(self, desc=b"hg-git"):
         """obtain a transaction specific for the repository
@@ -912,6 +917,7 @@ class GitHandler(object):
                         progress.increment(item=commit.short)
                         self.import_git_commit(
                             self.git[commit.sha],
+                            commit.phase,
                         )
 
                     self.import_tags(refs)
@@ -923,7 +929,7 @@ class GitHandler(object):
         # TODO if the tags cache is used, remove any dangling tag references
         return total
 
-    def import_git_commit(self, commit):
+    def import_git_commit(self, commit, phase):
         self.ui.debug(_(b"importing: %s\n") % commit.id)
         unfiltered = self.repo.unfiltered()
 
@@ -1146,6 +1152,11 @@ class GitHandler(object):
         node = unfiltered.commitctx(ctx)
 
         self.swap_out_encoding(oldenc)
+
+        with self.repo.lock(), self.repo.transaction(b"phase") as tr:
+            phases.advanceboundary(
+                self.repo, tr, phase, [node],
+            )
 
         # save changeset to mapping file
         cs = hex(node)
@@ -1638,6 +1649,16 @@ class GitHandler(object):
             self.ui.warn(_(b'creating bookmarks failed, do you have'
                          b' bookmarks enabled?\n'))
 
+    def get_public_heads(self, remote_name, refs):
+        nodeids_to_publish = set()
+
+        for sha in git2hg.get_public(self.ui, refs, remote_name):
+            hgsha = self.map_hg_get(sha, deref=True)
+            if hgsha:
+                nodeids_to_publish.add(bin(hgsha))
+
+        return nodeids_to_publish
+
     def update_remote_branches(self, remote_name, refs):
         remote_refs = self.remote_refs
 
@@ -1652,15 +1673,6 @@ class GitHandler(object):
                     if LOCAL_BRANCH_PREFIX + t[len(remote_name) + 1:] not in refs:
                         del self.git.refs[REMOTE_BRANCH_PREFIX + t]
 
-        use_phases = self.ui.configbool(b'hggit', b'usephases')
-        refs_to_publish = self.ui.configlist(b'git', b'public')
-
-        # if nothing is requested, fall back to defaults, meaning HEAD
-        # and tags
-        publish_defaults = use_phases and not refs_to_publish
-
-        nodeids_to_publish = []
-
         for ref_name, sha in refs.items():
             hgsha = self.map_hg_get(sha)
 
@@ -1671,39 +1683,22 @@ class GitHandler(object):
                 head = ref_name[11:]
                 remote_head = b'/'.join((remote_name, head))
 
-                # mark public any branches the user specified
-                if head in refs_to_publish or remote_head in refs_to_publish:
-                    self.ui.note(
-                        b'publishing remote branch %s\n' % remote_head,
-                    )
-                    nodeids_to_publish.append(bin(hgsha))
-
                 remote_refs[remote_head] = bin(hgsha)
                 # TODO(durin42): what is this doing?
                 new_ref = REMOTE_BRANCH_PREFIX + remote_head
                 self.git.refs[new_ref] = sha
             elif (ref_name.startswith(LOCAL_TAG_PREFIX) and not
                   ref_name.endswith(b'^{}')):
-                tag = ref_name[10:]
-                if (
-                    hgsha is not None and
-                    (publish_defaults or tag in refs_to_publish)
-                ):
-                    msg = b'publishing remote tag %s/%s\n' % (remote_name, tag)
-                    self.ui.note(msg)
-                    nodeids_to_publish.append(bin(hgsha))
                 self.git.refs[ref_name] = sha
-            elif (
-                ref_name == b'HEAD' and publish_defaults and hgsha is not None
-            ):
-                    self.ui.note(b'publishing remote HEAD\n')
-                    nodeids_to_publish.append(bin(hgsha))
 
-        if use_phases and nodeids_to_publish:
-            with self.repo.lock(), self.repo.transaction(b"phase") as tr:
-                phases.advanceboundary(
-                    self.repo, tr, phases.public, nodeids_to_publish,
-                )
+        # ensure that we update phases on push and no-op pulls
+        with self.repo.lock(), self.repo.transaction(b"phase") as tr:
+            phases.advanceboundary(
+                self.repo,
+                tr,
+                phases.public,
+                self.get_public_heads(remote_name, refs),
+            )
 
     # UTILITY FUNCTIONS
 

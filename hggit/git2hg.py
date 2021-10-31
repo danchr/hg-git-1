@@ -1,11 +1,53 @@
 # git2hg.py - convert Git repositories and commits to Mercurial ones
 
 from dulwich.objects import Commit, Tag
+from dulwich.refs import LOCAL_BRANCH_PREFIX, LOCAL_TAG_PREFIX
 
 from mercurial.node import bin, short
 from mercurial import util as hgutil
+from mercurial import phases
 
-def find_incoming(git_object_store, git_map, refs):
+
+def get_public(ui, refs, remote_name=None):
+    if not ui.configbool(b'hggit', b'usephases'):
+        return {}
+
+    refs_to_publish = set(ui.configlist(b'git', b'public'))
+
+    # if nothing is requested, fall back to defaults, meaning HEAD
+    # and tags
+    publish_defaults = not refs_to_publish
+
+    to_publish = set()
+
+    if remote_name is not None:
+        refs_to_publish.update([
+            ref[len(remote_name) + 1:]
+            for ref in refs_to_publish
+            if ref.startswith(remote_name + b'/')
+        ])
+
+    for ref_name, sha in refs.items():
+        if ref_name.startswith(LOCAL_BRANCH_PREFIX):
+            branch = ref_name[len(LOCAL_BRANCH_PREFIX):]
+            if branch in refs_to_publish:
+                ui.note(b"publishing branch %s\n" % branch)
+                to_publish.add(sha)
+
+        elif ref_name.startswith(LOCAL_TAG_PREFIX):
+            tag = ref_name[len(LOCAL_TAG_PREFIX):]
+            if publish_defaults or tag in refs_to_publish:
+                ui.note(b"publishing tag %s\n" % ref_name[len(LOCAL_TAG_PREFIX):])
+                to_publish.add(sha)
+
+        elif publish_defaults and ref_name == b'HEAD':
+            ui.note(b"publishing remote HEAD\n")
+            to_publish.add(sha)
+
+    return to_publish
+
+
+def find_incoming(ui, git_object_store, git_map, refs):
     '''find what commits need to be imported
 
     git_object_store: is a dulwich object store.
@@ -15,6 +57,7 @@ def find_incoming(git_object_store, git_map, refs):
 
     '''
 
+    public = get_public(ui, refs)
     done = set()
 
     # sort by commit date
@@ -56,6 +99,9 @@ def find_incoming(git_object_store, git_map, refs):
             obj = git_object_store[sha]
             assert isinstance(obj, Commit)
             for p in obj.parents:
+                if sha in public:
+                    public.add(p)
+
                 if p not in done and p not in git_map:
                     todo.append(p)
                     # process parents of a commit before processing the
@@ -71,9 +117,15 @@ def find_incoming(git_object_store, git_map, refs):
     todo = get_heads(refs)
     commits = get_unseen_commits(todo)
 
+    for sha in reversed(commits):
+        for p in git_object_store[sha].parents:
+            if sha in public:
+                public.add(p)
+
     return [
         GitIncomingCommit(
             sha,
+            phases.public if sha in public else phases.draft,
         )
         for sha in commits
     ]
@@ -81,10 +133,11 @@ def find_incoming(git_object_store, git_map, refs):
 
 '''struct to store result from find_incoming'''
 class GitIncomingCommit:
-    __slots__ = 'sha',
+    __slots__ = 'sha', 'phase'
 
-    def __init__(self, sha):
+    def __init__(self, sha, phase):
         self.sha = sha
+        self.phase = phase
 
     @property
     def node(self):
