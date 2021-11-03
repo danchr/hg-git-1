@@ -263,3 +263,29 @@ Check whether `gimport` handles tags
   detached
   alpha
   $ cd ..
+
+Test how pulling an explicit branch with an annotated tag:
+
+  $ hg clone -r master gitrepo hgrepo-2
+  importing 5 git commits
+  new changesets ff7a2f2d8d70:97a843c5e338 (5 drafts)
+  updating to branch default
+  4 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg log -r 'ancestors(master) and tagged()' -T '{gitnode|short} {tags}\n' -R hgrepo-2
+  7eeab2ea75ec alpha
+  3f8f38c36867 beta gamma
+  2a602869ad56 default/master tip
+  $ rm -rf hgrepo-2
+
+  $ hg clone -r master gitrepo hgrepo-2
+  importing 5 git commits
+  new changesets ff7a2f2d8d70:97a843c5e338 (5 drafts)
+  updating to branch default
+  4 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg log -r 'tagged()' -T '{gitnode|short} {tags}\n' -R hgrepo-2
+  7eeab2ea75ec alpha
+  3f8f38c36867 beta gamma
+  2a602869ad56 default/master tip
+This used to die:
+  $ hg -R hgrepo-2 gexport
+  $ rm -rf hgrepo-2

@@ -1507,18 +1507,24 @@ class GitHandler(object):
                 # check whether the tag already exists and is
                 # annotated
                 if tag_refname in self.git.refs:
-                    gittarget = self.git.refs[tag_refname]
-                    gittag = self.git.get_object(gittarget)
-                    if isinstance(gittag, Tag):
-                        if gittag.object[1] != target:
+                    reftarget = self.git.refs[tag_refname]
+                    try:
+                        peeledtarget = self.git.get_peeled(tag_refname)
+                    except KeyError as e:
+                        peeledtarget = e.args[0]
+
+                    if peeledtarget != reftarget:
+                        # warn the user if they tried changing the tag
+                        if target != peeledtarget:
                             self.repo.ui.warn(
                                 b"warning: not overwriting annotated "
                                 b"tag '%s'\n" % tag
                             )
 
-                        # never overwrite annotated tags, otherwise
-                        # it'd happen on every pull
-                        target = gittarget
+                        # and never overwrite annotated tags,
+                        # otherwise it'd happen on every pull
+                        target = reftarget
+
 
                 self.git.refs[tag_refname] = target
                 self.tags[tag] = hex(sha)
