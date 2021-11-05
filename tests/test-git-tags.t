@@ -3,7 +3,7 @@ Load commonly used test logic
 
   $ cat >> $HGRCPATH <<EOF
   > [templates]
-  > shorttags = '{rev}:{node|short} {tags}{if(obsolete, " X")}\n'
+  > shorttags = '{rev}:{node|short} {phase} {tags}{if(obsolete, " X")}\n'
   > EOF
 
   $ git init gitrepo
@@ -129,10 +129,10 @@ Verify that amending commits known to remotes doesn't break anything
   $ echo beta-fix-again >> beta
   $ fn_hg_commit --amend
   $ hg log -T shorttags
-  3:3094b9e8da41 tip
-  2:61175962e488 default/master X
-  1:7fe02317c63d beta
-  0:ff7a2f2d8d70 alpha
+  3:3094b9e8da41 draft tip
+  2:61175962e488 draft default/master X
+  1:7fe02317c63d draft beta
+  0:ff7a2f2d8d70 draft alpha
   $ hg tags
   tip                                3:3094b9e8da41
   default/master                     2:61175962e488
@@ -163,10 +163,10 @@ Now create a tag for the old, obsolete master
   pulling from $TESTTMP/gitrepo
   no changes found
   $ hg log -T shorttags
-  3:3094b9e8da41 default/master tip
-  2:61175962e488 detached X
-  1:7fe02317c63d beta
-  0:ff7a2f2d8d70 alpha
+  3:3094b9e8da41 draft default/master tip
+  2:61175962e488 draft detached X
+  1:7fe02317c63d draft beta
+  0:ff7a2f2d8d70 draft alpha
   $ hg tags
   tip                                3:3094b9e8da41
   default/master                     3:3094b9e8da41
@@ -188,14 +188,14 @@ untagged commit.
   $ touch gamma
   $ fn_hg_commit -A -m 'add gamma'
   $ hg log -T shorttags -r 'gittag()'
-  0:ff7a2f2d8d70 alpha
-  1:7fe02317c63d beta
-  2:61175962e488 detached X
+  0:ff7a2f2d8d70 draft alpha
+  1:7fe02317c63d draft beta
+  2:61175962e488 draft detached X
   $ hg log -T shorttags -r 'gittag(detached)'
-  2:61175962e488 detached X
+  2:61175962e488 draft detached X
   $ hg log -T shorttags -r 'gittag("re:a$")'
-  0:ff7a2f2d8d70 alpha
-  1:7fe02317c63d beta
+  0:ff7a2f2d8d70 draft alpha
+  1:7fe02317c63d draft beta
 
 Create a git tag from hg, but pointing to a new commit:
 
@@ -275,9 +275,9 @@ Test how pulling an explicit branch with an annotated tag:
   updating to branch default
   4 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg log -r 'ancestors(master) and tagged()' -T shorttags -R hgrepo-2
-  0:ff7a2f2d8d70 alpha
-  3:0eb1ab0073a8 beta gamma
-  4:c49682c7cba4 default/master tip
+  0:ff7a2f2d8d70 draft alpha
+  3:0eb1ab0073a8 draft beta gamma
+  4:c49682c7cba4 draft default/master tip
   $ rm -rf hgrepo-2
 
   $ hg clone -r master gitrepo hgrepo-2
@@ -286,9 +286,9 @@ Test how pulling an explicit branch with an annotated tag:
   updating to branch default
   4 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg log -r 'tagged()' -T shorttags -R hgrepo-2
-  0:ff7a2f2d8d70 alpha
-  3:0eb1ab0073a8 beta gamma
-  4:c49682c7cba4 default/master tip
+  0:ff7a2f2d8d70 draft alpha
+  3:0eb1ab0073a8 draft beta gamma
+  4:c49682c7cba4 draft default/master tip
 This used to die:
   $ hg -R hgrepo-2 gexport
   $ rm -rf hgrepo-2
