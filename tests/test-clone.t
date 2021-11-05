@@ -24,7 +24,9 @@ Load commonly used test logic
 
 
   $ cd ..
+
 clone a tag
+
   $ hg clone -r alpha gitrepo hgrepo-a
   importing 1 git commits
   new changesets ff7a2f2d8d70 (1 drafts)
@@ -32,12 +34,13 @@ clone a tag
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo-a bookmarks
      master                    0:ff7a2f2d8d70
-  $ hg -R hgrepo-a log --graph
+  $ hg -R hgrepo-a log --graph --template=phases
   @  changeset:   0:ff7a2f2d8d70
      bookmark:    master
      tag:         alpha
      tag:         default/master
      tag:         tip
+     phase:       draft
      user:        test <test@example.org>
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add alpha
