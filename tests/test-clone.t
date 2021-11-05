@@ -1,5 +1,15 @@
+#testcases secret draft
+
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
+
+#if secret
+The phases setting should not affect hg-git
+  $ cat >> $HGRCPATH <<EOF
+  > [phases]
+  > new-commit = secret
+  > EOF
+#endif
 
   $ git init gitrepo
   Initialized empty Git repository in $TESTTMP/gitrepo/.git/

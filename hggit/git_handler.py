@@ -1131,7 +1131,8 @@ class GitHandler(object):
                                      author, date, {b'hg-git': b'octopus'})
                 # See comment below about setting substate to None.
                 ctx.substate = None
-                return hex(unfiltered.commitctx(ctx))
+                with util.forcedraftcommits():
+                    return hex(unfiltered.commitctx(ctx))
 
             octopus = len(gparents) > 2
             p2 = gparents.pop()
@@ -1175,7 +1176,8 @@ class GitHandler(object):
         # that won't work. Forcibly set the substate to None so that there's no
         # attempt to read subrepos.
         ctx.substate = None
-        node = unfiltered.commitctx(ctx)
+        with util.forcedraftcommits():
+            node = unfiltered.commitctx(ctx)
 
         self.swap_out_encoding(oldenc)
 

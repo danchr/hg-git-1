@@ -1,3 +1,5 @@
+#testcases secret draft
+
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
@@ -5,6 +7,14 @@ Load commonly used test logic
   > [templates]
   > shorttags = '{rev}:{node|short} {phase} {tags}{if(obsolete, " X")}\n'
   > EOF
+
+#if secret
+The phases setting should not affect hg-git
+  $ cat >> $HGRCPATH <<EOF
+  > [phases]
+  > new-commit = secret
+  > EOF
+#endif
 
   $ git init gitrepo
   Initialized empty Git repository in $TESTTMP/gitrepo/.git/
@@ -106,6 +116,9 @@ Create a git tag from hg
   
   $ echo beta-fix >> beta
   $ fn_hg_commit -m 'fix for beta'
+#if secret
+  $ hg phase -d
+#endif
   $ hg push
   pushing to $TESTTMP/gitrepo
   searching for changes
@@ -187,6 +200,9 @@ untagged commit.
   $ cd hgrepo
   $ touch gamma
   $ fn_hg_commit -A -m 'add gamma'
+#if secret
+  $ hg phase -d
+#endif
   $ hg log -T shorttags -r 'gittag()'
   0:ff7a2f2d8d70 draft alpha
   1:7fe02317c63d draft beta
@@ -236,6 +252,9 @@ Try to overwrite an annotated tag:
   abort: tag 'beta' already exists (use -f to force)
   [255]
   $ hg tag -f beta
+#if secret
+  $ hg phase -d
+#endif
   $ hg push
   pushing to $TESTTMP/gitrepo
   warning: not overwriting annotated tag 'beta'
@@ -292,3 +311,16 @@ Test how pulling an explicit branch with an annotated tag:
 This used to die:
   $ hg -R hgrepo-2 gexport
   $ rm -rf hgrepo-2
+
+Check that pulling will update phases only — which it doesn't, yet:
+
+  $ cd hgrepo
+  $ hg phase -fs gamma detached
+  $ hg pull
+  pulling from $TESTTMP/gitrepo
+  no changes found
+  $ hg log -T shorttags -r gamma -r detached
+  4:0eb1ab0073a8 secret beta gamma
+  2:61175962e488 secret detached X
+  $ hg phase -d 'all()'
+  $ cd ..

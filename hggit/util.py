@@ -4,16 +4,33 @@ functions."""
 from __future__ import generator_stop
 
 import collections
+import contextlib
 import re
 
 from dulwich import errors
 from mercurial.i18n import _
 from mercurial import (
     error,
+    extensions,
+    phases,
     util as hgutil,
 )
 
 gitschemes = (b'git', b'git+ssh', b'git+http', b'git+https')
+
+
+@contextlib.contextmanager
+def forcedraftcommits():
+    """Context manager that forces new commits to at least draft,
+    regardless of configuration.
+
+    """
+    with extensions.wrappedfunction(
+            phases,
+            'newcommitphase',
+            lambda orig, ui: phases.draft,
+    ):
+        yield
 
 
 def parse_hgsub(lines):
