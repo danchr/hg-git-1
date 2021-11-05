@@ -29,12 +29,13 @@ pull a tag
   (run 'hg update' to get a working copy)
   $ hg -R hgrepo update t_alpha
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  $ hg -R hgrepo log --graph
+  $ hg -R hgrepo log --graph --template=phases
   @  changeset:   0:ff7a2f2d8d70
      bookmark:    master
      tag:         default/master
      tag:         t_alpha
      tag:         tip
+     phase:       draft
      user:        test <test@example.org>
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add alpha
@@ -72,11 +73,12 @@ pull a branch
   importing 1 git commits
   new changesets 7fe02317c63d (1 drafts)
   (run 'hg update' to get a working copy)
-  $ hg -R hgrepo log --graph
+  $ hg -R hgrepo log --graph --template=phases
   o  changeset:   1:7fe02317c63d
   |  bookmark:    beta
   |  tag:         default/beta
   |  tag:         tip
+  |  phase:       draft
   |  user:        test <test@example.org>
   |  date:        Mon Jan 01 00:00:11 2007 +0000
   |  summary:     add beta
@@ -87,10 +89,12 @@ pull a branch
      tag:         default/epsilon
      tag:         default/master
      tag:         t_alpha
+     phase:       draft
      user:        test <test@example.org>
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add alpha
   
+
 add another commit and tag to the git repo
   $ cd gitrepo
   $ git checkout -q beta
@@ -107,11 +111,12 @@ pull everything else
   importing 2 git commits
   new changesets 678ebee93e38:6f898ad1f3e1 (2 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
-  $ hg -R hgrepo log --graph
+  $ hg -R hgrepo log --graph --template=phases
   o  changeset:   3:6f898ad1f3e1
   |  bookmark:    master
   |  tag:         default/master
   |  tag:         tip
+  |  phase:       draft
   |  parent:      0:ff7a2f2d8d70
   |  user:        test <test@example.org>
   |  date:        Mon Jan 01 00:00:13 2007 +0000
@@ -120,6 +125,7 @@ pull everything else
   | o  changeset:   2:678ebee93e38
   |/   bookmark:    delta
   |    tag:         default/delta
+  |    phase:       draft
   |    parent:      0:ff7a2f2d8d70
   |    user:        test <test@example.org>
   |    date:        Mon Jan 01 00:00:12 2007 +0000
@@ -129,6 +135,7 @@ pull everything else
   |/   bookmark:    beta
   |    tag:         default/beta
   |    tag:         t_beta
+  |    phase:       draft
   |    user:        test <test@example.org>
   |    date:        Mon Jan 01 00:00:11 2007 +0000
   |    summary:     add beta
@@ -137,6 +144,7 @@ pull everything else
      bookmark:    epsilon
      tag:         default/epsilon
      tag:         t_alpha
+     phase:       draft
      user:        test <test@example.org>
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add alpha
