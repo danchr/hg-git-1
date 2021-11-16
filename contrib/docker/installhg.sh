@@ -21,7 +21,7 @@ set -xe
 
 apk add --no-cache $BUILDDEPENDS $RUNDEPENDS
 
-python -m pip --no-cache-dir install $PIPDEPENDS
+python -m pip --no-cache-dir install --pre $PIPDEPENDS
 
 # handle pre-release versions
 get_version() {
