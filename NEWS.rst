@@ -1,3 +1,12 @@
+hg-git 0.10.3 (2021-11-16)
+==========================
+
+This is a minor release, focusing on bugs and compatibility.
+
+Enhancements:
+
+* Add support for Mercurial 6.0.
+
 hg-git 0.10.2 (2021-07-31)
 ==========================
 
