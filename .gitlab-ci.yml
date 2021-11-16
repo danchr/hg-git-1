@@ -127,7 +127,7 @@ Development:
       - &development-versions
         PYTHON:
           - "2.7"
-          - "3.9"
+          - "3.10"
         HG:
           - "stable"
           - "default"
@@ -288,6 +288,9 @@ x86 Wheels:
           - cp37
           - cp38
           - cp39
+      - PLATFORM: manylinux_2_24
+        ABI:
+          - cp310
 
 ARM Wheels:
   extends: "x86 Wheels"
@@ -302,3 +305,6 @@ ARM Wheels:
           - cp37
           - cp38
           - cp39
+      - PLATFORM: manylinux_2_24
+        ABI:
+          - cp310
