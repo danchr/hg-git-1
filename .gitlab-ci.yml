@@ -17,7 +17,11 @@ stages:
     - adduser -D test
     - chown -R test *
     - su test -c contrib/ci.sh
+    - mv tests/.coverage coverage-$CI_JOB_ID
   artifacts: &test-artifacts
+    expire_in: 1 day
+    paths:
+      - coverage-$CI_JOB_ID
     reports:
       junit: tests-$CI_JOB_ID.xml
 
@@ -81,7 +85,8 @@ Ubuntu:
         pyflakes3
       - >
         python3 tests/run-tests.py -v --color=always
-        --xunit $PWD/tests-$CI_JOB_ID.xml
+        --xunit $PWD/tests-$CI_JOB_ID.xml --cover
+      - mv tests/.coverage coverage-$CI_JOB_ID
     artifacts: *test-artifacts
 
 # Test that the tests pass against the current branches
@@ -109,6 +114,21 @@ Development:
         HG:
           - "stable"
           - "default"
+
+Coverage:
+  stage: .post
+  image: python:alpine
+  when: always
+  allow_failure: true
+  coverage: '/TOTAL +\d+ +\d+ +[.0-9]+%/'
+  script:
+    - pip install coverage
+    - coverage combine coverage-*
+    - coverage xml --include='hggit/*' --ignore-errors
+    - coverage report --include='hggit/*' --precision=1
+  artifacts:
+    reports:
+      cobertura: coverage.xml
 
 # Build images for the above tasks; this should be a scheduled job, as
 # it is quite unnecessary to run on every invocation.
