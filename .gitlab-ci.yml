@@ -228,8 +228,8 @@ Git service image:
       --cleanup
       --destination registry.heptapod.net:443/mercurial/hg-git/git-server
 
-x86 Wheels:
-  image: quay.io/pypa/${PLATFORM}
+Wheels:
+  image: python
   timeout: 15m
   stage: archives
   rules:
@@ -239,10 +239,7 @@ x86 Wheels:
     - if: '$CI_COMMIT_REF_PROTECTED == "true"'
     # and when explicitly requested
     - if: '$CI_BUILD_ARCHIVES == "1"'
-  variables:
-    PYPI_REPOSITORY: ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi
   script:
-    - yum install -y gettext
     - |
       cat > ~/.pypirc <<EOF
       [distutils]
@@ -254,58 +251,13 @@ x86 Wheels:
       username = gitlab-ci-token
       password = ${CI_JOB_TOKEN}
       EOF
+    - pip install mercurial twine build
+    - pyproject-build
     - |
-      for pythondir in /opt/python/${ABI}*
-      do
-        # setuptools_scm needs hg in its path
-        export PATH=$pythondir/bin:$PATH
-        $pythondir/bin/pip install docutils pygments mercurial twine
-        $pythondir/bin/pip wheel -w wheelhouse mercurial .
-      done
-    - |
-      for whl in wheelhouse/*-linux_*.whl
-      do
-        auditwheel repair --plat ${PLATFORM} -w wheelhouse $whl
-        rm -v $whl
-      done
-    # rely on our PATH adjustment above
-    - |
-      for whl in wheelhouse/*-${PLATFORM}.whl wheelhouse/hg_git-*.whl
-      do
-        twine upload \
-          --disable-progress-bar --verbose --skip-existing \
-          --repository gitlab \
-          $whl \
-          && echo "upload of $whl success" \
-          || echo "upload of $whl failed"
-      done
+      twine upload \
+        --disable-progress-bar --verbose --skip-existing \
+        --repository gitlab \
+        dist/*
   artifacts:
     paths:
       - wheelhouse
-  parallel:
-    matrix:
-      - PLATFORM: manylinux2014_x86_64
-        ABI:
-          - cp36
-          - cp37
-          - cp38
-          - cp39
-      - PLATFORM: manylinux_2_24
-        ABI:
-          - cp310
-
-ARM Wheels:
-  extends: "x86 Wheels"
-  tags:
-    - arm64
-  parallel:
-    matrix:
-      - PLATFORM: manylinux2014_aarch64
-        ABI:
-          - cp36
-          - cp37
-          - cp38
-          - cp39
-      - PLATFORM: manylinux_2_24
-        ABI:
-          - cp310
