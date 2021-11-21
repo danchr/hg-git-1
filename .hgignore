@@ -8,4 +8,4 @@ dist
 *.orig
 \#*\#
 .\#*
-
+.coverage

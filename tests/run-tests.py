@@ -3948,12 +3948,17 @@ class TestRunner(object):
         # output.
         os.chdir(self._hgroot)
         covdir = os.path.join(_bytes2sys(self._installdir), '..', 'coverage')
-        cov = coverage(data_file=os.path.join(covdir, 'cov'))
+        cov = coverage(
+            data_file=os.path.join(_bytes2sys(self._outputdir), '.coverage'),
+        )
 
         # Map install directory paths back to source directory.
         cov.config.paths['srcdir'] = ['.', _bytes2sys(self._pythondir)]
 
-        cov.combine()
+        cov.combine(data_paths=[
+            os.path.join(covdir, p) for p in os.listdir(covdir)
+        ])
+        cov.save()
 
         omit = [
             _bytes2sys(os.path.join(x, b'*'))
