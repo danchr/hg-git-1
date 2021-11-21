@@ -1,4 +1,4 @@
-from __future__ import generator_stop
+from __future__ import absolute_import, print_function
 
 import distutils.version
 import os
@@ -14,6 +14,8 @@ tempprefix = 'hg-hghave-'
 checks = {
     "true": (lambda: True, "yak shaving"),
     "false": (lambda: False, "nail clipper"),
+    "known-bad-output": (lambda: True, "use for currently known bad output"),
+    "missing-correct-output": (lambda: False, "use for missing good output"),
 }
 
 try:
@@ -27,7 +29,8 @@ except ImportError:
 stdout = getattr(sys.stdout, 'buffer', sys.stdout)
 stderr = getattr(sys.stderr, 'buffer', sys.stderr)
 
-if sys.version_info[0] >= 3:
+is_not_python2 = sys.version_info[0] >= 3
+if is_not_python2:
 
     def _sys2bytes(p):
         if p is None:
@@ -102,8 +105,8 @@ def checkfeatures(features):
         check, desc = checks[feature]
         try:
             available = check()
-        except Exception:
-            result['error'].append('hghave check failed: %s' % feature)
+        except Exception as e:
+            result['error'].append('hghave check %s failed: %r' % (feature, e))
             continue
 
         if not negate and not available:
@@ -138,9 +141,22 @@ def matchoutput(cmd, regexp, ignorestatus=False):
     """Return the match object if cmd executes successfully and its output
     is matched by the supplied regular expression.
     """
+
+    # Tests on Windows have to fake USERPROFILE to point to the test area so
+    # that `~` is properly expanded on py3.8+.  However, some tools like black
+    # make calls that need the real USERPROFILE in order to run `foo --version`.
+    env = os.environ
+    if os.name == 'nt':
+        env = os.environ.copy()
+        env['USERPROFILE'] = env['REALUSERPROFILE']
+
     r = re.compile(regexp)
     p = subprocess.Popen(
-        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+        cmd,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        env=env,
     )
     s = p.communicate()[0]
     ret = p.returncode
@@ -152,38 +168,40 @@ def has_baz():
     return matchoutput('baz --version 2>&1', br'baz Bazaar version')
 
 
-@check("bzr", "Canonical's Bazaar client")
+@check("bzr", "Breezy library and executable version >= 3.1")
 def has_bzr():
+    if not is_not_python2:
+        return False
     try:
-        import bzrlib
-        import bzrlib.bzrdir
-        import bzrlib.errors
-        import bzrlib.revision
-        import bzrlib.revisionspec
+        # Test the Breezy python lib
+        import breezy
+        import breezy.bzr.bzrdir
+        import breezy.errors
+        import breezy.revision
+        import breezy.revisionspec
 
-        bzrlib.revisionspec.RevisionSpec
-        return bzrlib.__doc__ is not None
+        breezy.revisionspec.RevisionSpec
+        if breezy.__doc__ is None or breezy.version_info[:2] < (3, 1):
+            return False
     except (AttributeError, ImportError):
         return False
-
-
-@checkvers("bzr", "Canonical's Bazaar client >= %s", (1.14,))
-def has_bzr_range(v):
-    major, minor = v.split('rc')[0].split('.')[0:2]
-    try:
-        import bzrlib
-
-        return bzrlib.__doc__ is not None and bzrlib.version_info[:2] >= (
-            int(major),
-            int(minor),
-        )
-    except ImportError:
-        return False
+    # Test the executable
+    return matchoutput('brz --version 2>&1', br'Breezy \(brz\) ')
 
 
 @check("chg", "running with chg")
 def has_chg():
-    return 'CHGHG' in os.environ
+    return 'CHG_INSTALLED_AS_HG' in os.environ
+
+
+@check("rhg", "running with rhg as 'hg'")
+def has_rhg():
+    return 'RHG_INSTALLED_AS_HG' in os.environ
+
+
+@check("pyoxidizer", "running with pyoxidizer build as 'hg'")
+def has_rhg():
+    return 'PYOXIDIZED_INSTALLED_AS_HG' in os.environ
 
 
 @check("cvs", "cvs client/server")
@@ -244,6 +262,13 @@ def has_executablebit():
         # we don't care, the user probably won't be able to commit anyway
         return False
     return not (new_file_has_exec or exec_flags_cannot_flip)
+
+
+@check("suidbit", "setuid and setgid bit")
+def has_suidbit():
+    if getattr(os, "statvfs", None) is None or getattr(os, "ST_NOSUID") is None:
+        return False
+    return bool(os.statvfs('.').f_flag & os.ST_NOSUID)
 
 
 @check("icasefs", "case insensitive file system")
@@ -612,14 +637,21 @@ def has_pyflakes():
 
 @check("pylint", "Pylint python linter")
 def has_pylint():
-    return matchoutput("pylint --help", br"Usage:  pylint", True)
+    return matchoutput("pylint --help", br"Usage:[ ]+pylint", True)
 
 
-@check("clang-format", "clang-format C code formatter")
+@check("clang-format", "clang-format C code formatter (>= 11)")
 def has_clang_format():
     m = matchoutput('clang-format --version', br'clang-format version (\d+)')
-    # style changed somewhere between 4.x and 6.x
-    return m and int(m.group(1)) >= 6
+    # style changed somewhere between 10.x and 11.x
+    if m:
+        return int(m.group(1)) >= 11
+    # Assist Googler contributors, they have a centrally-maintained version of
+    # clang-format that is generally very fresh, but unlike most builds (both
+    # official and unofficial), it does *not* include a version number.
+    return matchoutput(
+        'clang-format --version', br'clang-format .*google3-trunk \([0-9a-f]+\)'
+    )
 
 
 @check("jshint", "JSHint static code analysis tool")
@@ -726,15 +758,33 @@ def has_test_repo():
     return os.path.isdir(os.path.join(t, "..", ".hg"))
 
 
-@check("tic", "terminfo compiler and curses module")
-def has_tic():
+@check("network-io", "whether tests are allowed to access 3rd party services")
+def has_test_repo():
+    t = os.environ.get("HGTESTS_ALLOW_NETIO")
+    return t == "1"
+
+
+@check("curses", "terminfo compiler and curses module")
+def has_curses():
     try:
         import curses
 
         curses.COLOR_BLUE
-        return matchoutput('test -x "`which tic`"', br'')
+
+        # Windows doesn't have a `tic` executable, but the windows_curses
+        # package is sufficient to run the tests without it.
+        if os.name == 'nt':
+            return True
+
+        return has_tic()
+
     except (ImportError, AttributeError):
         return False
+
+
+@check("tic", "terminfo compiler")
+def has_tic():
+    return matchoutput('test -x "`which tic`"', br'')
 
 
 @check("xz", "xz compression utility")
@@ -851,7 +901,10 @@ def has_py3():
 
 @check("py3exe", "a Python 3.x interpreter is available")
 def has_python3exe():
-    return matchoutput('python3 -V', br'^Python 3.(5|6|7|8|9)')
+    py = 'python3'
+    if os.name == 'nt':
+        py = 'py -3'
+    return matchoutput('%s -V' % py, br'^Python 3.(5|6|7|8|9)')
 
 
 @check("pure", "running with pure Python code")
@@ -912,17 +965,16 @@ def has_ensurepip():
         return False
 
 
-@check("py2virtualenv", "Python2 virtualenv support")
-def has_py2virtualenv():
-    if sys.version_info[0] != 2:
-        return False
-
+@check("virtualenv", "virtualenv support")
+def has_virtualenv():
     try:
         import virtualenv
 
-        virtualenv.ACTIVATE_SH
-        return True
-    except ImportError:
+        # --no-site-package became the default in 1.7 (Nov 2011), and the
+        # argument was removed in 20.0 (Feb 2020).  Rather than make the
+        # script complicated, just ignore ancient versions.
+        return int(virtualenv.__version__.split('.')[0]) > 1
+    except (AttributeError, ImportError, IndexError):
         return False
 
 
@@ -1031,7 +1083,15 @@ def has_repofncache():
     return 'fncache' in getrepofeatures()
 
 
-@check('sqlite', 'sqlite3 module is available')
+@check('dirstate-v2', 'using the v2 format of .hg/dirstate')
+def has_dirstate_v2():
+    # Keep this logic in sync with `newreporequirements()` in `mercurial/localrepo.py`
+    return has_rust() and matchoutput(
+        'hg config format.exp-rc-dirstate-v2', b'(?i)1|yes|true|on|always'
+    )
+
+
+@check('sqlite', 'sqlite3 module and matching cli is available')
 def has_sqlite():
     try:
         import sqlite3
@@ -1047,7 +1107,7 @@ def has_sqlite():
     return matchoutput('sqlite3 -version', br'^3\.\d+')
 
 
-@check('vcr', 'vcr http mocking library')
+@check('vcr', 'vcr http mocking library (pytest-vcr)')
 def has_vcr():
     try:
         import vcr
@@ -1067,13 +1127,13 @@ def has_emacs():
     return matchoutput('emacs --version', b'GNU Emacs 2(4.4|4.5|5|6|7|8|9)')
 
 
-@check('black', 'the black formatter for python')
+@check('black', 'the black formatter for python (>= 20.8b1)')
 def has_black():
     blackcmd = 'black --version'
     version_regex = b'black, version ([0-9a-b.]+)'
     version = matchoutput(blackcmd, version_regex)
     sv = distutils.version.StrictVersion
-    return version and sv(_bytes2sys(version.group(1))) >= sv('19.10b0')
+    return version and sv(_bytes2sys(version.group(1))) >= sv('20.8b1')
 
 
 @check('pytype', 'the pytype type checker')
@@ -1084,12 +1144,18 @@ def has_pytype():
     return version and sv(_bytes2sys(version.group(0))) >= sv('2019.10.17')
 
 
-@check("rustfmt", "rustfmt tool")
+@check("rustfmt", "rustfmt tool at version nightly-2020-10-04")
 def has_rustfmt():
     # We use Nightly's rustfmt due to current unstable config options.
     return matchoutput(
-        '`rustup which --toolchain nightly rustfmt` --version', b'rustfmt'
+        '`rustup which --toolchain nightly-2020-10-04 rustfmt` --version',
+        b'rustfmt',
     )
+
+
+@check("cargo", "cargo tool")
+def has_cargo():
+    return matchoutput('`rustup which cargo` --version', b'cargo')
 
 
 @check("lzma", "python lzma module")
@@ -1101,3 +1167,8 @@ def has_lzma():
         return True
     except ImportError:
         return False
+
+
+@check("bash", "bash shell")
+def has_bash():
+    return matchoutput("bash -c 'echo hi'", b'^hi$')

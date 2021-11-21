@@ -71,10 +71,10 @@ repository prevents cloning into the directory:
   $ git init -q hgrepo
   $ hg clone gitrepo --config git.intree=yes hgrepo
   abort: destination 'hgrepo' is not empty
-  [255]
+  [10]
   $ hg clone $TESTTMP/gitrepo --config git.intree=yes --cwd hgrepo .
   abort: destination '.' is not empty
-  [255]
+  [10]
   $ rm -rf hgrepo
 
 Map saving
