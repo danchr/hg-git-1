@@ -80,8 +80,8 @@ Ubuntu:
         python3-pygments python3-coverage python3-dulwich python3-setuptools
         pyflakes3
       - >
-        python3 tests/run-tests.py -v
-        --xunit $PWD/tests-$CI_JOB_ID.xml --color=always --timeout 300
+        python3 tests/run-tests.py -v --color=always
+        --xunit $PWD/tests-$CI_JOB_ID.xml
     artifacts: *test-artifacts
 
 # Test that the tests pass against the current branches
