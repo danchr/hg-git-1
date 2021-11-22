@@ -11,7 +11,11 @@ import shutil
 from dulwich.errors import HangupException, GitProtocolError
 from dulwich.objects import Blob, Commit, Tag, Tree, parse_timezone
 from dulwich.pack import create_delta, apply_delta
-from dulwich.refs import LOCAL_BRANCH_PREFIX, LOCAL_TAG_PREFIX
+from dulwich.refs import (
+    ANNOTATED_TAG_SUFFIX,
+    LOCAL_BRANCH_PREFIX,
+    LOCAL_TAG_PREFIX,
+)
 from dulwich.repo import Repo, check_ref_format
 from dulwich import client
 from dulwich import config as dul_config
@@ -1605,7 +1609,7 @@ class GitHandler(object):
                         raise error.RepoLookupError(msg)
         else:
             for ref, sha in refs.items():
-                if not ref.endswith(b'^{}') and (
+                if not ref.endswith(ANNOTATED_TAG_SUFFIX) and (
                     ref.startswith(LOCAL_BRANCH_PREFIX)
                     or ref.startswith(LOCAL_TAG_PREFIX)
                 ):
@@ -1762,7 +1766,7 @@ class GitHandler(object):
                 # the ones we are pulling
                 if refs[k] not in self.git.object_store:
                     continue
-                if ref_name[-3:] == b'^{}':
+                if ref_name[-3:] == ANNOTATED_TAG_SUFFIX:
                     ref_name = ref_name[:-3]
                 if ref_name not in repotags:
                     sha = self.map_hg_get(refs[k], deref=True)
@@ -1941,7 +1945,7 @@ class GitHandler(object):
                 self.git.refs[new_ref] = sha
             elif ref_name.startswith(
                 LOCAL_TAG_PREFIX
-            ) and not ref_name.endswith(b'^{}'):
+            ) and not ref_name.endswith(ANNOTATED_TAG_SUFFIX):
                 self.git.refs[ref_name] = sha
 
             if hgsha:
