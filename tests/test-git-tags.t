@@ -59,7 +59,7 @@ Error checking on tag creation
   [255]
   $ hg tag --git beta --remove -r 0
   abort: cannot specify both --rev and --remove
-  [10]
+  [255]
   $ hg tag --git alpha
   abort: git tags require an explicit revision
   (please specify -r/--rev)
@@ -69,16 +69,16 @@ Error checking on tag creation
   [255]
   $ hg tag --git alpha -r 0 -e
   abort: cannot specify both --git and --edit
-  [10]
+  [255]
   $ hg tag --git alpha -r 0 -m 42
   abort: cannot specify both --git and --message
-  [10]
+  [255]
   $ hg tag --git alpha -r 0 -d 42
   abort: cannot specify both --git and --date
-  [10]
+  [255]
   $ hg tag --git alpha -r 0 -u user@example.com
   abort: cannot specify both --git and --user
-  [10]
+  [255]
   $ hg tag --git 'with space' -r 0
   abort: the name 'with space' is not a valid git tag
   [255]
@@ -90,7 +90,7 @@ Error checking on tag creation
   [255]
   $ hg tag --git tip -r 0
   abort: the name 'tip' is reserved
-  [10]
+  [255]
 
 Create a git tag from hg
 
@@ -250,7 +250,7 @@ Try to overwrite an annotated tag:
 #endif
   $ hg tag beta
   abort: tag 'beta' already exists (use -f to force)
-  [10]
+  [255]
   $ hg tag -f beta
 #if secret
   $ hg phase -d
