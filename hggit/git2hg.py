@@ -135,10 +135,9 @@ def find_incoming(ui, git_object_store, git_map, refs):
     ]
 
 
-'''struct to store result from find_incoming'''
-
-
 class GitIncomingCommit:
+    '''struct to store result from find_incoming'''
+
     __slots__ = 'sha', 'phase'
 
     def __init__(self, sha, phase):
