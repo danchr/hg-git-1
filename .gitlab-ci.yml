@@ -120,7 +120,7 @@ Coverage:
   image: python:alpine
   when: always
   allow_failure: true
-  coverage: '/TOTAL +\d+ +\d+ +[.0-9]+%/'
+  coverage: /^TOTAL.+?([.0-9]+\%)$/
   script:
     - pip install coverage
     - coverage combine coverage-*
