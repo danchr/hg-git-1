@@ -125,8 +125,12 @@ Coverage:
     - pip install coverage
     - coverage combine coverage-*
     - coverage xml --include='hggit/*' --ignore-errors
+    - coverage html --include='hggit/*' --ignore-errors
     - coverage report --include='hggit/*' --precision=1
   artifacts:
+    expire_in: 1 week
+    paths:
+      - htmlcov
     reports:
       cobertura: coverage.xml
 
