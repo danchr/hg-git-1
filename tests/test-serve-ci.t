@@ -11,23 +11,9 @@ We assume the git server is unavailable elsewhere.
 
 Allow password prompts without a TTY:
 
-  $ cat << EOF > get_pass.py
-  > from __future__ import generator_stop
-  > import getpass, os, sys
-  > def newgetpass(args):
-  >     try:
-  >       passwd = os.environb.get(b'PASSWD', b'nope')
-  >       print(passwd.encode())
-  >     except AttributeError: # python 2.7
-  >       passwd = os.environ.get('PASSWD', 'nope')
-  >       print(passwd)
-  >     sys.stdout.flush()
-  >     return passwd
-  > getpass.getpass = newgetpass
-  > EOF
   $ cat >> $HGRCPATH << EOF
   > [extensions]
-  > getpass = $TESTTMP/get_pass.py
+  > getpass = $TESTDIR/testlib/ext-get-password-from-env.py
   > EOF
 
 Create a silly SSH configuration:
