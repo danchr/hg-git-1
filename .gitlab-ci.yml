@@ -17,9 +17,9 @@ stages:
     - adduser -D test
     - chown -R test *
     - su test -c contrib/ci.sh
-  artifacts:
+  artifacts: &test-artifacts
     reports:
-      junit: tests-$PYTHON-$HG.xml
+      junit: tests-$CI_JOB_ID.xml
 
 # First, test with the latest and greatest Mercurial, across the
 # versions Python supported. We generally assume that if e.g. CPython
@@ -81,10 +81,8 @@ Ubuntu:
         pyflakes3
       - >
         python3 tests/run-tests.py -v
-        --xunit $PWD/tests-ubuntu.xml --color=always --timeout 300
-    artifacts:
-      reports:
-        junit: tests-ubuntu.xml
+        --xunit $PWD/tests-$CI_JOB_ID.xml --color=always --timeout 300
+    artifacts: *test-artifacts
 
 # Test that the tests pass against the current branches
 Development:
