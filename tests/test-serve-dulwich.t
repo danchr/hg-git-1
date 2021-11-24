@@ -34,19 +34,19 @@ Make sure that clone over unauthenticated HTTP doesn't break
 
   $ hg clone -U git+http://localhost:$HGPORT copy 2>&1
   \r (no-eol) (esc)
-  counting objects 6 [ <=>                                  ]\r (no-eol) (esc) (no-dulwich0204 !)
   counting objects 1 [ <=>                                  ]\r (no-eol) (esc) (dulwich0204 !)
   counting objects 2 [  <=>                                 ]\r (no-eol) (esc) (dulwich0204 !)
   counting objects 3 [   <=>                                ]\r (no-eol) (esc) (dulwich0204 !)
   counting objects 4 [    <=>                               ]\r (no-eol) (esc) (dulwich0204 !)
   counting objects 5 [     <=>                              ]\r (no-eol) (esc) (dulwich0204 !)
   counting objects 6 [      <=>                             ]\r (no-eol) (esc) (dulwich0204 !)
-  counting objects 6 [       <=>                            ]\r (no-eol) (esc) (dulwich0204 !)
-                                                              \r (no-eol) (esc)
-  \r (no-eol) (esc)
+                                                              \r (no-eol) (esc) (dulwich0204 !)
+  \r (no-eol) (esc) (dulwich0204 !)
   importing commits 1/2 b23744d34f97         [======>       ]\r (no-eol) (esc)
   importing commits 2/2 3af9773036a9         [=============>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
+  remote: dul-daemon says what (no-dulwich01910 !)
+  remote: how was that, then? (no-dulwich01910 !)
   importing 2 git commits
   new changesets c4d188f6e13d:221dd250e933 (2 drafts)
   $ hg log -T 'HG:{node|short} GIT:{gitnode|short}\n' -R copy

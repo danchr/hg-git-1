@@ -88,6 +88,7 @@ And finally, pull the new commit:
 
   $ hg -R repo-git pull -u
   pulling from git://git-server/repo.git
+  remote: warning: unable to access '/root/.config/git/attributes': Permission denied
   importing 1 git commits
   adding bookmark master
   new changesets fa22339f4ab8 (1 drafts)
@@ -108,6 +109,7 @@ But we can specify authentication in the configuration:
   >    --config auth.git.password=git \
   >    pull -u
   pulling from http://git-server/repo.git
+  remote: warning: unable to access '/root/.config/git/attributes': Permission denied
   importing 1 git commits
   adding bookmark master
   new changesets fa22339f4ab8 (1 drafts)

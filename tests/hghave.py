@@ -420,6 +420,7 @@ def has_dulwich():
     "dulwich", "Dulwich >= %s", [
         '%d.%d.%d' % vers
         for vers in (
+            (0, 19, 10),
             (0, 20, 0),
             (0, 20, 3),
             (0, 20, 4),

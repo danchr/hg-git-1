@@ -58,67 +58,83 @@ RE_GIT_URI = re.compile(
     br'^(?P<scheme>git([+]ssh)?://)(?P<host>.*?)(:(?P<port>\d+))?'
     br'(?P<sepr>[:/])(?P<path>.*)$')
 
-RE_NEWLINES = re.compile(br'[\r\n]')
+RE_NEWLINES = re.compile(br'[\r\n]$')
 RE_GIT_DETERMINATE_PROGRESS = re.compile(br'\((\d+)/(\d+)\)')
 RE_GIT_INDETERMINATE_PROGRESS = re.compile(br'(\d+)')
+RE_GIT_TOTALS_LINE = re.compile(
+    br'Total \d+ \(delta \d+\), reused \d+ \(delta \d+\)',
+)
 
 RE_AUTHOR_FILE = re.compile(br'\s*=\s*')
 
 
 class GitProgress(object):
-    """convert git server progress strings into mercurial progress"""
-    def __init__(self, ui, remote=False):
+    """convert git server progress strings into mercurial progress
+
+    but also detect the intertwined "remote" messages
+    """
+
+    def __init__(self, ui):
         self.ui = ui
-        self.remote = remote
 
         self._progress = None
         self.msgbuf = b''
 
-    def progress(self, msg):
+    def progress(self, message):
         # 'Counting objects: 33640, done.\n'
         # 'Compressing objects:   0% (1/9955)   \r
-        msgs = RE_NEWLINES.split(self.msgbuf + compat.sysbytes(msg))
-        self.msgbuf = msgs.pop()
 
-        for msg in msgs:
+        lines = (self.msgbuf + compat.sysbytes(message)).splitlines(keepends=True)
+        self.msgbuf = b''
+
+        for msg in lines:
+            # if it's still a partial line, postpone processing
+            if not RE_NEWLINES.search(msg):
+                self.msgbuf = msg
+                return
+
+            # anything that endswith a newline, we should probably print out
+            if msg.endswith(b'\n'):
+                # except some final statistics
+                if RE_GIT_TOTALS_LINE.search(msg) or msg.endswith(b', done.\n'):
+                    self.ui.note(_(b'remote: %s\n') % msg[:-1])
+                else:
+                    self.ui.status(_(b'remote: %s\n') % msg[:-1])
+                self.flush()
+                continue
+
+            # this is a progress message
+            assert msg.endswith(b'\r'), f"{msg} is not a progress message"
+
             td = msg.split(b':', 1)
             data = td.pop()
-            if not td:
-                self.flush(data)
-                continue
-            topic = td[0]
+
+            try:
+                topic = td[0]
+            except IndexError:
+                topic = b''
 
             determinate = RE_GIT_DETERMINATE_PROGRESS.search(data)
             indeterminate = RE_GIT_INDETERMINATE_PROGRESS.search(data)
 
-            if determinate or indeterminate:
-                if self._progress and self._progress.topic != topic:
-                    self.flush()
-                if not self._progress:
-                    self._progress = self.ui.makeprogress(topic)
+            if self._progress and self._progress.topic != topic:
+                return False
+            if not self._progress:
+                self._progress = self.ui.makeprogress(topic)
 
-                if determinate:
-                    pos, total = map(int, determinate.group(1, 2))
-                else:
-                    pos = int(indeterminate.group(1))
-                    total = None
-                self._progress.update(pos, total=total)
+            if determinate:
+                pos, total = map(int, determinate.group(1, 2))
             else:
-                self.flush(msg)
+                pos = int(indeterminate.group(1))
+                total = None
 
-    def flush(self, msg=None):
-        if self._progress is None:
-            return
-        self._progress.complete()
-        self._progress = None
-        if msg is None:
-            msg = self.msgbuf
-        if msg is not None and msg.strip():
-            if self.remote:
-                self.ui.status(b'remote: %s\n' % msg)
-            else:
-                self.ui.note(msg + b'\n')
+            self._progress.update(pos, total=total)
 
+    def flush(self, msg=b''):
+        if self._progress is not None:
+            self._progress.complete()
+            self._progress = None
+        self.progress(b'')
 
 def get_repo_and_gitdir(repo):
     if repo.shared():
@@ -1237,7 +1253,7 @@ class GitHandler(object):
                 ofs_delta=ofs_delta,
             )
 
-        progress = GitProgress(self.ui, remote=True)
+        progress = GitProgress(self.ui)
         progressfunc = progress.progress
 
         try:
