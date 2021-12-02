@@ -310,6 +310,16 @@ what's on the remote.
 
 This option is enabled by default.
 
+``git.pull-prune-bookmarks``
+--------------
+
+On pull, delete any unchanged bookmarks removed on the remote. In
+other words, if e.g. the ``thebranch`` bookmark remains at
+``default/thebranch``, and the branch is deleted in Git, pulling
+deletes the bookmark.
+
+This option is enabled by default.
+
 ``git.renamelimit``
 -------------------
 

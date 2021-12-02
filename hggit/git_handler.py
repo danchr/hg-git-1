@@ -949,7 +949,7 @@ class GitHandler(object):
                         )
 
                     self.import_tags(refs)
-                    self.update_hg_bookmarks(refs)
+                    self.update_hg_bookmarks(remote_names, refs)
 
                     for remote_name in remote_names:
                         self.update_remote_branches(remote_name, refs)
@@ -1626,33 +1626,79 @@ class GitHandler(object):
         self.export_commits()
         self.save_tags()
 
-    def _get_heads(self, refs):
+    def _get_heads(self, remote_names, refs):
         """get a {head → hg-bin-sha} mapping
 
-        (This function return binary node id)"""
+        We generally assume that `refs` contains all the refs in the
+        server, not just the ones we are pulling.
+
+        Please note that this function returns binary node ids. A node
+        ID of `nullid` means that the commit isn't present locally;
+        `None` means that the branch was deleted.
+
+        """
         heads = {}
+
         for ref, git_sha in refs.items():
             if not ref.startswith(LOCAL_BRANCH_PREFIX):
                 continue
+
             h = ref[len(LOCAL_BRANCH_PREFIX):]
             hg_sha = self.map_hg_get(git_sha)
+
             # refs contains all the refs in the server,
             # not just the ones we are pulling
-            if hg_sha is not None:
-                heads[h] = bin(hg_sha)
+            heads[h] = bin(hg_sha) if hg_sha is not None else nullid
+
+        # detect deletions; do this last to retain ordering
+        if self.ui.configbool(b'git', b'pull-prune-bookmarks'):
+            for remote_name in remote_names:
+                prefix = remote_name + b'/'
+                for remote_ref in self.remote_refs:
+                    if remote_ref.startswith(prefix):
+                        h = remote_ref[len(prefix):]
+                        heads.setdefault(h, None)
 
         return heads
 
-    def update_hg_bookmarks(self, refs):
+    def update_hg_bookmarks(self, remote_names, refs):
         try:
             bms = self.repo._bookmarks
-
             changes = []
-            for head, hgsha in self._get_heads(refs).items():
+
+            for head, hgsha in self._get_heads(remote_names, refs).items():
                 bm = head + (self.branch_bookmark_suffix or b'')
 
-                if bms.get(bm) == hgsha:
+                if bm in bms and bms[bm] == hgsha:
                     self.ui.note(_(b"bookmark %s is up-to-date\n") % bm)
+
+                elif hgsha == nullid:
+                    self.ui.note(_(b"bookmark %s is not known yet\n") % bm)
+
+                elif hgsha is None and bm not in bms:
+                    self.ui.note(
+                        b"bookmark %s is deleted locally as well\n" % bm
+                    )
+
+                elif hgsha is None:
+                    self.ui.note(_(b"bookmark %s is  known yet\n") % bm)
+                    # possibly deleted branch, check if we have a
+                    # matching remote ref
+                    unmoved = any(
+                        bms[bm] == self.remote_refs.get(
+                            b'%s/%s' % (remote_name, head)
+                        )
+                        for remote_name in remote_names
+                    )
+
+                    # only delete unmoved bookmarks
+                    if unmoved:
+                        changes.append((bm, None))
+                        self.ui.status(_(b"deleting bookmark %s\n") % bm)
+                    else:
+                        self.ui.status(
+                            b"not deleting diverged bookmark %s\n" % bm
+                        )
 
                 elif bm not in bms:
                     # new branch

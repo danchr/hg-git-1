@@ -187,6 +187,7 @@ pull the merge
   pulling from $TESTTMP/gitrepo
   importing 1 git commits
   updating bookmark master
+  deleting bookmark beta
   new changesets a02330f767a4 (1 drafts)
   (run 'hg update' to get a working copy)
   $ hg -R hgrepo tags | grep default/beta
@@ -222,8 +223,7 @@ pull the merge
   | |    summary:     add delta
   | |
   o |  changeset:   1:7fe02317c63d
-  |/   bookmark:    beta
-  |    tag:         t_beta
+  |/   tag:         t_beta
   |    user:        test <test@example.org>
   |    date:        Mon Jan 01 00:00:11 2007 +0000
   |    summary:     add beta
@@ -301,8 +301,7 @@ ensure that releases/v1 and releases/v2 are pulled but not notreleases/v1
   | |    summary:     add delta
   | |
   o |  changeset:   1:7fe02317c63d
-  |/   bookmark:    beta
-  |    tag:         t_beta
+  |/   tag:         t_beta
   |    user:        test <test@example.org>
   |    date:        Mon Jan 01 00:00:11 2007 +0000
   |    summary:     add beta
@@ -339,6 +338,12 @@ also add an annotated tag
   $ GIT_COMMITTER_DATE="2009-02-01 00:00:00 +0000" \
   > git tag -a -m 'tagging oldtag' oldtag
   $ cd ..
+
+Master is now filtered, so it's just stays there:
+
+  $ hg -R hgrepo pull --config git.pull-prune-bookmarks=no
+  pulling from $TESTTMP/gitrepo
+  no changes found
   $ hg -R hgrepo pull
   pulling from $TESTTMP/gitrepo
   no changes found

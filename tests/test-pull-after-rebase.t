@@ -189,6 +189,7 @@ And pull that:
   $ hg pull
   pulling from $TESTTMP/repo.git
   no changes found
+  not deleting diverged bookmark otherbranch
   $ hg state
   o   tip 5:5a1e52bb860a4369dc5fff2e63a56d8103404336
   |  add gamma
@@ -202,3 +203,24 @@ And pull that:
   |/   add beta
   o    0:ff7a2f2d8d7099694ae1e8b03838d40575bebb63
      add alpha
+  $ cd ..
+
+We only get that message once:
+
+  $ hg -R hgrepo pull
+  pulling from $TESTTMP/repo.git
+  no changes found
+
+Now try deleting one already gone locally, which shouldn't output
+anything:
+
+  $ cd gitrepo
+  $ git push origin :branch
+  To $TESTTMP/repo.git
+   - [deleted]         branch
+  $ cd ../hgrepo
+  $ hg book -d branch
+  $ hg pull
+  pulling from $TESTTMP/repo.git
+  no changes found
+  $ cd ..

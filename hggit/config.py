@@ -16,6 +16,7 @@ CONFIG_DEFAULTS = {
         b'renamelimit': 400,
         b'similarity': 0,
         b'pull-prune-remote-branches': True,
+        b'pull-prune-bookmarks': True,
     },
     b'hggit': {
         b'fetchbuffer': 100,
