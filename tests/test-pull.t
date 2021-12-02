@@ -170,11 +170,7 @@ pull everything else
   
 add a merge to the git repo, and delete the branch
   $ cd gitrepo
-  $ git merge -m "Merge branch 'beta'" beta | sed 's/|  */| /'
-  Merge made by the 'recursive' strategy.
-   beta | 1 +
-   1 file changed, 1 insertion(+)
-   create mode 100644 beta
+  $ git merge -q -m "Merge branch 'beta'" beta
   $ git branch -d beta
   Deleted branch beta (was 9497a4e).
   $ cd ..
