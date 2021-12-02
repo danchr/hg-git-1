@@ -74,11 +74,22 @@ Now switch back to git and create a new commit based on what we just rebased
 
   $ cd gitrepo
   $ git checkout --quiet -b otherbranch branch
+  $ git log --oneline --graph --all --decorate
+  * e5023f9 (HEAD -> otherbranch, origin/branch, branch) add gamma
+  | * 9497a4e (origin/master, master) add beta
+  |/  
+  * 7eeab2e add alpha
   $ echo delta > delta
   $ git add delta
   $ fn_git_commit -m 'add gamma'
   $ git push --quiet --set-upstream origin otherbranch
   Branch 'otherbranch' set up to track remote branch 'otherbranch' from 'origin'. (?)
+  $ git log --oneline --graph --all --decorate
+  * c4cfa5e (HEAD -> otherbranch, origin/otherbranch) add gamma
+  * e5023f9 (origin/branch, branch) add gamma
+  | * 9497a4e (origin/master, master) add beta
+  |/  
+  * 7eeab2e add alpha
   $ cd ..
 
 Pull that
@@ -109,29 +120,59 @@ Now try rebasing that branch, from the Git side of things
 
   $ cd gitrepo
   $ git checkout -q otherbranch
-  $ fn_git_rebase --onto branch otherbranch
+  $ git log --oneline --graph --all --decorate
+  * c4cfa5e (HEAD -> otherbranch, origin/otherbranch) add gamma
+  * e5023f9 (origin/branch, branch) add gamma
+  | * 9497a4e (origin/master, master) add beta
+  |/  
+  * 7eeab2e add alpha
+  $ fn_git_rebase --onto master branch otherbranch
+  $ git log --oneline --graph --all --decorate
+  * 5c9b4bb (HEAD -> otherbranch) add gamma
+  * 9497a4e (origin/master, master) add beta
+  | * c4cfa5e (origin/otherbranch) add gamma
+  | * e5023f9 (origin/branch, branch) add gamma
+  |/  
+  * 7eeab2e add alpha
   $ git push -f
   To $TESTTMP/repo.git
-   + c4cfa5e...e5023f9 otherbranch -> otherbranch (forced update)
+   + c4cfa5e...5c9b4bb otherbranch -> otherbranch (forced update)
+  $ git log --oneline --graph --all --decorate
+  * 5c9b4bb (HEAD -> otherbranch, origin/otherbranch) add gamma
+  * 9497a4e (origin/master, master) add beta
+  | * e5023f9 (origin/branch, branch) add gamma
+  |/  
+  * 7eeab2e add alpha
   $ cd ..
 
+And check that pulling something else doesn't delete that branch.
+
   $ cd hgrepo
-  $ hg pull
+  $ hg pull -r master
   pulling from $TESTTMP/repo.git
   no changes found
+
+Now just pull it:
+
+  $ hg pull
+  pulling from $TESTTMP/repo.git
+  importing 1 git commits
   not updating diverged bookmark otherbranch
+  new changesets 5a1e52bb860a (1 drafts)
+  (run 'hg heads .' to see heads, 'hg merge' to merge)
   $ hg state
-  *  otherbranch tip 4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5
+  o   default/otherbranch tip 5:5a1e52bb860a4369dc5fff2e63a56d8103404336
   |  add gamma
-  | @  branch default/branch 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
+  | *  otherbranch  4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5
   | |  add gamma
-  x |   default/otherbranch 2:205a004356ef32b8da782afb89d9179d12ca31e9
+  +---@  branch default/branch 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
+  | |    add gamma
+  | x    2:205a004356ef32b8da782afb89d9179d12ca31e9
   | |  add gamma
-  | o  master default/master 1:7fe02317c63d9ee324d4b5df7c9296085162da1b
+  o |  master default/master 1:7fe02317c63d9ee324d4b5df7c9296085162da1b
   |/   add beta
   o    0:ff7a2f2d8d7099694ae1e8b03838d40575bebb63
      add alpha
-
   $ cd ..
 
 And finally, delete it:
@@ -149,13 +190,15 @@ And pull that:
   pulling from $TESTTMP/repo.git
   no changes found
   $ hg state
-  *  otherbranch tip 4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5
+  o   tip 5:5a1e52bb860a4369dc5fff2e63a56d8103404336
   |  add gamma
-  | @  branch default/branch 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
+  | *  otherbranch  4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5
   | |  add gamma
-  x |    2:205a004356ef32b8da782afb89d9179d12ca31e9
+  +---@  branch default/branch 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
+  | |    add gamma
+  | x    2:205a004356ef32b8da782afb89d9179d12ca31e9
   | |  add gamma
-  | o  master default/master 1:7fe02317c63d9ee324d4b5df7c9296085162da1b
+  o |  master default/master 1:7fe02317c63d9ee324d4b5df7c9296085162da1b
   |/   add beta
   o    0:ff7a2f2d8d7099694ae1e8b03838d40575bebb63
      add alpha
