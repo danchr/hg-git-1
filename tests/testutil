@@ -8,6 +8,10 @@
 # Windows
 export MSYS=winsymlinks:nativestrict
 
+# silence some output related to templates
+mkdir -p $TESTTMP/gittemplates
+export GIT_TEMPLATE_DIR=$TESTTMP/gittemplates
+
 # Activate extensions
 echo "[extensions]" >> $HGRCPATH
 echo "hggit=$(echo $(dirname $TESTDIR))/hggit" >> $HGRCPATH

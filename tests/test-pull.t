@@ -126,11 +126,10 @@ pull everything else
   
 add a merge to the git repo
   $ cd gitrepo
-  $ git merge -m "Merge branch 'beta'" beta | sed 's/|  */| /'
-  Merge made by the 'recursive' strategy.
-   beta | 1 +
-   1 file changed, 1 insertion(+)
-   create mode 100644 beta
+  $ git merge -q -m "Merge branch 'beta'" beta
+  $ git show --oneline
+  8642e88 Merge branch 'beta'
+  
   $ cd ..
 
 pull the merge
