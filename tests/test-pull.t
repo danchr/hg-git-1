@@ -176,6 +176,9 @@ pull everything else
 add a merge to the git repo, and delete the branch
   $ cd gitrepo
   $ git merge -q -m "Merge branch 'beta'" beta
+  $ git show --oneline
+  8642e88 Merge branch 'beta'
+  
   $ git branch -d beta
   Deleted branch beta (was 9497a4e).
   $ cd ..

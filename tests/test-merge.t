@@ -21,11 +21,10 @@ Load commonly used test logic
   $ fn_git_commit -m 'add gamma'
 
 clean merge
-  $ git merge -m "Merge branch 'beta'" beta | sed "s/the '//;s/' strategy//" | sed 's/^Merge.*recursive.*$/Merge successful/' | sed 's/files/file/;s/insertions/insertion/;s/, 0 deletions.*//' | sed 's/|  */| /'
-  Merge successful
-   beta | 1 +
-   1 file changed, 1 insertion(+)
-   create mode 100644 beta
+  $ git merge -q -m "Merge branch 'beta'" beta
+  $ git show --oneline
+  5806851 Merge branch 'beta'
+  
 
   $ cd ..
   $ git init -q --bare repo.git
