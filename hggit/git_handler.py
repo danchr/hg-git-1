@@ -2152,12 +2152,21 @@ class GitHandler(object):
                 username, password = self._pwmgr.find_user_password(
                     self._http_auth_realm, str_uri,
                 )
+                # NB: probably bytes here
             elif auth is not None:
                 username, password = auth
-                username = username.decode('utf-8')
-                password = password.decode('utf-8')
+                # NB: probably string here
             else:
-                username, password = self._pwmgr.find_stored_password(str_uri)
+                username, password = map(
+                    pycompat.strurl, self._pwmgr.find_stored_password(str_uri),
+                )
+                # NB: probably string here
+
+            if isinstance(username, bytes):
+                username = username.decode('utf-8')
+
+            if isinstance(password, bytes):
+                password = password.decode('utf-8')
 
             return (
                 client.HttpGitClient(
