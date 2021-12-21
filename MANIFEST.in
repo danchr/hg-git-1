@@ -1,6 +1,10 @@
 include COPYING
+include CONTRIBUTING.rst NEWS.rst README.rst
+
 include MANIFEST.in
-include README.md
+include Makefile
 
 recursive-include hggit *.py *.rst
-recursive-include tests *.t *.py *.py.out hghave latin-1-encoding testutil
+recursive-include tests *.t *.py *.sh *.py.out
+recursive-include tests hghave latin-1-encoding testutil
+recursive-include tests/gpg *.gpg
