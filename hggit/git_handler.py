@@ -2157,9 +2157,7 @@ class GitHandler(object):
                 username, password = auth
                 # NB: probably string here
             else:
-                username, password = map(
-                    pycompat.strurl, self._pwmgr.find_stored_password(str_uri),
-                )
+                username, password = self._pwmgr.find_stored_password(str_uri)
                 # NB: probably string here
 
             if isinstance(username, bytes):
