@@ -283,6 +283,11 @@ following to your ``hgrc``::
    [git]
    intree = True
 
+Please note that changing this setting in an existing repository
+doesn't move the local Git repository. You will either have to do so
+yourself, or issue an ``hg pull`` after the fact to repopulate the new
+location.
+
 
 ``git.mindate``
 ---------------
