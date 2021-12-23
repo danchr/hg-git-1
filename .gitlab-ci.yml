@@ -91,6 +91,7 @@ Supported:
 Ubuntu:
     stage: compat
     image: ubuntu:20.10
+    allow_failure: true
     script:
       - apt-get -qq update
       - >
