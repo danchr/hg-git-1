@@ -762,15 +762,11 @@ class GitHandler(object):
         for parent in self.get_git_parents(ctx):
             hgsha = hex(parent.node())
             git_sha = self.map_git_get(hgsha)
-            if git_sha:
+            if git_sha is not None:
                 if git_sha not in self.git.object_store:
-                    raise error.Abort(
-                        _(
-                            b'Parent SHA-1 not present in Git'
-                            b'repo: %s' % git_sha
-                        )
+                    raise error.ProgrammingError(
+                        b'%s is not present in the local git cache' % git_sha
                     )
-
                 commit.parents.append(git_sha)
 
         commit.message, extra = self.get_git_message_and_extra(ctx)
@@ -788,8 +784,8 @@ class GitHandler(object):
         tree_sha = exporter.root_tree_sha
 
         if tree_sha not in self.git.object_store:
-            raise error.Abort(
-                _(b'Tree SHA-1 not present in Git repo: %s' % tree_sha)
+            raise error.ProgrammingError(
+                b'%s is not present in the local git cache' % tree_sha
             )
 
         commit.tree = tree_sha
