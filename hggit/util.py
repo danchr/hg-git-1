@@ -20,6 +20,23 @@ gitschemes = (b'git', b'git+ssh', b'git+http', b'git+https')
 
 
 @contextlib.contextmanager
+def abort_push_on_keyerror():
+    """raise a rather verbose error on missing commits"""
+
+    try:
+        yield
+    except KeyError as e:
+        raise error.Abort(
+            b'cannot push git commit %s as it is not present locally'
+            % e.args[0][:12],
+            hint=(
+                b'please try pulling first, or as a fallback run git-cleanup '
+                b'to re-export the missing commits'
+            ),
+        )
+
+
+@contextlib.contextmanager
 def forcedraftcommits():
     """Context manager that forces new commits to at least draft,
     regardless of configuration.

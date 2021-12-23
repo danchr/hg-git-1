@@ -609,11 +609,8 @@ class GitHandler(object):
             gitcommit = None
         else:
             gitsha = self._map_hg[hex(pnode)]
-            try:
+            with util.abort_push_on_keyerror():
                 gitcommit = self.git[gitsha]
-            except KeyError:
-                raise error.Abort(_(b'Parent SHA-1 not present in Git'
-                                    b'repo: %s' % gitsha))
 
         exporter = hg2git.IncrementalChangesetExporter(
             self.repo, pctx, self.git.object_store, gitcommit)
@@ -1232,8 +1229,14 @@ class GitHandler(object):
 
         def genpack(have, want, progress=None, ofs_delta=True):
             commits = []
-            for mo in self.git.object_store.find_missing_objects(have, want):
-                (sha, name) = mo
+
+            with util.abort_push_on_keyerror():
+                missing = self.git.object_store.find_missing_objects(
+                    have,
+                    want,
+                )
+
+            for sha, name in missing:
                 o = self.git.object_store[sha]
                 t = type(o)
                 change_totals[t] = change_totals.get(t, 0) + 1
