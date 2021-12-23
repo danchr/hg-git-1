@@ -228,6 +228,10 @@ class GitHandler(object):
         if os.path.exists(self.gitdir):
             return Repo(gitpath)
         else:
+            if self._map_git:
+                self.ui.warn(
+                    b'warning: created new git repository at %s\n' % self.gitdir,
+                )
             os.mkdir(self.gitdir)
             return Repo.init_bare(gitpath)
 

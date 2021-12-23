@@ -40,6 +40,7 @@ what happens when we push it?
 
   $ hg -R hgrepo push
   pushing to $TESTTMP/repo.git
+  warning: created new git repository at $TESTTMP/hgrepo/.hg/git
   abort: cannot push git commit 533d4e670a8b as it is not present locally
   (please try pulling first, or as a fallback run git-cleanup to re-export the missing commits)
   [255]
@@ -51,6 +52,7 @@ try to follow the hint:
   $ rm -rf hgrepo/.hg/git hgrepo/.git
   $ hg -R hgrepo pull
   pulling from $TESTTMP/repo.git
+  warning: created new git repository at $TESTTMP/hgrepo/.hg/git
   no changes found
   not updating diverged bookmark master
   $ hg -R hgrepo push
@@ -69,6 +71,7 @@ simply pushing doesn't suffice:
   $ rm -rf .hg/git
   $ hg push
   pushing to $TESTTMP/repo.git
+  warning: created new git repository at $TESTTMP/hgrepo/.hg/git
   searching for changes
   no changes found
   [1]
@@ -84,6 +87,7 @@ it, and push:
   $ rm -rf .hg/git
   $ hg push
   pushing to $TESTTMP/repo.git
+  warning: created new git repository at $TESTTMP/hgrepo/.hg/git
   searching for changes
   abort: cannot push git commit 61619410916a as it is not present locally
   (please try pulling first, or as a fallback run git-cleanup to re-export the missing commits)
