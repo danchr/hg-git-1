@@ -1595,7 +1595,9 @@ class GitHandler(object):
         for hg_sha, refs in exportable.items():
             for git_ref in refs.heads:
                 git_sha = self.map_git_get(hg_sha)
-                if git_sha:
+                # prior to 0.20.22, dulwich couldn't handle refs
+                # pointing to missing objects, so don't add them
+                if git_sha and git_sha in self.git:
                     self.git.refs[git_ref] = git_sha
 
         return exportable

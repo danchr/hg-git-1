@@ -75,8 +75,13 @@ Supported:
 Ubuntu:
     stage: compat
     image: ubuntu:20.10
-    allow_failure: true
+    retry: 2
     script:
+      - >
+        apt-get -qq update ||
+        sed -i
+        's,http://[^.]*\.ubuntu\.,http://old-releases.ubuntu.,g'
+        /etc/apt/sources.list
       - apt-get -qq update
       - >
         DEBIAN_FRONTEND=noninteractive
