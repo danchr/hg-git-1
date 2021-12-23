@@ -25,7 +25,8 @@ def parse_subrepos(ctx):
     substate = collections.OrderedDict()
     if b'.hgsubstate' in ctx:
         substate = util.parse_hgsubstate(
-            ctx[b'.hgsubstate'].data().splitlines())
+            ctx[b'.hgsubstate'].data().splitlines()
+        )
     return sub, substate
 
 
@@ -213,7 +214,8 @@ class IncrementalChangesetExporter(object):
         # localrepo.status().
         status = self._hg.status(self._ctx, newctx)
         modified, added, removed = map(
-            self.filter_unsafe_paths, (status.modified, status.added, status.removed),
+            self.filter_unsafe_paths,
+            (status.modified, status.added, status.removed),
         )
 
         # We track which directories/trees have modified in this update and we
@@ -455,5 +457,7 @@ class IncrementalChangesetExporter(object):
         else:
             mode = 0o100644
 
-        return (dulobjs.TreeEntry(os.path.basename(fctx.path()), mode,
-                                  blob_id), blob)
+        return (
+            dulobjs.TreeEntry(os.path.basename(fctx.path()), mode, blob_id),
+            blob,
+        )

@@ -23,8 +23,9 @@ def generate_ssh_vendor(ui):
             assert isinstance(command, str)
             command = command.encode(SSHGitClient.DEFAULT_ENCODING)
             sshcmd = ui.config(b"ui", b"ssh", b"ssh")
-            args = procutil.sshargs(sshcmd, pycompat.bytesurl(host),
-                                  username, port)
+            args = procutil.sshargs(
+                sshcmd, pycompat.bytesurl(host), username, port
+            )
             cmd = b'%s %s %s' % (sshcmd, args, procutil.shellquote(command))
             # consistent with mercurial
             ui.debug(b'running %s\n' % cmd)

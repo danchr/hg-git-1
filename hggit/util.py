@@ -43,9 +43,9 @@ def forcedraftcommits():
 
     """
     with extensions.wrappedfunction(
-            phases,
-            'newcommitphase',
-            lambda orig, ui: phases.draft,
+        phases,
+        'newcommitphase',
+        lambda orig, ui: phases.draft,
     ):
         yield
 
@@ -86,11 +86,13 @@ def serialize_hgsubstate(data):
 
 def transform_notgit(f):
     '''use as a decorator around functions that call into dulwich'''
+
     def inner(*args, **kwargs):
         try:
             return f(*args, **kwargs)
         except errors.NotGitRepository:
             raise error.Abort(b'not a git repository')
+
     return inner
 
 
@@ -128,8 +130,10 @@ def isgitsshuri(uri):
         if len(giturl) > 1 and repopath.endswith(b'.git'):
             return True
         # use a simple regex to check if it is a fqdn regex
-        fqdn_re = (br'(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}'
-                   br'(?<!-)\.)+[a-zA-Z]{2,63}$)')
+        fqdn_re = (
+            br'(?=^.{4,253}$)(^((?!-)[a-zA-Z0-9-]{1,63}'
+            br'(?<!-)\.)+[a-zA-Z]{2,63}$)'
+        )
         if re.match(fqdn_re, giturl):
             return True
     return False
@@ -147,5 +151,4 @@ def checksafessh(host):
     """
     host = hgutil.urlreq.unquote(host)
     if host.startswith(b'-'):
-        raise error.Abort(_(b"potentially unsafe hostname: '%s'") %
-                          (host,))
+        raise error.Abort(_(b"potentially unsafe hostname: '%s'") % (host,))

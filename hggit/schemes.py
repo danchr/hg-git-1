@@ -38,9 +38,11 @@ def isgitdir(path):
         # is full git repo
         return True
 
-    if (os.path.exists(os.path.join(path, b'HEAD')) and
-        os.path.exists(os.path.join(path, b'objects')) and
-        os.path.exists(os.path.join(path, b'refs'))):
+    if (
+        os.path.exists(os.path.join(path, b'HEAD'))
+        and os.path.exists(os.path.join(path, b'objects'))
+        and os.path.exists(os.path.join(path, b'refs'))
+    ):
         # is bare git repo
         return True
 

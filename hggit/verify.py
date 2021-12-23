@@ -29,15 +29,19 @@ def verify(ui, repo, hgctx):
     gitsha = handler.map_git_get(hgctx.hex())
     if not gitsha:
         # TODO deal better with commits in the middle of octopus merges
-        raise error.Abort(_(b'no git commit found for rev %s') % hgctx,
-                          hint=_(b'if this is an octopus merge, '
-                                 b'verify against the last rev'))
+        raise error.Abort(
+            _(b'no git commit found for rev %s') % hgctx,
+            hint=_(
+                b'if this is an octopus merge, ' b'verify against the last rev'
+            ),
+        )
 
     try:
         gitcommit = handler.git.get_object(gitsha)
     except KeyError:
-        raise error.Abort(_(b'git equivalent %s for rev %s not found!') %
-                          (gitsha, hgctx))
+        raise error.Abort(
+            _(b'git equivalent %s for rev %s not found!') % (gitsha, hgctx)
+        )
     except Exception:
         ui.traceback()
         raise error.Abort(
@@ -46,8 +50,10 @@ def verify(ui, repo, hgctx):
         )
 
     if not isinstance(gitcommit, Commit):
-        raise error.Abort(_(b'git equivalent %s for rev %s is not a commit!') %
-                          (gitsha, hgctx))
+        raise error.Abort(
+            _(b'git equivalent %s for rev %s is not a commit!')
+            % (gitsha, hgctx)
+        )
 
     ui.status(_(b'verifying rev %s against git commit %s\n') % (hgctx, gitsha))
     failed = False
@@ -63,13 +69,17 @@ def verify(ui, repo, hgctx):
     gitfiles = set()
 
     with ui.makeprogress(b'verify', total=len(hgfiles)) as progress:
-        for gitfile, dummy in diff_tree.walk_trees(handler.git.object_store,
-                                                   gitcommit.tree, None):
+        for gitfile, dummy in diff_tree.walk_trees(
+            handler.git.object_store, gitcommit.tree, None
+        ):
             if gitfile.mode == dirkind:
                 continue
             # TODO deal with submodules
-            if (gitfile.mode == S_IFGITLINK or gitfile.path == b'.hgsubstate' or
-                gitfile.path == b'.hgsub'):
+            if (
+                gitfile.mode == S_IFGITLINK
+                or gitfile.path == b'.hgsubstate'
+                or gitfile.path == b'.hgsub'
+            ):
                 continue
             progress.increment()
             gitfiles.add(gitfile.path)
@@ -83,8 +93,10 @@ def verify(ui, repo, hgctx):
             hgflags = fctx.flags()
             gitflags = handler.convert_git_int_mode(gitfile.mode)
             if hgflags != gitflags:
-                ui.write(_(b"file has different flags: %s (hg '%s', git '%s')\n") %
-                         (gitfile.path, hgflags, gitflags))
+                ui.write(
+                    _(b"file has different flags: %s (hg '%s', git '%s')\n")
+                    % (gitfile.path, hgflags, gitflags)
+                )
                 failed = True
             if fctx.data() != handler.git[gitfile.sha].data:
                 ui.write(_(b'difference in: %s\n') % gitfile.path)

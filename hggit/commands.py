@@ -137,24 +137,30 @@ def tag(orig, ui, repo, *names, **opts):
     opts = pycompat.byteskwargs(opts)
 
     # check for various unimplemented arguments
-    compat.check_incompatible_arguments(opts, b'git', [
-        # conflict
-        b'local',
-        # we currently don't convert or expose this metadata, so
-        # disallow setting it on creation
-        b'edit',
-        b'message',
-        b'date',
-        b'user',
-    ])
+    compat.check_incompatible_arguments(
+        opts,
+        b'git',
+        [
+            # conflict
+            b'local',
+            # we currently don't convert or expose this metadata, so
+            # disallow setting it on creation
+            b'edit',
+            b'message',
+            b'date',
+            b'user',
+        ],
+    )
     compat.check_at_most_one_arg(opts, b'rev', b'remove')
 
     if opts[b'remove']:
         opts[b'rev'] = b'null'
 
     if not opts.get(b'rev'):
-        raise error.Abort(_(b'git tags require an explicit revision'),
-                          hint=b'please specify -r/--rev')
+        raise error.Abort(
+            _(b'git tags require an explicit revision'),
+            hint=b'please specify -r/--rev',
+        )
 
     # the semantics of git tag editing are quite confusing, so we
     # don't bother; if you _really_ want to, use another tool to do

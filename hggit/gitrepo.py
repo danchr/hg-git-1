@@ -65,7 +65,8 @@ class gitrepo(peerrepository):
                 result = handler.fetch_pack(self.path, heads=[])
                 # map any git shas that exist in hg to hg shas
                 stripped_refs = {
-                    ref[len(LOCAL_BRANCH_PREFIX):]: handler.map_hg_get(val) or val
+                    ref[len(LOCAL_BRANCH_PREFIX) :]: handler.map_hg_get(val)
+                    or val
                     for ref, val in result.refs.items()
                     if ref.startswith(LOCAL_BRANCH_PREFIX)
                 }
@@ -115,6 +116,7 @@ class gitrepo(peerrepository):
 
     def _submitone(self, op, args):
         return None
+
 
 instance = gitrepo
 

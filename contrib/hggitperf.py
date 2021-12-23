@@ -33,6 +33,7 @@ def gettimer(ui, opts=None):
     fm = ui.formatter(b'perf', opts)
     return functools.partial(_timer, fm), fm
 
+
 def _timer(fm, func, title=None):
     results = []
     begin = time.time()
@@ -45,7 +46,7 @@ def _timer(fm, func, title=None):
         ostop = os.times()
         count += 1
         a, b = ostart, ostop
-        results.append((cstop - cstart, b[0] - a[0], b[1]-a[1]))
+        results.append((cstop - cstart, b[0] - a[0], b[1] - a[1]))
         if cstop - begin > 3 and count >= 100:
             break
         if cstop - begin > 10 and count >= 3:
@@ -62,15 +63,17 @@ def _timer(fm, func, title=None):
     fm.write(b'wall', b' wall %f', m[0])
     fm.write(b'comb', b' comb %f', m[1] + m[2])
     fm.write(b'user', b' user %f', m[1])
-    fm.write(b'sys',  b' sys %f', m[2])
-    fm.write(b'count',  b' (best of %d)', count)
+    fm.write(b'sys', b' sys %f', m[2])
+    fm.write(b'count', b' (best of %d)', count)
     fm.plain(b'\n')
+
 
 @command(b'perfgitloadmap')
 def perfgitloadmap(ui, repo):
     timer, fm = gettimer(ui)
     timer(repo.githandler.load_map)
     fm.end()
+
 
 @command(b'perfgitsavemap')
 def perfgitsavemap(ui, repo):

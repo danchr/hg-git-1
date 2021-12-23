@@ -8,7 +8,7 @@ CONFIG_DEFAULTS = {
     b'git': {
         b'authors': None,
         b'branch_bookmark_suffix': None,
-        b'debugextrainmessage': False,   # test only -- do not document this!
+        b'debugextrainmessage': False,  # test only -- do not document this!
         b'findcopiesharder': False,
         b'intree': None,
         b'mindate': None,
@@ -24,7 +24,7 @@ CONFIG_DEFAULTS = {
         b'usephases': False,
         b'retries': 3,
         b'invalidpaths': b'skip',
-    }
+    },
 }
 
 for section, items in CONFIG_DEFAULTS.items():

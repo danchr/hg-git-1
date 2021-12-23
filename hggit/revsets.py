@@ -18,8 +18,9 @@ def revset_fromgit(repo, subset, x):
     revset.getargs(x, 0, 0, b"fromgit takes no arguments")
     git = repo.githandler
     node = repo.changelog.node
-    return revset.baseset(r for r in subset
-                          if git.map_git_get(hex(node(r))) is not None)
+    return revset.baseset(
+        r for r in subset if git.map_git_get(hex(node(r))) is not None
+    )
 
 
 @eh.revsetpredicate(b'gitnode')
@@ -30,8 +31,7 @@ def revset_gitnode(repo, subset, x):
     starts with `a5b`. Aborts if multiple changesets match the abbreviation.
     '''
     args = revset.getargs(x, 1, 1, b"gitnode takes one argument")
-    rev = revset.getstring(args[0],
-                           b"the argument to gitnode() must be a hash")
+    rev = revset.getstring(args[0], b"the argument to gitnode() must be a hash")
     git = repo.githandler
     node = repo.changelog.node
 
@@ -40,12 +40,15 @@ def revset_gitnode(repo, subset, x):
         if gitnode is None:
             return False
         return gitnode.startswith(rev)
+
     result = revset.baseset(r for r in subset if matches(r))
     if 0 <= len(result) < 2:
         return result
 
     raise error.AmbiguousPrefixLookupError(
-        rev, git.map_file, _(b'ambiguous identifier'),
+        rev,
+        git.map_file,
+        _(b'ambiguous identifier'),
     )
 
 

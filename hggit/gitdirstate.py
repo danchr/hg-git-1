@@ -62,7 +62,7 @@ def gignorepats(orig, lines, root=None):
                     pat = line
                     break
                 elif line.startswith(s + b':'):
-                    pat = rels + line[len(s) + 1:]
+                    pat = rels + line[len(s) + 1 :]
                     break
             patterns.append(pat)
 
@@ -116,17 +116,22 @@ class gitdirstate(dirstate.dirstate):
         """A copy of dirstate.walk. This is called from the new _ignore method,
         which is called by dirstate.walk, which would cause infinite recursion,
         except _finddotgitignores calls the superclass _ignore directly."""
-        match = matchmod.match(self._root, self.getcwd(),
-                               [b'relglob:.gitignore'])
+        match = matchmod.match(
+            self._root, self.getcwd(), [b'relglob:.gitignore']
+        )
         # TODO: need subrepos?
         subrepos = []
         unknown = True
         ignored = False
 
         def fwarn(f, msg):
-            self._ui.warn(b'%s: %s\n' % (
-                self.pathto(f), pycompat.sysbytes(msg),
-            ))
+            self._ui.warn(
+                b'%s: %s\n'
+                % (
+                    self.pathto(f),
+                    pycompat.sysbytes(msg),
+                )
+            )
             return False
 
         ignore = super(gitdirstate, self)._ignore
@@ -152,7 +157,7 @@ class gitdirstate(dirstate.dirstate):
         exact = skipstep3 = False
         if matchfn == match.exact:  # match.exact
             exact = True
-            dirignore = util.always                  # skip step 2
+            dirignore = util.always  # skip step 2
         elif match.files() and not match.anypats():  # match.match, no patterns
             skipstep3 = True
 

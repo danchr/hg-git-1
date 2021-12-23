@@ -45,11 +45,7 @@ class overlaymanifest(object):
 
     def withflags(self):
         self.load()
-        return {
-            path
-            for path, flag in self._flags.items()
-            if flag != b''
-        }
+        return {path for path, flag in self._flags.items() if flag != b''}
 
     def copy(self):
         return overlaymanifest(self.repo, self.tree.id)
@@ -168,9 +164,7 @@ def wrapmanifestdictdiff(orig, self, m2, match=None, clean=False):
         clean = match
         match = None
 
-    kwargs = {
-        'clean': clean
-    }
+    kwargs = {'clean': clean}
     # Older versions of mercurial don't support the match arg, so only add it
     # if it exists.
     if match is not None:
@@ -308,13 +302,20 @@ class overlaychangectx(context.changectx):
     def phase(self):
         try:
             from mercurial import phases
+
             return phases.draft
         except (AttributeError, ImportError):
             return 1
 
     def totuple(self):
-        return (self.commit.tree, self.user(), self.date(), self.files(),
-                self.description(), self.extra())
+        return (
+            self.commit.tree,
+            self.user(),
+            self.date(),
+            self.files(),
+            self.description(),
+            self.extra(),
+        )
 
 
 class overlayrevlog(object):
@@ -466,8 +467,9 @@ class overlayrepo(object):
         self.githandler = overlaygithandler(self)
 
     def _constructmanifest(self):
-        return overlaymanifestrevlog(self,
-                                     self.handler.repo._constructmanifest())
+        return overlaymanifestrevlog(
+            self, self.handler.repo._constructmanifest()
+        )
 
     def __getitem__(self, n):
         if isinstance(n, int):
@@ -532,10 +534,10 @@ class overlayrepo(object):
         self.tagmap = {}
         for ref in refs:
             if ref.startswith(LOCAL_BRANCH_PREFIX):
-                refname = ref[len(LOCAL_BRANCH_PREFIX):]
+                refname = ref[len(LOCAL_BRANCH_PREFIX) :]
                 self.refmap.setdefault(bin(refs[ref]), []).append(refname)
             elif ref.startswith(LOCAL_TAG_PREFIX):
-                tagname = ref[len(LOCAL_TAG_PREFIX):]
+                tagname = ref[len(LOCAL_TAG_PREFIX) :]
                 self.tagmap.setdefault(bin(refs[ref]), []).append(tagname)
 
     def narrowmatch(self, *args, **kwargs):

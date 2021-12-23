@@ -15,6 +15,7 @@ from mercurial import (
 
 # 5.9 and earlier used a future-based API
 if hasattr(wireprotov1peer, 'future'):
+
     def makebatchable(fn):
         @functools.wraps(fn)
         @wireprotov1peer.batchable
@@ -23,8 +24,11 @@ if hasattr(wireprotov1peer, 'future'):
             yield fn(*args, **kwargs)
 
         return wrapper
+
+
 # 6.0 and later simplified the API
 else:
+
     def makebatchable(fn):
         @functools.wraps(fn)
         @wireprotov1peer.batchable
@@ -33,12 +37,14 @@ else:
 
         return wrapper
 
+
 def sysbytes(s):
     # 5.2 does not check this
     if isinstance(s, str):
         return pycompat.sysbytes(s)
     else:
         return s
+
 
 try:
     # moved in 5.9
@@ -52,6 +58,7 @@ try:
     # added in 5.9
     from mercurial.node import sha1nodeconstants
 except ImportError:
+
     class sha1nodeconstants(object):
         nodelen = len(node.nullid)
 
@@ -63,6 +70,7 @@ except ImportError:
         wdirfilenodeids = node.wdirfilenodeids
         wdirid = node.wdirid
         wdirhex = node.wdirhex
+
 
 try:
     # added in 5.8
@@ -83,6 +91,7 @@ except ImportError:
     # added in dulwich 0.20.3; just create a dummy class for catching
     class HTTPUnauthorized(Exception):
         pass
+
 
 try:
     from mercurial.cmdutil import check_at_most_one_arg
@@ -107,6 +116,7 @@ except (ImportError, AttributeError):
                     )
                 previous = x
         return previous
+
 
 # added in 5.3 but changed in 5.4, so always use our implementation
 def check_incompatible_arguments(opts, first, others):

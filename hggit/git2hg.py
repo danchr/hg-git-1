@@ -21,23 +21,27 @@ def get_public(ui, refs, remote_name=None):
     to_publish = set()
 
     if remote_name is not None:
-        refs_to_publish.update([
-            ref[len(remote_name) + 1:]
-            for ref in refs_to_publish
-            if ref.startswith(remote_name + b'/')
-        ])
+        refs_to_publish.update(
+            [
+                ref[len(remote_name) + 1 :]
+                for ref in refs_to_publish
+                if ref.startswith(remote_name + b'/')
+            ]
+        )
 
     for ref_name, sha in refs.items():
         if ref_name.startswith(LOCAL_BRANCH_PREFIX):
-            branch = ref_name[len(LOCAL_BRANCH_PREFIX):]
+            branch = ref_name[len(LOCAL_BRANCH_PREFIX) :]
             if branch in refs_to_publish:
                 ui.note(b"publishing branch %s\n" % branch)
                 to_publish.add(sha)
 
         elif ref_name.startswith(LOCAL_TAG_PREFIX):
-            tag = ref_name[len(LOCAL_TAG_PREFIX):]
+            tag = ref_name[len(LOCAL_TAG_PREFIX) :]
             if publish_defaults or tag in refs_to_publish:
-                ui.note(b"publishing tag %s\n" % ref_name[len(LOCAL_TAG_PREFIX):])
+                ui.note(
+                    b"publishing tag %s\n" % ref_name[len(LOCAL_TAG_PREFIX) :]
+                )
                 to_publish.add(sha)
 
         elif publish_defaults and ref_name == b'HEAD':
@@ -132,6 +136,8 @@ def find_incoming(ui, git_object_store, git_map, refs):
 
 
 '''struct to store result from find_incoming'''
+
+
 class GitIncomingCommit:
     __slots__ = 'sha', 'phase'
 
@@ -202,7 +208,9 @@ def extract_hg_metadata(message, git_extra):
             command = field[3:]
             if command == b'rename':
                 before, after = data.split(b':', 1)
-                renames[hgutil.urlreq.unquote(after)] = hgutil.urlreq.unquote(before)
+                renames[hgutil.urlreq.unquote(after)] = hgutil.urlreq.unquote(
+                    before
+                )
             elif command == b'extra':
                 k, v = data.split(b':', 1)
                 extra[hgutil.urlreq.unquote(k)] = hgutil.urlreq.unquote(v)

@@ -25,7 +25,7 @@ def _gitnodekw(node, repo):
 @eh.templatekeyword(b'gitnode', requires={b'ctx', b'repo'})
 def gitnodekw(context, mapping):
     """:gitnode: String. The Git changeset identification hash, as a
-        40 hexadecimal digit string."""
+    40 hexadecimal digit string."""
     node = context.resource(mapping, b'ctx')
     repo = context.resource(mapping, b'repo')
     return _gitnodekw(node, repo)
