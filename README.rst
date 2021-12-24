@@ -422,5 +422,5 @@ change this by setting ``hggit.invalidpaths`` in ``.hgrc``::
   [hggit]
   invalidpaths = keep
 
-Possible values are ``keep``, ``skip`` or ``abort``. Prior to 0.11,
+Possible values are ``keep``, ``skip`` or ``abort``. Prior to 1.0,
 the default was ``abort``.
