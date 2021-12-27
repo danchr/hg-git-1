@@ -134,7 +134,7 @@ class gitdirstate(dirstate.dirstate):
             )
             return False
 
-        ignore = super(gitdirstate, self)._ignore
+        ignore = super()._ignore
         dirignore = self._dirignore
         if ignored:
             ignore = util.never
@@ -255,7 +255,7 @@ class gitdirstate(dirstate.dirstate):
             self._ui.debug(b'suppressing rust status to intercept gitignores\n')
             raise dirstate.rustmod.FallbackError
         else:
-            return super(gitdirstate, self)._rust_status(*args, **kwargs)
+            return super()._rust_status(*args, **kwargs)
 
 
 @eh.reposetup

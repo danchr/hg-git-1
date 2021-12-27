@@ -29,17 +29,13 @@ def reposetup(ui, repo):
         def findoutgoing(self, remote, base=None, heads=None, force=False):
             if isinstance(remote, gitrepo):
                 base, heads = self.githandler.get_refs(remote.path)
-                out, h = super(hgrepo, self).findoutgoing(
-                    remote, base, heads, force
-                )
+                out, h = super().findoutgoing(remote, base, heads, force)
                 return out
             else:  # pragma: no cover
-                return super(hgrepo, self).findoutgoing(
-                    remote, base, heads, force
-                )
+                return super().findoutgoing(remote, base, heads, force)
 
         def _findtags(self):
-            (tags, tagtypes) = super(hgrepo, self)._findtags()
+            (tags, tagtypes) = super()._findtags()
 
             for tag, rev in self.githandler.tags.items():
                 if tag not in tags:
@@ -63,7 +59,7 @@ def reposetup(ui, repo):
 
         def tags(self):
             # TODO consider using self._tagscache
-            tagscache = super(hgrepo, self).tags()
+            tagscache = super().tags()
             tagscache.update(self.githandler.remote_refs)
             for tag, rev in self.githandler.tags.items():
                 if tag in tagscache:

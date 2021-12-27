@@ -234,7 +234,7 @@ class overlaychangectx(context.changectx):
         # So, if the attribute wasn't found, fallback to _hgrepo
         if name == '_repo':
             return self._hgrepo
-        return super(overlaychangectx, self).__getattr__(name)
+        return super().__getattr__(name)
 
     def repo(self):
         return self._hgrepo
