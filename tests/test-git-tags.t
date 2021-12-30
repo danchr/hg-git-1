@@ -16,21 +16,31 @@ The phases setting should not affect hg-git
   > EOF
 #endif
 
+Create a bare upstream repository
+
+  $ git init --bare repo.git
+  Initialized empty Git repository in $TESTTMP/repo.git/
+
+Create a couple of commits from Git
+
   $ git init gitrepo
   Initialized empty Git repository in $TESTTMP/gitrepo/.git/
   $ cd gitrepo
-  $ git config receive.denyCurrentBranch ignore
   $ echo alpha > alpha
   $ git add alpha
   $ fn_git_commit -m 'add alpha'
-
   $ echo beta > beta
   $ git add beta
   $ fn_git_commit -m 'add beta'
   $ fn_git_tag -a -m 'added tag beta' beta
-
+  $ git remote add origin $TESTTMP/repo.git
+  $ git push --quiet --tags --set-upstream origin master
+  Branch 'master' set up to track remote branch 'master' from 'origin'. (?)
   $ cd ..
-  $ hg clone gitrepo hgrepo
+
+Clone it:
+
+  $ hg clone repo.git hgrepo
   importing 2 git commits
   new changesets ff7a2f2d8d70:7fe02317c63d (2 drafts)
   updating to bookmark master (hg57 !)
@@ -120,7 +130,7 @@ Create a git tag from hg
   $ hg phase -d
 #endif
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
@@ -152,12 +162,12 @@ Verify that amending commits known to remotes doesn't break anything
   beta                               1:7fe02317c63d
   alpha                              0:ff7a2f2d8d70
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   abort: pushing refs/heads/master overwrites 3094b9e8da41
   [255]
   $ hg push -f
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
@@ -165,7 +175,7 @@ Verify that amending commits known to remotes doesn't break anything
 
 Now create a tag for the old, obsolete master
 
-  $ cd ../gitrepo
+  $ cd ../repo.git
   $ git tag detached $(hg log -R ../hgrepo --hidden -r 2 -T '{gitnode}\n')
   $ git tag
   alpha
@@ -173,7 +183,7 @@ Now create a tag for the old, obsolete master
   detached
   $ cd ../hgrepo
   $ hg pull
-  pulling from $TESTTMP/gitrepo
+  pulling from $TESTTMP/repo.git
   no changes found
   $ hg log -T shorttags
   3:3094b9e8da41 draft default/master tip
@@ -187,7 +197,7 @@ Now create a tag for the old, obsolete master
   beta                               1:7fe02317c63d
   alpha                              0:ff7a2f2d8d70
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   no changes found
   [1]
@@ -222,13 +232,14 @@ Create a git tag from hg, but pointing to a new commit:
   converting revision 0eb1ab0073a885a498d4ae3dc5cf0c26e750fa3d
   saving git map to $TESTTMP/hgrepo/.hg/git-mapfile
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
   adding reference refs/tags/gamma
   $ cd ../gitrepo
+  $ git fetch --quiet --tags
   $ git tag
   alpha
   beta
@@ -256,7 +267,7 @@ Try to overwrite an annotated tag:
   $ hg phase -d
 #endif
   $ hg push
-  pushing to $TESTTMP/gitrepo
+  pushing to $TESTTMP/repo.git
   warning: not overwriting annotated tag 'beta'
   searching for changes
   adding objects
@@ -288,7 +299,7 @@ Check whether `gimport` handles tags
 
 Test how pulling an explicit branch with an annotated tag:
 
-  $ hg clone -r master gitrepo hgrepo-2
+  $ hg clone -r master repo.git hgrepo-2
   importing 5 git commits
   new changesets ff7a2f2d8d70:c49682c7cba4 (5 drafts)
   updating to branch default
@@ -299,7 +310,7 @@ Test how pulling an explicit branch with an annotated tag:
   4:c49682c7cba4 draft default/master tip
   $ rm -rf hgrepo-2
 
-  $ hg clone -r master gitrepo hgrepo-2
+  $ hg clone -r master repo.git hgrepo-2
   importing 5 git commits
   new changesets ff7a2f2d8d70:c49682c7cba4 (5 drafts)
   updating to branch default
@@ -317,7 +328,7 @@ Check that pulling will update phases only:
   $ cd hgrepo
   $ hg phase -fs gamma detached
   $ hg pull
-  pulling from $TESTTMP/gitrepo
+  pulling from $TESTTMP/repo.git
   no changes found
   $ hg log -T shorttags -r gamma -r detached
   4:0eb1ab0073a8 draft beta gamma

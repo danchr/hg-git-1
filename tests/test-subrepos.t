@@ -1,6 +1,9 @@
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
+  $ git init --bare repo.git
+  Initialized empty Git repository in $TESTTMP/repo.git/
+
   $ git init gitsubrepo
   Initialized empty Git repository in $TESTTMP/gitsubrepo/.git/
   $ cd gitsubrepo
@@ -9,9 +12,11 @@ Load commonly used test logic
   $ fn_git_commit -m 'add beta'
   $ cd ..
 
-  $ git init gitrepo1
-  Initialized empty Git repository in $TESTTMP/gitrepo1/.git/
-  $ cd gitrepo1
+  $ git clone repo.git gitrepo
+  Cloning into 'gitrepo'...
+  warning: You appear to have cloned an empty repository.
+  done.
+  $ cd gitrepo
   $ echo alpha > alpha
   $ git add alpha
   $ fn_git_commit -m 'add alpha'
@@ -23,12 +28,12 @@ Load commonly used test logic
   Cloning into '*xyz/subrepo2'... (glob)
   done.
   $ fn_git_commit -m 'add subrepo2'
-we are going to push to this repo from our hg clone,
-allow commits despite working copy presense
-  $ git config receive.denyCurrentBranch ignore
+  $ git push
+  To $TESTTMP/repo.git
+   * [new branch]      master -> master
   $ cd ..
 Ensure gitlinks are transformed to .hgsubstate on hg pull from git
-  $ hg clone -u tip gitrepo1 hgrepo 2>&1 | egrep -v '^(Cloning into|done)'
+  $ hg clone -u tip repo.git hgrepo 2>&1 | egrep -v '^(Cloning into|done)'
   importing 3 git commits
   new changesets e532b2bfda10:88c5e06a2a29 (3 drafts)
   updating to branch default
@@ -71,13 +76,24 @@ hg status shall NOT report .hgsub and .hgsubstate as untracked - either ignored 
   $ echo xxx >> alpha
   $ fn_hg_commit -m 'Update subrepo2 from hg' | grep -v "committing subrepository" || true
   $ hg push
-  pushing to $TESTTMP/gitrepo1
+  pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
   added 1 commits with 2 trees and 1 blobs
   updating reference refs/heads/master
   $ cd ..
-  $ cd gitrepo1
+  $ cd gitrepo
+  $ git pull --ff-only
+  From $TESTTMP/repo
+     89c22d7..275b0a5  master     -> origin/master
+  Fetching submodule xyz/subrepo2
+  From $TESTTMP/gitsubrepo
+     56f0304..aabf7cd  master     -> origin/master
+  Updating 89c22d7..275b0a5
+  Fast-forward
+   alpha        | 1 +
+   xyz/subrepo2 | 2 +-
+   2 files changed, 2 insertions(+), 1 deletion(-)
 there shall be two gitlink entries, with values matching that in .hgsubstate
   $ git ls-tree -r HEAD^{tree} | grep 'commit'
   160000 commit 56f0304c5250308f14cfbafdc27bd12d40154d17	subrepo1
@@ -93,14 +109,18 @@ bring working copy to HEAD state (it's not bare repo)
   $ echo delta > delta
   $ hg add delta
   $ fn_hg_commit -m "add delta"
-  $ echo "`hg tip --template '{node}'` hgsub" > ../gitrepo1/.hgsubstate
-  $ echo "hgsub = ../hgsub" > ../gitrepo1/.hgsub
-  $ cd ../gitrepo1
+  $ echo "`hg tip --template '{node}'` hgsub" > ../gitrepo/.hgsubstate
+  $ echo "hgsub = ../hgsub" > ../gitrepo/.hgsub
+  $ cd ../gitrepo
   $ git add .hgsubstate .hgsub
   $ fn_git_commit -m "Test3. Prepare .hgsub and .hgsubstate sources"
+  $ git push
+  To $TESTTMP/repo.git
+     275b0a5..e31d576  master -> master
+
   $ cd ../hgrepo
   $ hg pull
-  pulling from $TESTTMP/gitrepo1
+  pulling from $TESTTMP/repo.git
   importing 1 git commits
   updating bookmark master
   new changesets [0-9a-f]{12,12} \(1 drafts\) (re)
