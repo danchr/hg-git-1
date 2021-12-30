@@ -142,3 +142,67 @@ pull shall bring .hgsub entry which was added to the git repo
   481ec30d580f333ae3a77f94c973ce37b69d5bda hgsub
   56f0304c5250308f14cfbafdc27bd12d40154d17 subrepo1
   aabf7cd015089aff0b84596e69aa37b24a3d090a xyz/subrepo2
+
+4. Try changing the subrepos from the Mercurial side
+
+  $ cd hgrepo
+  $ cat >> .hgsub <<EOF
+  > subrepo2 = [git]../gitsubrepo
+  > EOF
+  $ git clone ../gitsubrepo subrepo2
+  Cloning into 'subrepo2'...
+  done.
+  $ fn_hg_commit -m 'some stuff'
+  $ hg push
+  pushing to $TESTTMP/repo.git
+  no changes made to subrepo hgsub since last push to $TESTTMP/hgsub
+  searching for changes
+  adding objects
+  added 1 commits with 1 trees and 0 blobs
+  updating reference refs/heads/master
+  $ cd ..
+
+5. But we actually do something quite weird in this case: If a
+.gitmodules file exists in the repository, it always wins! In this
+case, we break the bidirectional convention, and modify the repository
+data. That's odd, so show it:
+
+  $ hg id hgrepo
+  e8ddf4fb3ed4 default/master/tip master
+  $ hg clone -U repo.git hgrepo2
+  importing 6 git commits
+  new changesets e532b2bfda10:36bc272d4273 (6 drafts)
+  $ hg -R hgrepo2 up :master
+  Cloning into '$TESTTMP/hgrepo2/subrepo1'...
+  done.
+  cloning subrepo hgsub from $TESTTMP/hgsub
+  cloning subrepo subrepo1 from $TESTTMP/gitsubrepo
+  checking out detached HEAD in subrepository "subrepo1"
+  check out a git branch if you intend to make changes
+  Cloning into '$TESTTMP/hgrepo2/xyz/subrepo2'...
+  done.
+  cloning subrepo xyz/subrepo2 from $TESTTMP/gitsubrepo
+  4 files updated, 0 files merged, 0 files removed, 0 files unresolved
+
+We broke bidirectionality :(
+
+  $ git diff --stat hgrepo/.hgsub hgrepo2/.hgsub
+   {hgrepo => hgrepo2}/.hgsub | 1 -
+   1 file changed, 1 deletion(-)
+  [1]
+  $ hg id hgrepo
+  e8ddf4fb3ed4 default/master/tip master
+  $ hg id hgrepo2
+  36bc272d4273+ default/master/tip master
+
+And even have something weird in the new clone:
+
+  $ hg diff -R hgrepo2
+  diff -r 36bc272d4273 .hgsubstate
+  --- a/.hgsubstate	Mon Jan 01 00:00:17 2007 +0000
+  +++ b/.hgsubstate	Thu Jan 01 00:00:00 1970 +0000
+  @@ -1,4 +1,3 @@
+   481ec30d580f333ae3a77f94c973ce37b69d5bda hgsub
+   56f0304c5250308f14cfbafdc27bd12d40154d17 subrepo1
+  -aabf7cd015089aff0b84596e69aa37b24a3d090a subrepo2
+   aabf7cd015089aff0b84596e69aa37b24a3d090a xyz/subrepo2
