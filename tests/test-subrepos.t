@@ -44,7 +44,7 @@ Ensure gitlinks are transformed to .hgsubstate on hg pull from git
   $ hg bookmarks -f -r default master
 1. Ensure gitlinks are transformed to .hgsubstate on hg <- git pull
 .hgsub shall list two [git] subrepos
-  $ cat .hgsub | sort
+  $ cat .hgsub
   subrepo1 = [git]../gitsubrepo
   xyz/subrepo2 = [git]../gitsubrepo
 .hgsubstate shall list two idenitcal revisions
