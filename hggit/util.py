@@ -57,7 +57,7 @@ def parse_hgsub(lines):
     rv = collections.OrderedDict()
     for l in lines:
         ls = l.strip()
-        if not ls or ls[0] == b'#':
+        if not ls or ls.startswith(b'#'):
             continue
         name, value = l.split(b'=', 1)
         rv[name.strip()] = value.strip()
@@ -75,7 +75,7 @@ def parse_hgsubstate(lines):
     rv = collections.OrderedDict()
     for l in lines:
         ls = l.strip()
-        if not ls or ls[0] == b'#':
+        if not ls or ls.startswith(b'#'):
             continue
         value, name = l.split(b' ', 1)
         rv[name.strip()] = value.strip()

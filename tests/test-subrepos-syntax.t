@@ -51,10 +51,11 @@ comments and [subpaths] in .hgsub
   4 files updated, 0 files merged, 0 files removed, 0 files unresolved
   (activating bookmark master)
   $ cat >> .hgsub <<EOF
+  > # this is a comment
   > [subpaths]
   > flaf = blyf
   > EOF
-  $ fn_hg_commit -m 'add subsection'
+  $ fn_hg_commit -m 'add comment & subsection'
   $ hg push
   pushing to $TESTTMP/repo.git
   searching for changes
@@ -66,8 +67,8 @@ comments and [subpaths] in .hgsub
   $ cd gitrepo
   $ git pull --ff-only
   From $TESTTMP/repo
-     89c22d7..65b2315  master     -> origin/master
-  Updating 89c22d7..65b2315
+     89c22d7..106b34e  master     -> origin/master
+  Updating 89c22d7..106b34e
   Fast-forward
   $ cat .gitmodules
   [submodule "subrepo1"]
@@ -82,8 +83,8 @@ We broke bidirectionality:
 
   $ hg clone -U repo.git hgrepo2
   importing 4 git commits
-  new changesets e532b2bfda10:dd67948be265 (4 drafts)
+  new changesets e532b2bfda10:d4d6b10ca1df (4 drafts)
   $ hg id -r tip hgrepo
-  d0831db86128 default/master/tip master
+  6d770a109c8f default/master/tip master
   $ hg id -r tip hgrepo2
-  dd67948be265 default/master/tip master
+  d4d6b10ca1df default/master/tip master
