@@ -1,12 +1,12 @@
 from __future__ import generator_stop
 
 import collections
-import itertools
 import io
+import itertools
 import os
 import re
-import tempfile
 import shutil
+import tempfile
 
 from dulwich.errors import HangupException, GitProtocolError
 from dulwich.objects import Blob, Commit, Tag, Tree, parse_timezone
