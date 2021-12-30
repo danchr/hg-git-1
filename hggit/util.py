@@ -14,6 +14,7 @@ from mercurial import (
     extensions,
     phases,
     util as hgutil,
+    pycompat,
 )
 
 gitschemes = (b'git', b'git+ssh', b'git+http', b'git+https')
@@ -152,3 +153,30 @@ def checksafessh(host):
     host = hgutil.urlreq.unquote(host)
     if host.startswith(b'-'):
         raise error.Abort(_(b"potentially unsafe hostname: '%s'") % (host,))
+
+
+def decode_guess(string, encoding):
+    # text is not valid utf-8, try to make sense of it
+    if encoding:
+        try:
+            return string.decode(pycompat.sysstr(encoding)).encode('utf-8')
+        except UnicodeDecodeError:
+            pass
+
+    try:
+        return string.decode('latin-1').encode('utf-8')
+    except UnicodeDecodeError:
+        return string.decode('ascii', 'replace').encode('utf-8')
+
+
+# Stolen from hgsubversion
+def swap_out_encoding(new_encoding=b'UTF-8'):
+    try:
+        from mercurial import encoding
+
+        old = encoding.encoding
+        encoding.encoding = new_encoding
+    except (AttributeError, ImportError):
+        old = hgutil._encoding
+        hgutil._encoding = new_encoding
+    return old

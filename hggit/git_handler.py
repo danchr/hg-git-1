@@ -1,7 +1,6 @@
 from __future__ import generator_stop
 
 import collections
-import io
 import itertools
 import os
 import re
@@ -43,7 +42,6 @@ from . import git2hg
 from . import hg2git
 from . import util
 from .overlay import overlayrepo
-
 
 REMOTE_BRANCH_PREFIX = b'refs/remotes/'
 
@@ -659,18 +657,13 @@ class GitHandler(object):
                 if mapsavefreq and i % mapsavefreq == 0:
                     self.save_map(self.map_file)
 
-    def set_commiter_from_author(self, commit):
-        commit.committer = commit.author
-        commit.commit_time = commit.author_time
-        commit.commit_timezone = commit.author_timezone
-
     # convert this commit into git objects
     # go through the manifest, convert all blobs/trees we don't have
     # write the commit object (with metadata info)
     def export_hg_commit(self, rev, exporter):
         self.ui.note(_(b"converting revision %s\n") % hex(rev))
 
-        oldenc = self.swap_out_encoding()
+        oldenc = util.swap_out_encoding()
 
         ctx = self.repo[rev]
         extra = ctx.extra()
@@ -709,9 +702,9 @@ class GitHandler(object):
                 commit.commit_timezone = timezone
             except ValueError:
                 self.ui.traceback()
-                self.set_commiter_from_author(commit)
+                git2hg.set_committer_from_author(commit)
         else:
-            self.set_commiter_from_author(commit)
+            git2hg.set_committer_from_author(commit)
 
         commit.parents = []
         for parent in self.get_git_parents(ctx):
@@ -753,7 +746,7 @@ class GitHandler(object):
             self.git.object_store.add_object(commit)
         self.map_set(commit.id, ctx.hex())
 
-        self.swap_out_encoding(oldenc)
+        util.swap_out_encoding(oldenc)
         return commit.id
 
     @staticmethod
@@ -997,7 +990,7 @@ class GitHandler(object):
     def import_git_objects(self, remote_names, refs, heads=None):
         filteredrefs = self.filter_min_date(refs)
         if heads is not None:
-            filteredrefs = self.filter_refs(filteredrefs, heads)
+            filteredrefs = git2hg.filter_refs(filteredrefs, heads)
         commits = self.get_git_incoming(filteredrefs)
         # import each of the commits, oldest first
         total = len(commits)
@@ -1089,7 +1082,7 @@ class GitHandler(object):
         # - .hgsubstate from hg parent
         # - changes in gitlinks
         hgsubstate = util.parse_hgsubstate(
-            self.git_file_readlines(git_commit_tree, b'.hgsubstate')
+            git2hg.git_file_readlines(self.git, git_commit_tree, b'.hgsubstate')
         )
         parentsubdata = b''
         if gparents:
@@ -1117,10 +1110,10 @@ class GitHandler(object):
 
         # Analyze .hgsub and merge with .gitmodules
         hgsub = None
-        gitmodules = self.parse_gitmodules(git_commit_tree)
+        gitmodules = git2hg.parse_gitmodules(self.git, git_commit_tree)
         if gitmodules:
             hgsub = util.parse_hgsub(
-                self.git_file_readlines(git_commit_tree, b'.hgsub')
+                git2hg.git_file_readlines(self.git, git_commit_tree, b'.hgsub')
             )
             for (sm_path, sm_url, sm_name) in gitmodules:
                 hgsub[sm_path] = b'[git]' + sm_url
@@ -1141,7 +1134,7 @@ class GitHandler(object):
         try:
             text.decode('utf-8')
         except UnicodeDecodeError:
-            text = self.decode_guess(text, commit.encoding)
+            text = util.decode_guess(text, commit.encoding)
 
         text = b'\n'.join(l.rstrip() for l in text.splitlines()).strip(b'\n')
         if text + b'\n' != origtext:
@@ -1165,10 +1158,10 @@ class GitHandler(object):
             author.decode('utf-8')
         except UnicodeDecodeError:
             origauthor = author
-            author = self.decode_guess(author, commit.encoding)
+            author = util.decode_guess(author, commit.encoding)
             extra[b'author'] = create_delta(author, origauthor)
 
-        oldenc = self.swap_out_encoding()
+        oldenc = util.swap_out_encoding()
 
         def findconvergedfiles(p1, p2):
             # If any files have the same contents in both parents of a merge
@@ -1206,7 +1199,7 @@ class GitHandler(object):
                 else:
                     data = self.git[sha].data
                     copied_path = renames.get(f)
-                    e = self.convert_git_int_mode(mode)
+                    e = git2hg.convert_git_int_mode(mode)
             else:
                 # it's a converged file
                 fc = context.filectx(unfiltered, f, changeid=memctx.p1().rev())
@@ -1305,7 +1298,7 @@ class GitHandler(object):
         with util.forcedraftcommits():
             node = unfiltered.commitctx(ctx)
 
-        self.swap_out_encoding(oldenc)
+        util.swap_out_encoding(oldenc)
 
         with self.repo.lock(), self.repo.transaction(b"phase") as tr:
             phases.advanceboundary(
@@ -1477,7 +1470,7 @@ class GitHandler(object):
         def determine_wants(refs):
             if refs is None:
                 return None
-            filteredrefs = self.filter_refs(refs, heads)
+            filteredrefs = git2hg.filter_refs(refs, heads)
             return [x for x in filteredrefs.values() if x not in self.git]
 
         progress = GitProgress(self.ui)
@@ -1570,56 +1563,6 @@ class GitHandler(object):
         raise error.Abort(_(b'authorization failed'))
 
     # REFERENCES HANDLING
-
-    def filter_refs(self, refs, heads):
-        '''For a dictionary of refs: shas, if heads is None then return refs
-        that match the heads. Otherwise, return refs that are heads or tags.
-
-        '''
-        filteredrefs = []
-        if heads is not None:
-            # contains pairs of ('refs/(heads|tags|...)/foo', 'foo')
-            # if ref is just '<foo>', then we get ('foo', 'foo')
-            stripped_refs = [
-                (r, r[r.find(b'/', r.find(b'/') + 1) + 1 :]) for r in refs
-            ]
-            for h in heads:
-                if h.endswith(b'/*'):
-                    prefix = h[:-1]  # include the / but not the *
-                    r = [
-                        pair[0]
-                        for pair in stripped_refs
-                        if pair[1].startswith(prefix)
-                    ]
-                    r.sort()
-                    filteredrefs.extend(r)
-                else:
-                    r = [pair[0] for pair in stripped_refs if pair[1] == h]
-                    if not r:
-                        msg = _(b"unknown revision '%s'") % h
-                        raise error.RepoLookupError(msg)
-                    elif len(r) == 1:
-                        filteredrefs.append(r[0])
-                    else:
-                        msg = _(b"ambiguous reference %s: %s")
-                        msg %= (
-                            h,
-                            b', '.join(sorted(r)),
-                        )
-                        raise error.RepoLookupError(msg)
-        else:
-            for ref, sha in refs.items():
-                if not ref.endswith(ANNOTATED_TAG_SUFFIX) and (
-                    ref.startswith(LOCAL_BRANCH_PREFIX)
-                    or ref.startswith(LOCAL_TAG_PREFIX)
-                ):
-                    filteredrefs.append(ref)
-            filteredrefs.sort()
-
-        # the choice of OrderedDict vs plain dict has no impact on stock
-        # hg-git, but allows extensions to customize the order in which refs
-        # are returned
-        return collections.OrderedDict((r, refs[r]) for r in filteredrefs)
 
     def filter_min_date(self, refs):
         '''filter refs by minimum date
@@ -1972,13 +1915,6 @@ class GitHandler(object):
 
     # UTILITY FUNCTIONS
 
-    def convert_git_int_mode(self, mode):
-        # TODO: make these into constants
-        convert = {0o100644: b'', 0o100755: b'x', 0o120000: b'l'}
-        if mode in convert:
-            return convert[mode]
-        return b''
-
     def get_file(self, commit, f):
         otree = self.git.tree(commit.tree)
         parts = f.split(b'/')
@@ -2115,40 +2051,6 @@ class GitHandler(object):
             find_copies_harder=find_copies_harder,
         )
 
-    def parse_gitmodules(self, tree_obj):
-        """Parse .gitmodules from a git tree specified by tree_obj
-
-        :return: list of tuples (submodule path, url, name),
-        where name is hgutil.urlreq.quoted part of the section's name, or
-        empty list if nothing found
-        """
-        rv = []
-        try:
-            unused_mode, gitmodules_sha = tree_obj[b'.gitmodules']
-        except KeyError:
-            return rv
-        gitmodules_content = self.git[gitmodules_sha].data
-        fo = io.BytesIO(gitmodules_content)
-        tt = dul_config.ConfigFile.from_file(fo)
-        for section in tt.keys():
-            section_kind, section_name = section
-            if section_kind == b'submodule':
-                sm_path = tt.get(section, b'path')
-                sm_url = tt.get(section, b'url')
-                rv.append((sm_path, sm_url, section_name))
-        return rv
-
-    def git_file_readlines(self, tree_obj, fname):
-        """Read content of a named entry from the git commit tree
-
-        :return: list of lines
-        """
-        if fname in tree_obj:
-            unused_mode, sha = tree_obj[fname]
-            content = self.git[sha].data
-            return content.splitlines()
-        return []
-
     def remote_names(self, remote, push):
         names = set()
         url = compat.url(remote)
@@ -2196,31 +2098,6 @@ class GitHandler(object):
                 return False
 
         return True
-
-    # Stolen from hgsubversion
-    def swap_out_encoding(self, new_encoding=b'UTF-8'):
-        try:
-            from mercurial import encoding
-
-            old = encoding.encoding
-            encoding.encoding = new_encoding
-        except (AttributeError, ImportError):
-            old = hgutil._encoding
-            hgutil._encoding = new_encoding
-        return old
-
-    def decode_guess(self, string, encoding):
-        # text is not valid utf-8, try to make sense of it
-        if encoding:
-            try:
-                return string.decode(pycompat.sysstr(encoding)).encode('utf-8')
-            except UnicodeDecodeError:
-                pass
-
-        try:
-            return string.decode('latin-1').encode('utf-8')
-        except UnicodeDecodeError:
-            return string.decode('ascii', 'replace').encode('utf-8')
 
     def _get_transport_and_path(self, uri):
         """Method that sets up the transport (either ssh or http(s))

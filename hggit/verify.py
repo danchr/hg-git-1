@@ -15,6 +15,8 @@ from mercurial.i18n import _
 from dulwich import diff_tree
 from dulwich.objects import Commit, S_IFGITLINK
 
+from . import git2hg
+
 
 def verify(ui, repo, hgctx):
     '''verify that a Mercurial rev matches the corresponding Git rev
@@ -91,7 +93,7 @@ def verify(ui, repo, hgctx):
                 continue
 
             hgflags = fctx.flags()
-            gitflags = handler.convert_git_int_mode(gitfile.mode)
+            gitflags = git2hg.convert_git_int_mode(gitfile.mode)
             if hgflags != gitflags:
                 ui.write(
                     _(b"file has different flags: %s (hg '%s', git '%s')\n")

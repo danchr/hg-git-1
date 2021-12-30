@@ -1,10 +1,18 @@
 # git2hg.py - convert Git repositories and commits to Mercurial ones
+import collections
+import io
 
+from dulwich import config
 from dulwich.objects import Commit, Tag
-from dulwich.refs import LOCAL_BRANCH_PREFIX, LOCAL_TAG_PREFIX
+from dulwich.refs import (
+    ANNOTATED_TAG_SUFFIX,
+    LOCAL_BRANCH_PREFIX,
+    LOCAL_TAG_PREFIX,
+)
+from mercurial.i18n import _
 
 from mercurial.node import bin, short
-from mercurial import util as hgutil
+from mercurial import error, util as hgutil
 from mercurial import phases
 
 
@@ -222,3 +230,104 @@ def extract_hg_metadata(message, git_extra):
             extra[hgutil.urlreq.quote(hg_field)] = hgutil.urlreq.quote(data)
 
     return (message, renames, branch, extra)
+
+
+def convert_git_int_mode(mode):
+    # TODO: make these into constants
+    convert = {0o100644: b'', 0o100755: b'x', 0o120000: b'l'}
+    if mode in convert:
+        return convert[mode]
+    return b''
+
+
+def set_committer_from_author(commit):
+    commit.committer = commit.author
+    commit.commit_time = commit.author_time
+    commit.commit_timezone = commit.author_timezone
+
+
+def filter_refs(refs, heads):
+    '''For a dictionary of refs: shas, if heads is None then return refs
+    that match the heads. Otherwise, return refs that are heads or tags.
+
+    '''
+    filteredrefs = []
+    if heads is not None:
+        # contains pairs of ('refs/(heads|tags|...)/foo', 'foo')
+        # if ref is just '<foo>', then we get ('foo', 'foo')
+        stripped_refs = [
+            (r, r[r.find(b'/', r.find(b'/') + 1) + 1 :]) for r in refs
+        ]
+        for h in heads:
+            if h.endswith(b'/*'):
+                prefix = h[:-1]  # include the / but not the *
+                r = [
+                    pair[0]
+                    for pair in stripped_refs
+                    if pair[1].startswith(prefix)
+                ]
+                r.sort()
+                filteredrefs.extend(r)
+            else:
+                r = [pair[0] for pair in stripped_refs if pair[1] == h]
+                if not r:
+                    msg = _(b"unknown revision '%s'") % h
+                    raise error.RepoLookupError(msg)
+                elif len(r) == 1:
+                    filteredrefs.append(r[0])
+                else:
+                    msg = _(b"ambiguous reference %s: %s")
+                    msg %= (
+                        h,
+                        b', '.join(sorted(r)),
+                    )
+                    raise error.RepoLookupError(msg)
+    else:
+        for ref, sha in refs.items():
+            if not ref.endswith(ANNOTATED_TAG_SUFFIX) and (
+                ref.startswith(LOCAL_BRANCH_PREFIX)
+                or ref.startswith(LOCAL_TAG_PREFIX)
+            ):
+                filteredrefs.append(ref)
+        filteredrefs.sort()
+
+    # the choice of OrderedDict vs plain dict has no impact on stock
+    # hg-git, but allows extensions to customize the order in which refs
+    # are returned
+    return collections.OrderedDict((r, refs[r]) for r in filteredrefs)
+
+
+def parse_gitmodules(git, tree_obj):
+    """Parse .gitmodules from a git tree specified by tree_obj
+
+    :return: list of tuples (submodule path, url, name),
+    where name is hgutil.urlreq.quoted part of the section's name, or
+    empty list if nothing found
+    """
+    rv = []
+    try:
+        unused_mode, gitmodules_sha = tree_obj[b'.gitmodules']
+    except KeyError:
+        return rv
+    gitmodules_content = git[gitmodules_sha].data
+    fo = io.BytesIO(gitmodules_content)
+    tt = config.ConfigFile.from_file(fo)
+    for section in tt.keys():
+        section_kind, section_name = section
+        if section_kind == b'submodule':
+            sm_path = tt.get(section, b'path')
+            sm_url = tt.get(section, b'url')
+            rv.append((sm_path, sm_url, section_name))
+    return rv
+
+
+def git_file_readlines(git, tree_obj, fname):
+    """Read content of a named entry from the git commit tree
+
+    :return: list of lines
+    """
+    if fname in tree_obj:
+        unused_mode, sha = tree_obj[fname]
+        content = git[sha].data
+        return content.splitlines()
+    return []
