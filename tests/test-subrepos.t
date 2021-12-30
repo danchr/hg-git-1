@@ -69,7 +69,7 @@ hg status shall NOT report .hgsub and .hgsubstate as untracked - either ignored 
    create mode 100644 gamma
   $ cd ../..
   $ echo xxx >> alpha
-  $ hg commit -m 'Update subrepo2 from hg' | grep -v "committing subrepository" || true
+  $ fn_hg_commit -m 'Update subrepo2 from hg' | grep -v "committing subrepository" || true
   $ hg push
   pushing to $TESTTMP/gitrepo1
   searching for changes
@@ -84,7 +84,7 @@ there shall be two gitlink entries, with values matching that in .hgsubstate
   160000 commit aabf7cd015089aff0b84596e69aa37b24a3d090a	xyz/subrepo2
 bring working copy to HEAD state (it's not bare repo)
   $ git reset --hard
-  HEAD is now at ae335e3 Update subrepo2 from hg
+  HEAD is now at 275b0a5 Update subrepo2 from hg
   $ cd ..
 
 3. Check .hgsub and .hgsubstate from git repository are merged, not overwritten
@@ -94,7 +94,7 @@ bring working copy to HEAD state (it's not bare repo)
   $ hg add delta
   $ fn_hg_commit -m "add delta"
   $ echo "`hg tip --template '{node}'` hgsub" > ../gitrepo1/.hgsubstate
-  $ echo "hgsub = $(pwd)" > ../gitrepo1/.hgsub
+  $ echo "hgsub = ../hgsub" > ../gitrepo1/.hgsub
   $ cd ../gitrepo1
   $ git add .hgsubstate .hgsub
   $ fn_git_commit -m "Test3. Prepare .hgsub and .hgsubstate sources"
@@ -111,8 +111,8 @@ bring working copy to HEAD state (it's not bare repo)
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd ..
 pull shall bring .hgsub entry which was added to the git repo
-  $ cat hgrepo/.hgsub | sort
-  hgsub = $TESTTMP/hgsub
+  $ cat hgrepo/.hgsub
+  hgsub = ../hgsub
   subrepo1 = [git]../gitsubrepo
   xyz/subrepo2 = [git]../gitsubrepo
 .hgsubstate shall list revision of the subrepo added through git repo
