@@ -53,6 +53,7 @@ def forcedraftcommits():
 
 def parse_hgsub(lines):
     """Fills OrderedDict with hgsub file content passed as list of lines"""
+    # TODO: get rid of this code and rely on mercurial infrastructure
     rv = collections.OrderedDict()
     for l in lines:
         ls = l.strip()
@@ -70,6 +71,7 @@ def serialize_hgsub(data):
 
 def parse_hgsubstate(lines):
     """Fills OrderedDict with hgsubtate file content passed as list of lines"""
+    # TODO: get rid of this code and rely on mercurial infrastructure
     rv = collections.OrderedDict()
     for l in lines:
         ls = l.strip()
