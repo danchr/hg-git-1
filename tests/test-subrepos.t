@@ -109,8 +109,10 @@ bring working copy to HEAD state (it's not bare repo)
   $ echo delta > delta
   $ hg add delta
   $ fn_hg_commit -m "add delta"
-  $ echo "`hg tip --template '{node}'` hgsub" > ../gitrepo/.hgsubstate
-  $ echo "hgsub = ../hgsub" > ../gitrepo/.hgsub
+  $ hg tip --template '{node} hgsub\n' > ../gitrepo/.hgsubstate
+  $ cat > ../gitrepo/.hgsub <<EOF
+  > hgsub = ../hgsub
+  > EOF
   $ cd ../gitrepo
   $ git add .hgsubstate .hgsub
   $ fn_git_commit -m "Test3. Prepare .hgsub and .hgsubstate sources"
