@@ -133,9 +133,9 @@ Coverage:
   script:
     - pip install coverage
     - coverage combine coverage-*
-    - coverage xml --include='hggit/*' --ignore-errors
-    - coverage html --include='hggit/*' --ignore-errors
-    - coverage report --include='hggit/*' --precision=1
+    - coverage xml --ignore-errors
+    - coverage html --ignore-errors
+    - coverage report
   artifacts:
     expire_in: 1 week
     paths:
