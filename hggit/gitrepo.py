@@ -168,18 +168,10 @@ def findcommonoutgoing(orig, repo, other, *args, **kwargs):
 
 
 @eh.wrapfunction(bundlerepo, b'getremotechanges')
-def getremotechanges(orig, ui, repo, other, *args, **opts):
+def getremotechanges(orig, ui, repo, other, revs, *args, **opts):
     if isinstance(other, gitrepo):
-        if args:
-            revs = args[0]
-        else:
-            revs = opts.get('onlyheads', opts.get('revs'))
-        r, c, cleanup = repo.githandler.getremotechanges(other, revs)
-        # ugh. This is ugly even by mercurial API compatibility standards
-        if 'onlyheads' not in orig.__code__.co_varnames:
-            cleanup = None
-        return r, c, cleanup
-    return orig(ui, repo, other, *args, **opts)
+        return repo.githandler.getremotechanges(other, revs)
+    return orig(ui, repo, other, revs, *args, **opts)
 
 
 @eh.wrapfunction(exchange, b'pull')
