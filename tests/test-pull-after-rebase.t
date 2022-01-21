@@ -199,7 +199,7 @@ Another special case, is that we should update commits over obsolete boundaries:
   $ hg pull
   pulling from $TESTTMP/repo.git
   no changes found
-  not updating diverged bookmark otherbranch
+  updating bookmark otherbranch
   $ cd ..
   $ rm -rf hgrepo-clone
 

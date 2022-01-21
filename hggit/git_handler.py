@@ -29,6 +29,7 @@ from mercurial import (
     encoding,
     error,
     hg,
+    obsutil,
     phases,
     pycompat,
     url,
@@ -1824,6 +1825,16 @@ class GitHandler(object):
 
                 elif unfiltered[bms[bm]].isancestorof(unfiltered[hgsha]):
                     # fast forward
+                    changes.append((bm, hgsha))
+                    self.ui.status(_("updating bookmark %s\n") % bm)
+
+                elif unfiltered.obsstore and hgsha in obsutil.foreground(
+                    unfiltered, [bms[bm]]
+                ):
+                    # this is fast-forward or a rebase, across
+                    # obsolescence markers too. (ideally we would have
+                    # a background thingy that is more efficient that
+                    # the foreground one.)
                     changes.append((bm, hgsha))
                     self.ui.status(_("updating bookmark %s\n") % bm)
 
