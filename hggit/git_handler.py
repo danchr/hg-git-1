@@ -1800,7 +1800,6 @@ class GitHandler(object):
                     )
 
                 elif wanted_node is None:
-                    self.ui.note(_(b"bookmark %s is  known yet\n") % bm)
                     # possibly deleted branch, check if we have a
                     # matching remote ref
                     unmoved = any(
