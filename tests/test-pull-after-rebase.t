@@ -81,11 +81,11 @@ Now switch back to git and create a new commit based on what we just rebased
   * 7eeab2e add alpha
   $ echo delta > delta
   $ git add delta
-  $ fn_git_commit -m 'add gamma'
+  $ fn_git_commit -m 'add delta'
   $ git push --quiet --set-upstream origin otherbranch
   Branch 'otherbranch' set up to track remote branch 'otherbranch' from 'origin'. (?)
   $ git log --oneline --graph --all --decorate
-  * c4cfa5e (HEAD -> otherbranch, origin/otherbranch) add gamma
+  * bba0011 (HEAD -> otherbranch, origin/otherbranch) add delta
   * e5023f9 (origin/branch, branch) add gamma
   | * 9497a4e (origin/master, master) add beta
   |/  
@@ -100,11 +100,11 @@ Pull that
   importing 1 git commits
   adding bookmark otherbranch
   1 new orphan changesets
-  new changesets f4bd265a9d39 (1 drafts)
+  new changesets 075302705298 (1 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
   $ hg state
-  *  otherbranch default/otherbranch tip 4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5
-  |  add gamma
+  *  otherbranch default/otherbranch tip 4:0753027052980aef9c9c37adb7d76d5719e8d818
+  |  add delta
   | @  branch default/branch 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
   | |  add gamma
   x |    2:205a004356ef32b8da782afb89d9179d12ca31e9
@@ -121,24 +121,24 @@ Now try rebasing that branch, from the Git side of things
   $ cd gitrepo
   $ git checkout -q otherbranch
   $ git log --oneline --graph --all --decorate
-  * c4cfa5e (HEAD -> otherbranch, origin/otherbranch) add gamma
+  * bba0011 (HEAD -> otherbranch, origin/otherbranch) add delta
   * e5023f9 (origin/branch, branch) add gamma
   | * 9497a4e (origin/master, master) add beta
   |/  
   * 7eeab2e add alpha
   $ fn_git_rebase --onto master branch otherbranch
   $ git log --oneline --graph --all --decorate
-  * 5c9b4bb (HEAD -> otherbranch) add gamma
+  * 9c58139 (HEAD -> otherbranch) add delta
   * 9497a4e (origin/master, master) add beta
-  | * c4cfa5e (origin/otherbranch) add gamma
+  | * bba0011 (origin/otherbranch) add delta
   | * e5023f9 (origin/branch, branch) add gamma
   |/  
   * 7eeab2e add alpha
   $ git push -f
   To $TESTTMP/repo.git
-   + c4cfa5e...5c9b4bb otherbranch -> otherbranch (forced update)
+   + bba0011...9c58139 otherbranch -> otherbranch (forced update)
   $ git log --oneline --graph --all --decorate
-  * 5c9b4bb (HEAD -> otherbranch, origin/otherbranch) add gamma
+  * 9c58139 (HEAD -> otherbranch, origin/otherbranch) add delta
   * 9497a4e (origin/master, master) add beta
   | * e5023f9 (origin/branch, branch) add gamma
   |/  
@@ -158,13 +158,13 @@ Now just pull it:
   pulling from $TESTTMP/repo.git
   importing 1 git commits
   not updating diverged bookmark otherbranch
-  new changesets 5a1e52bb860a (1 drafts)
+  new changesets d64bf0521af6 (1 drafts)
   (run 'hg heads .' to see heads, 'hg merge' to merge)
   $ hg state
-  o   default/otherbranch tip 5:5a1e52bb860a4369dc5fff2e63a56d8103404336
-  |  add gamma
-  | *  otherbranch  4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5
-  | |  add gamma
+  o   default/otherbranch tip 5:d64bf0521af68fe2160791a1b4ab9baf282a3879
+  |  add delta
+  | *  otherbranch  4:0753027052980aef9c9c37adb7d76d5719e8d818
+  | |  add delta
   +---@  branch default/branch 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
   | |    add gamma
   | x    2:205a004356ef32b8da782afb89d9179d12ca31e9
@@ -191,10 +191,10 @@ And pull that:
   no changes found
   not deleting diverged bookmark otherbranch
   $ hg state
-  o   tip 5:5a1e52bb860a4369dc5fff2e63a56d8103404336
-  |  add gamma
-  | *  otherbranch  4:f4bd265a9d39e5c4da2c0a752de5ea70335199c5
-  | |  add gamma
+  o   tip 5:d64bf0521af68fe2160791a1b4ab9baf282a3879
+  |  add delta
+  | *  otherbranch  4:0753027052980aef9c9c37adb7d76d5719e8d818
+  | |  add delta
   +---@  branch default/branch 3:52def9937d74e43b83dfded6ce0e5adf731b9d22
   | |    add gamma
   | x    2:205a004356ef32b8da782afb89d9179d12ca31e9
