@@ -151,9 +151,38 @@ And check that pulling something else doesn't delete that branch.
   $ hg pull -r master
   pulling from $TESTTMP/repo.git
   no changes found
+  $ cd ..
+
+A special case, is that we can pull into a repository, where a commit
+corresponding to the new branch exists, but that commit is obsolete.
+In order to avoid “pinning” the obsolete commit, and thereby making it
+visible, we first pull from Git as an unnamed remote.
+
+  $ hg clone --config phases.publish=no hgrepo hgrepo-clone
+  updating to branch default
+  3 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ cd hgrepo-clone
+  $ hg pull ../repo.git
+  pulling from ../repo.git
+  importing 4 git commits
+  not updating diverged bookmark otherbranch
+  new changesets d64bf0521af6 (1 drafts)
+  (run 'hg heads .' to see heads, 'hg merge' to merge)
+  $ hg debugobsolete d64bf0521af68fe2160791a1b4ab9baf282a3879
+  1 new obsolescence markers
+  obsoleted 1 changesets
+  $ cp ../hgrepo/.hg/hgrc .hg
+  $ hg pull
+  pulling from $TESTTMP/repo.git
+  no changes found
+  abort: filtered revision 'd64bf0521af68fe2160791a1b4ab9baf282a3879'
+  [255]
+  $ cd ..
+  $ rm -rf hgrepo-clone
 
 Now just pull it:
 
+  $ cd hgrepo
   $ hg pull
   pulling from $TESTTMP/repo.git
   importing 1 git commits
