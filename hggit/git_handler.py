@@ -1741,8 +1741,8 @@ class GitHandler(object):
         self.export_commits()
         self.save_tags()
 
-    def _get_heads(self, remote_names, refs):
-        """get a {head → hg-bin-sha} mapping
+    def _get_ref_nodes(self, remote_names, refs):
+        """get a {ref_name → node} mapping
 
         We generally assume that `refs` contains all the refs in the
         server, not just the ones we are pulling.
@@ -1752,7 +1752,7 @@ class GitHandler(object):
         `None` means that the branch was deleted.
 
         """
-        heads = {}
+        ref_nodes = {}
 
         for ref, git_sha in refs.items():
             if not ref.startswith(LOCAL_BRANCH_PREFIX):
@@ -1763,7 +1763,7 @@ class GitHandler(object):
 
             # refs contains all the refs in the server,
             # not just the ones we are pulling
-            heads[h] = bin(hg_sha) if hg_sha is not None else nullid
+            ref_nodes[h] = bin(hg_sha) if hg_sha is not None else nullid
 
         # detect deletions; do this last to retain ordering
         if self.ui.configbool(b'git', b'pull-prune-bookmarks'):
@@ -1772,9 +1772,9 @@ class GitHandler(object):
                 for remote_ref in self.remote_refs:
                     if remote_ref.startswith(prefix):
                         h = remote_ref[len(prefix) :]
-                        heads.setdefault(h, None)
+                        ref_nodes.setdefault(h, None)
 
-        return heads
+        return ref_nodes
 
     def update_hg_bookmarks(self, remote_names, refs):
         try:
@@ -1782,27 +1782,30 @@ class GitHandler(object):
             unfiltered = self.repo.unfiltered()
             changes = []
 
-            for head, hgsha in self._get_heads(remote_names, refs).items():
-                bm = head + (self.branch_bookmark_suffix or b'')
+            for ref_name, wanted_node in self._get_ref_nodes(
+                remote_names, refs
+            ).items():
+                bm = ref_name + (self.branch_bookmark_suffix or b'')
+                current_node = bms.get(bm)
 
-                if bm in bms and bms[bm] == hgsha:
+                if current_node is not None and current_node == wanted_node:
                     self.ui.note(_(b"bookmark %s is up-to-date\n") % bm)
 
-                elif hgsha == nullid:
+                elif wanted_node == nullid:
                     self.ui.note(_(b"bookmark %s is not known yet\n") % bm)
 
-                elif hgsha is None and bm not in bms:
+                elif wanted_node is None and current_node is None:
                     self.ui.note(
                         b"bookmark %s is deleted locally as well\n" % bm
                     )
 
-                elif hgsha is None:
+                elif wanted_node is None:
                     self.ui.note(_(b"bookmark %s is  known yet\n") % bm)
                     # possibly deleted branch, check if we have a
                     # matching remote ref
                     unmoved = any(
-                        bms[bm]
-                        == self.remote_refs.get(b'%s/%s' % (remote_name, head))
+                        self.remote_refs.get(b'%s/%s' % (remote_name, ref_name))
+                        == current_node
                         for remote_name in remote_names
                     )
 
@@ -1815,27 +1818,29 @@ class GitHandler(object):
                             b"not deleting diverged bookmark %s\n" % bm
                         )
 
-                elif bm not in bms:
+                elif current_node is None:
                     # new branch
-                    changes.append((bm, hgsha))
+                    changes.append((bm, wanted_node))
 
                     # only log additions on subsequent pulls
                     if not self.is_clone:
                         self.ui.status(_("adding bookmark %s\n") % bm)
 
-                elif unfiltered[bms[bm]].isancestorof(unfiltered[hgsha]):
+                elif unfiltered[current_node].isancestorof(
+                    unfiltered[wanted_node]
+                ):
                     # fast forward
-                    changes.append((bm, hgsha))
+                    changes.append((bm, wanted_node))
                     self.ui.status(_("updating bookmark %s\n") % bm)
 
-                elif unfiltered.obsstore and hgsha in obsutil.foreground(
-                    unfiltered, [bms[bm]]
+                elif unfiltered.obsstore and wanted_node in obsutil.foreground(
+                    unfiltered, [current_node]
                 ):
                     # this is fast-forward or a rebase, across
                     # obsolescence markers too. (ideally we would have
                     # a background thingy that is more efficient that
                     # the foreground one.)
-                    changes.append((bm, hgsha))
+                    changes.append((bm, wanted_node))
                     self.ui.status(_("updating bookmark %s\n") % bm)
 
                 else:
