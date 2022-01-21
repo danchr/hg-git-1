@@ -175,8 +175,7 @@ visible, we first pull from Git as an unnamed remote.
   $ hg pull
   pulling from $TESTTMP/repo.git
   no changes found
-  abort: filtered revision 'd64bf0521af68fe2160791a1b4ab9baf282a3879'
-  [255]
+  not updating diverged bookmark otherbranch
   $ cd ..
   $ rm -rf hgrepo-clone
 

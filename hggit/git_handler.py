@@ -1778,6 +1778,7 @@ class GitHandler(object):
     def update_hg_bookmarks(self, remote_names, refs):
         try:
             bms = self.repo._bookmarks
+            unfiltered = self.repo.unfiltered()
             changes = []
 
             for head, hgsha in self._get_heads(remote_names, refs).items():
@@ -1821,7 +1822,7 @@ class GitHandler(object):
                     if not self.is_clone:
                         self.ui.status(_("adding bookmark %s\n") % bm)
 
-                elif self.repo[bms[bm]].isancestorof(self.repo[hgsha]):
+                elif unfiltered[bms[bm]].isancestorof(unfiltered[hgsha]):
                     # fast forward
                     changes.append((bm, hgsha))
                     self.ui.status(_("updating bookmark %s\n") % bm)
