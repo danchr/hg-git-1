@@ -13,6 +13,17 @@ Other changes:
 
 * TBD
 
+hg-git 0.10.4 (2022-01-26)
+==========================
+
+This is a minor release, focusing on bugs and compatibility.
+
+Bug fixes:
+
+* Fix compatibility with the ``mercurial_keyring`` extension. (#360)
+* Add missing test files to the source archive. (#375)
+* Fix tests with Git 2.34.
+
 hg-git 0.10.3 (2021-11-16)
 ==========================
 
