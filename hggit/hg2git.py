@@ -124,7 +124,7 @@ class IncrementalChangesetExporter(object):
         ``ui``:
 
         ``abort`` means insecure paths abort the conversion —
-        this was the default prior to 0.11.
+        this was the default prior to 1.0.
 
         ``keep`` means issue a warning and keep the path,
         returning ``True``.

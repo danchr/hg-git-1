@@ -1,17 +1,83 @@
-hg-git 0.11.0 (unreleased)
-==========================
+hg-git 1.0b1 (2022-01-26)
+=========================
+
+This is a preview of an upcoming major release that contains changes
+to user-facing behaviour, as well as a fair amount of internal
+changes. The primary focus is on adjusting the user experience to be
+more intuitive and consistent with Git and Mercurial. The internal
+changes are mainly refactoring to make the code more consistent and
+maintainable. Performance should also be much better; a simple clone
+of a medium-sized repository is about 40% faster.
+
+This release requires Mercurial 5.2 or later and Python 3.6 or later.
+
+Changes to behaviour:
+
+* When a pull detects that a Git remote branch vanishes, it will
+  remove the corresponding local tags, such as ``default/branch``.
+  This is equivalent to using ``git fetch --prune``, and adjustable
+  using the ``git.pull-prune-remote-branches`` configuration option.
+* Similarly, delete the actual bookmarks corresponding to a remote
+  branch, unless the bookmarks was moved since the last pull from Git.
+  This is enabled by default and adjustable using the
+  ``git.pull-prune-bookmarks`` configuration option.
+* Speed up ``pull`` by using a single transaction per map save
+  interval.
+* Similarly, speed up ``hg clone`` by always using a single
+  transaction and map save interval, as Mercurial will delete the
+  repository on errors.
+* Change the default ``hggit.mapsavefrequency`` to 1,000 commits rather
+  than just saving at the end.
+* Abort with a helpful error when a user attempts to push to Git from
+  a Mercurial repository without any bookmarks nor tags. Previously,
+  that would either invent a bookmark —— *once* — or just report that
+  nothing was found.
+* Only update e.g. ``default/master`` when actually pulling from
+  ``default``.
 
 Enhancements:
 
-* TBD
+* Add a ``gittag()`` revset.
+* Print a message describing which bookmarks changed during a pull.
+* Let Mercurial report on the incoming changes once each transaction
+  is saved, similar to when pulling from a regular repository.
+* Remove some unnecessary caching in an attempt to decrease memory
+  footprint.
+* Advance phases during the pull rather than at the end.
+* With ``hggit.usephases``, allow publishing tags and specific remotes
+  on pull, as well as publishing the remote ``HEAD`` on push.
+* Change defaults to drop illegal paths rather than aborting the
+  conversion; this is adjustable using the ``hggit.invalidpaths``
+  configuration option.
+* Allow updating bookmarks from obsolete commits to their successors.
 
 Bug fixes:
 
-* TBD
+* Adjust publishing of branches to correspond to the documentation.
+  Previously, e.g. listing ``master`` would publish a local bookmark
+  even if diverged from the remote.
+* Handle corrupt repositories gracefully in the ``gverify`` command,
+  and allow checking repository integrity.
+* Only apply extension wrappers when the extension is actually
+  enabled rather than just loaded.
+* Fix pulling with ``phases.new-commit`` set to ``secret``. (#266)
+* Detect divergence with a branch bookmark suffix.
+* Fix flawed handling of remote messages on pull and push, which
+  caused most such messages to be discarded.
+* Report a helpful error when attempting to push or convert with
+  commits missing in the Git repository. Also, issue a warning when
+  creating a new Git repository with a non-empty map, as that may lead
+  to the former.
+* Ensure that ``gimport`` also synchronises tags.
+* Address a bug where updating bookmarks might fail with certain
+  obsolete commits.
+* Handle missing Git commits gracefully. (#376)
 
 Other changes:
 
-* TBD
+* Require ``setuptools`` for building, and use ``setuptools_scm`` for
+  determining the version of the extension.
+* Refactoring and reformatting of the code base.
 
 hg-git 0.10.4 (2022-01-26)
 ==========================
