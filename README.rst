@@ -163,7 +163,7 @@ The extension has certain drawbacks, however:
    will fail.
  * You cannot interact with Mercurial repositories.
 
-.. octopus merges_: https://git-scm.com/docs/git-merge
+.. _octopus merges: https://git-scm.com/docs/git-merge
 
 Another extension packaged with Mercurial, the ``convert`` extension,
 also has Git support.
@@ -171,7 +171,7 @@ also has Git support.
 Other alternatives exist for Git users wanting to access Mercurial
 repositories, such as `git-remote-hg`_.
 
-.. git-remote-hg_: https://pypi.org/project/git-remote-hg/
+.. _git-remote-hg: https://pypi.org/project/git-remote-hg/
 
 Configuration
 =============
@@ -305,7 +305,7 @@ therefore converted to Mercurial in the 'public' phase. This is only
 used if ``hggit.usephases`` is set.
 
 ``git.pull-prune-remote-branches``
---------------
+----------------------------------
 
 Before fetching, remove any remote-tracking references, or
 pseudo-tags, that no longer exist on the remote. This is equivalent to
@@ -316,7 +316,7 @@ what's on the remote.
 This option is enabled by default.
 
 ``git.pull-prune-bookmarks``
---------------
+----------------------------
 
 On pull, delete any unchanged bookmarks removed on the remote. In
 other words, if e.g. the ``thebranch`` bookmark remains at
@@ -392,21 +392,21 @@ Publishing commits prevents their modification, and speeds up many
 local Mercurial operations, such as ``hg shelve``.
 
 ``hggit.fetchbuffer``
--------------------
+---------------------
 
 Data fetched from Git is buffered in memory, unless it exceeds the
 given limit, in megabytes. By default, flush the buffer to disk when
 it exceeds 100MB.
 
 ``hggit.retries``
--------------------
+-----------------
 
 Interacting with a remote Git repository may require authentication.
 Normally, this will trigger a prompt and a retry, and this option
 restricts the amount of retries. Defaults to 3.
 
 ``hggit.invalidpaths``
--------------------
+----------------------
 
 Both Mercurial and Git consider paths as just bytestrings internally,
 and allow almost anything. The difference, however, is in the _almost_
