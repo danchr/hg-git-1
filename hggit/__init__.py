@@ -152,7 +152,7 @@ except AttributeError:  # pre 4.7 API
         b'ipaddress',
     ])
 
-__version__ = b'0.10.3'
+__version__ = b'0.10.4'
 
 testedwith = (b'4.4.2 4.5.3 4.6.2 4.7.2 4.8.2 4.9.1 5.0.2 5.1.2 5.2 5.3 5.4 '
               b'5.5 5.6 5.7 5.8 5.9 6.0')

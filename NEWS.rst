@@ -1,4 +1,4 @@
-hg-git 0.10.4 (unreleased)
+hg-git 0.10.4 (2022-01-26)
 ==========================
 
 This is a minor release, focusing on bugs and compatibility.
