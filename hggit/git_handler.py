@@ -1777,88 +1777,73 @@ class GitHandler(object):
         return ref_nodes
 
     def update_hg_bookmarks(self, remote_names, refs):
-        try:
-            bms = self.repo._bookmarks
-            unfiltered = self.repo.unfiltered()
-            changes = []
+        bms = self.repo._bookmarks
+        unfiltered = self.repo.unfiltered()
+        changes = []
 
-            for ref_name, wanted_node in self._get_ref_nodes(
-                remote_names, refs
-            ).items():
-                bm = ref_name + (self.branch_bookmark_suffix or b'')
-                current_node = bms.get(bm)
+        for ref_name, wanted_node in self._get_ref_nodes(
+            remote_names, refs
+        ).items():
+            bm = ref_name + (self.branch_bookmark_suffix or b'')
+            current_node = bms.get(bm)
 
-                if current_node is not None and current_node == wanted_node:
-                    self.ui.note(_(b"bookmark %s is up-to-date\n") % bm)
+            if current_node is not None and current_node == wanted_node:
+                self.ui.note(_(b"bookmark %s is up-to-date\n") % bm)
 
-                elif wanted_node == nullid:
-                    self.ui.note(_(b"bookmark %s is not known yet\n") % bm)
+            elif wanted_node == nullid:
+                self.ui.note(_(b"bookmark %s is not known yet\n") % bm)
 
-                elif wanted_node is None and current_node is None:
-                    self.ui.note(
-                        b"bookmark %s is deleted locally as well\n" % bm
-                    )
+            elif wanted_node is None and current_node is None:
+                self.ui.note(b"bookmark %s is deleted locally as well\n" % bm)
 
-                elif wanted_node is None:
-                    # possibly deleted branch, check if we have a
-                    # matching remote ref
-                    unmoved = any(
-                        self.remote_refs.get(b'%s/%s' % (remote_name, ref_name))
-                        == current_node
-                        for remote_name in remote_names
-                    )
-
-                    # only delete unmoved bookmarks
-                    if unmoved:
-                        changes.append((bm, None))
-                        self.ui.status(_(b"deleting bookmark %s\n") % bm)
-                    else:
-                        self.ui.status(
-                            b"not deleting diverged bookmark %s\n" % bm
-                        )
-
-                elif current_node is None:
-                    # new branch
-                    changes.append((bm, wanted_node))
-
-                    # only log additions on subsequent pulls
-                    if not self.is_clone:
-                        self.ui.status(_("adding bookmark %s\n") % bm)
-
-                elif unfiltered[current_node].isancestorof(
-                    unfiltered[wanted_node]
-                ):
-                    # fast forward
-                    changes.append((bm, wanted_node))
-                    self.ui.status(_("updating bookmark %s\n") % bm)
-
-                elif unfiltered.obsstore and wanted_node in obsutil.foreground(
-                    unfiltered, [current_node]
-                ):
-                    # this is fast-forward or a rebase, across
-                    # obsolescence markers too. (ideally we would have
-                    # a background thingy that is more efficient that
-                    # the foreground one.)
-                    changes.append((bm, wanted_node))
-                    self.ui.status(_("updating bookmark %s\n") % bm)
-
-                else:
-                    self.ui.status(
-                        _("not updating diverged bookmark %s\n") % bm,
-                    )
-
-            if changes:
-                with self.repo.wlock(), self.repo.lock():
-                    with self.repo.transaction(b"hg-git") as tr:
-                        bms.applychanges(self.repo, tr, changes)
-
-        except AttributeError:
-            self.ui.warn(
-                _(
-                    b'creating bookmarks failed, do you have'
-                    b' bookmarks enabled?\n'
+            elif wanted_node is None:
+                # possibly deleted branch, check if we have a
+                # matching remote ref
+                unmoved = any(
+                    self.remote_refs.get(b'%s/%s' % (remote_name, ref_name))
+                    == current_node
+                    for remote_name in remote_names
                 )
-            )
+
+                # only delete unmoved bookmarks
+                if unmoved:
+                    changes.append((bm, None))
+                    self.ui.status(_(b"deleting bookmark %s\n") % bm)
+                else:
+                    self.ui.status(b"not deleting diverged bookmark %s\n" % bm)
+
+            elif current_node is None:
+                # new branch
+                changes.append((bm, wanted_node))
+
+                # only log additions on subsequent pulls
+                if not self.is_clone:
+                    self.ui.status(_("adding bookmark %s\n") % bm)
+
+            elif unfiltered[current_node].isancestorof(unfiltered[wanted_node]):
+                # fast forward
+                changes.append((bm, wanted_node))
+                self.ui.status(_("updating bookmark %s\n") % bm)
+
+            elif unfiltered.obsstore and wanted_node in obsutil.foreground(
+                unfiltered, [current_node]
+            ):
+                # this is fast-forward or a rebase, across
+                # obsolescence markers too. (ideally we would have
+                # a background thingy that is more efficient that
+                # the foreground one.)
+                changes.append((bm, wanted_node))
+                self.ui.status(_("updating bookmark %s\n") % bm)
+
+            else:
+                self.ui.status(
+                    _("not updating diverged bookmark %s\n") % bm,
+                )
+
+        if changes:
+            with self.repo.wlock(), self.repo.lock():
+                with self.repo.transaction(b"hg-git") as tr:
+                    bms.applychanges(self.repo, tr, changes)
 
     def get_public_heads(self, remote_name, refs):
         nodeids_to_publish = set()
