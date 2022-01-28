@@ -1203,6 +1203,8 @@ class GitHandler(object):
             )
             for sm_path, sm_url, sm_name in gitmodules:
                 hgsub[sm_path] = b'[git]' + sm_url
+            for path in hgsubstate.keys() - hgsub.keys():
+                del hgsubstate[path]
             files[b'.hgsub'] = (False, 0o100644, None)
         elif (
             commit.parents

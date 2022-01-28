@@ -173,7 +173,7 @@ data. That's odd, so show it:
   e8ddf4fb3ed4 default/master/tip master
   $ hg clone -U repo.git hgrepo2
   importing 6 git commits
-  new changesets e532b2bfda10:36bc272d4273 (6 drafts)
+  new changesets e532b2bfda10:97330ba1deef (6 drafts)
   $ hg -R hgrepo2 up :master
   Cloning into '$TESTTMP/hgrepo2/subrepo1'...
   done.
@@ -195,16 +195,4 @@ We broke bidirectionality :(
   $ hg id hgrepo
   e8ddf4fb3ed4 default/master/tip master
   $ hg id hgrepo2
-  36bc272d4273+ default/master/tip master
-
-And even have something weird in the new clone:
-
-  $ hg diff -R hgrepo2
-  diff -r 36bc272d4273 .hgsubstate
-  --- a/.hgsubstate	Mon Jan 01 00:00:17 2007 +0000
-  +++ b/.hgsubstate	Thu Jan 01 00:00:00 1970 +0000
-  @@ -1,4 +1,3 @@
-   481ec30d580f333ae3a77f94c973ce37b69d5bda hgsub
-   56f0304c5250308f14cfbafdc27bd12d40154d17 subrepo1
-  -aabf7cd015089aff0b84596e69aa37b24a3d090a subrepo2
-   aabf7cd015089aff0b84596e69aa37b24a3d090a xyz/subrepo2
+  97330ba1deef default/master/tip master
