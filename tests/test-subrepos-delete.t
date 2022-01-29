@@ -53,16 +53,16 @@ And there should be nothing in Mercurial either:
 
   $ hg clone -U repo.git hgrepo
   importing 3 git commits
-  new changesets e532b2bfda10:824fb8f70a77 (3 drafts)
+  new changesets e532b2bfda10:cc611d35fb62 (3 drafts)
   $ cd hgrepo
   $ hg log --graph --template info
   o
-  |  commit:  2:824fb8f70a77  delete subrepo
+  |  commit:  2:cc611d35fb62  delete subrepo
   |  added:
-  |  removed: .gitmodules .hgsub .hgsubstate
+  |  removed: .hgsub .hgsubstate
   o
-  |  commit:  1:32c6bd4f29bd  add subrepo
-  |  added:   .gitmodules .hgsub .hgsubstate
+  |  commit:  1:8d549bcc5179  add subrepo
+  |  added:   .hgsub .hgsubstate
   |  removed:
   o
      commit:  0:e532b2bfda10  add alpha

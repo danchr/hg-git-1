@@ -34,6 +34,7 @@ Enhancements:
   intercepting when commits are converted. As a result, you can now
   use the ``notify`` extension when interacting with Git repositories.
   (#402)
+* Git subrepositories will now be pushed as Git submodules.
 
 This release requires Mercurial 6.1, or later, Dulwich 0.20.11 or
 later, and Python 3.8 or later.

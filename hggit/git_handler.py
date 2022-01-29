@@ -1206,6 +1206,7 @@ class GitHandler(object):
             for path in hgsubstate.keys() - hgsub.keys():
                 del hgsubstate[path]
             files[b'.hgsub'] = (False, 0o100644, None)
+            files.pop(b'.gitmodules', None)
         elif (
             commit.parents
             and b'.gitmodules' in self.git[self.git[commit.parents[0]].tree]

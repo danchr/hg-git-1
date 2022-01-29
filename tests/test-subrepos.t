@@ -35,11 +35,11 @@ Load commonly used test logic
 Ensure gitlinks are transformed to .hgsubstate on hg pull from git
   $ hg clone -u tip repo.git hgrepo 2>&1 | grep -E -v '^(Cloning into|done)'
   importing 3 git commits
-  new changesets e532b2bfda10:88c5e06a2a29 (3 drafts)
+  new changesets e532b2bfda10:3c4fd561cbeb (3 drafts)
   updating to branch default
   cloning subrepo subrepo1 from $TESTTMP/gitsubrepo
   cloning subrepo xyz/subrepo2 from $TESTTMP/gitsubrepo
-  4 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  3 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
   $ hg bookmarks -f -r default master
 1. Ensure gitlinks are transformed to .hgsubstate on hg <- git pull
@@ -160,7 +160,7 @@ pull shall bring .hgsub entry which was added to the git repo
   searching for changes
   adding objects
   remote: found 0 deltas to reuse (dulwich0210 !)
-  added 1 commits with 1 trees and 0 blobs
+  added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
   $ cd ..
 
@@ -170,10 +170,10 @@ case, we break the bidirectional convention, and modify the repository
 data. That's odd, so show it:
 
   $ hg id hgrepo
-  e8ddf4fb3ed4 default/master/tip master
+  42c46c7eef3a default/master/tip master
   $ hg clone -U repo.git hgrepo2
   importing 6 git commits
-  new changesets e532b2bfda10:97330ba1deef (6 drafts)
+  new changesets e532b2bfda10:42c46c7eef3a (6 drafts)
   $ hg -R hgrepo2 up :master
   Cloning into '$TESTTMP/hgrepo2/subrepo1'...
   done.
@@ -181,18 +181,18 @@ data. That's odd, so show it:
   cloning subrepo subrepo1 from $TESTTMP/gitsubrepo
   checking out detached HEAD in subrepository "subrepo1"
   check out a git branch if you intend to make changes
+  Cloning into '$TESTTMP/hgrepo2/subrepo2'...
+  done.
   Cloning into '$TESTTMP/hgrepo2/xyz/subrepo2'...
   done.
+  cloning subrepo subrepo2 from $TESTTMP/gitsubrepo
   cloning subrepo xyz/subrepo2 from $TESTTMP/gitsubrepo
-  4 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  3 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
-We broke bidirectionality :(
+We retained bidirectionality!
 
   $ git diff --stat hgrepo/.hgsub hgrepo2/.hgsub
-   {hgrepo => hgrepo2}/.hgsub | 1 -
-   1 file changed, 1 deletion(-)
-  [1]
   $ hg id hgrepo
-  e8ddf4fb3ed4 default/master/tip master
+  42c46c7eef3a default/master/tip master
   $ hg id hgrepo2
-  97330ba1deef default/master/tip master
+  42c46c7eef3a default/master/tip master

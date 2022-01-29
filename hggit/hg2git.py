@@ -3,9 +3,11 @@
 # repositories to Git repositories. Code in this file is meant to be a generic
 # library and should be usable outside the context of hg-git or an hg command.
 
+import io
 import os
 import stat
 
+import dulwich.config as dulcfg
 import dulwich.objects as dulobjs
 from mercurial import (
     subrepoutil,
@@ -219,7 +221,7 @@ class IncrementalChangesetExporter(object):
 
         for s in modified, added, removed:
             if b'.hgsub' in s or b'.hgsubstate' in s:
-                subadded, subremoved = self._handle_subrepos(newctx)
+                gitmodules, subadded, subremoved = self._handle_subrepos(newctx)
                 break
 
         # We first process subrepo and file removals so we can prune dead
@@ -234,6 +236,10 @@ class IncrementalChangesetExporter(object):
             self._remove_path(path, dirty_trees)
 
         for path, sha in subadded:
+            if b'.gitmodules' in newctx:
+                modified.append(b'.gitmodules')
+            else:
+                added.append(b'.gitmodules')
             d = os.path.dirname(path)
             tree = self._dirs.setdefault(d, dulobjs.Tree())
             dirty_trees.add(d)
@@ -250,9 +256,17 @@ class IncrementalChangesetExporter(object):
             tree = self._dirs.setdefault(d, dulobjs.Tree())
             dirty_trees.add(d)
 
-            fctx = newctx[path]
+            if path == b'.gitmodules':
+                blob = dulobjs.Blob.from_string(gitmodules)
+                entry = dulobjs.TreeEntry(
+                    path,
+                    flags2mode(newctx[b'.hgsub'].flags()),
+                    blob.id,
+                )
+            else:
+                fctx = newctx[path]
 
-            entry, blob = self.tree_entry(fctx)
+                entry, blob = self.tree_entry(fctx)
 
             if blob is not None:
                 yield blob
@@ -402,6 +416,16 @@ class IncrementalChangesetExporter(object):
         # 'added' is both modified and added
         added, removed = [], []
 
+        if b'.gitmodules' not in newctx:
+            config = dulcfg.ConfigFile()
+        else:
+            with io.BytesIO(newctx[b'.gitmodules'].data()) as buf:
+                config = dulcfg.ConfigFile.from_file(buf)
+
+        submodules = {
+            path: name for (path, url, name) in dulcfg.parse_submodules(config)
+        }
+
         for path, (remote, sha, t) in state.items():
             if t != b'git':
                 # old = hg -- will be handled in next loop
@@ -410,6 +434,7 @@ class IncrementalChangesetExporter(object):
             if path not in newstate or newstate[path][2] != b'git':
                 # new = hg or no, case (2) or (3)
                 removed.append(path)
+                submodules.pop(path, None)
 
         for path, (remote, sha, t) in newstate.items():
             if t != b'git':
@@ -420,7 +445,15 @@ class IncrementalChangesetExporter(object):
             # case (1)
             added.append((path, sha))
 
-        return added, removed
+            section = b"submodule", submodules.get(path, path)
+            config.set(section, b"path", path)
+            config.set(section, b"url", remote)
+
+        with io.BytesIO() as buf:
+            config.write_to_file(buf)
+            gitmodules = buf.getvalue()
+
+        return gitmodules, added, removed
 
     def tree_entry(self, fctx):
         """Compute a dulwich TreeEntry from a filectx.

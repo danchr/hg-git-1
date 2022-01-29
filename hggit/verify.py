@@ -63,9 +63,6 @@ def verify(ui, repo, hgctx):
     dirkind = stat.S_IFDIR
 
     hgfiles = set(hgctx)
-    # TODO deal with submodules
-    hgfiles.discard(b'.hgsubstate')
-    hgfiles.discard(b'.hgsub')
     gitfiles = set()
 
     with ui.makeprogress(b'verify', total=len(hgfiles)) as progress:
@@ -101,6 +98,12 @@ def verify(ui, repo, hgctx):
             if fctx.data() != handler.git[gitfile.sha].data:
                 ui.write(_(b'difference in: %s\n') % gitfile.path)
                 failed = True
+
+    # TODO: we should actually verify submodules & subrepos, but for
+    #       now, we'll just not report an error
+    hgfiles.discard(b'.hgsubstate')
+    hgfiles.discard(b'.hgsub')
+    gitfiles.discard(b'.gitmodules')
 
     if hgfiles != gitfiles:
         failed = True

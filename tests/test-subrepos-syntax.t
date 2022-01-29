@@ -39,7 +39,7 @@ comments and [subpaths] in .hgsub
 
   $ hg clone -U repo.git hgrepo
   importing 3 git commits
-  new changesets e532b2bfda10:88c5e06a2a29 (3 drafts)
+  new changesets e532b2bfda10:3c4fd561cbeb (3 drafts)
   $ cd hgrepo
   $ hg up master
   Cloning into '$TESTTMP/hgrepo/subrepo1'...
@@ -48,7 +48,7 @@ comments and [subpaths] in .hgsub
   done.
   cloning subrepo subrepo1 from $TESTTMP/gitsubrepo
   cloning subrepo xyz/subrepo2 from $TESTTMP/gitsubrepo
-  4 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  3 files updated, 0 files merged, 0 files removed, 0 files unresolved
   (activating bookmark master)
   $ cat >> .hgsub <<EOF
   > # this is a comment
@@ -84,8 +84,8 @@ We broke bidirectionality:
 
   $ hg clone -U repo.git hgrepo2
   importing 4 git commits
-  new changesets e532b2bfda10:d4d6b10ca1df (4 drafts)
+  new changesets e532b2bfda10:cbf584fe001b (4 drafts)
   $ hg id -r tip hgrepo
-  6d770a109c8f default/master/tip master
+  c58a542b18bc default/master/tip master
   $ hg id -r tip hgrepo2
-  d4d6b10ca1df default/master/tip master
+  cbf584fe001b default/master/tip master
