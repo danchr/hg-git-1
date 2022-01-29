@@ -143,6 +143,23 @@ class GitProgress(object):
         self.progress(b'')
 
 
+class heads_tags(object):
+    __slots__ = "heads", "tags"
+
+    def __init__(self, heads=(), tags=()):
+        self.heads = set(heads)
+        self.tags = set(tags)
+
+    def __iter__(self):
+        return itertools.chain(self.heads, self.tags)
+
+    def __bool__(self):
+        return bool(self.heads) or bool(self.tags)
+
+    def __repr__(self):
+        return f"heads_tags(heads={self.heads}, tags={self.tags})"
+
+
 def get_repo_and_gitdir(repo):
     if repo.shared():
         repo = hg.sharedreposource(repo)
@@ -1678,17 +1695,6 @@ class GitHandler(object):
             return [(_filter_bm(bm), bm, n) for bm, n in bms.items()]
 
     def get_exportable(self):
-        class heads_tags(object):
-            def __init__(self):
-                self.heads = set()
-                self.tags = set()
-
-            def __iter__(self):
-                return itertools.chain(self.heads, self.tags)
-
-            def __bool__(self):
-                return bool(self.heads) or bool(self.tags)
-
         res = collections.defaultdict(heads_tags)
 
         for filtered_bm, bm, node in self.get_filtered_bookmarks():
