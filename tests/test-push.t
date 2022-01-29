@@ -195,6 +195,15 @@ fails:
   updating reference refs/heads/not-master
   $ cd ..
 
+We can push only one of two bookmarks on the same revision:
+
+  $ cd hgrepo
+  $ hg book also-not-master really-not-master
+  $ hg push -B also-not-master
+  pushing to file:///$TESTTMP/gitrepo
+  searching for changes
+  adding reference refs/heads/also-not-master
+
 Push empty Hg repo to empty Git repo (issue #58)
   $ hg init hgrepo2
   $ git init -q --bare repo.git

@@ -491,8 +491,8 @@ class GitHandler(object):
                 _(b"git remote error: ") + pycompat.sysbytes(str(e))
             )
 
-    def push(self, remote, revs, force):
-        old_refs, new_refs = self.upload_pack(remote, revs, force)
+    def push(self, remote, revs, bookmarks, force):
+        old_refs, new_refs = self.upload_pack(remote, revs, bookmarks, force)
         remote_names = self.remote_names(remote, True)
         remote_desc = remote_names[0] if remote_names else remote
 
@@ -1334,7 +1334,13 @@ class GitHandler(object):
 
     # PACK UPLOADING AND FETCHING
 
-    def upload_pack(self, remote, revs, force):
+    def upload_pack(self, remote, revs, bookmarks, force):
+        if bookmarks and self.branch_bookmark_suffix:
+            raise error.Abort(
+                b"the -B/--bookmarks option is not supported when "
+                b"branch_bookmark_suffix is set",
+            )
+
         all_exportable = self.export_commits()
         old_refs = {}
         change_totals = {}
@@ -1352,7 +1358,16 @@ class GitHandler(object):
                             b"revision %s cannot be pushed since"
                             b" it doesn't have a bookmark" % self.repo[rev]
                         )
-                    exportable[rev] = all_exportable[rev]
+                    elif bookmarks:
+                        # we should only push the listed bookmarks,
+                        # and not any other bookmarks that might point
+                        # to the same changeset
+                        exportable[rev] = heads_tags(
+                            heads=all_exportable[rev].heads
+                            & {LOCAL_BRANCH_PREFIX + bm for bm in bookmarks},
+                        )
+                    else:
+                        exportable[rev] = all_exportable[rev]
             return self.get_changed_refs(refs, exportable, force)
 
         def genpack(have, want, progress=None, ofs_delta=True):

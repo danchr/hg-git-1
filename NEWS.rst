@@ -1,3 +1,13 @@
+hg-git 1.1b1 (unreleased)
+=========================
+
+Enhancements:
+
+* The ``-B/--bookmark`` flag for ``push`` will now restrict bookmarks
+  by name rather than revision. (Please note that this is unsupported
+  when the ``git.branch_bookmark_suffix`` configuration option is
+  set.)
+
 hg-git 1.0b2 (2022-03-10)
 =========================
 
@@ -9,7 +19,6 @@ bugs:
   storing the authenticated client. (#379)
 
 This release requires Mercurial 5.2 or later and Python 3.6 or later.
-
 
 hg-git 1.0b1 (2022-01-26)
 =========================
