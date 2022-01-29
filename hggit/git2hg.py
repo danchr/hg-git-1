@@ -310,15 +310,9 @@ def parse_gitmodules(git, tree_obj):
     except KeyError:
         return rv
     gitmodules_content = git[gitmodules_sha].data
-    fo = io.BytesIO(gitmodules_content)
-    tt = config.ConfigFile.from_file(fo)
-    for section in tt.keys():
-        section_kind, section_name = section
-        if section_kind == b'submodule':
-            sm_path = tt.get(section, b'path')
-            sm_url = tt.get(section, b'url')
-            rv.append((sm_path, sm_url, section_name))
-    return rv
+    with io.BytesIO(gitmodules_content) as fp:
+        cfg = config.ConfigFile.from_file(fp)
+    return config.parse_submodules(cfg)
 
 
 def git_file_readlines(git, tree_obj, fname):
