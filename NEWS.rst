@@ -7,6 +7,9 @@ Enhancements:
   by name rather than revision. (Please note that this is unsupported
   when the ``git.branch_bookmark_suffix`` configuration option is
   set.)
+* Pushing an unknown bookmark with the ``-B/--bookmark`` option now
+  has the same effect as when pushing to a Mercurial repository, and
+  will delete the remote Git branch.
 
 hg-git 1.0b2 (2022-03-10)
 =========================

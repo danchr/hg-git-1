@@ -21,7 +21,7 @@ from dulwich import config as dul_config
 from dulwich import diff_tree
 
 from mercurial.i18n import _
-from mercurial.node import hex, bin, nullid, short
+from mercurial.node import hex, bin, nullid, nullhex, short
 from mercurial.utils import dateutil
 from mercurial import (
     bookmarks,
@@ -511,6 +511,8 @@ class GitHandler(object):
                     b'warning: failed to update %s; %s\n'
                     % (ref, pycompat.sysbytes(ref_status[ref])),
                 )
+            elif new_sha == nullhex:
+                self.ui.status(b"deleting reference %s\n" % ref)
             elif old_sha is None:
                 if self.ui.verbose:
                     self.ui.note(
@@ -1353,7 +1355,16 @@ class GitHandler(object):
             else:
                 exportable = {}
                 for rev in (hex(r) for r in revs):
-                    if rev not in all_exportable:
+                    if rev == nullhex:
+                        # a deletion
+                        exportable[rev] = heads_tags(
+                            heads={
+                                LOCAL_BRANCH_PREFIX + bm
+                                for bm in bookmarks
+                                if bm not in self.repo._bookmarks
+                            }
+                        )
+                    elif rev not in all_exportable:
                         raise error.Abort(
                             b"revision %s cannot be pushed since"
                             b" it doesn't have a bookmark" % self.repo[rev]
@@ -1467,7 +1478,18 @@ class GitHandler(object):
                 uptodate_annotated_tags.append(ref)
 
             for ref in rev_refs:
-                if ref not in refs:
+                if ctx.node() == nullid:
+                    if ref not in new_refs:
+                        # this is reasonably consistent with
+                        # mercurial; git aborts with an error in this
+                        # case
+                        self.ui.warn(
+                            b"warning: unable to delete '%s' as it does not "
+                            b"exist on the remote repository\n" % ref,
+                        )
+                    else:
+                        new_refs[ref] = nullhex
+                elif ref not in refs:
                     gitobj = self.git.get_object(self.git.refs[ref])
                     if isinstance(gitobj, Tag):
                         new_refs[ref] = gitobj.id
