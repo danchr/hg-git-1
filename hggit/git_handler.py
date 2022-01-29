@@ -767,7 +767,7 @@ class GitHandler(object):
         if b'gpgsig' in extra:
             commit.gpgsig = extra[b'gpgsig']
 
-        for obj, nodeid in exporter.update_changeset(ctx):
+        for obj in exporter.update_changeset(ctx):
             if obj.id not in self.git.object_store:
                 self.git.object_store.add_object(obj)
 

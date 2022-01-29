@@ -246,7 +246,7 @@ class IncrementalChangesetExporter(object):
             func = IncrementalChangesetExporter.tree_entry
             entry, blob = func(fctx, self._blob_cache)
             if blob is not None:
-                yield (blob, fctx.filenode())
+                yield blob
 
             tree.add(*entry)
 
@@ -256,7 +256,7 @@ class IncrementalChangesetExporter(object):
         # dulwich.index.commit_tree(), which builds new Tree instances for each
         # series of blobs.
         for obj in self._populate_tree_entries(dirty_trees):
-            yield (obj, None)
+            yield obj
 
         self._ctx = newctx
 
