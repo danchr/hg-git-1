@@ -14,6 +14,15 @@ from mercurial import (
 )
 
 
+def flags2mode(flags):
+    if b'l' in flags:
+        return 0o120000
+    elif b'x' in flags:
+        return 0o100755
+    else:
+        return 0o100644
+
+
 class IncrementalChangesetExporter(object):
     """Incrementally export Mercurial changesets to Git trees.
 
@@ -243,8 +252,8 @@ class IncrementalChangesetExporter(object):
 
             fctx = newctx[path]
 
-            func = IncrementalChangesetExporter.tree_entry
-            entry, blob = func(fctx, self._blob_cache)
+            entry, blob = self.tree_entry(fctx)
+
             if blob is not None:
                 yield blob
 
@@ -413,32 +422,26 @@ class IncrementalChangesetExporter(object):
 
         return added, removed
 
-    @staticmethod
-    def tree_entry(fctx, blob_cache):
+    def tree_entry(self, fctx):
         """Compute a dulwich TreeEntry from a filectx.
 
-        A side effect is the TreeEntry is stored in the passed cache.
+        A side effect is the TreeEntry is stored in the blob cache.
 
         Returns a 2-tuple of (dulwich.objects.TreeEntry, dulwich.objects.Blob).
         """
-        blob_id = blob_cache.get(fctx.filenode(), None)
+        blob_id = self._blob_cache.get(fctx.filenode(), None)
         blob = None
 
         if blob_id is None:
             blob = dulobjs.Blob.from_string(fctx.data())
             blob_id = blob.id
-            blob_cache[fctx.filenode()] = blob_id
-
-        flags = fctx.flags()
-
-        if b'l' in flags:
-            mode = 0o120000
-        elif b'x' in flags:
-            mode = 0o100755
-        else:
-            mode = 0o100644
+            self._blob_cache[fctx.filenode()] = blob_id
 
         return (
-            dulobjs.TreeEntry(os.path.basename(fctx.path()), mode, blob_id),
+            dulobjs.TreeEntry(
+                os.path.basename(fctx.path()),
+                flags2mode(fctx.flags()),
+                blob_id,
+            ),
             blob,
         )
