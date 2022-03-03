@@ -180,6 +180,7 @@ Create a git tag from hg, but pointing to a new commit:
   $ touch gamma
   $ fn_hg_commit -A -m 'add gamma'
   $ hg tag --git gamma --debug -r tip
+  invalid branch cache (visible): tip differs (?)
   adding git tag gamma
   finding hg commits to export
   exporting hg objects to git
