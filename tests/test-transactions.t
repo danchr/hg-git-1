@@ -131,7 +131,7 @@ A low save interval causes a lot of reports:
 Reset the repository
 
   $ hg strip --no-backup 'all()'
-  $ hg gclear
+  $ hg debug-remove-hggit-state
   clearing out the git cache data
 
 And with phases? No mention of draft changesets, as we publish changes
@@ -150,7 +150,7 @@ during the conversion:
 Reset the repository
 
   $ hg strip --no-backup 'all()'
-  $ hg gclear
+  $ hg debug-remove-hggit-state
   clearing out the git cache data
 
 Interruptions
@@ -188,7 +188,7 @@ Check that we have no state, but clear it just in case
 
   $ ls -d .hg/git*
   .hg/git
-  $ hg gclear
+  $ hg debug-remove-hggit-state
   clearing out the git cache data
 
 Test the user exiting in the middle of a conversion, after the first

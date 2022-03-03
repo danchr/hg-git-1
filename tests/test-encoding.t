@@ -116,7 +116,7 @@ The warning message changed in Git 1.8.0
   
   
 
-  $ hg gclear
+  $ hg debug-remove-hggit-state
   clearing out the git cache data
   $ hg push ../repo.git
   pushing to ../repo.git

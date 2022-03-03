@@ -23,13 +23,17 @@ from mercurial import (
     error,
     exthelper,
     pycompat,
+    registrar,
     scmutil,
 )
 
 eh = exthelper.exthelper()
 
 
-@eh.command(b'gimport')
+@eh.command(
+    b'git-import|gimport',
+    helpcategory=registrar.command.CATEGORY_IMPORT_EXPORT,
+)
 def gimport(ui, repo, remote_name=None):
     '''import commits from Git to Mercurial (ADVANCED)
 
@@ -44,7 +48,10 @@ def gimport(ui, repo, remote_name=None):
         repo.githandler.import_commits(remote_name)
 
 
-@eh.command(b'gexport')
+@eh.command(
+    b'git-export|gexport',
+    helpcategory=registrar.command.CATEGORY_IMPORT_EXPORT,
+)
 def gexport(ui, repo):
     '''export commits from Mercurial to Git (ADVANCED)
 
@@ -59,9 +66,9 @@ def gexport(ui, repo):
     repo.githandler.export_commits()
 
 
-@eh.command(b'gclear')
+@eh.command(b'debug-remove-hggit-state')
 def gclear(ui, repo):
-    '''clear out the Git cached data (ADVANCED)
+    '''remove all Git-related cache and metadata (DANGEROUS)
 
     Strips all Git-related metadata from the repo, including the mapping
     between Git and Mercurial changesets. This is an irreversible
@@ -79,12 +86,13 @@ def gitdir(ui, repo):
 
 
 @eh.command(
-    b'gverify',
+    b'git-verify|gverify',
     [
         (b'r', b'rev', b'', _(b'revision to verify'), _(b'REV')),
         (b'c', b'fsck', False, _(b'verify repository integrity as well')),
     ],
     _(b'[-r REV]'),
+    helpcategory=registrar.command.CATEGORY_MAINTENANCE,
 )
 def gverify(ui, repo, **opts):
     '''verify that a Mercurial rev matches the corresponding Git rev
@@ -103,7 +111,7 @@ def gverify(ui, repo, **opts):
     return verify.verify(ui, repo, ctx)
 
 
-@eh.command(b'git-cleanup')
+@eh.command(b'git-cleanup', helpcategory=registrar.command.CATEGORY_MAINTENANCE)
 def git_cleanup(ui, repo):
     '''clean up Git commit map after history editing'''
     new_map = []

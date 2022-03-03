@@ -38,7 +38,7 @@ Load commonly used test logic
   adds: d1/f1 d1/f2
   dels: 
 
-  $ hg gclear
+  $ hg debug-remove-hggit-state
   clearing out the git cache data
   $ hg push ../repo.git
   pushing to ../repo.git

@@ -71,7 +71,7 @@ this gets the tree pointed to by the commit at HEAD
 
 corrupt git repository
 
-  $ hg gclear
+  $ hg debug-remove-hggit-state
   clearing out the git cache data
   $ hg gexport
   $ mv -f .hg/git/objects/82/166b4cbde0f025d20aacb93fd085aa1462cd4e .hg/git/objects/6d/ff77b710b6f0961ac0b6d91d85902195133d74

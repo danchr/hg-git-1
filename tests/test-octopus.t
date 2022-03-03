@@ -106,7 +106,7 @@ Load commonly used test logic
   (if this is an octopus merge, verify against the last rev)
   [255]
 
-  $ hg gclear
+  $ hg debug-remove-hggit-state
   clearing out the git cache data
   $ hg push ../repo.git
   pushing to ../repo.git

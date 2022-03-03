@@ -1,8 +1,17 @@
 hg-git 1.1b1 (unreleased)
 =========================
 
+Upcoming feature release.
+
+Changes to behaviour:
+
+* The ``gclear`` command is inherently dangerous, and has been
+  replaced with a debug command instead.
+
 Enhancements:
 
+* Minor adjustments to categorisation of internal commands, and ensure
+  that they all start with ``git-*``.
 * The ``-B/--bookmark`` flag for ``push`` will now restrict bookmarks
   by name rather than revision. (Please note that this is unsupported
   when the ``git.branch_bookmark_suffix`` configuration option is

@@ -444,7 +444,7 @@ Now make another clone and compare the hashes
   +16
 
 Regenerate the Git metadata and compare the hashes
-  $ hg gclear
+  $ hg debug-remove-hggit-state
   clearing out the git cache data
   $ hg gexport
   $ cd .hg/git

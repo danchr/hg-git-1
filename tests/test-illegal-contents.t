@@ -25,7 +25,7 @@ Load commonly used test logic
   warning: skipping invalid path 'foo/git~100/wat'
   $ GIT_DIR=.hg/git git ls-tree -r --name-only  master
   this/is/safe
-  $ hg gclear
+  $ hg debug-remove-hggit-state
   clearing out the git cache data
   $ hg gexport --config hggit.invalidpaths=keep
   warning: path '.git/hooks/post-update' contains an invalid path component
@@ -60,7 +60,7 @@ Load commonly used test logic
 
 We can trigger an error:
 
-  $ hg -q gclear
+  $ hg -q debug-remove-hggit-state
   $ hg --config hggit.invalidpaths=abort gexport
   abort: invalid path 'nested/.git/hooks/post-update' rejected by configuration
   (see 'hg help hggit' for details)

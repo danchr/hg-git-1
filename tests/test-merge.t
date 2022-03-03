@@ -38,7 +38,7 @@ clean merge
   $ cd hgrepo
 
 clear the cache to be sure it is regenerated correctly
-  $ hg gclear
+  $ hg debug-remove-hggit-state
   clearing out the git cache data
   $ hg push ../repo.git
   pushing to ../repo.git
