@@ -142,7 +142,9 @@ you can't check out.
   importing 1 git commits
   warning: path 'nested/.hg/00changelog.i' contains an invalid path component
   warning: path 'nested/.hg/requires' contains an invalid path component
+  warning: path 'nested/.hg/store/requires' contains an invalid path component (?)
   new changesets [0-9a-f]{12,12} \(1 drafts\) (re)
+  warning: path 'nested/.hg/store/requires' is within a nested repository, which Mercurial cannot check out. (?)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
   abort: path 'nested/.hg/00changelog.i' is inside nested repo 'nested'
@@ -152,6 +154,7 @@ you can't check out.
   importing 1 git commits
   warning: skipping invalid path 'nested/.hg/00changelog.i'
   warning: skipping invalid path 'nested/.hg/requires'
+  warning: skipping invalid path 'nested/.hg/store/requires' (?)
   new changesets 3ea18a67c0e6 (1 drafts)
   updating to branch default (no-hg57 !)
   updating to bookmark master (hg57 !)
