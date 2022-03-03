@@ -38,7 +38,7 @@ Latest:
           - "3.6"
           - "3.10"
         HG:
-          - "6.0"
+          - "6.1"
 
 # This is the authoritative list of versions of Mercurial that this
 # extension is supported and tested with; it should be kept in sync
@@ -66,6 +66,7 @@ Supported:
           - "5.7"
           - "5.8"
           - "5.9"
+          - "6.0"
 
 # Test that it is possible to use and run hg-git on Ubuntu without
 # compiling any C code, i.e. with stock Dulwich, Mercurial and

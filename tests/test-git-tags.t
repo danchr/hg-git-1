@@ -226,6 +226,7 @@ untagged commit.
 Create a git tag from hg, but pointing to a new commit:
 
   $ hg tag --git gamma --debug -r tip
+  invalid branch cache (visible): tip differs (?)
   adding git tag gamma
   finding unexported changesets
   exporting 1 changesets
