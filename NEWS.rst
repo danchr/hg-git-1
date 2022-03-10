@@ -1,3 +1,16 @@
+hg-git 1.0b2 (2022-03-10)
+=========================
+
+This is a follow-up to the previous beta, that fixes the following
+bugs:
+
+* Fix tests with Mercurial 6.1.
+* Avoid prompting for authentication after a successful push, by
+  storing the authenticated client. (#379)
+
+This release requires Mercurial 5.2 or later and Python 3.6 or later.
+
+
 hg-git 1.0b1 (2022-01-26)
 =========================
 

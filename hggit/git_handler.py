@@ -187,6 +187,8 @@ class GitHandler(object):
 
         self._pwmgr = url.passwordmgr(self.ui, self.ui.httppasswordmgrdb)
 
+        self._clients = {}
+
         # the HTTP authentication realm -- this specifies that we've
         # tried an unauthenticated request, gotten a realm, and are now
         # ready to prompt the user, if necessary
@@ -1533,12 +1535,22 @@ class GitHandler(object):
                 os.remove(f.name)
 
     def _call_client(self, remote, method, *args, **kwargs):
+        if remote in self._clients:
+            clientobj, path = self._clients[remote]
+            return getattr(clientobj, method)(path, *args, **kwargs)
+
         for ignored in range(self.ui.configint(b'hggit', b'retries')):
             clientobj, path = self._get_transport_and_path(remote)
             func = getattr(clientobj, method)
 
             try:
-                return func(path, *args, **kwargs)
+                ret = func(path, *args, **kwargs)
+
+                # it worked, so save the client for later!
+                self._clients[remote] = clientobj, path
+
+                return ret
+
             except (compat.HTTPUnauthorized, GitProtocolError) as e:
                 self.ui.traceback()
 
