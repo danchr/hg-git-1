@@ -5,29 +5,15 @@
 
 from __future__ import generator_stop
 
-import collections
 import os
 import stat
 
 import dulwich.objects as dulobjs
 from mercurial import (
+    subrepoutil,
     encoding,
     error,
 )
-
-from . import util
-
-
-def parse_subrepos(ctx):
-    sub = collections.OrderedDict()
-    if b'.hgsub' in ctx:
-        sub = util.parse_hgsub(ctx[b'.hgsub'].data().splitlines())
-    substate = collections.OrderedDict()
-    if b'.hgsubstate' in ctx:
-        substate = util.parse_hgsubstate(
-            ctx[b'.hgsubstate'].data().splitlines()
-        )
-    return sub, substate
 
 
 class IncrementalChangesetExporter(object):
@@ -389,8 +375,8 @@ class IncrementalChangesetExporter(object):
             parent_tree[os.path.basename(d)] = (stat.S_IFDIR, tree.id)
 
     def _handle_subrepos(self, newctx):
-        sub, substate = parse_subrepos(self._ctx)
-        newsub, newsubstate = parse_subrepos(newctx)
+        state = subrepoutil.state(self._ctx, self._hg.ui)
+        newstate = subrepoutil.state(newctx, self._hg.ui)
 
         # For each path, the logic is described by the following table. 'no'
         # stands for 'the subrepo doesn't exist', 'git' stands for 'git
@@ -409,20 +395,17 @@ class IncrementalChangesetExporter(object):
         # 'added' is both modified and added
         added, removed = [], []
 
-        def isgit(sub, path):
-            return path not in sub or sub[path].startswith(b'[git]')
-
-        for path, sha in substate.items():
-            if not isgit(sub, path):
+        for path, (remote, sha, t) in state.items():
+            if t != b'git':
                 # old = hg -- will be handled in next loop
                 continue
             # old = git
-            if path not in newsubstate or not isgit(newsub, path):
+            if path not in newstate or newstate[path][2] != b'git':
                 # new = hg or no, case (2) or (3)
                 removed.append(path)
 
-        for path, sha in newsubstate.items():
-            if not isgit(newsub, path):
+        for path, (remote, sha, t) in newstate.items():
+            if t != b'git':
                 # new = hg or no; the only cases we care about are handled
                 # above
                 continue

@@ -11,6 +11,16 @@ Enhancements:
   has the same effect as when pushing to a Mercurial repository, and
   will delete the remote Git branch.
 
+hg-git 1.0b3 (unreleased)
+=========================
+
+This is a follow-up to the previous beta, that fixes the following
+bugs:
+
+* Handle errors in ``.gitmodules`` gracefully, allowing the conversion
+  to continue. (#329)
+* Don't die with an error when ``.hgsub`` contains comments. (#128)
+
 hg-git 1.0b2 (2022-03-10)
 =========================
 

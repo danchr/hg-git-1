@@ -1132,8 +1132,19 @@ class GitHandler(object):
 
         # Analyze .hgsub and merge with .gitmodules
         hgsub = None
-        gitmodules = git2hg.parse_gitmodules(self.git, git_commit_tree)
-        if gitmodules:
+        try:
+            gitmodules = git2hg.parse_gitmodules(self.git, git_commit_tree)
+        except KeyError:
+            gitmodules = None
+        except ValueError:
+            self.ui.traceback()
+            self.ui.warn(
+                b'warning: failed to parse .gitmodules in %s\n'
+                % commit.id[:12],
+            )
+            gitmodules = None
+
+        if gitmodules is not None:
             hgsub = util.parse_hgsub(
                 git2hg.git_file_readlines(self.git, git_commit_tree, b'.hgsub')
             )

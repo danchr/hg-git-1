@@ -300,25 +300,16 @@ def filter_refs(refs, heads):
 def parse_gitmodules(git, tree_obj):
     """Parse .gitmodules from a git tree specified by tree_obj
 
-    :return: list of tuples (submodule path, url, name),
-    where name is hgutil.urlreq.quoted part of the section's name, or
-    empty list if nothing found
+    Returns a list of tuples (submodule path, url, name), where name
+    is hgutil.urlreq.quoted part of the section's name
+
+    Raises KeyError if no modules exist, or ValueError if they're invalid
     """
-    rv = []
-    try:
-        unused_mode, gitmodules_sha = tree_obj[b'.gitmodules']
-    except KeyError:
-        return rv
+    unused_mode, gitmodules_sha = tree_obj[b'.gitmodules']
     gitmodules_content = git[gitmodules_sha].data
-    fo = io.BytesIO(gitmodules_content)
-    tt = config.ConfigFile.from_file(fo)
-    for section in tt.keys():
-        section_kind, section_name = section
-        if section_kind == b'submodule':
-            sm_path = tt.get(section, b'path')
-            sm_url = tt.get(section, b'url')
-            rv.append((sm_path, sm_url, section_name))
-    return rv
+    with io.BytesIO(gitmodules_content) as fp:
+        cfg = config.ConfigFile.from_file(fp)
+    return config.parse_submodules(cfg)
 
 
 def git_file_readlines(git, tree_obj, fname):
