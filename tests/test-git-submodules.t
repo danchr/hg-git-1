@@ -416,3 +416,37 @@ are the same is enough
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add alpha
   
+  $ cd ..
+
+test handling of an invalid .gitmodules file (#380)
+
+  $ git init --quiet gitrepo-issue380
+  $ cd gitrepo-issue380
+  $ git submodule add ../gitsubrepo
+  Cloning into '$TESTTMP/gitrepo-issue380/gitsubrepo'...
+  done.
+  $ fn_git_commit -m 'add a submodule'
+  $ cat >> .gitmodules <<EOF
+  > <<<<<<< HEAD
+  > EOF
+  $ fn_git_commit -a -m 'b0rken .gitmodules'
+  $ git status
+  fatal: bad config line 4 in file $TESTTMP/gitrepo-issue380/.gitmodules
+  [128]
+  $ sed -i.orig /HEAD/d .gitmodules
+  $ fn_git_commit -a -m 'fix .gitmodules'
+  $ git status
+  On branch master
+  Untracked files:
+    (use "git add <file>..." to include in what will be committed)
+  	.gitmodules.orig
+  
+  nothing added to commit but untracked files present (use "git add" to track)
+  $ cd ..
+  $ git clone gitrepo-issue380  gitrepo-issue380~
+  Cloning into 'gitrepo-issue380~'...
+  done.
+  $ hg clone -U gitrepo-issue380 hgrepo-issue380
+  importing 3 git commits
+  warning: failed to parse .gitmodules in 2e4ec4293822
+  new changesets 50ecf82d04fd:eb9cddb3177e (3 drafts)
