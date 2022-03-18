@@ -9,6 +9,7 @@ bugs:
 * Don't die with an error when ``.hgsub`` contains comments. (#128)
 * Suppress errors on export related to history editing of certain
   commits with unusual authorship and messages. (#383)
+* Fix tests with Git 2.35.
 
 hg-git 1.0b2 (2022-03-10)
 =========================
