@@ -49,26 +49,30 @@ The warning message changed in Git 1.8.0
   4 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
 
-  $ HGENCODING=utf-8 hg log --graph --debug | grep -v 'phase:' | grep -v ': *author=' | grep -v ': *message='
+  $ HGENCODING=utf-8 hg log --graph --debug
   @  changeset:   3:b8a0ac52f339ccd6d5729508bac4aee6e8b489d8
   |  bookmark:    master
   |  tag:         default/master
   |  tag:         tip
+  |  phase:       draft
   |  parent:      2:8bc4d64940260d4a1e70b54c099d3a76c83ff41e
   |  parent:      -1:0000000000000000000000000000000000000000
   |  manifest:    3:ea49f93388380ead5601c8fcbfa187516e7c2ed8
   |  user:        tést èncödîng <test@example.org>
   |  date:        Mon Jan 01 00:00:13 2007 +0000
   |  files+:      delta
+  |  extra:       author=$ \x90\x01\x01\xe9\x91\x03\x03\x01\xe8\x91\x08\x02\x01\xf6\x91\x0c\x01\x01\xee\x91\x0f\x15
   |  extra:       branch=default
   |  extra:       committer=test <test@example.org> 1167609613 0
   |  extra:       encoding=latin-1
   |  extra:       hg-git-rename-source=git
+  |  extra:       message=\x0c\n\x90\x05\x01\xe9\x91\x07\x02\x01\xe0\x91\x0b\x01
   |  description:
   |  add d\xc3\xa9lt\xc3\xa0 (esc)
   |
   |
   o  changeset:   2:8bc4d64940260d4a1e70b54c099d3a76c83ff41e
+  |  phase:       draft
   |  parent:      1:f35a3100b78e57a0f5e4589a438f952a14b26ade
   |  parent:      -1:0000000000000000000000000000000000000000
   |  manifest:    2:f580e7da3673c137370da2b931a1dee83590d7b4
@@ -83,6 +87,7 @@ The warning message changed in Git 1.8.0
   |
   |
   o  changeset:   1:f35a3100b78e57a0f5e4589a438f952a14b26ade
+  |  phase:       draft
   |  parent:      0:87cd29b67a9159eec3b5495b0496ef717b2769f5
   |  parent:      -1:0000000000000000000000000000000000000000
   |  manifest:    1:f0bd6fbafbaebe4bb59c35108428f6fce152431d
@@ -97,6 +102,7 @@ The warning message changed in Git 1.8.0
   |
   |
   o  changeset:   0:87cd29b67a9159eec3b5495b0496ef717b2769f5
+     phase:       draft
      parent:      -1:0000000000000000000000000000000000000000
      parent:      -1:0000000000000000000000000000000000000000
      manifest:    0:8b8a0e87dfd7a0706c0524afa8ba67e20544cbf0
@@ -144,3 +150,48 @@ The warning message changed in Git 1.8.0
   Date:   Mon Jan 1 00:00:10 2007 +0000
   
       add älphà
+
+Stashing binary deltas in other extra keys may wasn't the most
+forward-looking of choices, as it can lead to weird results if you
+edit those keys:
+
+  $ cp -r hgrepo hgrepo-evolve
+  $ cd hgrepo-evolve
+  $ cat >> .hg/hgrc <<EOF
+  > [experimental]
+  > evolution = all
+  > [extensions]
+  > amend =
+  > rebase =
+  > EOF
+  $ hg pull -u
+  pulling from $TESTTMP/gitrepo
+  importing 1 git commits
+  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg log --debug -r .
+  changeset:   3:b8a0ac52f339ccd6d5729508bac4aee6e8b489d8
+  bookmark:    master
+  tag:         default/master
+  tag:         tip
+  phase:       draft
+  parent:      2:8bc4d64940260d4a1e70b54c099d3a76c83ff41e
+  parent:      -1:0000000000000000000000000000000000000000
+  manifest:    3:ea49f93388380ead5601c8fcbfa187516e7c2ed8
+  user:        t?st ?nc?d?ng <test@example.org>
+  date:        Mon Jan 01 00:00:13 2007 +0000
+  files+:      delta
+  extra:       author=$ \x90\x01\x01\xe9\x91\x03\x03\x01\xe8\x91\x08\x02\x01\xf6\x91\x0c\x01\x01\xee\x91\x0f\x15
+  extra:       branch=default
+  extra:       committer=test <test@example.org> 1167609613 0
+  extra:       encoding=latin-1
+  extra:       hg-git-rename-source=git
+  extra:       message=\x0c\n\x90\x05\x01\xe9\x91\x07\x02\x01\xe0\x91\x0b\x01
+  description:
+  add d?lt?
+  
+  
+  $ hg amend -u 'simple user <test@example.com>' -m 42
+  $ hg gexport
+  warning: disregarding possibly invalid metadata in ea036eaa4643
+  warning: disregarding possibly invalid metadata in ea036eaa4643
+  $ cd ..

@@ -7,7 +7,7 @@ import re
 import shutil
 import tempfile
 
-from dulwich.errors import HangupException, GitProtocolError
+from dulwich.errors import HangupException, GitProtocolError, ApplyDeltaError
 from dulwich.objects import Blob, Commit, Tag, Tree, parse_timezone
 from dulwich.pack import create_delta, apply_delta
 from dulwich.refs import (
@@ -847,7 +847,14 @@ class GitHandler(object):
             author = self.get_valid_git_username_email(author) + b' <none@none>'
 
         if b'author' in ctx.extra():
-            author = b"".join(apply_delta(author, ctx.extra()[b'author']))
+            try:
+                author = b"".join(apply_delta(author, ctx.extra()[b'author']))
+            except ApplyDeltaError:
+                self.ui.traceback()
+                self.ui.warn(
+                    b"warning: disregarding possibly invalid metadata in %s\n"
+                    % ctx
+                )
 
         return author
 
@@ -876,7 +883,14 @@ class GitHandler(object):
 
         message = ctx.description() + b"\n"
         if b'message' in extra:
-            message = b"".join(apply_delta(message, extra[b'message']))
+            try:
+                message = b"".join(apply_delta(message, extra[b'message']))
+            except ApplyDeltaError:
+                self.ui.traceback()
+                self.ui.warn(
+                    b"warning: disregarding possibly invalid metadata in %s\n"
+                    % ctx
+                )
 
         # HG EXTRA INFORMATION
 
