@@ -68,6 +68,42 @@ Supported:
           - "5.9"
           - "6.0"
 
+# Test that it is possible to use and run hg-git on versions of Alpine
+# that include Dulwich, and with the oldest Dulwich supported.
+Alpine:
+  stage: compat
+  image:
+    name: alpine:$ALPINE
+  script:
+    - apk add gnupg git unzip openssh mercurial py3-pip py3-pygments
+    - |
+      if test -z "$DULWICH"
+      then
+        apk add py3-dulwich
+      else
+        apk add build-base python3-dev
+        pip3 install dulwich==$DULWICH
+      fi
+    - pip3 install coverage
+    - hg --config extensions.hggit=./hggit debuginstall
+    - hg --config extensions.hggit=./hggit version -v
+    - adduser -D test
+    - chown -R test *
+    - PYTHON=3 su test -c contrib/ci.sh
+    - mv tests/.coverage coverage-$CI_JOB_ID
+  artifacts: *test-artifacts
+  parallel:
+    matrix:
+      - ALPINE: "3.11"
+        DULWICH:
+          - "0.19.3"
+          - "0.19.11"
+          - "0.20.3"
+          - "0.20.5"
+      - ALPINE:
+        - "3.14"
+        - "3.15"
+
 # Test that it is possible to use and run hg-git on Ubuntu without
 # compiling any C code, i.e. with stock Dulwich, Mercurial and
 # CPython. This should most definitely be the case on the latest
