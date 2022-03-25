@@ -108,7 +108,7 @@ Alpine:
 Development:
   extends: .base
   stage: upcoming
-  rules:
+  rules: &upcoming-rules
     # disallow failures for scheduled builds, so we get a nice
     # notification
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
@@ -129,6 +129,16 @@ Development:
         HG:
           - "stable"
           - "default"
+
+# Test Alpine edge, which usually includes the very latest version of
+# Git & Dulwich
+Dependencies:
+  extends: Alpine
+  stage: upcoming
+  image:
+    name: alpine:edge
+  rules: *upcoming-rules
+  parallel:
 
 Coverage:
   stage: .post

@@ -11,6 +11,11 @@ bugs:
   commits with unusual authorship and messages. (#383)
 * Fix tests with Git 2.35.
 
+Other changes:
+
+* Increase test coverage by using different versions of Alpine Linux
+  and Dulwich.
+
 hg-git 1.0b2 (2022-03-10)
 =========================
 
