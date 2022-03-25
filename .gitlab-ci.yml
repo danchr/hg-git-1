@@ -104,39 +104,6 @@ Alpine:
         - "3.14"
         - "3.15"
 
-# Test that it is possible to use and run hg-git on Ubuntu without
-# compiling any C code, i.e. with stock Dulwich, Mercurial and
-# CPython. This should most definitely be the case on the latest
-# rolling release without a PPA. We can live with PPAs on older
-# systems.
-Ubuntu:
-  stage: compat
-  image: ubuntu:20.10
-  retry: 2
-  script:
-    - >
-      apt-get -qq update ||
-      sed -i
-      's,http://[^.]*\.ubuntu\.,http://old-releases.ubuntu.,g'
-      /etc/apt/sources.list
-    - apt-get -qq update
-    - >
-      DEBIAN_FRONTEND=noninteractive
-      apt-get -qq install --no-install-recommends
-      gnupg gnupg-agent git unzip ssh mercurial
-      python3-pygments python3-pip python3-dulwich python3-setuptools
-      pyflakes3
-    # get latest coverage, otherwise it might not be compatible
-    - pip install coverage
-    - useradd test
-    - chown -R test *
-    - >
-      runuser -u test --
-      python3 tests/run-tests.py -v --color=always
-      --xunit $PWD/tests-$CI_JOB_ID.xml --cover
-    - mv tests/.coverage coverage-$CI_JOB_ID
-  artifacts: *test-artifacts
-
 # Test that the tests pass against the current branches
 Development:
   extends: .base
