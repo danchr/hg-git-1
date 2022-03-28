@@ -11,10 +11,8 @@ Load commonly used test logic
   $ echo alpha > alpha
   $ git add alpha
   $ fn_git_commit -m "add alpha"
-  $ git push --set-upstream origin master
-  To $TESTTMP/repo.git
-   * [new branch]      master -> master
-  Branch 'master' set up to track remote branch 'master' from 'origin'.
+  $ git push --quiet --set-upstream origin master
+  Branch 'master' set up to track remote branch 'master' from 'origin'. (?)
 
   $ cd ..
   $ hg clone repo.git hgrepo

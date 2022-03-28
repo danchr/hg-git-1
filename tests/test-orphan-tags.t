@@ -33,10 +33,8 @@ Create a temporary branch and tag
   $ fn_git_tag the_tag -m "Tag message"
   $ git tag -ln
   the_tag         Tag message
-  $ git push --set-upstream origin the_branch
-  To $TESTTMP/repo.git
-   * [new branch]      the_branch -> the_branch
-  Branch 'the_branch' set up to track remote branch 'the_branch' from 'origin'.
+  $ git push --quiet --set-upstream origin the_branch
+  Branch 'the_branch' set up to track remote branch 'the_branch' from 'origin'. (?)
   $ git push --tags
   To $TESTTMP/repo.git
    * [new tag]         the_tag -> the_tag

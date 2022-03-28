@@ -20,6 +20,14 @@ bugs:
 * Handle errors in ``.gitmodules`` gracefully, allowing the conversion
   to continue. (#329)
 * Don't die with an error when ``.hgsub`` contains comments. (#128)
+* Suppress errors on export related to history editing of certain
+  commits with unusual authorship and messages. (#383)
+* Fix tests with Git 2.35.
+
+Other changes:
+
+* Increase test coverage by using different versions of Alpine Linux
+  and Dulwich.
 
 hg-git 1.0b2 (2022-03-10)
 =========================
