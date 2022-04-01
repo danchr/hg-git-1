@@ -29,7 +29,7 @@ This plugin is implemented entirely in Python — there are no Git
 binary dependencies, and you do not need to have Git installed on your
 system. The only dependencies are:
 
-* Mercurial 5.2
+* Mercurial 5.3
 * Dulwich 0.19.3
 * Python 3.7
 

@@ -14,6 +14,7 @@ from dulwich import porcelain
 from mercurial.node import hex, nullhex
 from mercurial.i18n import _
 from mercurial import (
+    cmdutil,
     error,
     exthelper,
     pycompat,
@@ -138,7 +139,7 @@ def tag(orig, ui, repo, *names, **opts):
             b'user',
         ],
     )
-    compat.check_at_most_one_arg(opts, b'rev', b'remove')
+    cmdutil.check_at_most_one_arg(opts, b'rev', b'remove')
 
     if opts[b'remove']:
         opts[b'rev'] = b'null'

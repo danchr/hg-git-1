@@ -58,7 +58,6 @@ Supported:
       - &supported-versions
         PYTHON: "3.9"
         HG:
-          - "5.2"
           - "5.3"
           - "5.4"
           - "5.5"

@@ -2,11 +2,9 @@ from __future__ import generator_stop
 
 import functools
 
-from mercurial.i18n import _
 from mercurial import (
-    error,
+    cmdutil,
     node,
-    pycompat,
     ui,
     util as hgutil,
     wireprotov1peer,
@@ -47,14 +45,6 @@ else:
             return None, lambda v: fn(*args, **kwargs)
 
         return wrapper
-
-
-def sysbytes(s):
-    # 5.2 does not check this
-    if isinstance(s, str):
-        return pycompat.sysbytes(s)
-    else:
-        return s
 
 
 try:
@@ -104,31 +94,6 @@ except ImportError:
         pass
 
 
-try:
-    from mercurial.cmdutil import check_at_most_one_arg
-except (ImportError, AttributeError):
-    # added in 5.3
-    def check_at_most_one_arg(opts, *args):
-        """abort if more than one of the arguments are in opts
-
-        Returns the unique argument or None if none of them were specified.
-        """
-
-        def to_display(name):
-            return sysbytes(name).replace(b'_', b'-')
-
-        previous = None
-        for x in args:
-            if opts.get(x):
-                if previous:
-                    raise error.Abort(
-                        _(b'cannot specify both --%s and --%s')
-                        % (to_display(previous), to_display(x))
-                    )
-                previous = x
-        return previous
-
-
 # added in 5.3 but changed in 5.4, so always use our implementation
 def check_incompatible_arguments(opts, first, others):
     """abort if the first argument is given along with any of the others
@@ -137,4 +102,4 @@ def check_incompatible_arguments(opts, first, others):
     among themselves, and they're passed as a single collection.
     """
     for other in others:
-        check_at_most_one_arg(opts, first, other)
+        cmdutil.check_at_most_one_arg(opts, first, other)

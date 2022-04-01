@@ -88,7 +88,7 @@ class GitProgress(object):
         # 'Counting objects: 33640, done.\n'
         # 'Compressing objects:   0% (1/9955)   \r
 
-        lines = (self.msgbuf + compat.sysbytes(message)).splitlines(
+        lines = (self.msgbuf + pycompat.sysbytes(message)).splitlines(
             keepends=True
         )
         self.msgbuf = b''
