@@ -1,8 +1,8 @@
-hg-git 1.0b3 (unreleased)
+hg-git 1.0.0 (2022-04-01)
 =========================
 
-This is a follow-up to the previous beta, that fixes the following
-bugs:
+This is the first stable release in the 1.0 series. In addition to all
+the features and fixes in the betas, it includes:
 
 * Handle errors in ``.gitmodules`` gracefully, allowing the conversion
   to continue. (#329)
@@ -15,6 +15,8 @@ Other changes:
 
 * Increase test coverage by using different versions of Alpine Linux
   and Dulwich.
+
+This release requires Mercurial 5.2 or later and Python 3.6 or later.
 
 hg-git 1.0b2 (2022-03-10)
 =========================
