@@ -42,6 +42,10 @@ Load commonly used test logic
      summary:     add f1
   
 
+  $ hg push -B asdasd ../repo.git
+  pushing to ../repo.git
+  abort: the -B/--bookmarks option is not supported when branch_bookmark_suffix is set
+  [255]
 
   $ hg push ../repo.git
   pushing to ../repo.git

@@ -225,7 +225,9 @@ def exchangepush(
             bookmarks,
             **pycompat.strkwargs(opargs or {}),
         )
-        pushop.cgresult = repo.githandler.push(remote.path, revs, force)
+        pushop.cgresult = repo.githandler.push(
+            remote.path, revs, bookmarks, force
+        )
         return pushop
     else:
         return orig(

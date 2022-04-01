@@ -21,7 +21,7 @@ from dulwich import config as dul_config
 from dulwich import diff_tree
 
 from mercurial.i18n import _
-from mercurial.node import hex, bin, nullid, short
+from mercurial.node import hex, bin, nullid, nullhex, short
 from mercurial.utils import dateutil
 from mercurial import (
     bookmarks,
@@ -141,6 +141,23 @@ class GitProgress(object):
             self._progress.complete()
             self._progress = None
         self.progress(b'')
+
+
+class heads_tags(object):
+    __slots__ = "heads", "tags"
+
+    def __init__(self, heads=(), tags=()):
+        self.heads = set(heads)
+        self.tags = set(tags)
+
+    def __iter__(self):
+        return itertools.chain(self.heads, self.tags)
+
+    def __bool__(self):
+        return bool(self.heads) or bool(self.tags)
+
+    def __repr__(self):
+        return f"heads_tags(heads={self.heads}, tags={self.tags})"
 
 
 def get_repo_and_gitdir(repo):
@@ -474,8 +491,8 @@ class GitHandler(object):
                 _(b"git remote error: ") + pycompat.sysbytes(str(e))
             )
 
-    def push(self, remote, revs, force):
-        old_refs, new_refs = self.upload_pack(remote, revs, force)
+    def push(self, remote, revs, bookmarks, force):
+        old_refs, new_refs = self.upload_pack(remote, revs, bookmarks, force)
         remote_names = self.remote_names(remote, True)
         remote_desc = remote_names[0] if remote_names else remote
 
@@ -494,6 +511,8 @@ class GitHandler(object):
                     b'warning: failed to update %s; %s\n'
                     % (ref, pycompat.sysbytes(ref_status[ref])),
                 )
+            elif new_sha == nullhex:
+                self.ui.status(b"deleting reference %s\n" % ref)
             elif old_sha is None:
                 if self.ui.verbose:
                     self.ui.note(
@@ -1342,7 +1361,13 @@ class GitHandler(object):
 
     # PACK UPLOADING AND FETCHING
 
-    def upload_pack(self, remote, revs, force):
+    def upload_pack(self, remote, revs, bookmarks, force):
+        if bookmarks and self.branch_bookmark_suffix:
+            raise error.Abort(
+                b"the -B/--bookmarks option is not supported when "
+                b"branch_bookmark_suffix is set",
+            )
+
         all_exportable = self.export_commits()
         old_refs = {}
         change_totals = {}
@@ -1355,12 +1380,30 @@ class GitHandler(object):
             else:
                 exportable = {}
                 for rev in (hex(r) for r in revs):
-                    if rev not in all_exportable:
+                    if rev == nullhex:
+                        # a deletion
+                        exportable[rev] = heads_tags(
+                            heads={
+                                LOCAL_BRANCH_PREFIX + bm
+                                for bm in bookmarks
+                                if bm not in self.repo._bookmarks
+                            }
+                        )
+                    elif rev not in all_exportable:
                         raise error.Abort(
                             b"revision %s cannot be pushed since"
                             b" it doesn't have a bookmark" % self.repo[rev]
                         )
-                    exportable[rev] = all_exportable[rev]
+                    elif bookmarks:
+                        # we should only push the listed bookmarks,
+                        # and not any other bookmarks that might point
+                        # to the same changeset
+                        exportable[rev] = heads_tags(
+                            heads=all_exportable[rev].heads
+                            & {LOCAL_BRANCH_PREFIX + bm for bm in bookmarks},
+                        )
+                    else:
+                        exportable[rev] = all_exportable[rev]
             return self.get_changed_refs(refs, exportable, force)
 
         def genpack(have, want, progress=None, ofs_delta=True):
@@ -1460,7 +1503,18 @@ class GitHandler(object):
                 uptodate_annotated_tags.append(ref)
 
             for ref in rev_refs:
-                if ref not in refs:
+                if ctx.node() == nullid:
+                    if ref not in new_refs:
+                        # this is reasonably consistent with
+                        # mercurial; git aborts with an error in this
+                        # case
+                        self.ui.warn(
+                            b"warning: unable to delete '%s' as it does not "
+                            b"exist on the remote repository\n" % ref,
+                        )
+                    else:
+                        new_refs[ref] = nullhex
+                elif ref not in refs:
                     gitobj = self.git.get_object(self.git.refs[ref])
                     if isinstance(gitobj, Tag):
                         new_refs[ref] = gitobj.id
@@ -1703,17 +1757,6 @@ class GitHandler(object):
             return [(_filter_bm(bm), bm, n) for bm, n in bms.items()]
 
     def get_exportable(self):
-        class heads_tags(object):
-            def __init__(self):
-                self.heads = set()
-                self.tags = set()
-
-            def __iter__(self):
-                return itertools.chain(self.heads, self.tags)
-
-            def __bool__(self):
-                return bool(self.heads) or bool(self.tags)
-
         res = collections.defaultdict(heads_tags)
 
         for filtered_bm, bm, node in self.get_filtered_bookmarks():
