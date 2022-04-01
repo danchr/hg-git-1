@@ -1128,7 +1128,7 @@ def has_emacs():
     return matchoutput('emacs --version', b'GNU Emacs 2(4.4|4.5|5|6|7|8|9)')
 
 
-@check('black', 'the black formatter for python (>= 21.12b0)')
+@check('black', 'the black formatter for python (>= 22.3)')
 def has_black():
     try:
         import black
@@ -1136,7 +1136,7 @@ def has_black():
     except ImportError:
         version = None
     sv = distutils.version.StrictVersion
-    return version and sv(version) >= sv('21.12b0')
+    return version and sv(version) >= sv('22.3')
 
 
 @check('pytype', 'the pytype type checker')
