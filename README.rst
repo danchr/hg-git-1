@@ -31,7 +31,7 @@ system. The only dependencies are:
 
 * Mercurial 5.2
 * Dulwich 0.19.3
-* Python 3.6
+* Python 3.7
 
 Please note that these are the earliest versions known to work; later
 versions generally work better.
