@@ -39,18 +39,17 @@ versions generally work better.
 Installing
 ==========
 
-Clone this repository somewhere and make the 'extensions' section in
-your ``~/.hgrc`` file look something like this::
+We recommend installing the plugin using your a package manager, such
+as pip::
 
-   [extensions]
-   hggit = [path-to]/hg-git/hggit
+  python -m pip install hg-git
 
-That will enable the Hg-Git extension for you.
+Alternatively, you can clone this repository somewhere and install it
+from the directory::
 
-You can also install the plugin using your favourite package manager,
-e.g. pip::
-
-  pip3 install hggit
+  hg clone https://foss.heptapod.net/mercurial/hg-git/
+  cd hg-git
+  python -m pip install .
 
 And enable it from somewhere in your ``$PYTHONPATH``::
 
