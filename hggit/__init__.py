@@ -156,6 +156,7 @@ from mercurial import (
     pycompat,
 )
 
+from . import bundle
 from . import commands
 from . import config
 from . import debugcommands
@@ -189,6 +190,7 @@ reposetup = eh.finalreposetup
 uipopulate = eh.finaluipopulate
 
 for _mod in (
+    bundle,
     commands,
     config,
     debugcommands,

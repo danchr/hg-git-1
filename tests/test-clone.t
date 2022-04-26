@@ -198,3 +198,26 @@ anything special
   $ hg -R hgrepo-2 id --tags
   default/beta tip
   $ rm -rf hgrepo-2
+
+test that cloning a regular mercurial repository does not introduce
+git state
+
+  $ hg init hgrepo-base
+  $ cd hgrepo-base
+  $ touch flaf
+  $ fn_hg_commit -A -m flaf
+  $ cd ..
+  $ hg clone -U hgrepo-base hgrepo-copy
+  requesting all changes (secret !)
+  $ ls hgrepo-copy/.hg | grep git
+  [1]
+  $ hg clone -U --pull hgrepo-base hgrepo-pull
+  requesting all changes
+  adding changesets (draft !)
+  adding manifests (draft !)
+  adding file changes (draft !)
+  added 1 changesets with 1 changes to 1 files (draft !)
+  new changesets 76c919376257 (draft !)
+  $ ls hgrepo-pull | grep git
+  [1]
+  $ rm -r hgrepo-base hgrepo-copy hgrepo-pull
