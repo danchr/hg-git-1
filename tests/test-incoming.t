@@ -10,7 +10,7 @@ Load commonly used test logic
 
   $ cd ..
   $ hg init hgrepo-empty
-  $ hg -R hgrepo-empty incoming gitrepo | grep -v 'no changes found'
+  $ hg -R hgrepo-empty incoming gitrepo
   comparing with gitrepo
   changeset:   0:7eeab2ea75ec
   bookmark:    master
@@ -26,8 +26,10 @@ Load commonly used test logic
   updating to branch default (no-hg57 !)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
-  $ hg -R hgrepo incoming | grep -v 'no changes found'
+  $ hg -R hgrepo incoming
   comparing with $TESTTMP/gitrepo
+  no changes found
+  [1]
 
   $ cd gitrepo
   $ echo beta > beta
@@ -35,7 +37,7 @@ Load commonly used test logic
   $ fn_git_commit -m 'add beta'
   $ cd ..
 
-  $ hg -R hgrepo incoming | grep -v 'no changes found'
+  $ hg -R hgrepo incoming
   comparing with $TESTTMP/gitrepo
   changeset:   1:9497a4ee62e1
   bookmark:    master
@@ -57,7 +59,7 @@ Load commonly used test logic
   $ git add d/gamma
   $ fn_git_commit -m'add d/gamma line 2'
   $ cd ../hgrepo
-  $ hg incoming -p | grep -v 'no changes found'
+  $ hg incoming -p
   comparing with $TESTTMP/gitrepo
   changeset:   1:9497a4ee62e1
   bookmark:    master
@@ -98,13 +100,13 @@ Load commonly used test logic
   +gamma 2
   
 
-  $ hg incoming -r master --template 'changeset: {rev}:{node|short}\ngitnode:   {gitnode}\n' | grep -v 'no changes found'
+  $ hg incoming -r master --template 'changeset: {rev}:{node|short}\ngitnode:   {gitnode}\n'
   comparing with $TESTTMP/gitrepo
   changeset: 1:9497a4ee62e1
   gitnode:   9497a4ee62e16ee641860d7677cdb2589ea15554
 
 incoming -r
-  $ hg incoming -r master | grep -v 'no changes found'
+  $ hg incoming -r master
   comparing with $TESTTMP/gitrepo
   changeset:   1:9497a4ee62e1
   bookmark:    master
@@ -112,7 +114,7 @@ incoming -r
   date:        Mon Jan 01 00:00:11 2007 +0000
   summary:     add beta
   
-  $ hg incoming -r b1 | grep -v 'no changes found'
+  $ hg incoming -r b1
   comparing with $TESTTMP/gitrepo
   changeset:   1:9865e289be73
   tag:         t1
@@ -126,7 +128,7 @@ incoming -r
   date:        Mon Jan 01 00:00:13 2007 +0000
   summary:     add d/gamma line 2
   
-  $ hg incoming -r t1 | grep -v 'no changes found'
+  $ hg incoming -r t1
   comparing with $TESTTMP/gitrepo
   changeset:   1:9865e289be73
   tag:         t1
@@ -136,13 +138,15 @@ incoming -r
   
 
 nothing incoming after pull
-"adding remote bookmark" message was added in Mercurial 2.3
-  $ hg pull | grep -v "adding remote bookmark"
+
+  $ hg pull
   pulling from $TESTTMP/gitrepo
   importing 3 git commits
   adding bookmark b1
   updating bookmark master
   new changesets 7fe02317c63d:248d83ebf472 (3 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
-  $ hg incoming | grep -v 'no changes found'
+  $ hg incoming
   comparing with $TESTTMP/gitrepo
+  no changes found
+  [1]

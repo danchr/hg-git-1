@@ -73,9 +73,10 @@ clone a branch
   [255]
   $ hg git-cleanup
   git commit map cleaned
+
 pull works after 'hg git-cleanup'
-"adding remote bookmark" message was added in Mercurial 2.3
-  $ hg pull -r beta | grep -v "adding remote bookmark"
+
+  $ hg pull -r beta
   pulling from $TESTTMP/gitrepo
   importing 2 git commits
   updating bookmark beta
