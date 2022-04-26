@@ -638,7 +638,13 @@ def has_pyflakes():
 
 @check("pylint", "Pylint python linter")
 def has_pylint():
-    return matchoutput("pylint --help", br"Usage:[ ]+pylint", True)
+    try:
+        import pylint
+
+        pylint.version  # silence unused import warning
+        return True
+    except ImportError:
+        return False
 
 
 @check("clang-format", "clang-format C code formatter (>= 11)")
