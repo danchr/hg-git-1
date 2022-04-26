@@ -64,19 +64,6 @@ def gexport(ui, repo):
     repo.githandler.export_commits()
 
 
-@eh.command(b'debug-remove-hggit-state')
-def gclear(ui, repo):
-    '''remove all Git-related cache and metadata (DANGEROUS)
-
-    Strips all Git-related metadata from the repo, including the mapping
-    between Git and Mercurial changesets. This is an irreversible
-    destructive operation that may prevent further interaction with
-    other clones.
-    '''
-    repo.ui.status(_(b"clearing out the git cache data\n"))
-    repo.githandler.clear()
-
-
 @eh.command(
     b'git-verify|gverify',
     [

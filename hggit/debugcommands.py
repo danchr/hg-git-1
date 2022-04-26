@@ -98,3 +98,16 @@ def perfgitsavemap(ui, repo):
 def gitdir(ui, repo):
     '''get the root of the git repository'''
     repo.ui.write(os.path.normpath(repo.githandler.gitdir), b'\n')
+
+
+@eh.command(b'debug-remove-hggit-state')
+def removestate(ui, repo):
+    '''remove all Git-related cache and metadata (DANGEROUS)
+
+    Strips all Git-related metadata from the repo, including the mapping
+    between Git and Mercurial changesets. This is an irreversible
+    destructive operation that may prevent further interaction with
+    other clones.
+    '''
+    repo.ui.status(b"clearing out the git cache data\n")
+    repo.githandler.clear()
