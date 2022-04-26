@@ -23,7 +23,9 @@ export GIT_TEMPLATE_DIR=$TESTTMP/gittemplates
 # Activate extensions
 echo "[extensions]" >> $HGRCPATH
 echo "hggit=$(echo $(dirname $TESTDIR))/hggit" >> $HGRCPATH
-echo 'mq=' >> $HGRCPATH
+
+# Mercurial 5.7 and later have this as debugstrip
+echo 'strip=' >> $HGRCPATH
 
 # Enable git subrepository
 echo '[subrepos]' >> $HGRCPATH
