@@ -13,10 +13,11 @@ Current checks:
 Unique to hg-git:
 - W1401: anomalous backslash in string
 - W1402: anomalous unicode escape in string
+- C0411: third party import order
 
   $ touch $TESTTMP/fakerc
   $ $PYTHON -m pylint --rcfile=$TESTTMP/fakerc --disable=all \
-  >   --enable=W0102,C0321,W1401,W1402 \
+  >   --enable=W0102,C0321,C0411,W1401,W1402 \
   >   --reports=no \
   >   $TESTDIR/../hggit | sed 's/\r$//'
   Using config file *fakerc (glob) (?)

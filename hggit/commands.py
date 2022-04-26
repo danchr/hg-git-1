@@ -11,10 +11,6 @@ from __future__ import generator_stop
 # global modules
 import os
 
-# local modules
-from . import compat
-from . import verify
-
 from dulwich import porcelain
 
 from mercurial.node import hex, nullhex
@@ -26,6 +22,10 @@ from mercurial import (
     registrar,
     scmutil,
 )
+
+# local modules
+from . import compat
+from . import verify
 
 eh = exthelper.exthelper()
 

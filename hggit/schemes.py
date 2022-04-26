@@ -11,17 +11,17 @@ from __future__ import generator_stop
 # global modules
 import os
 
-# local modules
-from . import compat
-from . import gitrepo
-from . import util
-
 from mercurial import (
     bookmarks,
     exthelper,
     hg,
     localrepo,
 )
+
+# local modules
+from . import compat
+from . import gitrepo
+from . import util
 
 eh = exthelper.exthelper()
 

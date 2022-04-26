@@ -1,7 +1,5 @@
 from __future__ import generator_stop
 
-from . import util
-from . import compat
 from dulwich.refs import LOCAL_BRANCH_PREFIX
 from mercurial import (
     bundlerepo,
@@ -14,6 +12,9 @@ from mercurial import (
     wireprotov1peer,
 )
 from mercurial.interfaces.repository import peer as peerrepository
+
+from . import util
+from . import compat
 
 eh = exthelper.exthelper()
 

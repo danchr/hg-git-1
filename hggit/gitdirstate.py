@@ -5,9 +5,6 @@ import stat
 import re
 import errno
 
-from . import git_handler
-from . import gitrepo
-
 from mercurial import (
     dirstate,
     error,
@@ -19,6 +16,9 @@ from mercurial import (
 )
 
 from mercurial.i18n import _
+
+from . import git_handler
+from . import gitrepo
 
 eh = exthelper.exthelper()
 

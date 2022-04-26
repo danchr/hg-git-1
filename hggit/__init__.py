@@ -139,7 +139,14 @@ Possible values are ``keep``, ``skip`` or ``abort``.
 
 from __future__ import generator_stop
 
-# local modules
+import dulwich
+
+from mercurial import (
+    demandimport,
+    exthelper,
+    pycompat,
+)
+
 from . import commands
 from . import config
 from . import gitdirstate
@@ -150,13 +157,6 @@ from . import revsets
 from . import schemes
 from . import templates
 
-import dulwich
-
-from mercurial import (
-    demandimport,
-    exthelper,
-    pycompat,
-)
 
 demandimport.IGNORES |= {
     b'collections',
