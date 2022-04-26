@@ -4,6 +4,10 @@
 # It can be called in a test like this:
 #  $ . "$TESTDIR/testutil"
 
+# force terminal width, otherwise terminal width may cause progress
+# tests to fail
+export COLUMNS=80
+
 # our test suite relies on being able to create symlinks, even on
 # Windows
 export MSYS=winsymlinks:nativestrict
