@@ -13,6 +13,7 @@ import tempfile
 import time
 
 from mercurial import exthelper
+from mercurial import registrar
 
 eh = exthelper.exthelper()
 
@@ -70,8 +71,12 @@ def _timer(fm, func, title=None):
     fm.plain(b'\n')
 
 
-@eh.command(b'debugperfgitloadmap')
+@eh.command(
+    b'debugperfgitloadmap',
+    helpcategory=registrar.command.CATEGORY_MISC,
+)
 def perfgitloadmap(ui, repo):
+    '''time loading the rev map of a repository'''
     ui.status(b'timing map load from %s\n' % repo.path)
 
     timer, fm = gettimer(ui)
@@ -79,8 +84,12 @@ def perfgitloadmap(ui, repo):
     fm.end()
 
 
-@eh.command(b'debugperfgitsavemap')
+@eh.command(
+    b'debugperfgitsavemap',
+    helpcategory=registrar.command.CATEGORY_MISC,
+)
 def perfgitsavemap(ui, repo):
+    '''time saving the rev map of a repository'''
     ui.status(b'timing map save in %s\n' % repo.path)
 
     timer, fm = gettimer(ui)
@@ -94,13 +103,19 @@ def perfgitsavemap(ui, repo):
     fm.end()
 
 
-@eh.command(b'debuggitdir')
+@eh.command(
+    b'debuggitdir',
+    helpcategory=registrar.command.CATEGORY_WORKING_DIRECTORY,
+)
 def gitdir(ui, repo):
     '''get the root of the git repository'''
     repo.ui.write(os.path.normpath(repo.githandler.gitdir), b'\n')
 
 
-@eh.command(b'debug-remove-hggit-state')
+@eh.command(
+    b'debug-remove-hggit-state',
+    helpcategory=registrar.command.CATEGORY_MAINTENANCE,
+)
 def removestate(ui, repo):
     '''remove all Git-related cache and metadata (DANGEROUS)
 
