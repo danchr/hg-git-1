@@ -6,21 +6,11 @@ Run pylint for known rules we care about.
 There should be no recorded failures; fix the codebase before introducing a
 new check.
 
-Current checks:
-- W0102: no mutable default argument
-- C0321: more than one statement on a single line
+See the rc file for a list of checks.
 
-Unique to hg-git:
-- W1401: anomalous backslash in string
-- W1402: anomalous unicode escape in string
-- C0411: third party import order
-
-  $ touch $TESTTMP/fakerc
-  $ $PYTHON -m pylint --rcfile=$TESTTMP/fakerc --disable=all \
-  >   --enable=W0102,C0321,C0411,W1401,W1402 \
-  >   --reports=no \
+  $ $PYTHON -m pylint --rcfile=$TESTDIR/../pyproject.toml \
   >   $TESTDIR/../hggit | sed 's/\r$//'
-  Using config file *fakerc (glob) (?)
+  Using config file *pyproject.toml (glob) (?)
    (?)
   ------------------------------------* (glob) (?)
   Your code has been rated at 10.00/10* (glob) (?)

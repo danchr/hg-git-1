@@ -23,3 +23,18 @@ build/
 | tests/
 '''
 skip-string-normalization = true
+
+[tool.pylint.master]
+#
+# Current checks:
+# - W0102: no mutable default argument
+# - C0321: more than one statement on a single line
+#
+# Unique to hg-git:
+# - W1401: anomalous backslash in string
+# - W1402: anomalous unicode escape in string
+# - C0411: third party import order
+#
+reports = "no"
+disable = "all"
+enable = ["W0102", "C0321", "W1401", "W1402", "C0411"]
