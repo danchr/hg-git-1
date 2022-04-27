@@ -366,8 +366,8 @@ class GitHandler(object):
     # COMMANDS METHODS
 
     def import_commits(self, remote_name):
+        remote_names = [remote_name] if remote_name is not None else []
         refs = self.git.refs.as_dict()
-        remote_names = [remote_name] if remote_name else []
         self.import_git_objects(remote_names, refs)
 
     def fetch(self, remote, heads):
@@ -547,8 +547,7 @@ class GitHandler(object):
             except (error.RepoLookupError):
                 self.ui.debug(b'remote repository has no HEAD\n')
 
-            for remote_name in remote_names:
-                self.update_remote_branches(remote_name, new_refs_with_head)
+            self.update_remote_branches(remote_names, new_refs_with_head)
 
         if old_refs == new_refs:
             if revs or not old_refs:
@@ -617,7 +616,12 @@ class GitHandler(object):
         else:
             reqrefs = result.refs
 
-        commits = [c.node for c in self.get_git_incoming(reqrefs)]
+        commits = [
+            c.node
+            for c in self.get_git_incoming(
+                reqrefs, self.remote_names(remote.path, push=False)
+            )
+        ]
 
         b = overlayrepo(self, commits, result.refs)
 
@@ -983,12 +987,13 @@ class GitHandler(object):
 
         return message, git_extra
 
-    def get_git_incoming(self, refs):
+    def get_git_incoming(self, refs, remote_names):
         return git2hg.find_incoming(
             self.ui,
             self.git.object_store,
             self._map_git,
             refs,
+            remote_names,
         )
 
     def get_transaction(self, desc=b"hg-git"):
@@ -1027,7 +1032,7 @@ class GitHandler(object):
         filteredrefs = self.filter_min_date(refs)
         if heads is not None:
             filteredrefs = git2hg.filter_refs(filteredrefs, heads)
-        commits = self.get_git_incoming(filteredrefs)
+        commits = self.get_git_incoming(filteredrefs, remote_names)
         # import each of the commits, oldest first
         total = len(commits)
         if total:
@@ -1064,9 +1069,7 @@ class GitHandler(object):
 
                     self.import_tags(refs)
                     self.update_hg_bookmarks(remote_names, refs)
-
-                    for remote_name in remote_names:
-                        self.update_remote_branches(remote_name, refs)
+                    self.update_remote_branches(remote_names, refs)
 
         # TODO if the tags cache is used, remove any dangling tag references
         return total
@@ -1925,17 +1928,7 @@ class GitHandler(object):
                 with self.repo.transaction(b"hg-git") as tr:
                     bms.applychanges(self.repo, tr, changes)
 
-    def get_public_heads(self, remote_name, refs):
-        nodeids_to_publish = set()
-
-        for sha in git2hg.get_public(self.ui, refs, remote_name):
-            hgsha = self.map_hg_get(sha, deref=True)
-            if hgsha:
-                nodeids_to_publish.add(bin(hgsha))
-
-        return nodeids_to_publish
-
-    def update_remote_branches(self, remote_name, refs):
+    def _update_remote_branches_for(self, remote_name, refs):
         remote_refs = self.remote_refs
 
         if self.ui.configbool(b'git', b'pull-prune-remote-branches'):
@@ -1977,8 +1970,10 @@ class GitHandler(object):
             if hgsha:
                 all_remote_nodeids.append(bin(hgsha))
 
-        with self.repo.lock(), self.repo.transaction(b"hg-git-phases") as tr:
-            if all_remote_nodeids:
+        if all_remote_nodeids:
+            with self.repo.lock(), self.repo.transaction(
+                b"hg-git-phases"
+            ) as tr:
                 # sanity check: ensure that all corresponding commits
                 # are at least draft; this can happen on no-op pulls
                 # where the commit already exists, but is secret
@@ -1988,12 +1983,25 @@ class GitHandler(object):
                     phases.draft,
                     all_remote_nodeids,
                 )
-            # ensure that we update phases on push and no-op pulls
+
+    def update_remote_branches(self, remote_names, refs):
+        for remote_name in remote_names:
+            self._update_remote_branches_for(remote_name, refs)
+
+        # ensure that we update phases on push and no-op pulls
+        with self.repo.lock(), self.repo.transaction(b"hg-git-phases") as tr:
+            nodeids_to_publish = set()
+
+            for sha in git2hg.get_public(self.ui, refs, remote_names):
+                hgsha = self.map_hg_get(sha, deref=True)
+                if hgsha:
+                    nodeids_to_publish.add(bin(hgsha))
+
             phases.advanceboundary(
                 self.repo,
                 tr,
                 phases.public,
-                self.get_public_heads(remote_name, refs),
+                nodeids_to_publish,
             )
 
     # UTILITY FUNCTIONS

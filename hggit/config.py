@@ -1,5 +1,7 @@
 from __future__ import generator_stop
 
+import collections
+
 from mercurial import exthelper
 
 eh = exthelper.exthelper()
@@ -30,3 +32,14 @@ CONFIG_DEFAULTS = {
 for section, items in CONFIG_DEFAULTS.items():
     for item, default in items.items():
         eh.configitem(section, item, default=default)
+
+
+publishoption = collections.namedtuple(
+    'publishoption', ['use_phases', 'publish_defaults', 'refs_to_publish']
+)
+
+
+def get_publishing_option(ui):
+    refs = set(ui.configlist(b'git', b'public'))
+
+    return publishoption(ui.configbool(b'hggit', b'usephases'), not refs, refs)

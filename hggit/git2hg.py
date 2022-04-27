@@ -1,6 +1,7 @@
 # git2hg.py - convert Git repositories and commits to Mercurial ones
 import collections
 import io
+import itertools
 
 from dulwich import config as dul_config
 from dulwich.objects import Commit, Tag
@@ -15,27 +16,31 @@ from mercurial.node import bin, short
 from mercurial import error, util as hgutil
 from mercurial import phases
 
+from . import config
 
-def get_public(ui, refs, remote_name=None):
-    if not ui.configbool(b'hggit', b'usephases'):
-        return {}
 
-    refs_to_publish = set(ui.configlist(b'git', b'public'))
+def get_public(ui, refs, remote_names):
+    cfg = config.get_publishing_option(ui)
 
-    # if nothing is requested, fall back to defaults, meaning HEAD
-    # and tags
-    publish_defaults = not refs_to_publish
+    paths = [ui.paths.get(name) for name in remote_names]
+
+    if paths and isinstance(paths[0], list):
+        # paths became lists in mercurial 5.9
+        paths = list(itertools.chain.from_iterable(paths))
 
     to_publish = set()
 
-    if remote_name is not None:
-        refs_to_publish.update(
-            [
-                ref[len(remote_name) + 1 :]
-                for ref in refs_to_publish
-                if ref.startswith(remote_name + b'/')
-            ]
-        )
+    use_phases, publish_defaults, refs_to_publish = cfg
+
+    if not use_phases:
+        return {}
+
+    for remote_name in remote_names:
+        refs_to_publish |= {
+            ref[len(remote_name) + 1 :]
+            for ref in refs_to_publish
+            if ref.startswith(remote_name + b'/')
+        }
 
     for ref_name, sha in refs.items():
         if ref_name.startswith(LOCAL_BRANCH_PREFIX):
@@ -59,7 +64,7 @@ def get_public(ui, refs, remote_name=None):
     return to_publish
 
 
-def find_incoming(ui, git_object_store, git_map, refs):
+def find_incoming(ui, git_object_store, git_map, refs, remote):
     '''find what commits need to be imported
 
     git_object_store: is a dulwich object store.
@@ -69,7 +74,7 @@ def find_incoming(ui, git_object_store, git_map, refs):
 
     '''
 
-    public = get_public(ui, refs)
+    public = get_public(ui, refs, remote)
     done = set()
 
     # sort by commit date
