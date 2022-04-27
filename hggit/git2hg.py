@@ -2,7 +2,7 @@
 import collections
 import io
 
-from dulwich import config
+from dulwich import config as dul_config
 from dulwich.objects import Commit, Tag
 from dulwich.refs import (
     ANNOTATED_TAG_SUFFIX,
@@ -308,8 +308,8 @@ def parse_gitmodules(git, tree_obj):
     unused_mode, gitmodules_sha = tree_obj[b'.gitmodules']
     gitmodules_content = git[gitmodules_sha].data
     with io.BytesIO(gitmodules_content) as fp:
-        cfg = config.ConfigFile.from_file(fp)
-    return config.parse_submodules(cfg)
+        cfg = dul_config.ConfigFile.from_file(fp)
+    return dul_config.parse_submodules(cfg)
 
 
 def git_file_readlines(git, tree_obj, fname):
