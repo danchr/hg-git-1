@@ -15,7 +15,7 @@ proc = subprocess.Popen(
         "-m",
         "dulwich.web",
     ] + sys.argv[1:],
-    stderr=subprocess.DEVNULL,
+    stderr=subprocess.STDOUT,
 )
 
 with open(os.getenv("DAEMON_PIDS"), "a") as fp:

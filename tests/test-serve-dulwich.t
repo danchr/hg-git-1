@@ -27,12 +27,12 @@ Create a dummy repository and serve it
   $ echo bar > bar
   $ git add bar
   $ fn_git_commit -m test
-  $ $PYTHON $TESTDIR/testlib/dulwich-serve.py --port=$HGPORT
+  $ $PYTHON $TESTDIR/testlib/dulwich-serve.py --port=$HGPORT > $TESTTMP/dulwich.log
   $ cd ..
 
 Make sure that clone over unauthenticated HTTP doesn't break
 
-  $ hg clone -U git+http://localhost:$HGPORT copy 2>&1
+  $ hg clone -U git+http://localhost:$HGPORT copy 2>&1 || cat $TESTTMP/dulwich.log
   \r (no-eol) (esc)
   counting objects 1 [ <=>                                  ]\r (no-eol) (esc) (dulwich0204 !)
   counting objects 2 [  <=>                                 ]\r (no-eol) (esc) (dulwich0204 !)
@@ -67,7 +67,7 @@ Broken due to bug #977 in Dulwich
   (activating bookmark master)
   $ echo baz > baz
   $ fn_hg_commit -A -m baz
-  $ hg push
+  $ hg push || cat $TESTTMP/dulwich.log
   \r (no-eol) (esc)
   searching commits 1/1 daf1ae153bf8         [=============>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
