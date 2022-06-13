@@ -27,12 +27,12 @@ Create a dummy repository and serve it
   $ echo bar > bar
   $ git add bar
   $ fn_git_commit -m test
-  $ $PYTHON $TESTDIR/testlib/dulwich-serve.py --port=$HGPORT
+  $ $PYTHON $TESTDIR/testlib/dulwich-serve.py --port=$HGPORT > $TESTTMP/dulwich.log
   $ cd ..
 
 Make sure that clone over unauthenticated HTTP doesn't break
 
-  $ hg clone -U git+http://localhost:$HGPORT copy 2>&1
+  $ hg clone -U git+http://localhost:$HGPORT copy 2>&1 || cat $TESTTMP/dulwich.log
   \r (no-eol) (esc)
   counting objects 1 [ <=>                                  ]\r (no-eol) (esc) (dulwich0204 !)
   counting objects 2 [  <=>                                 ]\r (no-eol) (esc) (dulwich0204 !)
@@ -53,6 +53,11 @@ Make sure that clone over unauthenticated HTTP doesn't break
   HG:221dd250e933 GIT:3af9773036a9
   HG:c4d188f6e13d GIT:b23744d34f97
 
+
+#if dulwich02037 no-dulwich02044
+Broken due to bug #977 in Dulwich
+#else
+
   $ cd copy
   $ hg up master
   \r (no-eol) (esc)
@@ -62,7 +67,7 @@ Make sure that clone over unauthenticated HTTP doesn't break
   (activating bookmark master)
   $ echo baz > baz
   $ fn_hg_commit -A -m baz
-  $ hg push
+  $ hg push || cat $TESTTMP/dulwich.log
   \r (no-eol) (esc)
   searching commits 1/1 daf1ae153bf8         [=============>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
@@ -81,6 +86,7 @@ Make sure that clone over unauthenticated HTTP doesn't break
   updating reference refs/heads/master
   $ hg log -T 'HG:{node|short} GIT:{gitnode|short}\n' -r .
   HG:daf1ae153bf8 GIT:ab88565d0614
+#endif
 
 Prevent the test from hanging:
 
