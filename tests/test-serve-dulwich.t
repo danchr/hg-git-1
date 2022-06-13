@@ -53,6 +53,11 @@ Make sure that clone over unauthenticated HTTP doesn't break
   HG:221dd250e933 GIT:3af9773036a9
   HG:c4d188f6e13d GIT:b23744d34f97
 
+
+#if dulwich02037 no-dulwich02044
+Broken due to bug #977 in Dulwich
+#else
+
   $ cd copy
   $ hg up master
   \r (no-eol) (esc)
@@ -81,6 +86,7 @@ Make sure that clone over unauthenticated HTTP doesn't break
   updating reference refs/heads/master
   $ hg log -T 'HG:{node|short} GIT:{gitnode|short}\n' -r .
   HG:daf1ae153bf8 GIT:ab88565d0614
+#endif
 
 Prevent the test from hanging:
 
