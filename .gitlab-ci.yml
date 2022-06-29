@@ -73,7 +73,7 @@ Supported:
 Alpine:
   stage: compat
   image:
-    name: alpine:$ALPINE
+    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:$ALPINE
   script:
     - apk add gnupg git unzip openssh mercurial py3-pip py3-pygments
     - |
@@ -136,13 +136,13 @@ Dependencies:
   extends: Alpine
   stage: upcoming
   image:
-    name: alpine:edge
+    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:edge
   rules: *upcoming-rules
   parallel:
 
 Coverage:
   stage: .post
-  image: python:alpine
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:alpine
   when: always
   allow_failure: true
   coverage: /^TOTAL.+?([.0-9]+\%)$/
@@ -254,7 +254,7 @@ Git service image:
       --destination registry.heptapod.net:443/mercurial/hg-git/git-server
 
 Wheels:
-  image: python
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python
   timeout: 15m
   stage: archives
   rules:
