@@ -85,8 +85,6 @@ Alpine:
         pip3 install dulwich==$DULWICH
       fi
     - pip3 install coverage
-    - hg --config extensions.hggit=./hggit debuginstall
-    - hg --config extensions.hggit=./hggit version -v
     - adduser -D test
     - chown -R test *
     - PYTHON=3 su test -c contrib/ci.sh
