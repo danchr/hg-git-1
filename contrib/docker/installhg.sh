@@ -25,7 +25,8 @@ hgversion=$(get_version mercurial $HG)
 
 if test -n "$hgversion"
 then
-    python -m pip install --pre mercurial==$hgversion
+    python -m pip install --pre mercurial==$hgversion \
+        || python -m pip install mercurial==$hgversion
 else
     # unreleased, so fetch directly from Heptapod itself
     python -m pip install \
