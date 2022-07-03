@@ -33,10 +33,10 @@ The warning message changed in Git 1.8.0
   $ . $TESTDIR/latin-1-encoding
   Warning: commit message (did|does) not conform to UTF-8. (re)
   You may want to amend it after fixing the message, or set the config
-  variable i18n.commitencoding to the encoding your project uses.
+  variable i18n.commit[eE]ncoding to the encoding your project uses. (re)
   Warning: commit message (did|does) not conform to UTF-8. (re)
   You may want to amend it after fixing the message, or set the config
-  variable i18n.commitencoding to the encoding your project uses.
+  variable i18n.commit[eE]ncoding to the encoding your project uses. (re)
 
   $ cd ..
   $ git init -q --bare repo.git
