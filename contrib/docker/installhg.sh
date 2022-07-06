@@ -6,11 +6,16 @@ BUILDDEPENDS="curl jq coreutils gcc gettext musl-dev"
 RUNDEPENDS="git git-daemon unzip openssh gnupg"
 PIPDEPENDS="black==22.3 coverage dulwich pyflakes pygments pylint"
 
+PIP="python -m pip --no-cache-dir"
+
 set -xe
 
 apk add --no-cache $BUILDDEPENDS $RUNDEPENDS
 
-python -m pip --no-cache-dir install --pre $PIPDEPENDS
+# update pip itself, due to issue #11123 in pip
+$PIP install -U pip setuptools wheel
+
+$PIP install $PIPDEPENDS
 
 # handle pre-release versions
 get_version() {
@@ -25,10 +30,10 @@ hgversion=$(get_version mercurial $HG)
 
 if test -n "$hgversion"
 then
-    python -m pip install --pre mercurial==$hgversion
+    $PIP install mercurial==$hgversion
 else
     # unreleased, so fetch directly from Heptapod itself
-    python -m pip install \
+    $PIP install \
         https://foss.heptapod.net/octobus/mercurial-devel/-/archive/branch/$HG/hg.tar.bz2
 fi
 

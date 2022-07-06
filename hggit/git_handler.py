@@ -1901,12 +1901,12 @@ class GitHandler(object):
 
                 # only log additions on subsequent pulls
                 if not self.is_clone:
-                    self.ui.status(_("adding bookmark %s\n") % bm)
+                    self.ui.status(_(b"adding bookmark %s\n") % bm)
 
             elif unfiltered[current_node].isancestorof(unfiltered[wanted_node]):
                 # fast forward
                 changes.append((bm, wanted_node))
-                self.ui.status(_("updating bookmark %s\n") % bm)
+                self.ui.status(_(b"updating bookmark %s\n") % bm)
 
             elif unfiltered.obsstore and wanted_node in obsutil.foreground(
                 unfiltered, [current_node]
@@ -1916,11 +1916,11 @@ class GitHandler(object):
                 # a background thingy that is more efficient that
                 # the foreground one.)
                 changes.append((bm, wanted_node))
-                self.ui.status(_("updating bookmark %s\n") % bm)
+                self.ui.status(_(b"updating bookmark %s\n") % bm)
 
             else:
                 self.ui.status(
-                    _("not updating diverged bookmark %s\n") % bm,
+                    _(b"not updating diverged bookmark %s\n") % bm,
                 )
 
         if changes:

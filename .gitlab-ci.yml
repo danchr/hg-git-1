@@ -38,7 +38,7 @@ Latest:
           - "3.6"
           - "3.10"
         HG:
-          - "6.1"
+          - "6.2"
 
 # This is the authoritative list of versions of Mercurial that this
 # extension is supported and tested with; it should be kept in sync
@@ -67,13 +67,14 @@ Supported:
           - "5.8"
           - "5.9"
           - "6.0"
+          - "6.1"
 
 # Test that it is possible to use and run hg-git on versions of Alpine
 # that include Dulwich, and with the oldest Dulwich supported.
 Alpine:
   stage: compat
   image:
-    name: alpine:$ALPINE
+    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:$ALPINE
   script:
     - apk add gnupg git unzip openssh mercurial py3-pip py3-pygments
     - |
@@ -85,8 +86,6 @@ Alpine:
         pip3 install dulwich==$DULWICH
       fi
     - pip3 install coverage
-    - hg --config extensions.hggit=./hggit debuginstall
-    - hg --config extensions.hggit=./hggit version -v
     - adduser -D test
     - chown -R test *
     - PYTHON=3 su test -c contrib/ci.sh
@@ -136,13 +135,13 @@ Dependencies:
   extends: Alpine
   stage: upcoming
   image:
-    name: alpine:edge
+    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:edge
   rules: *upcoming-rules
   parallel:
 
 Coverage:
   stage: .post
-  image: python:alpine
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:alpine
   when: always
   allow_failure: true
   coverage: /^TOTAL.+?([.0-9]+\%)$/
@@ -254,7 +253,7 @@ Git service image:
       --destination registry.heptapod.net:443/mercurial/hg-git/git-server
 
 Wheels:
-  image: python
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python
   timeout: 15m
   stage: archives
   rules:
