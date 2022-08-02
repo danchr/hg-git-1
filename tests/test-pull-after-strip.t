@@ -51,8 +51,7 @@ Load commonly used test logic
   abort: you appear to have run strip - please run hg git-cleanup
   [255]
   $ hg tags
-  abort: 00changelog@7fe02317c63d9ee324d4b5df7c9296085162da1b: no node
-  [255]
+  tip                                0:ff7a2f2d8d70
   $ hg git-cleanup
   git commit map cleaned
 pull works after 'hg git-cleanup'
