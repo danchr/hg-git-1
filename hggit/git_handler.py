@@ -130,9 +130,11 @@ class GitProgress(object):
 
             if determinate:
                 pos, total = map(int, determinate.group(1, 2))
-            else:
+            elif indeterminate:
                 pos = int(indeterminate.group(1))
                 total = None
+            else:
+                continue
 
             self._progress.update(pos, total=total)
 
