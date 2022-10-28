@@ -19,7 +19,9 @@ def generate_ssh_vendor(ui):
     """
 
     class _Vendor(SSHVendor):
-        def run_command(self, host, command, username=None, port=None):
+        def run_command(
+            self, host, command, username=None, port=None, **kwargs
+        ):
             assert isinstance(command, str)
             command = command.encode(SSHGitClient.DEFAULT_ENCODING)
             sshcmd = ui.config(b"ui", b"ssh", b"ssh")
