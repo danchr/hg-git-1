@@ -156,7 +156,9 @@ Coverage:
     paths:
       - htmlcov
     reports:
-      cobertura: coverage.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
 
 # Build images for the above tasks; this should be a scheduled job, as
 # it is quite unnecessary to run on every invocation.
