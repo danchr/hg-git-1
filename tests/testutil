@@ -29,6 +29,8 @@ echo 'git:allowed = yes' >> $HGRCPATH
 cat >> $TESTTMP/.gitconfig <<EOF
 [init]
 defaultBranch = master
+[protocol.file]
+allow = always
 EOF
 
 # Standard checks for external dependencies
