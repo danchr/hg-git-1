@@ -27,7 +27,7 @@ Enhancements:
     default:pushurl = git+ssh://git@github.com/example
     default:hg-git.publish = yes
 
-This release requires Mercurial 5.3 or later and Python 3.7 or later.
+This release requires Mercurial 5.4 or later and Python 3.7 or later.
 
 hg-git 1.0.2 (unreleased)
 =========================

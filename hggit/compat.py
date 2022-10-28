@@ -3,7 +3,6 @@ from __future__ import generator_stop
 import functools
 
 from mercurial import (
-    cmdutil,
     node,
     ui,
     util as hgutil,
@@ -92,14 +91,3 @@ except ImportError:
     # added in dulwich 0.20.3; just create a dummy class for catching
     class HTTPUnauthorized(Exception):
         pass
-
-
-# added in 5.3 but changed in 5.4, so always use our implementation
-def check_incompatible_arguments(opts, first, others):
-    """abort if the first argument is given along with any of the others
-
-    Unlike check_at_most_one_arg(), `others` are not mutually exclusive
-    among themselves, and they're passed as a single collection.
-    """
-    for other in others:
-        cmdutil.check_at_most_one_arg(opts, first, other)

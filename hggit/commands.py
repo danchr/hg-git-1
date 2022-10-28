@@ -23,7 +23,6 @@ from mercurial import (
 )
 
 # local modules
-from . import compat
 from . import verify
 
 eh = exthelper.exthelper()
@@ -125,7 +124,7 @@ def tag(orig, ui, repo, *names, **opts):
     opts = pycompat.byteskwargs(opts)
 
     # check for various unimplemented arguments
-    compat.check_incompatible_arguments(
+    cmdutil.check_incompatible_arguments(
         opts,
         b'git',
         [

@@ -58,7 +58,6 @@ Supported:
       - &supported-versions
         PYTHON: "3.9"
         HG:
-          - "5.3"
           - "5.4"
           - "5.5"
           - "5.6"
@@ -94,7 +93,7 @@ Alpine:
   artifacts: *test-artifacts
   parallel:
     matrix:
-      - ALPINE: "3.11"
+      - ALPINE: "3.12"
         DULWICH:
           - "0.19.3"
           - "0.19.11"
