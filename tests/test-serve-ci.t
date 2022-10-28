@@ -67,6 +67,14 @@ Clone using the git protocol:
   updating to branch default
   0 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
+..but also try SSH with GIT_SSH_COMMAND, which we just ignore:
+
+  $ GIT_SSH_COMMAND="ignored" \
+  > hg clone git@git-server:/srv/repo.git repo-ssh-2
+  updating to branch default
+  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ rm -rf repo-ssh-2
+
 So, that went well; now push...
 
   $ cd repo-ssh

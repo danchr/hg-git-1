@@ -130,9 +130,11 @@ class GitProgress(object):
 
             if determinate:
                 pos, total = map(int, determinate.group(1, 2))
-            else:
+            elif indeterminate:
                 pos = int(indeterminate.group(1))
                 total = None
+            else:
+                continue
 
             self._progress.update(pos, total=total)
 
@@ -331,7 +333,8 @@ class GitHandler(object):
         if os.path.exists(self.vfs.join(self.tags_file)):
             for line in self.vfs(self.tags_file):
                 sha, name = line.strip().split(b' ', 1)
-                self.tags[name] = sha
+                if sha in self.repo.unfiltered():
+                    self.tags[name] = sha
 
     def save_tags(self):
         with self.repo.lock():
@@ -356,8 +359,10 @@ class GitHandler(object):
                 for f in files:
                     try:
                         ref = root.replace(refdir + pycompat.ossep, b'') + b'/'
-                        node = open(os.path.join(root, f), 'rb').read().strip()
-                        self._remote_refs[ref + f] = bin(self._map_git[node])
+                        sha = open(os.path.join(root, f), 'rb').read().strip()
+                        node = bin(self._map_git[sha])
+                        if node in self.repo.unfiltered():
+                            self._remote_refs[ref + f] = node
                     except (KeyError, IOError):
                         pass
 
