@@ -1,6 +1,18 @@
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
+#if no-hg57
+Mercurial 5.7 folded the strip extension into core as a debug command;
+emulate that.
+
+  $ cat >> $HGRCPATH <<EOF
+  > [extensions]
+  > strip =
+  > [alias]
+  > debugstrip = strip
+  > EOF
+#endif
+
   $ git init gitrepo
   Initialized empty Git repository in $TESTTMP/gitrepo/.git/
   $ cd gitrepo
@@ -43,7 +55,7 @@ Load commonly used test logic
 
   $ cd ..
   $ cd hgrepo
-  $ hg strip tip 2>&1 | grep -v saving | grep -v backup
+  $ hg debugstrip --no-backup tip
   0 files updated, 0 files merged, 1 files removed, 0 files unresolved
   $ hg pull
   pulling from $TESTTMP/gitrepo

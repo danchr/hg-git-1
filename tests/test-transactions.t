@@ -12,8 +12,19 @@ Enable a few other extensions:
   $ cat >> $HGRCPATH <<EOF
   > [extensions]
   > breakage = $TESTDIR/testlib/ext-break-git-import.py
-  > strip =
   > EOF
+
+#if no-hg57
+Mercurial 5.7 folded the strip extension into core as a debug command;
+emulate that.
+
+  $ cat >> $HGRCPATH <<EOF
+  > [extensions]
+  > strip =
+  > [alias]
+  > debugstrip = strip
+  > EOF
+#endif
 
 Create a git repository with 100 commits, that touches 10 different
 files. We also have 10 tags.
@@ -130,7 +141,7 @@ A low save interval causes a lot of reports:
 
 Reset the repository
 
-  $ hg strip --no-backup 'all()'
+  $ hg debugstrip --no-backup 'all()'
   $ hg debug-remove-hggit-state
   clearing out the git cache data
 
@@ -149,7 +160,7 @@ during the conversion:
 
 Reset the repository
 
-  $ hg strip --no-backup 'all()'
+  $ hg debugstrip --no-backup 'all()'
   $ hg debug-remove-hggit-state
   clearing out the git cache data
 
