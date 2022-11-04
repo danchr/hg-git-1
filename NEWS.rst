@@ -7,6 +7,9 @@ Changes to behaviour:
 
 * The ``gclear`` command is inherently dangerous, and has been
   replaced with a debug command instead.
+* The ``.hgsub`` and ``.gitmodules`` files are no longer retained when
+  pushing to or pulling from Git, respectively. Instead, changes to
+  each will be applied during the conversion.
 
 Enhancements:
 

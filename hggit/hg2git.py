@@ -131,6 +131,7 @@ class IncrementalChangesetExporter(object):
         ui = self._hg.ui
 
         dangerous = False
+
         for c in path.split(b'/'):
             if encoding.hfsignoreclean(c) == b'.git':
                 dangerous = True
@@ -161,6 +162,12 @@ class IncrementalChangesetExporter(object):
                 # undocumented: just let anything else mean "skip"
                 ui.warn(b"warning: skipping invalid path '%s'\n" % prettypath)
                 return False
+        elif path == b'.gitmodules':
+            ui.warn(
+                b"warning: ignoring modifications to '%s' file; "
+                b"please use '.hgsub' instead\n" % path
+            )
+            return False
         else:
             return True
 
@@ -217,6 +224,7 @@ class IncrementalChangesetExporter(object):
         # only export those.
         dirty_trees = set()
 
+        gitmodules = b''
         subadded, subremoved = [], []
 
         for s in modified, added, removed:
