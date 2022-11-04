@@ -1,6 +1,8 @@
 ``git``
 -------
 
+Control how the Hg-Git extension interacts with Git.
+
 ``authors``
   Git uses a strict convention for "author names" when representing
   changesets, using the form ``[realname] [email address]``. Mercurial
@@ -145,6 +147,8 @@
 
 ``hggit``
 ---------
+
+Control behavior of the Hg-Git extension.
 
 ``mapsavefrequency``
   By default, hg-git only saves the results of a conversion at the end.
