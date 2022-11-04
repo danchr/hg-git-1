@@ -77,7 +77,7 @@ Alpine:
   image:
     name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:$ALPINE
   script:
-    - apk add gnupg git unzip openssh mercurial py3-pip py3-pygments
+    - apk add gnupg git unzip openssh mercurial py3-pip py3-pygments py3-setuptools_scm
     - |
       if test -z "$DULWICH"
       then
