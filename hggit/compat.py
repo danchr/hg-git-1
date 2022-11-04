@@ -12,6 +12,17 @@ from mercurial import (
     wireprotov1peer,
 )
 
+from dulwich import pack
+
+# dulwich 0.20.49 changed create_delta to a generator
+def create_delta(base_buf, target_buf):
+    delta = pack.create_delta(base_buf, target_buf)
+
+    if not isinstance(delta, bytes):
+        delta = b''.join(delta)
+
+    return delta
+
 
 # 5.9 and earlier used a future-based API
 if hasattr(wireprotov1peer, 'future'):
