@@ -37,7 +37,7 @@ Control how the Hg-Git extension interacts with Git.
      johnny = John Smith <jsmith@foo.com>
      dougie = Doug Johnson <dougiej@bar.com>
 
-  Empty lines and lines starting with a "#" are ignored.
+  Empty lines and lines starting with a ``#`` are ignored.
 
   It should be noted that this translation is in *the Mercurial to Git
   direction only*. Changesets coming from Git back to Mercurial will not
@@ -100,13 +100,14 @@ Control how the Hg-Git extension interacts with Git.
 
   Please note that changing this setting in an existing repository
   doesn't move the local Git repository. You will either have to do so
-  yourself, or issue an ``hg pull`` after the fact to repopulate the new
+  yourself, or issue an :hg:`pull` after the fact to repopulate the new
   location.
 
 ``mindate``
   If set, branches where the latest commit's commit time is older than
   this will not be imported. Accepts any date formats that Mercurial does
-  -- see ``hg help dates`` for more.
+  -- see :hg:`help dates` for more.
+
 
 ``public``
   A list of Git branches that should be considered "published", and
@@ -190,7 +191,7 @@ Control behavior of the Hg-Git extension.
   ``git.public`` option.
 
   Publishing commits prevents their modification, and speeds up many
-  local Mercurial operations, such as ``hg shelve``.
+  local Mercurial operations, such as :hg:`shelve`.
 
 ``fetchbuffer``
   Data fetched from Git is buffered in memory, unless it exceeds the
