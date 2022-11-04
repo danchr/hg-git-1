@@ -135,6 +135,17 @@ change this by setting ``hggit.invalidpaths`` in :hg:`config`::
 
 Possible values are ``keep``, ``skip`` or ``abort``.
 
+Ignoring files
+--------------
+
+In addition to the regular :hg:`help hgignore` support, ``hg-git``
+adds fallback support for Git ignore files. If no ``.hgignore`` file
+exists at the root of the repository, Mercurial will then read any
+``.gitignore`` files that exist.
+
+Please note that Mercurial doesn't support exclusion patterns, so any
+``.gitignore`` pattern starting with ``!`` will trigger a warning.
+
 '''
 
 from __future__ import generator_stop

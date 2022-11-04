@@ -137,6 +137,9 @@ If present, ``.gitignore`` will be taken into account provided that there is
 no ``.hgignore``. In the latter case, the rules from ``.hgignore`` apply,
 regardless of what ``.gitignore`` prescribes.
 
+Please note that Mercurial doesn't support exclusion patterns, so any
+``.gitignore`` pattern starting with ``!`` will trigger a warning.
+
 This has been so since version 0.5.0, released in 2013.
 
 Further reading
