@@ -145,7 +145,7 @@ This has been so since version 0.5.0, released in 2013.
 Further reading
 ===============
 
-See ``hg help -e hggit``.
+See ``hg help -e hggit`` and ``hg help hggit-config``.
 
 Alternatives
 ============

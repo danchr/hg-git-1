@@ -5,6 +5,7 @@ from __future__ import generator_stop
 
 import collections
 import contextlib
+import importlib.resources
 import re
 
 from dulwich import errors
@@ -208,3 +209,18 @@ def ref_exists(ref: bytes, container):
         return ref in container
     except OSError:
         return False
+
+
+def get_package_resource(path):
+    """get the given hg-git resource as a binary string"""
+
+    components = (__package__, *path.split('/'))
+
+    package = '.'.join(components[:-1])
+    name = components[-1]
+
+    if hasattr(importlib.resources, 'files'):
+        # added in 3.11; the old one now triggers a deprecation warning
+        return importlib.resources.files(package).joinpath(name).read_bytes()
+    else:
+        return importlib.resources.read_binary(package, name)

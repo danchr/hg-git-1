@@ -1,11 +1,16 @@
 from __future__ import generator_stop
 
+import bisect
 import collections
 
 from mercurial import exthelper
+from mercurial import help
+from mercurial.i18n import _
 from mercurial.utils import stringutil
 
 from . import compat
+from . import util
+
 
 eh = exthelper.exthelper()
 
@@ -61,3 +66,20 @@ def extsetup(ui):
             return publishoption(
                 True, False, frozenset(compat.parselist(value))
             )
+
+    def insertconfigurationhelp(ui, topic, doc):
+        doc += (
+            b'\n\n' + util.get_package_resource("helptext/config.rst").strip()
+        )
+
+        return doc
+
+    help.addtopichook(b'config', insertconfigurationhelp)
+
+    entry = (
+        [b'hggit-config'],
+        _(b"Configuring hg-git"),
+        lambda ui: util.get_package_resource("helptext/config.rst"),
+        help.TOPIC_CATEGORY_CONFIG,
+    )
+    bisect.insort(help.helptable, entry)

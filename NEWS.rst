@@ -12,6 +12,8 @@ Enhancements:
 
 * Minor adjustments to categorisation of internal commands, and ensure
   that they all start with ``git-*``.
+* Move configuration from the ``README`` file to contained within the
+  extension, so that it is now self-documenting like Mercurial.
 * The ``-B/--bookmark`` flag for ``push`` will now restrict bookmarks
   by name rather than revision. (Please note that this is unsupported
   when the ``git.branch_bookmark_suffix`` configuration option is
