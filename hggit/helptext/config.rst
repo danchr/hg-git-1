@@ -118,7 +118,7 @@ Control how the Hg-Git extension interacts with Git.
   Before fetching, remove any remote-tracking references, or
   pseudo-tags, that no longer exist on the remote. This is equivalent to
   the ``--prune`` option to ``git fetch``, and means that pseudo-tags
-  for remotes — such as ``default/master`` — always actually reflect
+  for remotes -- such as ``default/master`` -- always actually reflect
   what's on the remote.
 
   This option is enabled by default.
@@ -171,7 +171,7 @@ Control behavior of the Hg-Git extension.
     $ echo "[paths]\ndefault = https://github.com/torvalds/linux" > .hg/hgrc
     $ hg pull
 
-  …and be extremely patient. Please note that converting very large
+  ...and be extremely patient. Please note that converting very large
   repositories may take *days* rather than mere *hours*, and may run
   into issues with available memory for very long running clones. Even
   any small, undiscovered leak will build up when processing hundreds of
