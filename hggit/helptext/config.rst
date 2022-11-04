@@ -26,13 +26,17 @@ Control how the Hg-Git extension interacts with Git.
   for example, shows up unpleasantly on GitHub as "illegal email
   address"), the ``git.authors`` option provides for an "authors
   translation file" that will be used during outgoing transfers from
-  Mercurial to Git only, by modifying ``hgrc`` as such::
+  Mercurial to Git only, by modifying ``hgrc`` as such:
+
+  ::
 
      [git]
      authors = authors.txt
 
   Where ``authors.txt`` is the name of a text file containing author name
-  translations, one per each line, using the following format::
+  translations, one per each line, using the following format:
+
+  ::
 
      johnny = John Smith <jsmith@foo.com>
      dougie = Doug Johnson <dougiej@bar.com>
@@ -59,7 +63,9 @@ Control how the Hg-Git extension interacts with Git.
   branches as are present on the hg side, the ``branch_bookmark_suffix``
   might be all that's needed. This presents a string "suffix" that will
   be recognized on each bookmark name, and stripped off as the bookmark
-  is translated to a Git branch::
+  is translated to a Git branch:
+
+  ::
 
      [git]
      branch_bookmark_suffix=_bookmark
@@ -93,7 +99,9 @@ Control how the Hg-Git extension interacts with Git.
   default, the Git clone is the subdirectory ``git`` in your local
   Mercurial repository. If you would like this Git clone to be at the same
   level of your Mercurial repository instead (named ``.git``), add the
-  following to your ``hgrc``::
+  following to your ``hgrc``:
+
+  ::
 
      [git]
      intree = True
@@ -164,7 +172,9 @@ Control behavior of the Hg-Git extension.
 
   Please note that this is disregarded for an initial clone, as any
   error or interruption will delete the destination. So instead of
-  cloning a large Git repository, you might want to pull instead::
+  cloning a large Git repository, you might want to pull instead:
+
+  ::
 
     $ hg init linux
     $ cd linux
@@ -213,7 +223,9 @@ Control behavior of the Hg-Git extension.
   character.
 
   The default is to issue a warning and skip these paths. You can
-  change this by setting ``hggit.invalidpaths`` in ``.hgrc``::
+  change this by setting ``hggit.invalidpaths`` in ``.hgrc``:
+
+  ::
 
     [hggit]
     invalidpaths = keep
