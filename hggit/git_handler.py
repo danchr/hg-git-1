@@ -9,7 +9,7 @@ import tempfile
 
 from dulwich.errors import HangupException, GitProtocolError, ApplyDeltaError
 from dulwich.objects import Blob, Commit, Tag, Tree, parse_timezone
-from dulwich.pack import create_delta, apply_delta
+from dulwich.pack import apply_delta
 from dulwich.refs import (
     ANNOTATED_TAG_SUFFIX,
     LOCAL_BRANCH_PREFIX,
@@ -1171,7 +1171,7 @@ class GitHandler(object):
 
         text = b'\n'.join(l.rstrip() for l in text.splitlines()).strip(b'\n')
         if text + b'\n' != origtext:
-            extra[b'message'] = create_delta(text + b'\n', origtext)
+            extra[b'message'] = compat.create_delta(text + b'\n', origtext)
 
         author = commit.author
 
@@ -1192,7 +1192,7 @@ class GitHandler(object):
         except UnicodeDecodeError:
             origauthor = author
             author = util.decode_guess(author, commit.encoding)
-            extra[b'author'] = create_delta(author, origauthor)
+            extra[b'author'] = compat.create_delta(author, origauthor)
 
         oldenc = util.swap_out_encoding()
 
