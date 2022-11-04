@@ -140,7 +140,7 @@ class IncrementalChangesetExporter(object):
             if opt == b'abort':
                 raise error.Abort(
                     b"invalid path '%s' rejected by configuration" % prettypath,
-                    hint=b"see 'hg help hggit' for details",
+                    hint=b"see 'hg help config.hggit.invalidpaths for details",
                 )
             elif opt == b'keep':
                 ui.warn(

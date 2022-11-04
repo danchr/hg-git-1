@@ -63,7 +63,7 @@ We can trigger an error:
   $ hg -q debug-remove-hggit-state
   $ hg --config hggit.invalidpaths=abort gexport
   abort: invalid path 'nested/.git/hooks/post-update' rejected by configuration
-  (see 'hg help hggit' for details)
+  (see 'hg help config.hggit.invalidpaths for details)
   [255]
 
 We can override if needed:
@@ -135,7 +135,7 @@ you can't check out.
   $ hg clone --config hggit.invalidpaths=abort git hg
   importing 1 git commits
   abort: invalid path 'nested/.hg/00changelog.i' rejected by configuration
-  (see 'hg help hggit' for details)
+  (see 'hg help config.hggit.invalidpaths for details)
   [255]
   $ rm -rf hg
   $ hg clone --config hggit.invalidpaths=keep git hg
@@ -175,7 +175,7 @@ newline, which Mercurial expressly forbids
   $ hg clone --config hggit.invalidpaths=abort git hg
   importing 1 git commits
   abort: invalid path 'Icon\r' rejected by configuration
-  (see 'hg help hggit' for details)
+  (see 'hg help config.hggit.invalidpaths for details)
   [255]
   $ hg clone --config hggit.invalidpaths=keep git hg
   importing 1 git commits
