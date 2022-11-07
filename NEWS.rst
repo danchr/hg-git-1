@@ -27,6 +27,32 @@ Enhancements:
     default:pushurl = git+ssh://git@github.com/example
     default:hg-git.publish = yes
 
+hg-git 1.0.2 (unreleased)
+=========================
+
+This is a minor release, focusing on bugs and compatibility.
+
+* TBD
+
+
+hg-git 1.0.1 (2022-11-04)
+=========================
+
+This is a minor release, focusing on bugs and compatibility.
+
+* Ignore any ``GIT_SSH_COMMAND`` environment variable, rather than
+  dying with an error. (#369)
+* Fix bug with unusual progress lines from Azure Repo (#391)
+* Fix incorrect use of localisation APIs (#387)
+* Fix pushing with Dulwich 0.2.49 or later.
+* Fix tests with Git 2.37.
+* Fix bug with tags or remote refs in the local Git repository that
+  point to missing commits.
+* Mark Mercurial 6.2 and 6.3 as supported and tested.
+
+Thanks to Pierre Augier and Aay Jay Chan for contributing to this
+release!
+
 hg-git 1.0.0 (2022-04-01)
 =========================
 
