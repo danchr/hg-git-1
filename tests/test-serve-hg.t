@@ -1,5 +1,8 @@
 #require serve
 
+Load commonly used test logic
+  $ . "$TESTDIR/testutil"
+
   $ hg init test
   $ cd test
   $ echo foo>foo

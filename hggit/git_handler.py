@@ -146,7 +146,7 @@ class GitProgress(object):
 
 
 def get_repo_and_gitdir(repo):
-    if repo.shared():
+    if repo.local() and repo.shared():
         repo = hg.sharedreposource(repo)
 
     if repo.ui.configbool(b'git', b'intree'):
