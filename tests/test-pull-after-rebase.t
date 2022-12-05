@@ -174,10 +174,8 @@ Now strip the old commit
   git commit map cleaned
   $ hg pull
   pulling from $TESTTMP/repo.git
-  importing 1 git commits
+  no changes found
   adding bookmark otherbranch
-  new changesets 075302705298 (1 drafts)
-  (run 'hg update' to get a working copy)
   $ cd ..
 
 And check that pulling something else doesn't delete that branch.
