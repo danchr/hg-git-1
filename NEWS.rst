@@ -3,7 +3,8 @@ hg-git 1.0.2 (unreleased)
 
 This is a minor release, focusing on bugs and compatibility.
 
-* TBD
+* Fix ``--source``/``-s`` argument to ``transplant`` with Hg-Git
+  enabled. (#392)
 
 
 hg-git 1.0.1 (2022-11-04)

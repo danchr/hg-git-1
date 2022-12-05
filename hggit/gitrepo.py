@@ -168,10 +168,10 @@ def findcommonoutgoing(orig, repo, other, *args, **kwargs):
 
 
 @eh.wrapfunction(bundlerepo, b'getremotechanges')
-def getremotechanges(orig, ui, repo, other, revs, *args, **opts):
+def getremotechanges(orig, ui, repo, other, onlyheads, *args, **opts):
     if isinstance(other, gitrepo):
-        return repo.githandler.getremotechanges(other, revs)
-    return orig(ui, repo, other, revs, *args, **opts)
+        return repo.githandler.getremotechanges(other, onlyheads)
+    return orig(ui, repo, other, onlyheads, *args, **opts)
 
 
 @eh.wrapfunction(exchange, b'pull')
