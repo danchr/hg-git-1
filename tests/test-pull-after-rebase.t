@@ -116,6 +116,16 @@ Pull that
 
   $ cd ..
 
+To reproduce bug #386, do like github and save the old commit in a
+ref, and create a clone containing just the converted git commits:
+
+  $ cd repo.git
+  $ git update-ref refs/pr/1 otherbranch
+  $ cd ..
+  $ hg clone -U repo.git hgrepo-issue386
+  importing 5 git commits
+  new changesets ff7a2f2d8d70:075302705298 (5 drafts)
+
 Now try rebasing that branch, from the Git side of things
 
   $ cd gitrepo
@@ -143,6 +153,31 @@ Now try rebasing that branch, from the Git side of things
   | * e5023f9 (origin/branch, branch) add gamma
   |/  
   * 7eeab2e add alpha
+  $ cd ..
+
+Now strip the old commit
+
+  $ cd hgrepo-issue386
+  $ hg up null
+  0 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ hg id -qr otherbranch
+  075302705298
+  $ hg pull
+  pulling from $TESTTMP/repo.git
+  importing 1 git commits
+  not updating diverged bookmark otherbranch
+  new changesets d64bf0521af6 (1 drafts)
+  (run 'hg heads .' to see heads, 'hg merge' to merge)
+  $ hg strip --hidden --no-backup otherbranch
+  $ hg book -d otherbranch
+  $ hg git-cleanup
+  git commit map cleaned
+  $ hg pull
+  pulling from $TESTTMP/repo.git
+  importing 1 git commits
+  adding bookmark otherbranch
+  new changesets 075302705298 (1 drafts)
+  (run 'hg update' to get a working copy)
   $ cd ..
 
 And check that pulling something else doesn't delete that branch.
