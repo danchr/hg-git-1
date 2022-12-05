@@ -48,6 +48,7 @@ one pull
   checking manifests
   crosschecking files in changesets and manifests
   checking files
+  checking dirstate (?)
   checked 1 changesets with 2 changes to 2 files
   $ cat bar
   foo
@@ -130,6 +131,7 @@ test with "/" URI (issue747) and subrepo
   checking manifests
   crosschecking files in changesets and manifests
   checking files
+  checking dirstate (?)
   checked 1 changesets with 3 changes to 3 files
   checking subrepo links
   $ cat a
@@ -151,6 +153,7 @@ test with empty repo (issue965)
   checking manifests
   crosschecking files in changesets and manifests
   checking files
+  checking dirstate (?)
   checked 0 changesets with 0 changes to 0 files
   $ hg paths
   default = static-http://localhost:$HGPORT/remotempty

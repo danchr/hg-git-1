@@ -13,13 +13,13 @@ from mercurial import (
     pycompat,
     wireprotov1peer,
 )
-from mercurial.interfaces.repository import peer as peerrepository
+from mercurial.interfaces import repository
 
 eh = exthelper.exthelper()
 
 
-class gitrepo(peerrepository):
-    def __init__(self, ui, path, create, intents=None, **kwargs):
+class gitrepo(repository.peer):
+    def __init__(self, ui, path=None, create=False, intents=None, **kwargs):
         if create:  # pragma: no cover
             raise error.Abort(b'Cannot create a git repository.')
         self._ui = ui
@@ -50,6 +50,11 @@ class gitrepo(peerrepository):
     def local(self):
         if not self.path:
             raise error.RepoError
+
+    def filtered(self, name: bytes):
+        assert name == b'visible'
+
+        return self
 
     @compat.makebatchable
     def heads(self):
@@ -98,7 +103,7 @@ class gitrepo(peerrepository):
     def known(self):
         raise NotImplementedError
 
-    def peer(self):
+    def peer(self, path=None):
         return self
 
     def stream_out(self):
@@ -238,3 +243,7 @@ def exchangepush(
             opargs=None,
             **kwargs,
         )
+
+
+def make_peer(ui, path, create, intents=None, createopts=None):
+    return gitrepo(ui, path, create)

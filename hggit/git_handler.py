@@ -474,7 +474,7 @@ class GitHandler(object):
     def push(self, remote, revs, force):
         old_refs, new_refs = self.upload_pack(remote, revs, force)
         remote_names = self.remote_names(remote, True)
-        remote_desc = remote_names[0] if remote_names else remote
+        remote_desc = remote_names[0] if remote_names else b''
 
         if not isinstance(new_refs, dict):
             # dulwich 0.20.6 changed the API and deprectated treating
@@ -1525,6 +1525,9 @@ class GitHandler(object):
             progress.flush()
 
     def _call_client(self, remote, method, *args, **kwargs):
+        if not isinstance(remote, bytes):
+            remote = remote.loc
+
         if remote in self._clients:
             clientobj, path = self._clients[remote]
             return getattr(clientobj, method)(path, *args, **kwargs)
@@ -2062,6 +2065,9 @@ class GitHandler(object):
         )
 
     def remote_names(self, remote, push):
+        if not isinstance(remote, bytes):
+            return [remote.name] if remote.name is not None else []
+
         names = set()
         url = compat.url(remote)
 
@@ -2077,7 +2083,10 @@ class GitHandler(object):
                 # ignore aliases
                 if hasattr(path, 'raw_url') and path.raw_url.scheme == b'path':
                     continue
-                loc = push and path.pushloc or path.loc
+                if push and not hasattr(path, 'is_push_variant'):
+                    loc = push and path.pushloc or path.loc
+                else:
+                    loc = path.loc
                 if loc == remote:
                     names.add(name)
 
