@@ -90,7 +90,7 @@ Alpine:
     - pip3 install coverage
     - adduser -D test
     - chown -R test *
-    - PYTHON=3 su test -c contrib/ci.sh
+    - SETUPTOOLS_SCM_PRETEND_VERSION=1 PYTHON=3 su test -c contrib/ci.sh
     - mv tests/.coverage coverage-$CI_JOB_ID
   artifacts: *test-artifacts
   parallel:
