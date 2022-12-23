@@ -1,18 +1,6 @@
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
-#if no-hg57
-Mercurial 5.7 folded the strip extension into core as a debug command;
-emulate that.
-
-  $ cat >> $HGRCPATH <<EOF
-  > [extensions]
-  > strip =
-  > [alias]
-  > debugstrip = strip
-  > EOF
-#endif
-
   $ git init gitrepo
   Initialized empty Git repository in $TESTTMP/gitrepo/.git/
   $ cd gitrepo
