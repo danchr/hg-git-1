@@ -1698,11 +1698,13 @@ class GitHandler(object):
                 # prior to 0.20.22, dulwich couldn't handle refs
                 # pointing to missing objects, so don't add them
                 if git_sha and git_sha in self.git:
-                    self.git.refs[git_ref] = git_sha
+                    util.set_refs(self.ui, self.git, {git_ref: git_sha})
 
         return exportable
 
     def export_hg_tags(self):
+        new_refs = {}
+
         for tag, sha in self.repo.tags().items():
             if self.repo.tagtype(tag) in (b'global', b'git'):
                 tag = tag.replace(b' ', b'_')
@@ -1727,7 +1729,7 @@ class GitHandler(object):
 
                 # check whether the tag already exists and is
                 # annotated
-                if tag_refname in self.git.refs:
+                if util.ref_exists(tag_refname, self.git.refs):
                     reftarget = self.git.refs[tag_refname]
                     try:
                         peeledtarget = self.git.get_peeled(tag_refname)
@@ -1746,8 +1748,11 @@ class GitHandler(object):
                         # otherwise it'd happen on every pull
                         target = reftarget
 
-                self.git.refs[tag_refname] = target
+                new_refs[tag_refname] = target
                 self.tags[tag] = hex(sha)
+
+        if new_refs:
+            util.set_refs(self.ui, self.git, new_refs)
 
     def get_filtered_bookmarks(self):
         bms = self.repo._bookmarks
@@ -1966,11 +1971,11 @@ class GitHandler(object):
                 remote_refs[remote_head] = bin(hgsha)
                 # TODO(durin42): what is this doing?
                 new_ref = REMOTE_BRANCH_PREFIX + remote_head
-                self.git.refs[new_ref] = sha
+                util.set_refs(self.ui, self.git, {new_ref: sha})
             elif ref_name.startswith(
                 LOCAL_TAG_PREFIX
             ) and not ref_name.endswith(ANNOTATED_TAG_SUFFIX):
-                self.git.refs[ref_name] = sha
+                util.set_refs(self.ui, self.git, {ref_name: sha})
 
             if hgsha:
                 all_remote_nodeids.append(bin(hgsha))

@@ -182,3 +182,29 @@ def swap_out_encoding(new_encoding=b'UTF-8'):
         old = hgutil._encoding
         hgutil._encoding = new_encoding
     return old
+
+
+def set_refs(ui, git, refs):
+    for git_ref, git_sha in refs.items():
+        # prior to 0.20.22, dulwich couldn't handle refs
+        # pointing to missing objects, so don't add them
+        if git_sha and git_sha in git:
+            # some refs may actually be unstorable, e.g. refs
+            # containing a double quote on Windows or non-UTF-8 refs
+            # on macOS, so handle that gracefully
+            try:
+                git.refs[git_ref] = git_sha
+            except OSError:
+                ui.traceback()
+                ui.warn(b"warning: failed to save ref %s\n" % git_ref)
+
+
+def ref_exists(ref: bytes, container):
+    """Check whether the given ref is contained by the given container.
+
+    Unlike Dulwich, this handles underlying OS errors for a disk refs container.
+    """
+    try:
+        return ref in container
+    except OSError:
+        return False

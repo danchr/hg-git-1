@@ -1183,3 +1183,14 @@ def has_lzma():
 @check("bash", "bash shell")
 def has_bash():
     return matchoutput("bash -c 'echo hi'", b'^hi$')
+
+
+@check("unicodefs", "Unicode-only file system")
+def has_unicode_filesystem():
+    try:
+        with tempfile.NamedTemporaryFile(
+            prefix="bøf".encode("latin-1"), dir=b"."
+        ):
+            return False
+    except Exception:
+        return True
