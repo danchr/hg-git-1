@@ -1522,6 +1522,11 @@ class GitHandler(object):
                         )
                     else:
                         new_refs[ref] = nullhex
+                elif (
+                    not util.ref_exists(ref, self.git.refs)
+                    and ref not in new_refs
+                ):
+                    self.ui.warn(b"warning: cannot update '%s'\n" % ref)
                 elif ref not in refs:
                     gitobj = self.git.get_object(self.git.refs[ref])
                     if isinstance(gitobj, Tag):
