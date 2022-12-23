@@ -236,8 +236,13 @@ that platform.
   adding reference refs/tags/ascii-tag
   $ HGENCODING=latin-1 hg push
   pushing to $TESTTMP/repo.git
-  abort: * (glob)
-  [255]
+  warning: failed to save ref refs/tags/lat-t\xe4g (esc)
+  warning: failed to save ref refs/tags/uni-t\xe4g (esc)
+  searching for changes
+  warning: cannot update 'refs/tags/uni-t\xe4g' (esc)
+  warning: cannot update 'refs/tags/lat-t\xe4g' (esc)
+  no changes found (ignoring 1 changesets without bookmarks or tags)
+  [1]
   $ HGENCODING=utf-8 hg push
   pushing to $TESTTMP/repo.git
   searching for changes
