@@ -1034,9 +1034,7 @@ class GitHandler(object):
             return None, None
 
     def import_git_objects(self, remote_names, refs, heads=None):
-        filteredrefs = self.filter_min_date(refs)
-        if heads is not None:
-            filteredrefs = git2hg.filter_refs(filteredrefs, heads)
+        filteredrefs = git2hg.filter_refs(self.filter_min_date(refs), heads)
         commits = self.get_git_incoming(filteredrefs, remote_names)
         # import each of the commits, oldest first
         total = len(commits)

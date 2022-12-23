@@ -38,6 +38,9 @@ This is a minor release, focusing on bugs and compatibility.
   enabled. (#392)
 * Fix cloning repositories using the old static HTTP support with
   Hg-Git enabled.
+* Handle pushing tags to Git that cannot be stored as references such
+  as double-quotes on Windows. (#397)
+* Avoid converting unrelated refs on pull, such as Github PR-related refs. (#386)
 
 
 hg-git 1.0.1 (2022-11-04)
