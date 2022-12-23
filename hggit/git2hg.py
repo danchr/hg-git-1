@@ -287,6 +287,7 @@ def filter_refs(refs, heads):
             if not ref.endswith(ANNOTATED_TAG_SUFFIX) and (
                 ref.startswith(LOCAL_BRANCH_PREFIX)
                 or ref.startswith(LOCAL_TAG_PREFIX)
+                or ref == b'HEAD'
             ):
                 filteredrefs.append(ref)
         filteredrefs.sort()

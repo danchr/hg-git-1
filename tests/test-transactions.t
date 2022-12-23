@@ -140,13 +140,11 @@ during the conversion:
   $ hg --config hggit.mapsavefrequency=25 --config hggit.usephases=yes pull
   pulling from $TESTTMP/gitrepo
   importing 100 git commits
-  new changesets 1c8407413fa3:abc468b9e51b (5 drafts)
+  new changesets 1c8407413fa3:abc468b9e51b
   new changesets 217c308baf47:d5d14eeedd08
-  5 local changesets published
-  new changesets d9807ef6abcb:4678067bd500 (5 drafts)
+  new changesets d9807ef6abcb:4678067bd500
   updating bookmark master
   new changesets c31a154888bb:eda59117ba04
-  5 local changesets published
   (run 'hg update' to get a working copy)
 
 Reset the repository
