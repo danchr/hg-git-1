@@ -33,6 +33,7 @@ from mercurial import (
     url,
     util as hgutil,
     scmutil,
+    tags as tagsmod,
 )
 
 from . import _ssh
@@ -1591,12 +1592,7 @@ class GitHandler(object):
                         )
                     else:
                         new_refs[ref] = nullhex
-                elif (
-                    not util.ref_exists(ref, self.git.refs)
-                    and ref not in new_refs
-                ):
-                    self.ui.warn(b"warning: cannot update '%s'\n" % ref)
-                elif ref not in refs:
+                elif ref not in refs and util.ref_exists(ref, self.git.refs):
                     if ref not in self.git.refs:
                         self.ui.note(
                             b'note: cannot update %s\n' % (ref),
@@ -1607,6 +1603,8 @@ class GitHandler(object):
                             new_refs[ref] = gitobj.id
                         else:
                             new_refs[ref] = self.map_git_get(ctx.hex())
+                elif ref not in new_refs:
+                    new_refs[ref] = self.map_git_get(rev)
                 elif new_refs[ref] in self._map_git:
                     rctx = unfiltered[self.map_hg_get(new_refs[ref])]
                     if rctx.ancestor(ctx) == rctx or force:
@@ -1756,54 +1754,53 @@ class GitHandler(object):
     def export_hg_tags(self):
         new_refs = {}
 
-        for tag, sha in self.repo.tags().items():
-            if self.repo.tagtype(tag) in (b'global', b'git'):
-                tag = tag.replace(b' ', b'_')
-                target = self.map_git_get(hex(sha))
+        for tag, (sha, hist) in tagsmod.findglobaltags(
+            self.ui, self.repo
+        ).items():
+            tag = tag.replace(b' ', b'_')
+            target = self.map_git_get(hex(sha))
 
-                if target is None:
-                    self.repo.ui.warn(
-                        b"warning: not exporting tag '%s' "
-                        b"due to missing git "
-                        b"revision\n" % tag
-                    )
-                    continue
+            if target is None:
+                self.repo.ui.warn(
+                    b"warning: not exporting tag '%s' "
+                    b"due to missing git "
+                    b"revision\n" % tag
+                )
+                continue
 
-                tag_refname = LOCAL_TAG_PREFIX + tag
+            tag_refname = LOCAL_TAG_PREFIX + tag
 
-                if not check_ref_format(tag_refname):
-                    self.repo.ui.warn(
-                        b"warning: not exporting tag '%s' "
-                        b"due to invalid name\n" % tag
-                    )
-                    continue
+            if not check_ref_format(tag_refname):
+                self.repo.ui.warn(
+                    b"warning: not exporting tag '%s' "
+                    b"due to invalid name\n" % tag
+                )
+                continue
 
-                # check whether the tag already exists and is
-                # annotated
-                if util.ref_exists(tag_refname, self.git.refs):
-                    reftarget = self.git.refs[tag_refname]
-                    try:
-                        peeledtarget = self.git.get_peeled(tag_refname)
-                    except KeyError:
-                        self.ui.note(
-                            b'note: failed to peel tag %s' % (tag_refname)
+            # check whether the tag already exists and is
+            # annotated
+            if util.ref_exists(tag_refname, self.git.refs):
+                reftarget = self.git.refs[tag_refname]
+                try:
+                    peeledtarget = self.git.get_peeled(tag_refname)
+                except KeyError:
+                    self.ui.note(b'note: failed to peel tag %s' % (tag_refname))
+                    peeledtarget = None
+
+                if peeledtarget != reftarget:
+                    # warn the user if they tried changing the tag
+                    if target != peeledtarget:
+                        self.repo.ui.warn(
+                            b"warning: not overwriting annotated "
+                            b"tag '%s'\n" % tag
                         )
-                        peeledtarget = None
 
-                    if peeledtarget != reftarget:
-                        # warn the user if they tried changing the tag
-                        if target != peeledtarget:
-                            self.repo.ui.warn(
-                                b"warning: not overwriting annotated "
-                                b"tag '%s'\n" % tag
-                            )
+                    # and never overwrite annotated tags,
+                    # otherwise it'd happen on every pull
+                    target = reftarget
 
-                        # and never overwrite annotated tags,
-                        # otherwise it'd happen on every pull
-                        target = reftarget
-
-                new_refs[tag_refname] = target
-                self.tags[tag] = hex(sha)
+            new_refs[tag_refname] = target
+            self.tags[tag] = hex(sha)
 
         if new_refs:
             util.set_refs(self.ui, self.git, new_refs)
