@@ -195,3 +195,69 @@ edit those keys:
   warning: disregarding possibly invalid metadata in ea036eaa4643
   warning: disregarding possibly invalid metadata in ea036eaa4643
   $ cd ..
+
+create a tag with a latin-1 name -- this is horrible, as tags normally
+are utf-8, but this allows us to check two things:
+
+1) that tags safely roundtrip regardless of local encoding
+2) we can't store such tags on UTF-8 only file systems
+
+The first case isn't actually the case at the moment, but can we store
+them? The second case allows us to check issue #397 on macOS and
+Linux, i.e. refs we cannot store. That's much easier to run into on
+Windows, e.g. with double quotes, but we don't have CI coverage for
+that platform.
+
+  $ hg clone -U repo.git hgrepo-tags
+  importing 4 git commits
+  new changesets 87cd29b67a91:aabeccdc8b1e (4 drafts)
+  $ cd hgrepo-tags
+  $ hg up tip
+  4 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ fn_hg_tag ascii-tag
+  $ "$PYTHON" << EOF
+  > with open('.hgtags', 'a', encoding='utf-8') as f:
+  >   f.write('aabeccdc8b1e82054dfce21373bda3b2455900e2 uni-täg\n')
+  > with open('.hgtags', 'a', encoding='latin1') as f:
+  >   f.write('aabeccdc8b1e82054dfce21373bda3b2455900e2 lat-täg\n')
+  > EOF
+  $ fn_hg_commit --amend -m 'add loads of tags, some good, some bad'
+  $ cat .hgtags
+  aabeccdc8b1e82054dfce21373bda3b2455900e2 ascii-tag
+  aabeccdc8b1e82054dfce21373bda3b2455900e2 uni-t\xc3\xa4g (esc)
+  aabeccdc8b1e82054dfce21373bda3b2455900e2 lat-t\xe4g (esc)
+
+#if unicodefs
+  $ hg push
+  pushing to $TESTTMP/repo.git
+  warning: not exporting tag 'uni-t?g' due to invalid name
+  warning: not exporting tag 'lat-t?g' due to invalid name
+  searching for changes
+  adding reference refs/tags/ascii-tag
+  $ HGENCODING=latin-1 hg push
+  pushing to $TESTTMP/repo.git
+  abort: * (glob)
+  [255]
+  $ HGENCODING=utf-8 hg push
+  pushing to $TESTTMP/repo.git
+  searching for changes
+  adding reference refs/tags/lat-t\xc3\xa4g (esc)
+  adding reference refs/tags/uni-t\xc3\xa4g (esc)
+#else
+  $ hg push
+  pushing to $TESTTMP/repo.git
+  warning: not exporting tag 'uni-t?g' due to invalid name
+  warning: not exporting tag 'lat-t?g' due to invalid name
+  searching for changes
+  adding reference refs/tags/ascii-tag
+  $ HGENCODING=latin-1 hg push
+  pushing to $TESTTMP/repo.git
+  searching for changes
+  adding reference refs/tags/lat-t\xe4g (esc)
+  adding reference refs/tags/uni-t\xe4g (esc)
+  $ HGENCODING=utf-8 hg push
+  pushing to $TESTTMP/repo.git
+  searching for changes
+  adding reference refs/tags/lat-t\xc3\xa4g (esc)
+  adding reference refs/tags/uni-t\xc3\xa4g (esc)
+#endif
