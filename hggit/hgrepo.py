@@ -2,8 +2,10 @@ from __future__ import generator_stop
 
 from mercurial import exthelper
 from mercurial import repoview
+from mercurial import statichttprepo
 from mercurial import util as hgutil
 from mercurial.node import bin
+
 
 from .git_handler import GitHandler
 from .gitrepo import gitrepo
@@ -14,7 +16,7 @@ eh = exthelper.exthelper()
 
 @eh.reposetup
 def reposetup(ui, repo):
-    if isinstance(repo, gitrepo):
+    if isinstance(repo, (statichttprepo.statichttprepository, gitrepo)):
         return
 
     if hasattr(repo, '_wlockfreeprefix'):
