@@ -16,13 +16,13 @@ Load commonly used test logic
   $ hg ci -m "A->C"
   created new head
 
-  $ hg merge -r1 2>&1 | sed 's/-C ./-C/' | egrep -v '^merging afile' | sed 's/incomplete.*/failed!/'
+  $ hg merge -r1 2>&1 | sed 's/-C ./-C/' | grep -E -v '^merging afile' | sed 's/incomplete.*/failed!/'
   warning: conflicts.* (re)
   0 files updated, 0 files merged, 0 files removed, 1 files unresolved
   use 'hg resolve' to retry unresolved file merges or 'hg *' to abandon (glob)
 resolve using second parent
   $ echo B > afile
-  $ hg resolve -m afile | egrep -v 'no more unresolved files' || true
+  $ hg resolve -m afile | grep -E -v 'no more unresolved files' || true
   $ hg ci -m "merge to B"
 
   $ hg log --graph --style compact | sed 's/\[.*\]//g'

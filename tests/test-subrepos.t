@@ -33,7 +33,7 @@ Load commonly used test logic
    * [new branch]      master -> master
   $ cd ..
 Ensure gitlinks are transformed to .hgsubstate on hg pull from git
-  $ hg clone -u tip repo.git hgrepo 2>&1 | egrep -v '^(Cloning into|done)'
+  $ hg clone -u tip repo.git hgrepo 2>&1 | grep -E -v '^(Cloning into|done)'
   importing 3 git commits
   new changesets e532b2bfda10:88c5e06a2a29 (3 drafts)
   updating to branch default
