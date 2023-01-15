@@ -86,3 +86,10 @@ def perfgitsavemap(ui, repo):
     finally:
         os.unlink(f)
     fm.end()
+
+
+@command(b'perfgitloadremotes')
+def perfgitloadremotes(ui, repo):
+    timer, fm = gettimer(ui)
+    timer(repo.githandler.load_remote_refs)
+    fm.end()
