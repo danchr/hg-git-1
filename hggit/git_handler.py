@@ -328,26 +328,19 @@ class GitHandler(object):
 
     def load_remote_refs(self):
         self._remote_refs = {}
-        refdir = os.path.join(self.gitdir, b'refs', b'remotes')
 
         # if no paths are set, we should still check 'default'
         pathnames = list(self.ui.paths) or [b'default']
 
-        # we avoid using dulwich's refs method because it is incredibly slow;
-        # on a repo with a few hundred branches and a few thousand tags,
-        # dulwich took about 200ms
         for pathname in pathnames:
-            remotedir = os.path.join(refdir, pathname)
-            for root, dirs, files in os.walk(remotedir):
-                for f in files:
-                    try:
-                        ref = root.replace(refdir + pycompat.ossep, b'') + b'/'
-                        sha = open(os.path.join(root, f), 'rb').read().strip()
-                        node = bin(self._map_git[sha])
-                        if node in self.repo.unfiltered():
-                            self._remote_refs[ref + f] = node
-                    except (KeyError, IOError):
-                        pass
+            base = b'refs/remotes/%s/' % pathname
+            for ref in self.git.refs.subkeys(base):
+                ref = base + ref
+                sha = self.git.refs[ref]
+                if sha in self._map_git:
+                    node = bin(self._map_git[sha])
+                    if node in self.repo.unfiltered():
+                        self._remote_refs[ref[13:]] = node
 
     # END FILE LOAD AND SAVE METHODS
 

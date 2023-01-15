@@ -12,6 +12,7 @@ This is a minor release, focusing on bugs and compatibility.
 * Avoid converting unrelated refs on pull, such as Github PR-related refs. (#386)
 * Fix tests with GNU Grep 3.8 and later, by avoiding the ``egrep``
   alias (#400)
+* Support reading remote refs even if packed.
 
 Thanks to @icp for contributingwx changes to the release!
 
