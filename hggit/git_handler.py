@@ -1739,6 +1739,8 @@ class GitHandler(object):
     def update_references(self):
         exportable = self.get_exportable()
 
+        new_refs = {}
+
         # Create a local Git branch name for each
         # Mercurial bookmark.
         for hg_sha, refs in exportable.items():
@@ -1747,7 +1749,9 @@ class GitHandler(object):
                 # prior to 0.20.22, dulwich couldn't handle refs
                 # pointing to missing objects, so don't add them
                 if git_sha and git_sha in self.git:
-                    util.set_refs(self.ui, self.git, {git_ref: git_sha})
+                    new_refs[git_ref] = git_sha
+
+        compat.add_packed_refs(self.git.refs, new_refs)
 
         return exportable
 
@@ -1782,18 +1786,16 @@ class GitHandler(object):
             if util.ref_exists(tag_refname, self.git.refs):
                 reftarget = self.git.refs[tag_refname]
                 try:
-                    peeledtarget = self.git.get_peeled(tag_refname)
+                    gitobj = self.git.get_object(reftarget)
                 except KeyError:
                     self.ui.note(b'note: failed to peel tag %s' % (tag_refname))
-                    peeledtarget = None
+                    gitobj = None
 
-                if peeledtarget != reftarget:
-                    # warn the user if they tried changing the tag
-                    if target != peeledtarget:
-                        self.repo.ui.warn(
-                            b"warning: not overwriting annotated "
-                            b"tag '%s'\n" % tag
-                        )
+                if isinstance(gitobj, Tag):
+                    self.repo.ui.warn(
+                        b"warning: not overwriting annotated "
+                        b"tag '%s'\n" % tag
+                    )
 
                     # and never overwrite annotated tags,
                     # otherwise it'd happen on every pull
@@ -1802,8 +1804,7 @@ class GitHandler(object):
             new_refs[tag_refname] = target
             self.tags[tag] = hex(sha)
 
-        if new_refs:
-            util.set_refs(self.ui, self.git, new_refs)
+        compat.add_packed_refs(self.git.refs, new_refs)
 
     def get_filtered_bookmarks(self):
         bms = self.repo._bookmarks
@@ -1991,6 +1992,8 @@ class GitHandler(object):
     def _update_remote_branches_for(self, remote_name, refs):
         remote_refs = self.remote_refs
 
+        new_refs = {}
+
         if self.ui.configbool(b'git', b'pull-prune-remote-branches'):
             # since we re-write all refs for this remote each time,
             # prune all entries matching this remote from our refs
@@ -2003,7 +2006,7 @@ class GitHandler(object):
                         LOCAL_BRANCH_PREFIX + t[len(remote_name) + 1 :]
                         not in refs
                     ):
-                        del self.git.refs[REMOTE_BRANCH_PREFIX + t]
+                        new_refs[REMOTE_BRANCH_PREFIX + t] = None
 
         all_remote_nodeids = []
 
@@ -2027,12 +2030,14 @@ class GitHandler(object):
                 # TODO(durin42): what is this doing?
                 new_ref = REMOTE_BRANCH_PREFIX + remote_head
 
-                util.set_refs(self.ui, self.git, {new_ref: sha})
+                new_refs[new_ref] = sha
             elif ref_name.startswith(LOCAL_TAG_PREFIX):
-                util.set_refs(self.ui, self.git, {ref_name: sha})
+                new_refs[ref_name] = sha
 
             if hgsha:
                 all_remote_nodeids.append(bin(hgsha))
+
+        compat.add_packed_refs(self.git.refs, new_refs)
 
         if all_remote_nodeids:
             with self.repo.lock(), self.repo.transaction(
