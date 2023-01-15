@@ -10,7 +10,10 @@ This is a minor release, focusing on bugs and compatibility.
 * Handle pushing tags to Git that cannot be stored as references such
   as double-quotes on Windows. (#397)
 * Avoid converting unrelated refs on pull, such as Github PR-related refs. (#386)
+* Fix tests with GNU Grep 3.8 and later, by avoiding the ``egrep``
+  alias (#400)
 
+Thanks to @icp for contributingwx changes to the release!
 
 hg-git 1.0.1 (2022-11-04)
 =========================
