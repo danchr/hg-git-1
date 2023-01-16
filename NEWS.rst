@@ -14,7 +14,7 @@ This is a minor release, focusing on bugs and compatibility.
   alias (#400)
 * Support reading remote refs even if packed.
 
-Thanks to @icp for contributingwx changes to the release!
+Thanks to @icp1994 for contributing changes to the release!
 
 hg-git 1.0.1 (2022-11-04)
 =========================
