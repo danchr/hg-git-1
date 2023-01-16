@@ -192,7 +192,15 @@ def set_refs(ui, git, refs):
     for git_ref, git_sha in refs.items():
         # prior to 0.20.22, dulwich couldn't handle refs
         # pointing to missing objects, so don't add them
-        if git_sha and git_sha in git:
+        #
+        # moreover, don't set the ref if it already points to the
+        # target object since setting the ref triggers a fsync, which
+        # can be very slow in large repositories
+        if (
+            git_sha
+            and git_sha in git
+            and git.refs.follow(git_ref)[1] != git_sha
+        ):
             # some refs may actually be unstorable, e.g. refs
             # containing a double quote on Windows or non-UTF-8 refs
             # on macOS, so handle that gracefully
