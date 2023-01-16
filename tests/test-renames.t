@@ -39,7 +39,7 @@ Add a submodule (gitlink) and move it to a different spot:
   $ rmpwd="import sys; print(sys.stdin.read().replace('$(dirname $(pwd))/', ''))"
   $ clonefilt='s/Cloning into/Initialized empty Git repository in/;s/in .*/in .../'
 
-  $ git submodule add ../gitsubmodule 2>&1 | python -c "$rmpwd" | sed "$clonefilt" | egrep -v '^done\.$'
+  $ git submodule add ../gitsubmodule 2>&1 | python -c "$rmpwd" | sed "$clonefilt" | grep -E -v '^done\.$'
   Initialized empty Git repository in ...
   
   $ fn_git_commit -m 'add submodule'
@@ -72,7 +72,7 @@ Rename the file back:
 Rename a file elsewhere and replace it with a submodule:
 
   $ git mv gamma gamma-new
-  $ git submodule add ../gitsubmodule gamma 2>&1 | python -c "$rmpwd" | sed "$clonefilt" | egrep -v '^done\.$'
+  $ git submodule add ../gitsubmodule gamma 2>&1 | python -c "$rmpwd" | sed "$clonefilt" | grep -E -v '^done\.$'
   Initialized empty Git repository in ...
   
   $ fn_git_commit -m 'rename and add submodule'

@@ -104,6 +104,16 @@ def perfgitsavemap(ui, repo):
 
 
 @eh.command(
+    b'debugperfgitloadremotes',
+    helpcategory=registrar.command.CATEGORY_MISC,
+)
+def perfgitloadremotes(ui, repo):
+    timer, fm = gettimer(ui)
+    timer(repo.githandler.load_remote_refs)
+    fm.end()
+
+
+@eh.command(
     b'debuggitdir',
     helpcategory=registrar.command.CATEGORY_WORKING_DIRECTORY,
 )
