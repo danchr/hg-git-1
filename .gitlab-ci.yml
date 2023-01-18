@@ -145,7 +145,6 @@ Dependencies:
 Coverage:
   stage: .post
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:alpine
-  when: always
   allow_failure: true
   coverage: /^TOTAL.+?([.0-9]+\%)$/
   script:
