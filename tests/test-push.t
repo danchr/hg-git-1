@@ -202,11 +202,24 @@ fails:
 We can push only one of two bookmarks on the same revision:
 
   $ cd hgrepo
-  $ hg book also-not-master really-not-master
+  $ hg book -r 0 also-not-master really-not-master
   $ hg push -B also-not-master
   pushing to file:///$TESTTMP/gitrepo
   searching for changes
   adding reference refs/heads/also-not-master
+
+We can also push another bookmark to a path with another revision
+specified:
+
+  $ hg book -r 3 also-not-master
+  moving bookmark 'also-not-master' forward from ff7a2f2d8d70
+  $ hg push -B also-not-master "file:///$TESTTMP/gitrepo#master"
+  pushing to file:///$TESTTMP/gitrepo
+  searching for changes
+  adding objects
+  remote: found 0 deltas to reuse (dulwich0210 !)
+  added 1 commits with 1 trees and 1 blobs
+  updating reference refs/heads/also-not-master
 
 And we can delete them again afterwards:
 

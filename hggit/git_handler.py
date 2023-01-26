@@ -1467,7 +1467,7 @@ class GitHandler(object):
     def get_changed_refs(self, refs, exportable, force):
         new_refs = refs.copy()
 
-        if not exportable:
+        if not any(exportable.values()):
             raise error.Abort(
                 b'no bookmarks or tags to push to git',
                 hint=b'see "hg help bookmarks" for details on creating them',
@@ -1477,11 +1477,6 @@ class GitHandler(object):
         unfiltered = self.repo.unfiltered()
         for rev, rev_refs in exportable.items():
             ctx = self.repo[rev]
-            if not rev_refs:
-                raise error.Abort(
-                    b"revision %s cannot be pushed since"
-                    b" it doesn't have a bookmark" % ctx
-                )
 
             # Check if the tags the server is advertising are annotated tags,
             # by attempting to retrieve it from the our git repo, and building
