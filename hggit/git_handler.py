@@ -1362,17 +1362,18 @@ class GitHandler(object):
             commits = []
 
             with util.abort_push_on_keyerror():
-                missing = self.git.object_store.find_missing_objects(
+                for sha, name in compat.MissingObjectFinder(
+                    self.git.object_store,
                     have,
                     want,
-                )
+                    progress=progress,
+                ):
+                    o = self.git.object_store[sha]
+                    t = type(o)
+                    change_totals[t] = change_totals.get(t, 0) + 1
+                    if isinstance(o, Commit):
+                        commits.append(sha)
 
-            for sha, name in missing:
-                o = self.git.object_store[sha]
-                t = type(o)
-                change_totals[t] = change_totals.get(t, 0) + 1
-                if isinstance(o, Commit):
-                    commits.append(sha)
             commit_count = len(commits)
             self.ui.note(_(b"%d commits found\n") % commit_count)
             if commit_count > 0:

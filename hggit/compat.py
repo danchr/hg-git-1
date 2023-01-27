@@ -12,6 +12,7 @@ from mercurial import (
     wireprotov1peer,
 )
 
+from dulwich import object_store
 from dulwich import pack
 
 # dulwich 0.20.49 changed create_delta to a generator
@@ -138,3 +139,15 @@ def check_incompatible_arguments(opts, first, others):
     """
     for other in others:
         check_at_most_one_arg(opts, first, other)
+
+
+# dulwich 0.21 removed find_missing_objects() and made MissingObjectFinder a
+# proper iterable
+if not hasattr(object_store.MissingObjectFinder, '__iter__'):
+
+    class MissingObjectFinder(object_store.MissingObjectFinder):
+        def __iter__(self):
+            return iter(self.next, None)
+
+else:
+    MissingObjectFinder = object_store.MissingObjectFinder
