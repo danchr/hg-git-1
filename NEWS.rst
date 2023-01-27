@@ -13,6 +13,7 @@ This is a minor release, focusing on bugs and compatibility.
 * Fix tests with GNU Grep 3.8 and later, by avoiding the ``egrep``
   alias (#400)
 * Support reading remote refs even if packed.
+* Add support for Dulwich 0.21 and later.
 
 Thanks to @icp1994 for contributing changes to the release!
 

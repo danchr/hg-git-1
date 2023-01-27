@@ -44,6 +44,7 @@ clear the cache to be sure it is regenerated correctly
   pushing to ../repo.git
   searching for changes
   adding objects
+  remote: found 0 deltas to reuse (dulwich0210 !)
   added 4 commits with 4 trees and 3 blobs
   adding reference refs/heads/beta
   adding reference refs/heads/master

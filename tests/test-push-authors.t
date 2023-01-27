@@ -75,6 +75,7 @@ Push it!
   pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
+  remote: found 0 deltas to reuse (dulwich0210 !)
   added 6 commits with 6 trees and 1 blobs
   adding reference refs/heads/master
 

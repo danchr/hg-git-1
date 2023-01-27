@@ -49,6 +49,7 @@ resolve using second parent
   pushing to ../repo.git
   searching for changes
   adding objects
+  remote: found 0 deltas to reuse (dulwich0210 !)
   added 4 commits with 3 trees and 3 blobs
   adding reference refs/heads/master
   $ cd ..

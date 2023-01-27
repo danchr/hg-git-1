@@ -42,14 +42,14 @@ Make sure that clone over unauthenticated HTTP doesn't break
 
   $ hg clone -U git+http://localhost:$HGPORT/gitrepo hgrepo 2>&1 || cat $TESTTMP/dulwich.log
   \r (no-eol) (esc)
-  counting objects 1 [ <=>                                  ]\r (no-eol) (esc) (dulwich0204 !)
-  counting objects 2 [  <=>                                 ]\r (no-eol) (esc) (dulwich0204 !)
-  counting objects 3 [   <=>                                ]\r (no-eol) (esc) (dulwich0204 !)
-  counting objects 4 [    <=>                               ]\r (no-eol) (esc) (dulwich0204 !)
-  counting objects 5 [     <=>                              ]\r (no-eol) (esc) (dulwich0204 !)
-  counting objects 6 [      <=>                             ]\r (no-eol) (esc) (dulwich0204 !)
-                                                              \r (no-eol) (esc) (dulwich0204 !)
-  \r (no-eol) (esc) (dulwich0204 !)
+  counting objects 1 [ <=>                                  ]\r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+  counting objects 2 [  <=>                                 ]\r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+  counting objects 3 [   <=>                                ]\r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+  counting objects 4 [    <=>                               ]\r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+  counting objects 5 [     <=>                              ]\r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+  counting objects 6 [      <=>                             ]\r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+                                                              \r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+  \r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
   importing commits 1/2 b23744d34f97         [======>       ]\r (no-eol) (esc)
   importing commits 2/2 3af9773036a9         [=============>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
@@ -64,14 +64,14 @@ Make sure that clone over unauthenticated HTTP doesn't break
 Similarly, make sure that we detect repositories ending with .git
 
   $ hg clone -U http://localhost:$HGPORT/repo.git hgrepo-copy 2>&1 || cat $TESTTMP/dulwich.log
-  \r (no-eol) (esc) (dulwich0204 !)
-  counting objects 1 [ <=>                                  ]\r (no-eol) (esc) (dulwich0204 !)
-  counting objects 2 [  <=>                                 ]\r (no-eol) (esc) (dulwich0204 !)
-  counting objects 3 [   <=>                                ]\r (no-eol) (esc) (dulwich0204 !)
-  counting objects 4 [    <=>                               ]\r (no-eol) (esc) (dulwich0204 !)
-  counting objects 5 [     <=>                              ]\r (no-eol) (esc) (dulwich0204 !)
-  counting objects 6 [      <=>                             ]\r (no-eol) (esc) (dulwich0204 !)
-                                                              \r (no-eol) (esc) (dulwich0204 !)
+  \r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+  counting objects 1 [ <=>                                  ]\r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+  counting objects 2 [  <=>                                 ]\r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+  counting objects 3 [   <=>                                ]\r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+  counting objects 4 [    <=>                               ]\r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+  counting objects 5 [     <=>                              ]\r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+  counting objects 6 [      <=>                             ]\r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
+                                                              \r (no-eol) (esc) (dulwich0204 no-dulwich0210 !)
   \r (no-eol) (esc)
   importing commits 1/2 b23744d34f97         [======>       ]\r (no-eol) (esc)
   importing commits 2/2 3af9773036a9         [=============>]\r (no-eol) (esc)
@@ -102,14 +102,15 @@ Broken due to bug #977 in Dulwich
   \r (no-eol) (esc)
   exporting 1/1 daf1ae153bf8         [=====================>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
-  \r (no-eol) (esc)
-  counting objects 4 [ <=>                                  ]\r (no-eol) (esc)
-  counting objects 5 [  <=>                                 ]\r (no-eol) (esc)
-  counting objects 6 [   <=>                                ]\r (no-eol) (esc)
-                                                              \r (no-eol) (esc)
+  \r (no-eol) (esc) (no-dulwich0210 !)
+  counting objects 4 [ <=>                                  ]\r (no-eol) (esc) (no-dulwich0210 !)
+  counting objects 5 [  <=>                                 ]\r (no-eol) (esc) (no-dulwich0210 !)
+  counting objects 6 [   <=>                                ]\r (no-eol) (esc) (no-dulwich0210 !)
+                                                              \r (no-eol) (esc) (no-dulwich0210 !)
   pushing to git+http://localhost:$HGPORT/gitrepo
   searching for changes
   adding objects
+  remote: found 0 deltas to reuse (dulwich0210 !)
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
   $ hg log -T 'HG:{node|short} GIT:{gitnode|short}\n' -r .

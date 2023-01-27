@@ -151,6 +151,7 @@ actually pushed
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
+  remote: found 0 deltas to reuse (dulwich0210 !)
   added 1 commits with 1 trees and 1 blobs
   adding reference refs/heads/not-pushed
   $ hg phase -r 'all() - master' > $TESTTMP/after
@@ -162,6 +163,7 @@ actually pushed
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
+  remote: found 0 deltas to reuse (dulwich0210 !)
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
   $ hg phase -r 'all() - master' > $TESTTMP/after

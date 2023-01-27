@@ -371,6 +371,7 @@ Make a new commit with a copy and a rename in Mercurial
   pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
+  remote: found 0 deltas to reuse (dulwich0210 !)
   added 2 commits with 2 trees and 3 blobs
   updating reference refs/heads/master
 
