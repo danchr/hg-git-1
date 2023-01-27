@@ -5,7 +5,6 @@ import itertools
 import os
 import re
 import shutil
-import tempfile
 
 from dulwich.errors import HangupException, GitProtocolError, ApplyDeltaError
 from dulwich.objects import Blob, Commit, Tag, Tree, parse_timezone
@@ -1499,44 +1498,16 @@ class GitHandler(object):
 
         progress = GitProgress(self.ui)
 
-        tempargs = dict(
-            prefix=b'hg-git-fetch-',
-            suffix=b'.pack',
-            dir=self.gitdir,
-        )
-
-        if self.is_clone and self.gitdir.startswith(self.repo.root):
-            # if we're in a clone, and the git directory is within the
-            # repository just created, so we can use a named temporary
-            # file, suitable for moving into the git repository
-            move = delete = True
-            f = tempfile.NamedTemporaryFile(**tempargs, delete=False)
-        else:
-            move = delete = False
-            max_size = self.ui.configint(b'hggit', b'fetchbuffer') * 1e6
-            f = tempfile.SpooledTemporaryFile(**tempargs, max_size=max_size)
-
         try:
-            ret = self._call_client(
-                remote,
-                'fetch_pack',
-                determine_wants,
-                graphwalker,
-                f.write,
-                progress.progress,
-            )
-
-            if f.tell() != 0:
-                if move:
-                    self.ui.debug(b'moving git pack into %s\n' % self.gitdir)
-                    # windows might have issues moving an open file?
-                    f.close()
-                    self.git.object_store.move_in_pack(f.name)
-                    delete = False
-                else:
-                    self.ui.debug(b'adding git pack to %s\n' % self.gitdir)
-                    f.seek(0)
-                    self.git.object_store.add_thin_pack(f.read, None)
+            with util.add_pack(self.git.object_store) as f:
+                ret = self._call_client(
+                    remote,
+                    'fetch_pack',
+                    determine_wants,
+                    graphwalker,
+                    f.write,
+                    progress.progress,
+                )
 
             # For empty repos dulwich gives us None, but since later
             # we want to iterate over this, we really want an empty
@@ -1551,9 +1522,6 @@ class GitHandler(object):
             )
         finally:
             progress.flush()
-            f.close()
-            if delete:
-                os.remove(f.name)
 
     def _call_client(self, remote, method, *args, **kwargs):
         if remote in self._clients:
