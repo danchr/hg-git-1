@@ -722,7 +722,7 @@ class GitHandler(object):
                 commit.parents.append(git_sha)
 
         commit.message, extra = self.get_git_message_and_extra(ctx)
-        commit.extra.extend(extra)
+        commit._extra.extend(extra)
 
         if b'encoding' in extra:
             commit.encoding = extra[b'encoding']
@@ -1057,7 +1057,7 @@ class GitHandler(object):
             hg_renames,
             hg_branch,
             extra,
-        ) = git2hg.extract_hg_metadata(commit.message, commit.extra)
+        ) = git2hg.extract_hg_metadata(commit.message, commit._extra)
         if hg_renames is None:
             detect_renames = True
             # We have to store this unconditionally, even if there are no
