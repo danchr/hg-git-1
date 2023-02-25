@@ -2,7 +2,6 @@ stages:
   - images
   - current
   - compat
-  - upcoming
   - archives
 
 .base:
@@ -119,7 +118,7 @@ Alpine:
 # Test that the tests pass against the current branches
 Development:
   extends: .base
-  stage: upcoming
+  stage: compat
   rules: &upcoming-rules
     # disallow failures for scheduled builds, so we get a nice
     # notification
@@ -146,7 +145,7 @@ Development:
 # Git & Dulwich
 Dependencies:
   extends: Alpine
-  stage: upcoming
+  stage: compat
   image:
     name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:edge
   rules: *upcoming-rules
