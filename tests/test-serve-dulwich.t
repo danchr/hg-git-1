@@ -45,8 +45,8 @@ Make sure that clone over unauthenticated HTTP doesn't break
   importing commits 1/2 b23744d34f97         [======>       ]\r (no-eol) (esc)
   importing commits 2/2 3af9773036a9         [=============>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
-  remote: dul-daemon says what (no-dulwich01910 !)
-  remote: how was that, then? (no-dulwich01910 !)
+  remote: dul-daemon says what (no-dulwich0197 !)
+  remote: how was that, then? (no-dulwich0197 !)
   importing 2 git commits
   new changesets c4d188f6e13d:221dd250e933 (2 drafts)
   $ hg log -T 'HG:{node|short} GIT:{gitnode|short}\n' -R copy
