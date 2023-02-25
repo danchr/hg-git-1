@@ -155,7 +155,7 @@ class overlaymanifest(object):
         del self._map[path]
 
 
-@eh.wrapfunction(manifest.manifestdict, b'diff')
+@eh.wrapfunction(manifest.manifestdict, 'diff')
 def wrapmanifestdictdiff(orig, self, m2, match=None, clean=False):
     '''avoid calling into lazymanifest code if m2 is an overlaymanifest'''
     # Older mercurial clients used diff(m2, clean=False). If a caller failed

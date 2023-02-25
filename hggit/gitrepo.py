@@ -136,7 +136,7 @@ def islocal(path):
 
 
 # defend against tracebacks if we specify -r in 'hg pull'
-@eh.wrapfunction(hg, b'addbranchrevs')
+@eh.wrapfunction(hg, 'addbranchrevs')
 def safebranchrevs(orig, lrepo, otherrepo, branches, revs):
     revs, co = orig(lrepo, otherrepo, branches, revs)
     if isinstance(otherrepo, gitrepo):
@@ -152,7 +152,7 @@ def safebranchrevs(orig, lrepo, otherrepo, branches, revs):
     return revs, co
 
 
-@eh.wrapfunction(discovery, b'findcommonoutgoing')
+@eh.wrapfunction(discovery, 'findcommonoutgoing')
 def findcommonoutgoing(orig, repo, other, *args, **kwargs):
     if isinstance(other, gitrepo):
         heads = repo.githandler.get_refs(other.path)[0]
@@ -173,14 +173,14 @@ def findcommonoutgoing(orig, repo, other, *args, **kwargs):
     return orig(repo, other, *args, **kwargs)
 
 
-@eh.wrapfunction(bundlerepo, b'getremotechanges')
+@eh.wrapfunction(bundlerepo, 'getremotechanges')
 def getremotechanges(orig, ui, repo, other, onlyheads, *args, **opts):
     if isinstance(other, gitrepo):
         return repo.githandler.getremotechanges(other, onlyheads)
     return orig(ui, repo, other, onlyheads, *args, **opts)
 
 
-@eh.wrapfunction(exchange, b'pull')
+@eh.wrapfunction(exchange, 'pull')
 @util.transform_notgit
 def exchangepull(
     orig, repo, remote, heads=None, force=False, bookmarks=(), **kwargs
@@ -208,7 +208,7 @@ def exchangepull(
 
 
 # TODO figure out something useful to do with the newbranch param
-@eh.wrapfunction(exchange, b'push')
+@eh.wrapfunction(exchange, 'push')
 @util.transform_notgit
 def exchangepush(
     orig,

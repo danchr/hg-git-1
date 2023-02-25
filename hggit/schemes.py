@@ -99,7 +99,7 @@ class RepoFactory:
         return fn(ui, path, *args, **kwargs)
 
 
-@eh.wrapfunction(hg, b'defaultdest')
+@eh.wrapfunction(hg, 'defaultdest')
 def defaultdest(orig, source):
     if source.endswith(b'.git'):
         return orig(source[:-4])
@@ -107,7 +107,7 @@ def defaultdest(orig, source):
     return orig(source)
 
 
-@eh.wrapfunction(hg, b'peer')
+@eh.wrapfunction(hg, 'peer')
 def peer(orig, uiorrepo, *args, **opts):
     newpeer = orig(uiorrepo, *args, **opts)
     if isinstance(newpeer, gitrepo.gitrepo):
@@ -116,7 +116,7 @@ def peer(orig, uiorrepo, *args, **opts):
     return newpeer
 
 
-@eh.wrapfunction(hg, b'clone')
+@eh.wrapfunction(hg, 'clone')
 def clone(orig, *args, **opts):
     srcpeer, destpeer = orig(*args, **opts)
 
@@ -127,24 +127,24 @@ def clone(orig, *args, **opts):
     return srcpeer, destpeer
 
 
-@eh.wrapfunction(compat.path, b'_isvalidlocalpath')
+@eh.wrapfunction(compat.path, '_isvalidlocalpath')
 def isvalidlocalpath(orig, self, path):
     return orig(self, path) or isgitdir(path)
 
 
-@eh.wrapfunction(compat.url, b'islocal')
+@eh.wrapfunction(compat.url, 'islocal')
 def isurllocal(orig, path):
     # recognise git scp-style paths when cloning
     return orig(path) and not util.isgitsshuri(path._origpath)
 
 
-@eh.wrapfunction(hg, b'islocal')
+@eh.wrapfunction(hg, 'islocal')
 def islocal(orig, path):
     # recognise git scp-style paths when cloning
     return orig(path) and not util.isgitsshuri(path)
 
 
-@eh.wrapfunction(compat.urlutil, b'hasscheme')
+@eh.wrapfunction(compat.urlutil, 'hasscheme')
 def hasscheme(orig, path):
     # recognise git scp-style paths
     return orig(path) or util.isgitsshuri(path)
