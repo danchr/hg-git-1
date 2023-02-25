@@ -35,6 +35,7 @@ Load commonly used test logic
   warning: not exporting bookmark 'epsil*on' due to invalid name
   searching for changes
   adding objects
+  remote: found 0 deltas to reuse (dulwich0210 !)
   added 3 commits with 3 trees and 3 blobs
   adding reference refs/heads/delt#a
   updating reference refs/heads/master

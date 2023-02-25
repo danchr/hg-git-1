@@ -29,6 +29,7 @@ Create two commits, one secret:
   warning: not exporting secret bookmark 'secret'
   searching for changes
   adding objects
+  remote: found 0 deltas to reuse (dulwich0210 !)
   added 1 commits with 1 trees and 1 blobs
   adding reference refs/heads/master
   $ cd ..

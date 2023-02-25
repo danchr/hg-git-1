@@ -2,16 +2,18 @@ stages:
   - images
   - current
   - compat
-  - upcoming
   - archives
 
 .base:
   image: registry.heptapod.net:443/mercurial/hg-git/ci/$CI_COMMIT_HG_BRANCH:hg-$HG-py$PYTHON
   timeout: 20m
+  tags:
+    - clever
   services:
     - name: registry.heptapod.net:443/mercurial/hg-git/git-server
       alias: git-server
   variables:
+    CI_CLEVER_CLOUD_FLAVOR: XS
     CI_TEST_GIT_NETWORKING: 1
   script:
     - adduser -D test
@@ -31,6 +33,8 @@ stages:
 Latest:
   extends: .base
   stage: current
+  variables:
+    CI_CLEVER_CLOUD_FLAVOR: M
   parallel:
     matrix:
       - &latest-versions
@@ -74,7 +78,12 @@ Alpine:
   stage: compat
   image:
     name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:$ALPINE
+  tags:
+    - clever
+  variables:
+    CI_CLEVER_CLOUD_FLAVOR: XS
   timeout: 20m
+  retry: 1
   script:
     - apk add gnupg git unzip openssh mercurial py3-pip py3-pygments py3-setuptools_scm
     - |
@@ -107,7 +116,7 @@ Alpine:
 # Test that the tests pass against the current branches
 Development:
   extends: .base
-  stage: upcoming
+  stage: compat
   rules: &upcoming-rules
     # disallow failures for scheduled builds, so we get a nice
     # notification
@@ -134,7 +143,7 @@ Development:
 # Git & Dulwich
 Dependencies:
   extends: Alpine
-  stage: upcoming
+  stage: compat
   image:
     name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:edge
   rules: *upcoming-rules
@@ -143,7 +152,10 @@ Dependencies:
 Coverage:
   stage: .post
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:alpine
-  when: always
+  tags:
+    - clever
+  variables:
+    CI_CLEVER_CLOUD_FLAVOR: XS
   allow_failure: true
   coverage: /^TOTAL.+?([.0-9]+\%)$/
   script:
@@ -258,6 +270,10 @@ Git service image:
 Wheels:
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python
   timeout: 15m
+  tags:
+    - clever
+  variables:
+    CI_CLEVER_CLOUD_FLAVOR: XS
   stage: archives
   rules:
     # run on tags

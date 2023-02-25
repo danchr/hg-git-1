@@ -122,6 +122,7 @@ The warning message changed in Git 1.8.0
   pushing to ../repo.git
   searching for changes
   adding objects
+  remote: found 0 deltas to reuse (dulwich0210 !)
   added 4 commits with 4 trees and 4 blobs
   adding reference refs/heads/master
 
@@ -254,15 +255,18 @@ that platform.
   warning: not exporting tag 'uni-t?g' due to invalid name
   warning: not exporting tag 'lat-t?g' due to invalid name
   searching for changes
+  remote: found 0 deltas to reuse (dulwich0210 !)
   adding reference refs/tags/ascii-tag
   $ HGENCODING=latin-1 hg push
   pushing to $TESTTMP/repo.git
   searching for changes
+  remote: found 0 deltas to reuse (dulwich0210 !)
   adding reference refs/tags/lat-t\xe4g (esc)
   adding reference refs/tags/uni-t\xe4g (esc)
   $ HGENCODING=utf-8 hg push
   pushing to $TESTTMP/repo.git
   searching for changes
+  remote: found 0 deltas to reuse (dulwich0210 !)
   adding reference refs/tags/lat-t\xc3\xa4g (esc)
   adding reference refs/tags/uni-t\xc3\xa4g (esc)
 #endif

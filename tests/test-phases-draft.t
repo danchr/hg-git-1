@@ -56,6 +56,7 @@ pushing without hggit.usephases does not publish local changesets
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
+  remote: found 0 deltas to reuse (dulwich0210 !)
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
   $ hg phase -r master

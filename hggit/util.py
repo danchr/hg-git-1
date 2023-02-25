@@ -6,9 +6,13 @@ from __future__ import generator_stop
 import collections
 import contextlib
 import importlib.resources
+import os
 import re
+import tempfile
 
+from dulwich import __version__ as dulwich_version
 from dulwich import errors
+from dulwich.object_store import PackBasedObjectStore
 from mercurial.i18n import _
 from mercurial import (
     error,
@@ -224,3 +228,49 @@ def get_package_resource(path):
         return importlib.resources.files(package).joinpath(name).read_bytes()
     else:
         return importlib.resources.read_binary(package, name)
+
+
+if dulwich_version >= (0, 21, 0):
+
+    @contextlib.contextmanager
+    def add_pack(object_store: PackBasedObjectStore):
+        """Wrapper for ``object_store.add_pack()`` that's a context manager"""
+        f, commit, abort = object_store.add_pack()
+
+        try:
+            yield f
+            commit()
+        except Exception:
+            abort()
+            raise
+
+else:
+    # dulwich 0.20 or earlier, where add_pack() doesn't work with thin
+    # packs...
+    @contextlib.contextmanager
+    def add_pack(object_store: PackBasedObjectStore):
+        """Simple context manager for adding a file to a pack"""
+        if hasattr(object_store, "find_missing_objects"):
+            with tempfile.NamedTemporaryFile(
+                prefix='hg-git-fetch-',
+                suffix='.pack',
+                dir=object_store.pack_dir,
+                delete=False,
+            ) as f:
+                delete = True
+                try:
+                    yield f
+
+                    f.flush()
+
+                    if f.tell():
+                        if not os.listdir(object_store.pack_dir):
+                            # we're in an initial clone
+                            object_store.move_in_pack(f.name)
+                            delete = False
+                        else:
+                            f.seek(0)
+                            object_store.add_thin_pack(f.read, None)
+                finally:
+                    if delete:
+                        os.remove(f.name)

@@ -51,6 +51,7 @@ Load commonly used test logic
   pushing to ../repo.git
   searching for changes
   adding objects
+  remote: found 0 deltas to reuse (dulwich0210 !)
   added 2 commits with 2 trees and 2 blobs
   adding reference refs/heads/branch1
   adding reference refs/heads/branch2
