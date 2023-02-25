@@ -12,6 +12,7 @@ from mercurial import (
 from dulwich import object_store
 from dulwich import pack
 
+
 # dulwich 0.20.49 changed create_delta to a generator
 def create_delta(base_buf, target_buf):
     delta = pack.create_delta(base_buf, target_buf)

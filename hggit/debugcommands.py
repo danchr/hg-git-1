@@ -17,6 +17,7 @@ from mercurial import registrar
 
 eh = exthelper.exthelper()
 
+
 # the timer functions are copied from mercurial/contrib/perf.py
 def gettimer(ui, opts=None):
     """return a timer function and formatter: (timer, formatter)
