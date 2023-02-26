@@ -28,6 +28,12 @@ Enhancements:
     default = https://github.com/example/test
     default:pushurl = git+ssh://git@github.com/example
     default:hg-git.publish = yes
+* Pushing and pulling from Git now triggers ``incoming``, ``outgoing``
+  and ``changegroup`` hooks, along with the corresponding ``pre*``
+  hooks. In addition, the ``gitexport`` and ``gitimport`` hooks allow
+  intercepting when commits are converted. As a result, you can now
+  use the ``notify`` extension when interacting with Git repositories.
+  (#402)
 
 This release requires Mercurial 5.4 or later and Python 3.7 or later.
 

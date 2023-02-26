@@ -370,7 +370,7 @@ class GitHandler(object):
     def import_commits(self, remote_name):
         remote_names = [remote_name] if remote_name is not None else []
         refs = self.git.refs.as_dict()
-        self.import_git_objects(remote_names, refs)
+        self.import_git_objects(b'gimport', remote_names, refs)
 
     def fetch(self, remote, heads):
         result = self.fetch_pack(remote.path, heads)
@@ -380,6 +380,7 @@ class GitHandler(object):
 
         if result.refs:
             imported = self.import_git_objects(
+                b'pull',
                 remote_names,
                 result.refs,
                 heads=heads,
@@ -494,6 +495,13 @@ class GitHandler(object):
             )
 
     def push(self, remote, revs, bookmarks, force):
+        self.repo.hook(
+            b"preoutgoing",
+            git=True,
+            source=b'push',
+            url=remote,
+        )
+
         old_refs, new_refs = self.upload_pack(remote, revs, bookmarks, force)
         remote_names = self.remote_names(remote, True)
         remote_desc = remote_names[0] if remote_names else b''
@@ -657,6 +665,8 @@ class GitHandler(object):
                 return
 
         self.ui.note(_(b"exporting %d changesets\n") % total)
+
+        self.repo.hook(b'gitexport', nodes=[c.hex() for c in export], git=True)
 
         # By only exporting deltas, the assertion is that all previous objects
         # for all other changesets are already present in the Git repository.
@@ -1030,7 +1040,16 @@ class GitHandler(object):
         else:
             return None, None
 
-    def import_git_objects(self, remote_names, refs, heads=None):
+    def import_git_objects(self, command, remote_names, refs, heads=None):
+        self.repo.hook(
+            b'gitimport',
+            source=command,
+            git=True,
+            names=remote_names,
+            refs=refs,
+            heads=heads,
+        )
+
         filteredrefs = git2hg.filter_refs(self.filter_min_date(refs), heads)
         commits = self.get_git_incoming(filteredrefs, remote_names)
         # import each of the commits, oldest first
@@ -1060,21 +1079,38 @@ class GitHandler(object):
             # get at least one chunk
             for offset in range(0, max(total, 1), chunksize):
                 with self.get_transaction(b"gimport"):
+                    oldtiprev = self.repo.changelog.tiprev()
+
                     for commit in commits[offset : offset + chunksize]:
                         progress.increment(item=commit.short)
                         self.import_git_commit(
+                            command,
                             self.git[commit.sha],
                             commit.phase,
                         )
+
+                    lastrev = self.repo.changelog.tiprev()
 
                     self.import_tags(refs)
                     self.update_hg_bookmarks(remote_names, refs)
                     self.update_remote_branches(remote_names, refs)
 
+                    if oldtiprev != lastrev:
+                        first = self.repo.changelog.node(oldtiprev + 1)
+                        last = self.repo.changelog.node(lastrev)
+
+                        self.repo.hook(
+                            b"changegroup",
+                            source=b'push',
+                            git=True,
+                            node=hex(first),
+                            node_last=hex(last),
+                        )
+
         # TODO if the tags cache is used, remove any dangling tag references
         return total
 
-    def import_git_commit(self, commit, phase):
+    def import_git_commit(self, command, commit, phase):
         self.ui.debug(_(b"importing: %s\n") % commit.id)
         unfiltered = self.repo.unfiltered()
 
@@ -1337,6 +1373,7 @@ class GitHandler(object):
             date,
             extra,
         )
+
         # Starting Mercurial commit d2743be1bb06, memctx imports from
         # committablectx. This means that it has a 'substate' property that
         # contains the subrepo state. Ordinarily, Mercurial expects the subrepo
@@ -1361,6 +1398,14 @@ class GitHandler(object):
         # save changeset to mapping file
         cs = hex(node)
         self.map_set(commit.id, cs)
+
+        self.repo.hook(
+            b'incoming',
+            git=True,
+            source=command,
+            node=cs,
+            git_node=commit.id,
+        )
 
     # PACK UPLOADING AND FETCHING
 
@@ -1407,7 +1452,18 @@ class GitHandler(object):
                         )
                     else:
                         exportable[rev] = all_exportable[rev]
-            return self.get_changed_refs(refs, exportable, force)
+
+            changes = self.get_changed_refs(refs, exportable, force)
+
+            self.repo.hook(
+                b"prechangegroup",
+                source=b'push',
+                git=True,
+                url=remote,
+                changes=changes,
+            )
+
+            return changes
 
         def genpack(have, want, progress=None, ofs_delta=True):
             commits = []
@@ -1424,6 +1480,15 @@ class GitHandler(object):
                     change_totals[t] = change_totals.get(t, 0) + 1
                     if isinstance(o, Commit):
                         commits.append(sha)
+
+                        self.repo.hook(
+                            b"outgoing",
+                            source=b'push',
+                            git=True,
+                            url=remote,
+                            node=self.map_hg_get(sha),
+                            git_node=sha,
+                        )
 
             commit_count = len(commits)
             self.ui.note(_(b"%d commits found\n") % commit_count)

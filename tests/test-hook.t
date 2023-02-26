@@ -13,6 +13,8 @@ commit hooks can see env vars
   $ cd hgrepo
   $ cat > .hg/hgrc <<EOF
   > [hooks]
+  > gitimport = python:testlib.hooks.showargs
+  > gitexport = python:testlib.hooks.showargs
   > pretxncommit = echo : pretxncommit
   > preoutgoing = python:testlib.hooks.showargs
   > prechangegroup = python:testlib.hooks.showargs
@@ -34,7 +36,20 @@ Test pushing a single commit:
 
   $ hg push --config hooks.outgoing=python:testlib.hooks.showargs
   pushing to $TESTTMP/repo.git
+  | preoutgoing.git=True
+  | preoutgoing.source=push
+  | preoutgoing.url=$TESTTMP/repo.git
+  | gitexport.nodes=[b'cc0ffa47c67ebcb08dc50f69afaecb5d622cc777']
+  | gitexport.git=True
   searching for changes
+  | prechangegroup.source=push
+  | prechangegroup.git=True
+  | prechangegroup.url=$TESTTMP/repo.git
+  | outgoing.source=push
+  | outgoing.git=True
+  | outgoing.url=$TESTTMP/repo.git
+  | outgoing.node=cc0ffa47c67ebcb08dc50f69afaecb5d622cc777
+  | outgoing.git_node=681fb452693218a33986174228560272a6fad87a
   adding objects
   remote: found 0 deltas to reuse (dulwich0210 !)
   added 1 commits with 1 trees and 1 blobs
@@ -53,10 +68,27 @@ Hooks on pull?
 
   $ hg pull -u
   pulling from $TESTTMP/repo.git
+  | gitimport.source=pull
+  | gitimport.git=True
+  | gitimport.names=[b'default']
+  | gitimport.refs={b'HEAD': b'1dab31e7bc9691ba42a2fe7b14680694770bc527', b'refs/heads/master': b'1dab31e7bc9691ba42a2fe7b14680694770bc527'}
+  | gitimport.heads=None
   importing 2 git commits
   : pretxncommit
+  | incoming.git=True
+  | incoming.source=pull
+  | incoming.node=382ad5fa1d7727210384d40fa1539af52ca632c5
+  | incoming.git_node=92150d1529ccaea34a6b36fe4144993193080499
   : pretxncommit
+  | incoming.git=True
+  | incoming.source=pull
+  | incoming.node=892115eea5c32152e09ae4013c9a119d7b534049
+  | incoming.git_node=1dab31e7bc9691ba42a2fe7b14680694770bc527
   updating bookmark master
+  | changegroup.source=push
+  | changegroup.git=True
+  | changegroup.node=382ad5fa1d7727210384d40fa1539af52ca632c5
+  | changegroup.node_last=892115eea5c32152e09ae4013c9a119d7b534049
   new changesets 382ad5fa1d77:892115eea5c3 (2 drafts)
   updating to active bookmark master
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
@@ -67,7 +99,15 @@ Hooks on push?
   $ fn_commit hg e
   $ hg push
   pushing to $TESTTMP/repo.git
+  | preoutgoing.git=True
+  | preoutgoing.source=push
+  | preoutgoing.url=$TESTTMP/repo.git
+  | gitexport.nodes=[b'cc6164a17449d58d7811ff3918f33f89c2c83fa5', b'46737f6a4c9d8307b681cbb2e9e2e5419cc87f82']
+  | gitexport.git=True
   searching for changes
+  | prechangegroup.source=push
+  | prechangegroup.git=True
+  | prechangegroup.url=$TESTTMP/repo.git
   adding objects
   remote: found 0 deltas to reuse (dulwich0210 !)
   added 2 commits with 2 trees and 2 blobs
