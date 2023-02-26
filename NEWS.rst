@@ -15,8 +15,10 @@ This is a minor release, focusing on bugs and compatibility.
 * Support reading remote refs even if packed.
 * Add support for Dulwich 0.21 and later.
 * Mark Mercurial 6.4 as supported and tested.
+* Address slowness when pulling large repositories, caused by writing
+  unchanged references. (#401)
 
-Thanks to @icp1994 for contributing changes to the release!
+Thanks to @icp1994 and @jmb for contributing changes to the release!
 
 hg-git 1.0.1 (2022-11-04)
 =========================
