@@ -46,3 +46,8 @@ Make sure that clone regular mercurial repos over http doesn't break
   new changesets 8b6053c928fe (?)
   updating to branch default
   4 files updated, 0 files merged, 0 files removed, 0 files unresolved
+
+And it shouldn't create a Git repository needlessly:
+
+  $ ls copy/.hg | grep git
+  [1]

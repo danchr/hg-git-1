@@ -345,6 +345,11 @@ class GitHandler(object):
     def load_remote_refs(self):
         self._remote_refs = {}
 
+        # don't do anything if there's no git repository, as accessing
+        # `self.git` will create it
+        if not os.path.isdir(self.gitdir):
+            return
+
         # if no paths are set, we should still check 'default'
         pathnames = list(self.ui.paths) or [b'default']
 
