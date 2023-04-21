@@ -103,7 +103,7 @@ class gitrepo(repository.peer):
     def known(self):
         raise NotImplementedError
 
-    def peer(self, path=None):
+    def peer(self, path=None, remotehidden=False):
         return self
 
     def stream_out(self):
@@ -136,8 +136,8 @@ def islocal(path):
 
 # defend against tracebacks if we specify -r in 'hg pull'
 @eh.wrapfunction(hg, b'addbranchrevs')
-def safebranchrevs(orig, lrepo, otherrepo, branches, revs):
-    revs, co = orig(lrepo, otherrepo, branches, revs)
+def safebranchrevs(orig, lrepo, otherrepo, branches, revs, **kwargs):
+    revs, co = orig(lrepo, otherrepo, branches, revs, **kwargs)
     if isinstance(otherrepo, gitrepo):
         # FIXME: Unless it's None, the 'co' result is passed to the lookup()
         # remote command. Since our implementation of the lookup() remote
@@ -245,5 +245,7 @@ def exchangepush(
         )
 
 
-def make_peer(ui, path, create, intents=None, createopts=None):
+def make_peer(
+    ui, path, create, intents=None, createopts=None, remotehidden=False
+):
     return gitrepo(ui, path, create)
