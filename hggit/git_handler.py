@@ -832,7 +832,7 @@ class GitHandler(object):
         if b'author' in ctx.extra():
             try:
                 author = b"".join(apply_delta(author, ctx.extra()[b'author']))
-            except ApplyDeltaError:
+            except (ApplyDeltaError, AssertionError):
                 self.ui.traceback()
                 self.ui.warn(
                     b"warning: disregarding possibly invalid metadata in %s\n"
@@ -868,7 +868,7 @@ class GitHandler(object):
         if b'message' in extra:
             try:
                 message = b"".join(apply_delta(message, extra[b'message']))
-            except ApplyDeltaError:
+            except (ApplyDeltaError, AssertionError):
                 self.ui.traceback()
                 self.ui.warn(
                     b"warning: disregarding possibly invalid metadata in %s\n"
@@ -1462,11 +1462,16 @@ class GitHandler(object):
 
             for ref in rev_refs:
                 if ref not in refs:
-                    gitobj = self.git.get_object(self.git.refs[ref])
-                    if isinstance(gitobj, Tag):
-                        new_refs[ref] = gitobj.id
+                    if ref not in self.git.refs:
+                        self.ui.note(
+                            b'note: cannot update %s\n' % (ref),
+                        )
                     else:
-                        new_refs[ref] = self.map_git_get(ctx.hex())
+                        gitobj = self.git.get_object(self.git.refs[ref])
+                        if isinstance(gitobj, Tag):
+                            new_refs[ref] = gitobj.id
+                        else:
+                            new_refs[ref] = self.map_git_get(ctx.hex())
                 elif new_refs[ref] in self._map_git:
                     rctx = unfiltered[self.map_hg_get(new_refs[ref])]
                     if rctx.ancestor(ctx) == rctx or force:

@@ -234,19 +234,19 @@ that platform.
   warning: not exporting tag 'uni-t?g' due to invalid name
   warning: not exporting tag 'lat-t?g' due to invalid name
   searching for changes
+  remote: found 0 deltas to reuse (dulwich0210 !)
   adding reference refs/tags/ascii-tag
   $ HGENCODING=latin-1 hg push
   pushing to $TESTTMP/repo.git
   warning: failed to save ref refs/tags/lat-t\xe4g (esc)
   warning: failed to save ref refs/tags/uni-t\xe4g (esc)
   searching for changes
-  warning: cannot update 'refs/tags/uni-t\xe4g' (esc)
-  warning: cannot update 'refs/tags/lat-t\xe4g' (esc)
   no changes found (ignoring 1 changesets without bookmarks or tags)
   [1]
   $ HGENCODING=utf-8 hg push
   pushing to $TESTTMP/repo.git
   searching for changes
+  remote: found 0 deltas to reuse (dulwich0210 !)
   adding reference refs/tags/lat-t\xc3\xa4g (esc)
   adding reference refs/tags/uni-t\xc3\xa4g (esc)
 #else
