@@ -326,6 +326,12 @@ Test how pulling an explicit branch with an annotated tag:
   4:c49682c7cba4 draft default/master tip
 This used to die:
   $ hg -R hgrepo-2 gexport
+This used to fail, since we didn't actually pull the annotated tag:
+  $ hg -R hgrepo-2 push
+  pushing to $TESTTMP/repo.git
+  searching for changes
+  abort: branch 'refs/tags/beta' changed on the server, please pull and merge before pushing
+  [255]
   $ rm -rf hgrepo-2
 
 Check that pulling will update phases only:
