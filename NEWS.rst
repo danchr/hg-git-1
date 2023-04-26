@@ -37,6 +37,13 @@ Enhancements:
 
 This release requires Mercurial 5.4 or later and Python 3.7 or later.
 
+hg-git 1.0.3 (unreleased)
+=========================
+
+This is a minor release, focusing on bugs and compatibility.
+
+* Fix tests with Mercurial 6.5
+
 hg-git 1.0.2 (2023-03-03)
 =========================
 
