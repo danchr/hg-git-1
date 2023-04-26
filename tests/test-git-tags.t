@@ -314,7 +314,6 @@ Test how pulling an explicit branch with an annotated tag:
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg log -r 'ancestors(master) and tagged()' -T shorttags -R hgrepo-2
   0:ff7a2f2d8d70 draft alpha
-  1:7fe02317c63d draft beta
   3:0eb1ab0073a8 draft default/master gamma tip
   $ rm -rf hgrepo-2
 
@@ -325,7 +324,6 @@ Test how pulling an explicit branch with an annotated tag:
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg log -r 'tagged()' -T shorttags -R hgrepo-2
   0:ff7a2f2d8d70 draft alpha
-  1:7fe02317c63d draft beta
   3:0eb1ab0073a8 draft default/master gamma tip
 This used to die:
   $ hg -R hgrepo-2 gexport
@@ -333,8 +331,8 @@ This used to fail, since we didn't actually pull the annotated tag:
   $ hg -R hgrepo-2 push
   pushing to $TESTTMP/repo.git
   searching for changes
-  abort: branch 'refs/tags/beta' changed on the server, please pull and merge before pushing
-  [255]
+  no changes found
+  [1]
   $ rm -rf hgrepo-2
 
 Check that pulling will update phases only:

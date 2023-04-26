@@ -152,3 +152,13 @@ if not hasattr(object_store.MissingObjectFinder, '__iter__'):
 
 else:
     MissingObjectFinder = object_store.MissingObjectFinder
+
+
+# dulwich 0.21 added a module-level function and deprecated the
+# instance method
+try:
+    peel_sha = object_store.peel_sha
+except AttributeError:
+
+    def peel_sha(store, sha):
+        return store[sha], store.peel_sha(sha)
