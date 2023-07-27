@@ -74,7 +74,7 @@ def reposetup(ui, repo):
     repo.__class__ = hgrepo
 
 
-@eh.wrapfunction(repoview, b'pinnedrevs')
+@eh.wrapfunction(repoview, 'pinnedrevs')
 def pinnedrevs(orig, repo):
     pinned = orig(repo)
 
