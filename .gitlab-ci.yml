@@ -143,16 +143,6 @@ Development:
           - "stable"
           - "default"
 
-# Test Alpine edge, which usually includes the very latest version of
-# Git & Dulwich
-Dependencies:
-  extends: Alpine
-  stage: compat
-  image:
-    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:edge
-  rules: *upcoming-rules
-  parallel:
-
 Coverage:
   stage: .post
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:alpine
