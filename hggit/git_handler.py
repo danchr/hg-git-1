@@ -527,7 +527,7 @@ class GitHandler(object):
                 new_refs_with_head.update(
                     self.fetch_pack(remote, [b'HEAD']).refs,
                 )
-            except (error.RepoLookupError):
+            except error.RepoLookupError:
                 self.ui.debug(b'remote repository has no HEAD\n')
 
             for remote_name in remote_names:
@@ -1143,7 +1143,7 @@ class GitHandler(object):
             hgsub = util.parse_hgsub(
                 git2hg.git_file_readlines(self.git, git_commit_tree, b'.hgsub')
             )
-            for (sm_path, sm_url, sm_name) in gitmodules:
+            for sm_path, sm_url, sm_name in gitmodules:
                 hgsub[sm_path] = b'[git]' + sm_url
             files[b'.hgsub'] = (False, 0o100644, None)
         elif (

@@ -14,6 +14,7 @@ import functools
 cmdtable = {}
 command = cmdutil.command(cmdtable)
 
+
 # the timer functions are copied from mercurial/contrib/perf.py
 def gettimer(ui, opts=None):
     """return a timer function and formatter: (timer, formatter)
