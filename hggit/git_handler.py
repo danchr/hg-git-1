@@ -157,7 +157,7 @@ def get_repo_and_gitdir(repo):
 
 
 def has_gitrepo(repo):
-    if not hgutil.safehasattr(repo, b'vfs'):
+    if not hasattr(repo, 'vfs'):
         return False
 
     repo, gitdir = get_repo_and_gitdir(repo)
