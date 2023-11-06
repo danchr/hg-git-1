@@ -1,5 +1,3 @@
-from __future__ import generator_stop
-
 import subprocess
 
 from dulwich.client import SSHGitClient, SubprocessWrapper

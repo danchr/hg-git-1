@@ -1,5 +1,3 @@
-from __future__ import generator_stop
-
 from mercurial import exthelper
 from mercurial import repoview
 from mercurial import statichttprepo

@@ -1,8 +1,6 @@
 """Compatibility functions for old Mercurial versions and other utility
 functions."""
 
-from __future__ import generator_stop
-
 import collections
 import contextlib
 import importlib.resources

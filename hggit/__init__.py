@@ -148,8 +148,6 @@ Please note that Mercurial doesn't support exclusion patterns, so any
 
 '''
 
-from __future__ import generator_stop
-
 import dulwich
 
 from mercurial import (

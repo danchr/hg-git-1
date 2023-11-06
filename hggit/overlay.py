@@ -4,8 +4,6 @@
 #
 # incomplete, implemented on demand
 
-from __future__ import generator_stop
-
 from mercurial import (
     ancestor,
     changelog,

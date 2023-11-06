@@ -3,8 +3,6 @@
 # repositories to Git repositories. Code in this file is meant to be a generic
 # library and should be usable outside the context of hg-git or an hg command.
 
-from __future__ import generator_stop
-
 import os
 import stat
 

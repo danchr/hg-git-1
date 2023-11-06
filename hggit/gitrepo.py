@@ -1,5 +1,3 @@
-from __future__ import generator_stop
-
 from dulwich.refs import LOCAL_BRANCH_PREFIX
 from mercurial import (
     bundlerepo,

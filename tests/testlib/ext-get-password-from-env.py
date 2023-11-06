@@ -3,8 +3,6 @@
 # variable
 #
 
-from __future__ import generator_stop
-
 import getpass
 import os
 import sys
