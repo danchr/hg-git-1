@@ -40,7 +40,7 @@ Latest:
       - &latest-versions
         PYTHON:
           - "3.6"
-          - "3.11"
+          - "3.12"
         HG:
           - "6.5"
 
@@ -138,7 +138,7 @@ Development:
     matrix:
       - &development-versions
         PYTHON:
-          - "3.11"
+          - "3.12"
         HG:
           - "stable"
           - "default"
