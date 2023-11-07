@@ -412,6 +412,32 @@ def getgitversion():
     return (int(m.group(1)), int(m.group(2)))
 
 
+@check("dulwich", "Dulwich Python library")
+def has_dulwich():
+    try:
+        from dulwich import client
+
+        client.ZERO_SHA  # silence unused import
+        return True
+    except ImportError:
+        return False
+
+@checkvers(
+    "dulwich", "Dulwich >= %s", [
+        '%d.%d.%d' % vers
+        for vers in (
+            (0, 20, 37),
+            (0, 20, 44),
+            (0, 21, 0),
+        )
+    ]
+)
+def has_dulwich_range(v):
+    import dulwich
+
+    return dulwich.__version__ >= tuple(map(int, v.split('.')))
+
+
 @check("pygit2", "pygit2 Python library")
 def has_pygit2():
     try:
@@ -1109,13 +1135,15 @@ def has_emacs():
     return matchoutput('emacs --version', b'GNU Emacs 2(4.4|4.5|5|6|7|8|9)')
 
 
-@check('black', 'the black formatter for python (>= 20.8b1)')
+@check('black', 'the black formatter for python (>= 22.3)')
 def has_black():
-    blackcmd = 'black --version'
-    version_regex = b'black, (?:version )?([0-9a-b.]+)'
-    version = matchoutput(blackcmd, version_regex)
+    try:
+        import black
+        version = black.__version__
+    except ImportError:
+        version = None
     sv = distutils.version.StrictVersion
-    return version and sv(_bytes2sys(version.group(1))) >= sv('20.8b1')
+    return version and sv(version) >= sv('22.3')
 
 
 @check('pytype', 'the pytype type checker')
@@ -1156,6 +1184,15 @@ def has_bash():
     return matchoutput("bash -c 'echo hi'", b'^hi$')
 
 
+@check("unicodefs", "Unicode-only file system")
+def has_unicode_filesystem():
+    try:
+        with tempfile.NamedTemporaryFile(
+            prefix="bøf".encode("latin-1"), dir=b"."
+        ):
+            return False
+    except Exception:
+        return True
 @check("bigendian", "big-endian CPU")
 def has_bigendian():
     return sys.byteorder == 'big'

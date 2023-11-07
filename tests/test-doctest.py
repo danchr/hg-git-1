@@ -67,6 +67,7 @@ files = subprocess.check_output(
     "hg files --print0 \"%s\"" % fileset,
     shell=True,
     cwd=cwd,
+    stderr=subprocess.DEVNULL,
 ).split(b'\0')
 
 if sys.version_info[0] >= 3:
