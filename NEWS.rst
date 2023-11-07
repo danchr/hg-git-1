@@ -1,4 +1,11 @@
-hg-git 1.0.3 (unreleased)
+hg-git 1.0.4 (unreleased)
+=========================
+
+This is a minor release, focusing on bugs and compatibility.
+
+* TBD
+
+hg-git 1.0.3 (2023-11-07)
 =========================
 
 This is a minor release, focusing on bugs and compatibility.
