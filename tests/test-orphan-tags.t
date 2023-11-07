@@ -59,7 +59,7 @@ Delete the temporary branch
   $ cd ..
 
 Create a Mercurial clone
-n
+
   $ hg clone -U repo.git hgrepo
   importing 4 git commits
   new changesets b8e77484829b:387d03400596 (4 drafts)

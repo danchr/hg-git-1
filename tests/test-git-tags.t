@@ -263,6 +263,7 @@ Try to overwrite an annotated tag:
   beta                               1:7fe02317c63d git
   alpha                              0:ff7a2f2d8d70 git
 #endif
+  $ hg book not-master
   $ hg tag beta
   abort: tag 'beta' already exists (use -f to force)
   [255]
@@ -277,11 +278,12 @@ Try to overwrite an annotated tag:
   adding objects
   remote: found 0 deltas to reuse (dulwich0210 !)
   added 1 commits with 1 trees and 1 blobs
-  updating reference refs/heads/master
+  adding reference refs/heads/not-master
   $ hg tags
   tip                                5:c49682c7cba4
-  default/master                     5:c49682c7cba4
+  default/not-master                 5:c49682c7cba4
   gamma                              4:0eb1ab0073a8
+  default/master                     4:0eb1ab0073a8
   beta                               4:0eb1ab0073a8
   detached                           2:61175962e488
   alpha                              0:ff7a2f2d8d70
@@ -295,8 +297,9 @@ Check whether `gimport` handles tags
   importing 6 git commits
   $ hg tags -q
   tip
-  default/master
+  default/not-master
   gamma
+  default/master
   beta
   detached
   alpha
@@ -305,27 +308,31 @@ Check whether `gimport` handles tags
 Test how pulling an explicit branch with an annotated tag:
 
   $ hg clone -r master repo.git hgrepo-2
-  importing 5 git commits
-  new changesets ff7a2f2d8d70:c49682c7cba4 (5 drafts)
+  importing 4 git commits
+  new changesets ff7a2f2d8d70:0eb1ab0073a8 (4 drafts)
   updating to branch default
-  4 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  3 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg log -r 'ancestors(master) and tagged()' -T shorttags -R hgrepo-2
   0:ff7a2f2d8d70 draft alpha
-  3:0eb1ab0073a8 draft beta gamma
-  4:c49682c7cba4 draft default/master tip
+  3:0eb1ab0073a8 draft default/master gamma tip
   $ rm -rf hgrepo-2
 
   $ hg clone -r master repo.git hgrepo-2
-  importing 5 git commits
-  new changesets ff7a2f2d8d70:c49682c7cba4 (5 drafts)
+  importing 4 git commits
+  new changesets ff7a2f2d8d70:0eb1ab0073a8 (4 drafts)
   updating to branch default
-  4 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  3 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg log -r 'tagged()' -T shorttags -R hgrepo-2
   0:ff7a2f2d8d70 draft alpha
-  3:0eb1ab0073a8 draft beta gamma
-  4:c49682c7cba4 draft default/master tip
+  3:0eb1ab0073a8 draft default/master gamma tip
 This used to die:
   $ hg -R hgrepo-2 gexport
+This used to fail, since we didn't actually pull the annotated tag:
+  $ hg -R hgrepo-2 push
+  pushing to $TESTTMP/repo.git
+  searching for changes
+  no changes found
+  [1]
   $ rm -rf hgrepo-2
 
 Check that pulling will update phases only:
@@ -336,6 +343,6 @@ Check that pulling will update phases only:
   pulling from $TESTTMP/repo.git
   no changes found
   $ hg log -T shorttags -r gamma -r detached
-  4:0eb1ab0073a8 draft beta gamma
+  4:0eb1ab0073a8 draft beta default/master gamma
   2:61175962e488 draft detached X
   $ cd ..

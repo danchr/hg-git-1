@@ -43,6 +43,10 @@ hg-git 1.0.3 (unreleased)
 This is a minor release, focusing on bugs and compatibility.
 
 * Fix tests with Mercurial 6.5
+* Handle failures to save refs, such as when they use characters
+  forbidden by the file system; this is most easily noticed on Windows
+  and macOS. (#397)
+* Fix pulling annotated tags with ``-r``/``--rev``.
 
 hg-git 1.0.2 (2023-03-03)
 =========================

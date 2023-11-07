@@ -191,25 +191,27 @@ def swap_out_encoding(new_encoding=b'UTF-8'):
 
 def set_refs(ui, git, refs):
     for git_ref, git_sha in refs.items():
-        # prior to 0.20.22, dulwich couldn't handle refs
-        # pointing to missing objects, so don't add them
-        #
-        # moreover, don't set the ref if it already points to the
-        # target object since setting the ref triggers a fsync, which
-        # can be very slow in large repositories
-        if (
-            git_sha
-            and git_sha in git
-            and git.refs.follow(git_ref)[1] != git_sha
-        ):
+        try:
+            # prior to 0.20.22, dulwich couldn't handle refs pointing
+            # to missing objects, so don't add them
+            #
+            # moreover, don't set the ref if it already points to the
+            # target object since setting the ref triggers a fsync,
+            # which can be very slow in large repositories
+            if (
+                git_sha
+                and git_sha in git
+                and git.refs.follow(git_ref)[1] != git_sha
+            ):
+                git.refs[git_ref] = git_sha
+        except OSError:
             # some refs may actually be unstorable, e.g. refs
             # containing a double quote on Windows or non-UTF-8 refs
-            # on macOS, so handle that gracefully
-            try:
-                git.refs[git_ref] = git_sha
-            except OSError:
-                ui.traceback()
-                ui.warn(b"warning: failed to save ref %s\n" % git_ref)
+            # on macOS, so handle that gracefully -- and older
+            # versions of Dulwich don't even handle _checking_ for
+            # those refs
+            ui.traceback()
+            ui.warn(b"warning: failed to save ref %s\n" % git_ref)
 
 
 def ref_exists(ref: bytes, container):

@@ -7,8 +7,6 @@ stages:
 .base:
   image: registry.heptapod.net:443/mercurial/hg-git/ci/$CI_COMMIT_HG_BRANCH:hg-$HG-py$PYTHON
   timeout: 20m
-  tags:
-    - clever
   services:
     - name: registry.heptapod.net:443/mercurial/hg-git/git-server
       alias: git-server
@@ -40,9 +38,9 @@ Latest:
       - &latest-versions
         PYTHON:
           - "3.7"
-          - "3.11"
+          - "3.12"
         HG:
-          - "6.4"
+          - "6.5"
 
 # This is the authoritative list of versions of Mercurial that this
 # extension is supported and tested with; it should be kept in sync
@@ -72,6 +70,7 @@ Supported:
           - "6.1"
           - "6.2"
           - "6.3"
+          - "6.4"
 
 # Test that it is possible to use and run hg-git on versions of Alpine
 # that include Dulwich, and with the oldest Dulwich supported.
@@ -79,8 +78,6 @@ Alpine:
   stage: compat
   image:
     name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:$ALPINE
-  tags:
-    - clever
   variables:
     CI_CLEVER_CLOUD_FLAVOR: XS
   timeout: 20m
@@ -93,7 +90,7 @@ Alpine:
         apk add py3-dulwich
       else
         apk add build-base python3-dev
-        pip3 install dulwich==$DULWICH
+        pip3 install "urllib3<=2.0" dulwich==$DULWICH
       fi
     - pip3 install coverage
     - adduser -D test
@@ -135,26 +132,14 @@ Development:
     matrix:
       - &development-versions
         PYTHON:
-          - "3.11"
+          - "3.12"
         HG:
           - "stable"
           - "default"
 
-# Test Alpine edge, which usually includes the very latest version of
-# Git & Dulwich
-Dependencies:
-  extends: Alpine
-  stage: compat
-  image:
-    name: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/alpine:edge
-  rules: *upcoming-rules
-  parallel:
-
 Coverage:
   stage: .post
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:alpine
-  tags:
-    - clever
   variables:
     CI_CLEVER_CLOUD_FLAVOR: XS
   allow_failure: true
@@ -271,8 +256,6 @@ Git service image:
 Wheels:
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python
   timeout: 15m
-  tags:
-    - clever
   variables:
     CI_CLEVER_CLOUD_FLAVOR: XS
   stage: archives

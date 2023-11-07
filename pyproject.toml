@@ -21,6 +21,7 @@ build/
 | \.mypy_cache/
 | \.venv/
 | tests/
+| hggit/__version__.py
 '''
 skip-string-normalization = true
 

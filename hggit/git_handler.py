@@ -174,7 +174,7 @@ def get_repo_and_gitdir(repo):
 
 
 def has_gitrepo(repo):
-    if not hgutil.safehasattr(repo, b'vfs'):
+    if not hasattr(repo, 'vfs'):
         return False
 
     repo, gitdir = get_repo_and_gitdir(repo)
@@ -287,12 +287,13 @@ class GitHandler(object):
     def map_hg_get(self, gitsha, deref=False):
         if deref:
             try:
-                gitobj = self.git.get_object(gitsha)
+                unpeeled, peeled = compat.peel_sha(
+                    self.git.object_store, gitsha
+                )
+                gitsha = peeled.id
             except KeyError:
-                gitobj = None
-
-            if isinstance(gitobj, Tag):
-                gitsha = gitobj.object[1]
+                self.ui.note(b'note: failed to dereference %s\n' % gitsha)
+                return None
 
         return self._map_git.get(gitsha)
 
@@ -865,7 +866,7 @@ class GitHandler(object):
         if b'author' in ctx.extra():
             try:
                 author = b"".join(apply_delta(author, ctx.extra()[b'author']))
-            except ApplyDeltaError:
+            except (ApplyDeltaError, AssertionError):
                 self.ui.traceback()
                 self.ui.warn(
                     b"warning: disregarding possibly invalid metadata in %s\n"
@@ -901,7 +902,7 @@ class GitHandler(object):
         if b'message' in extra:
             try:
                 message = b"".join(apply_delta(message, extra[b'message']))
-            except ApplyDeltaError:
+            except (ApplyDeltaError, AssertionError):
                 self.ui.traceback()
                 self.ui.warn(
                     b"warning: disregarding possibly invalid metadata in %s\n"
@@ -1584,11 +1585,16 @@ class GitHandler(object):
                 ):
                     self.ui.warn(b"warning: cannot update '%s'\n" % ref)
                 elif ref not in refs:
-                    gitobj = self.git.get_object(self.git.refs[ref])
-                    if isinstance(gitobj, Tag):
-                        new_refs[ref] = gitobj.id
+                    if ref not in self.git.refs:
+                        self.ui.note(
+                            b'note: cannot update %s\n' % (ref),
+                        )
                     else:
-                        new_refs[ref] = self.map_git_get(ctx.hex())
+                        gitobj = self.git.get_object(self.git.refs[ref])
+                        if isinstance(gitobj, Tag):
+                            new_refs[ref] = gitobj.id
+                        else:
+                            new_refs[ref] = self.map_git_get(ctx.hex())
                 elif new_refs[ref] in self._map_git:
                     rctx = unfiltered[self.map_hg_get(new_refs[ref])]
                     if rctx.ancestor(ctx) == rctx or force:
@@ -1766,8 +1772,11 @@ class GitHandler(object):
                     reftarget = self.git.refs[tag_refname]
                     try:
                         peeledtarget = self.git.get_peeled(tag_refname)
-                    except KeyError as e:
-                        peeledtarget = e.args[0]
+                    except KeyError:
+                        self.ui.note(
+                            b'note: failed to peel tag %s' % (tag_refname)
+                        )
+                        peeledtarget = None
 
                     if peeledtarget != reftarget:
                         # warn the user if they tried changing the tag
@@ -1830,19 +1839,18 @@ class GitHandler(object):
             return
         repotags = self.repo.tags()
         for k in refs:
-            ref_name = k
-            parts = k.split(b'/')
-            if parts[0] == b'refs' and parts[1] == b'tags':
-                ref_name = b"/".join(v for v in parts[2:])
+            if k.startswith(LOCAL_TAG_PREFIX):
+                ref_name = k[len(LOCAL_TAG_PREFIX) :]
+
                 # refs contains all the refs in the server, not just
                 # the ones we are pulling
                 if refs[k] not in self.git.object_store:
                     continue
-                if ref_name[-3:] == ANNOTATED_TAG_SUFFIX:
-                    ref_name = ref_name[:-3]
+                if ref_name.endswith(ANNOTATED_TAG_SUFFIX):
+                    continue
                 if ref_name not in repotags:
                     sha = self.map_hg_get(refs[k], deref=True)
-                    if sha is not None:
+                    if sha is not None and sha is not None:
                         self.tags[ref_name] = sha
 
         self.save_tags()
@@ -1991,23 +1999,27 @@ class GitHandler(object):
         all_remote_nodeids = []
 
         for ref_name, sha in refs.items():
-            hgsha = self.map_hg_get(sha)
+            if ref_name.endswith(ANNOTATED_TAG_SUFFIX):
+                # the sha points to a peeled tag; we should either
+                # pick it up through the tag itself, or ignore it
+                continue
+
+            hgsha = self.map_hg_get(sha, deref=True)
 
             if (
                 ref_name.startswith(LOCAL_BRANCH_PREFIX)
                 and hgsha is not None
                 and hgsha in self.repo
             ):
-                head = ref_name[11:]
+                head = ref_name[len(LOCAL_BRANCH_PREFIX) :]
                 remote_head = b'/'.join((remote_name, head))
 
                 remote_refs[remote_head] = bin(hgsha)
                 # TODO(durin42): what is this doing?
                 new_ref = REMOTE_BRANCH_PREFIX + remote_head
+
                 util.set_refs(self.ui, self.git, {new_ref: sha})
-            elif ref_name.startswith(
-                LOCAL_TAG_PREFIX
-            ) and not ref_name.endswith(ANNOTATED_TAG_SUFFIX):
+            elif ref_name.startswith(LOCAL_TAG_PREFIX):
                 util.set_refs(self.ui, self.git, {ref_name: sha})
 
             if hgsha:
