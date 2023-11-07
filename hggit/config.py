@@ -55,7 +55,7 @@ def get_publishing_option(ui):
 
 @eh.extsetup
 def extsetup(ui):
-    @compat.pathsuboption(b'hg-git.publish', b'hggit_publish')
+    @compat.pathsuboption(b'hg-git.publish', 'hggit_publish')
     def pathsuboption(ui, path, value):
         b = stringutil.parsebool(value)
         if b is True:
