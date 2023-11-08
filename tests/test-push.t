@@ -203,10 +203,9 @@ fails:
   updating reference refs/heads/not-master
 That should have updated the tag:
   $ hg tags | grep ^default/
-  default/not-master                 5:ba0476ff1899 (no-hg64 !)
+  default/not-master                 5:ba0476ff1899
   default/master                     5:ba0476ff1899
   default/beta                       1:47580592d3d6
-  default/not-master                 0:ff7a2f2d8d70 (hg64 !)
   $ cd ..
 
 Push empty Hg repo to empty Git repo (issue #58)
