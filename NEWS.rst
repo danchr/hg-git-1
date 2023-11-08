@@ -3,7 +3,8 @@ hg-git 1.0.4 (unreleased)
 
 This is a minor release, focusing on bugs and compatibility.
 
-* TBD
+* Address regression with Mercurial 6.4 and later where remote tags
+  weren't updated on push.
 
 hg-git 1.1b1 (2023-11-08)
 =========================
