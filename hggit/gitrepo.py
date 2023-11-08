@@ -10,9 +10,9 @@ from mercurial import (
     wireprotov1peer,
 )
 from mercurial.interfaces import repository
+from mercurial.utils import urlutil
 
 from . import util
-from . import compat
 
 eh = exthelper.exthelper()
 
@@ -40,7 +40,7 @@ class gitrepo(repository.peer):
     def url(self):
         return self.path
 
-    @compat.makebatchable
+    @util.makebatchable
     def lookup(self, key):
         assert isinstance(key, bytes)
         # FIXME: this method is supposed to return a 20-byte node hash
@@ -55,11 +55,11 @@ class gitrepo(repository.peer):
 
         return self
 
-    @compat.makebatchable
+    @util.makebatchable
     def heads(self):
         return []
 
-    @compat.makebatchable
+    @util.makebatchable
     def listkeys(self, namespace):
         if namespace == b'namespaces':
             return {b'bookmarks': b''}
@@ -77,7 +77,7 @@ class gitrepo(repository.peer):
                 return stripped_refs
         return {}
 
-    @compat.makebatchable
+    @util.makebatchable
     def pushkey(self, namespace, key, old, new):
         return False
 
@@ -129,7 +129,7 @@ def islocal(path):
     if util.isgitsshuri(path):
         return True
 
-    u = compat.url(path)
+    u = urlutil.url(path)
     return not u.scheme or u.scheme == b'file'
 
 

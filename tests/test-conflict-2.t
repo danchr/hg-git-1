@@ -57,8 +57,7 @@ resolve using second parent
   $ hg clone repo.git hgrepo2
   importing 4 git commits
   new changesets 5d1a6b64f9d0:120385945d08 (4 drafts)
-  updating to bookmark master (hg57 !)
-  updating to branch default (no-hg57 !)
+  updating to bookmark master
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 expect the same revision ids as above
   $ hg -R hgrepo2 log --graph --style compact | sed 's/\[.*\]//g'

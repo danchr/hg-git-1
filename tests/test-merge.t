@@ -32,8 +32,7 @@ clean merge
   $ hg clone gitrepo hgrepo
   importing 4 git commits
   new changesets ff7a2f2d8d70:89ca4a68d6b9 (4 drafts)
-  updating to bookmark master (hg57 !)
-  updating to branch default (no-hg57 !)
+  updating to bookmark master
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
 

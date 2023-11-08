@@ -22,11 +22,11 @@ from . import config
 def get_public(ui, refs, remote_names):
     cfg = config.get_publishing_option(ui)
 
-    paths = [ui.paths.get(name) for name in remote_names]
-
-    if paths and isinstance(paths[0], list):
-        # paths became lists in mercurial 5.9
-        paths = list(itertools.chain.from_iterable(paths))
+    paths = list(
+        itertools.chain.from_iterable(
+            ui.paths.get(name) for name in remote_names
+        )
+    )
 
     # we may have multiple paths listed, so parse their configuration
     # and deduplicate it

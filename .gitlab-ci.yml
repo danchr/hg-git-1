@@ -60,13 +60,6 @@ Supported:
       - &supported-versions
         PYTHON: "3.9"
         HG:
-          - "5.4"
-          - "5.5"
-          - "5.6"
-          - "5.7"
-          - "5.8"
-          - "5.9"
-          - "6.0"
           - "6.1"
           - "6.2"
           - "6.3"
@@ -101,16 +94,13 @@ Alpine:
   artifacts: *test-artifacts
   parallel:
     matrix:
-      - ALPINE: "3.12"
+      - ALPINE: "3.16"
         DULWICH:
-          - "0.19.3"
-          - "0.19.11"
-          - "0.20.3"
-          - "0.20.5"
+          - "0.20.11"
       - ALPINE:
-        - "3.14"
-        - "3.15"
         - "3.16"
+        - "3.17"
+        - "3.18"
 
 # Test that the tests pass against the current branches
 Development:

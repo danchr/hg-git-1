@@ -153,8 +153,7 @@ Try cloning a bookmark, and make sure it gets checked out:
   $ hg clone -r branch3 repo.git hgrepo
   importing 4 git commits
   new changesets 40a840c1f8ae:faf44fc3a4e8 (4 drafts)
-  updating to bookmark branch3_bookmark (hg57 !)
-  updating to branch default (no-hg57 !)
+  updating to bookmark branch3_bookmark
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
   $ hg bookmarks

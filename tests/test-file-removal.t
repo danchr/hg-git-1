@@ -100,8 +100,7 @@ final manifest in git is just beta
   $ hg clone gitrepo hgrepo
   importing 9 git commits
   new changesets ff7a2f2d8d70:0995b8a0a943 (9 drafts)
-  updating to bookmark master (hg57 !)
-  updating to branch default (no-hg57 !)
+  updating to bookmark master
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
   $ hg log --graph
@@ -235,8 +234,7 @@ test with rename detection enabled
   $ hg --config git.similarity=100 clone gitrepo hgreporenames
   importing 9 git commits
   new changesets ff7a2f2d8d70:0995b8a0a943 (9 drafts)
-  updating to bookmark master (hg57 !)
-  updating to branch default (no-hg57 !)
+  updating to bookmark master
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgreporenames

@@ -42,8 +42,7 @@ Clone using the git protocol:
   >    --config auth.git.username=git \
   >    http://git-server/repo.git repo-http
   http authorization required for http://git-server/repo.git
-  realm: Git (no-dulwich0203 !)
-  realm: Git Access (dulwich0203 !)
+  realm: Git Access
   user: git
   password: nope
   abort: authorization failed
@@ -53,8 +52,7 @@ Clone using the git protocol:
   > git
   > EOF
   http authorization required for http://git-server/repo.git
-  realm: Git (no-dulwich0203 !)
-  realm: Git Access (dulwich0203 !)
+  realm: Git Access
   user: git
   password: git
   updating to branch default
@@ -124,8 +122,7 @@ But we can specify authentication in the configuration:
   new changesets fa22339f4ab8 (1 drafts)
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
-#if dulwich0200
-Try using git credentials, only supported on Dulwich 0.20+
+Try using git credentials:
 
 NB: the use of printf is deliberate; otherwise the test fails due to
 dulwich considering the newline part of the url
@@ -135,4 +132,3 @@ dulwich considering the newline part of the url
   pulling from http://git-server/repo.git
   no changes found
   $ rm -f $TESTTMP/.git-credentials
-#endif

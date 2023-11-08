@@ -16,8 +16,7 @@ Load commonly used test logic
   $ hg clone gitrepo hgrepo
   importing 2 git commits
   new changesets ff7a2f2d8d70:7fe02317c63d (2 drafts)
-  updating to bookmark master (hg57 !)
-  updating to branch default (no-hg57 !)
+  updating to bookmark master
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo log --graph
   @  changeset:   1:7fe02317c63d

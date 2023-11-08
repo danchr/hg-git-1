@@ -64,8 +64,7 @@ Load commonly used test logic
   $ hg clone gitrepo hgrepo
   importing 8 git commits
   new changesets ff7a2f2d8d70:307506d6ae8a (10 drafts)
-  updating to bookmark master (hg57 !)
-  updating to branch default (no-hg57 !)
+  updating to bookmark master
   6 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
   $ hg log --graph --style compact | sed 's/\[.*\]//g'

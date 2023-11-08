@@ -16,14 +16,12 @@ Clone it, and push back to master:
   $ hg clone gitrepo hgrepo
   importing 1 git commits
   new changesets ff7a2f2d8d70 (1 drafts)
-  updating to branch default (no-hg57 !)
-  updating to bookmark master (hg57 !)
+  updating to bookmark master
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
   $ echo beta > beta
   $ fn_hg_commit -A -m "add beta"
 
-#if dulwich0204
 The output is confusing, and this even more-so:
 
   $ hg push
@@ -69,31 +67,6 @@ The output is confusing, and this even more-so:
   remote: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
   added 1 commits with 1 trees and 1 blobs
   warning: failed to update refs/heads/master; branch is currently checked out
-
-#else
-This is a bit more sensible:
-
-  $ hg push
-  pushing to $TESTTMP/gitrepo
-  searching for changes
-  adding objects
-  remote: error: refusing to update checked out branch: refs/heads/master
-  remote: error: By default, updating the current branch in a non-bare repository
-  remote: is denied, because it will make the index and work tree inconsistent
-  remote: with what you pushed, and will require 'git reset --hard' to match
-  remote: the work tree to HEAD.
-  remote: 
-  remote: You can set the 'receive.denyCurrentBranch' configuration variable
-  remote: to 'ignore' or 'warn' in the remote repository to allow pushing into
-  remote: its current branch; however, this is not recommended unless you
-  remote: arranged to update its work tree to match what you pushed in some
-  remote: other way.
-  remote: 
-  remote: To squelch this message and still keep the default behaviour, set
-  remote: 'receive.denyCurrentBranch' configuration variable to 'refuse'.
-  abort: git remote error: refs/heads/master failed to update
-  [255]
-#endif
 
 Show that it really didn't get pushed:
 

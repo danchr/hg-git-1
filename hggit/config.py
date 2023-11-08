@@ -4,11 +4,9 @@ import collections
 from mercurial import exthelper
 from mercurial import help
 from mercurial.i18n import _
-from mercurial.utils import stringutil
+from mercurial.utils import stringutil, urlutil
 
-from . import compat
 from . import util
-
 
 eh = exthelper.exthelper()
 
@@ -53,7 +51,7 @@ def get_publishing_option(ui):
 
 @eh.extsetup
 def extsetup(ui):
-    @compat.pathsuboption(b'hg-git.publish', 'hggit_publish')
+    @urlutil.pathsuboption(b'hg-git.publish', 'hggit_publish')
     def pathsuboption(ui, path, value):
         b = stringutil.parsebool(value)
         if b is True:
@@ -62,7 +60,7 @@ def extsetup(ui):
             return publishoption(False, False, frozenset())
         else:
             return publishoption(
-                True, False, frozenset(compat.parselist(value))
+                True, False, frozenset(stringutil.parselist(value))
             )
 
     def insertconfigurationhelp(ui, topic, doc):

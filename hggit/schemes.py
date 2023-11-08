@@ -15,9 +15,9 @@ from mercurial import (
     hg,
     localrepo,
 )
+from mercurial.utils import urlutil
 
 # local modules
-from . import compat
 from . import gitrepo
 from . import util
 
@@ -70,7 +70,7 @@ class RepoFactory:
 
     def instance(self, ui, path, *args, **kwargs):
         if isinstance(path, bytes):
-            url = compat.url(path)
+            url = urlutil.url(path)
         else:
             url = path.url
 
@@ -125,12 +125,12 @@ def clone(orig, *args, **opts):
     return srcpeer, destpeer
 
 
-@eh.wrapfunction(compat.path, '_isvalidlocalpath')
+@eh.wrapfunction(urlutil.path, '_isvalidlocalpath')
 def isvalidlocalpath(orig, self, path):
     return orig(self, path) or isgitdir(path)
 
 
-@eh.wrapfunction(compat.url, 'islocal')
+@eh.wrapfunction(urlutil.url, 'islocal')
 def isurllocal(orig, path):
     # recognise git scp-style paths when cloning
     return orig(path) and not util.isgitsshuri(path._origpath)
@@ -142,7 +142,7 @@ def islocal(orig, path):
     return orig(path) and not util.isgitsshuri(path)
 
 
-@eh.wrapfunction(compat.urlutil, 'hasscheme')
+@eh.wrapfunction(urlutil, 'hasscheme')
 def hasscheme(orig, path):
     # recognise git scp-style paths
     return orig(path) or util.isgitsshuri(path)
@@ -164,7 +164,7 @@ def extsetup(ui):
         _oldlocal = hg.schemes[b'file']
 
         def _local(path):
-            p = compat.url(path).localpath()
+            p = urlutil.url(path).localpath()
             if isgitdir(p):
                 return gitrepo
             # detect git ssh urls (which mercurial thinks is a file-like path)

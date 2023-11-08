@@ -188,8 +188,7 @@ current behaviour.
   rollback completed
   interrupted!
   [255]
-the leftover below only appears in Mercurial 5.9+; it is unintentional
-TODO: once the first rc is released, change (?) to (hg59 !)
+the leftover below appeared in Mercurial 5.9+; it is unintentional
   $ ls -A hgrepo
-  .git (?)
+  .git
   $ rm -rf hgrepo

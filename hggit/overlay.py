@@ -23,8 +23,6 @@ from dulwich.refs import (
     LOCAL_TAG_PREFIX,
 )
 
-from . import compat
-
 eh = exthelper.exthelper()
 
 
@@ -434,7 +432,7 @@ class overlayrepo(object):
 
         self.changelog = overlaychangelog(self, handler.repo.changelog)
         self.manifestlog = overlaymanifestlog(self)
-        self.nodeconstants = compat.sha1nodeconstants
+        self.nodeconstants = node.sha1nodeconstants
 
         # for incoming -p
         self.root = handler.repo.root

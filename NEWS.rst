@@ -35,7 +35,8 @@ Enhancements:
   use the ``notify`` extension when interacting with Git repositories.
   (#402)
 
-This release requires Mercurial 5.4 or later and Python 3.8 or later.
+This release requires Mercurial 6.1, or later, Dulwich 0.20.11 or
+later, and Python 3.8 or later.
 
 hg-git 1.0.3 (unreleased)
 =========================

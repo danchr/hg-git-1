@@ -1,5 +1,3 @@
-#require hg59
-
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 

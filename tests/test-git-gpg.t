@@ -57,8 +57,7 @@ Hg clone it
   $ hg clone gitrepo hgrepo
   importing 2 git commits
   new changesets ab60c5e55bd6:[0-9a-f]{12,12} \(2 drafts\) (re)
-  updating to branch default (no-hg57 !)
-  updating to bookmark signed (hg57 !)
+  updating to bookmark signed
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgrepo

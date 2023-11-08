@@ -146,8 +146,6 @@ and we can also specify the tag
   $ cd ..
 
 
-#if hg59
-
 Check multiple paths behavior
 =============================
 
@@ -191,7 +189,6 @@ This test exist to make sure we bail out on our own.
   [255]
 
   $ cd ..
-#endif
 
 Check conflicting paths behavior
 ================================
@@ -218,3 +215,4 @@ Check conflicting paths behavior
   no changes found
   1 local changesets published
   $ cd ..
+

@@ -3,12 +3,13 @@ functions."""
 
 import collections
 import contextlib
+import functools
 import importlib.resources
 import os
 import re
 import tempfile
 
-from dulwich import __version__ as dulwich_version
+from dulwich import __version__ as dulwich_version, pack
 from dulwich import errors
 from dulwich.object_store import PackBasedObjectStore
 from mercurial.i18n import _
@@ -18,6 +19,7 @@ from mercurial import (
     phases,
     util as hgutil,
     pycompat,
+    wireprotov1peer,
 )
 
 gitschemes = (b'git', b'git+ssh', b'git+http', b'git+https')
@@ -282,3 +284,21 @@ else:
                 finally:
                     if delete:
                         os.remove(f.name)
+
+
+def makebatchable(fn):
+    @functools.wraps(fn)
+    @wireprotov1peer.batchable
+    def wrapper(*args, **kwargs):
+        return None, lambda v: fn(*args, **kwargs)
+
+    return wrapper
+
+
+def create_delta(base_buf, target_buf):
+    delta = pack.create_delta(base_buf, target_buf)
+
+    if not isinstance(delta, bytes):
+        delta = b''.join(delta)
+
+    return delta

@@ -4,6 +4,7 @@ import os
 import re
 import shutil
 
+from dulwich.client import HTTPUnauthorized
 from dulwich.errors import HangupException, GitProtocolError, ApplyDeltaError
 from dulwich.objects import Blob, Commit, Tag, Tree, parse_timezone
 from dulwich.pack import apply_delta
@@ -19,7 +20,7 @@ from dulwich import diff_tree
 
 from mercurial.i18n import _
 from mercurial.node import hex, bin, nullid, nullhex, short
-from mercurial.utils import dateutil
+from mercurial.utils import dateutil, urlutil
 from mercurial import (
     bookmarks,
     context,
@@ -1223,7 +1224,7 @@ class GitHandler(object):
 
         text = b'\n'.join(l.rstrip() for l in text.splitlines()).strip(b'\n')
         if text + b'\n' != origtext:
-            extra[b'message'] = compat.create_delta(text + b'\n', origtext)
+            extra[b'message'] = util.create_delta(text + b'\n', origtext)
 
         author = commit.author
 
@@ -1244,7 +1245,7 @@ class GitHandler(object):
         except UnicodeDecodeError:
             origauthor = author
             author = util.decode_guess(author, commit.encoding)
-            extra[b'author'] = compat.create_delta(author, origauthor)
+            extra[b'author'] = util.create_delta(author, origauthor)
 
         oldenc = util.swap_out_encoding()
 
@@ -1675,10 +1676,10 @@ class GitHandler(object):
 
                 return ret
 
-            except (compat.HTTPUnauthorized, GitProtocolError) as e:
+            except (HTTPUnauthorized, GitProtocolError) as e:
                 self.ui.traceback()
 
-                if isinstance(e, compat.HTTPUnauthorized):
+                if isinstance(e, HTTPUnauthorized):
                     # this is a fallback just in case the header isn't
                     # specified
                     self._http_auth_realm = 'Git'
@@ -2200,16 +2201,12 @@ class GitHandler(object):
             return [remote.name] if remote.name is not None else []
 
         names = set()
-        url = compat.url(remote)
+        url = urlutil.url(remote)
 
         if url.islocal() and not url.isabs():
             remote = os.path.abspath(url.localpath())
 
         for name, paths in self.ui.paths.items():
-            # paths became lists in mercurial 5.9
-            if not isinstance(paths, list):
-                paths = [paths]
-
             for path in paths:
                 # ignore aliases
                 if hasattr(path, 'raw_url') and path.raw_url.scheme == b'path':
@@ -2329,7 +2326,7 @@ class GitHandler(object):
             str_uri = uri.decode('utf-8')
             # not available in dulwich 0.19
             if hasattr(client, 'get_credentials_from_store'):
-                urlobj = compat.url(uri)
+                urlobj = urlutil.url(uri)
                 auth = client.get_credentials_from_store(
                     urlobj.scheme,
                     urlobj.host,
@@ -2371,7 +2368,7 @@ class GitHandler(object):
             )
 
         if uri.startswith(b'file://'):
-            return client.LocalGitClient(), compat.url(uri).path
+            return client.LocalGitClient(), urlutil.url(uri).path
 
         # if its not git or git+ssh, try a local url..
         return client.SubprocessGitClient(), uri

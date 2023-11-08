@@ -61,8 +61,7 @@ git should have the tag alpha
   $ hg clone repo.git hgrepo2
   importing 2 git commits
   new changesets ff7a2f2d8d70:e8b150f84560 (2 drafts)
-  updating to branch default (no-hg57 !)
-  updating to bookmark master (hg57 !)
+  updating to bookmark master
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo2 log --graph
   @  changeset:   1:e8b150f84560

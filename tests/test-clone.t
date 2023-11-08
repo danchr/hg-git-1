@@ -111,8 +111,7 @@ test shared repositories
   $ hg clone gitrepo hgrepo-base
   importing 5 git commits
   new changesets ff7a2f2d8d70:47d12948785d (5 drafts)
-  updating to branch default (no-hg57 !)
-  updating to bookmark beta (hg57 !)
+  updating to bookmark beta
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo-base bookmarks
    * beta                      4:47d12948785d
@@ -146,10 +145,8 @@ test cloning HEAD
   $ hg clone gitrepo hgrepo-2
   importing 5 git commits
   new changesets ff7a2f2d8d70:47d12948785d (5 drafts)
-  updating to bookmark master (hg57 !)
-  1 files updated, 0 files merged, 0 files removed, 0 files unresolved (hg57 !)
-  updating to branch default (no-hg57 !)
-  2 files updated, 0 files merged, 0 files removed, 0 files unresolved (no-hg57 !)
+  updating to bookmark master
+  1 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ rm -rf hgrepo-2
 
 clone empty repo
@@ -166,19 +163,11 @@ and activate the corresponding bookmark
   $ cd gitrepo
   $ git checkout -q -d master
   $ cd ..
-#if hg57
   $ hg clone gitrepo hgrepo-2
   importing 5 git commits
   new changesets ff7a2f2d8d70:47d12948785d (5 drafts)
   updating to bookmark master
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-#else
-  $ hg clone gitrepo hgrepo-2
-  importing 5 git commits
-  new changesets ff7a2f2d8d70:47d12948785d (5 drafts)
-  updating to branch default
-  2 files updated, 0 files merged, 0 files removed, 0 files unresolved
-#endif
   $ hg -R hgrepo-2 book
      beta                      4:47d12948785d
      gamma                     2:ca33a262eb46

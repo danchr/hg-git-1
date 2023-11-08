@@ -43,8 +43,7 @@ Clone it:
   $ hg clone repo.git hgrepo
   importing 2 git commits
   new changesets ff7a2f2d8d70:7fe02317c63d (2 drafts)
-  updating to bookmark master (hg57 !)
-  updating to branch default (no-hg57 !)
+  updating to bookmark master
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
   $ cd hgrepo
@@ -254,7 +253,6 @@ Create a git tag from hg, but pointing to a new commit:
 Try to overwrite an annotated tag:
 
   $ cd hgrepo
-#if hg57
   $ hg tags -v
   tip                                4:0eb1ab0073a8
   gamma                              4:0eb1ab0073a8 git
@@ -262,7 +260,6 @@ Try to overwrite an annotated tag:
   detached                           2:61175962e488 git
   beta                               1:7fe02317c63d git
   alpha                              0:ff7a2f2d8d70 git
-#endif
   $ hg book not-master
   $ hg tag beta
   abort: tag 'beta' already exists (use -f to force)
