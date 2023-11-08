@@ -1,7 +1,5 @@
 # this is hack to make sure no escape characters are inserted into the output
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 import doctest
 import os
@@ -11,8 +9,6 @@ import sys
 
 # add hggit/ to sys.path
 sys.path.insert(0, os.path.join(os.environ["TESTDIR"], ".."))
-
-ispy3 = sys.version_info[0] >= 3
 
 if 'TERM' in os.environ:
     del os.environ['TERM']
@@ -45,9 +41,7 @@ def testmod(name, optionflags=0, testtarget=None):
 
     # minimal copy of doctest.testmod()
     finder = doctest.DocTestFinder()
-    checker = None
-    if ispy3:
-        checker = py3docchecker()
+    checker = py3docchecker()
     runner = doctest.DocTestRunner(checker=checker, optionflags=optionflags)
     for test in finder.find(mod, name):
         runner.run(test)
@@ -73,7 +67,6 @@ files = subprocess.check_output(
     "hg files --print0 \"%s\"" % fileset,
     shell=True,
     cwd=cwd,
-    stderr=subprocess.DEVNULL,
 ).split(b'\0')
 
 if sys.version_info[0] >= 3:
@@ -88,8 +81,7 @@ for f in files:
         if not re.search(br'\n\s*>>>', fh.read()):
             continue
 
-    if ispy3:
-        f = f.decode()
+    f = f.decode()
 
     modname = f.replace('.py', '').replace('\\', '.').replace('/', '.')
 

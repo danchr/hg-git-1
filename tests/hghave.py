@@ -27,26 +27,17 @@ except ImportError:
 stdout = getattr(sys.stdout, 'buffer', sys.stdout)
 stderr = getattr(sys.stderr, 'buffer', sys.stderr)
 
-is_not_python2 = sys.version_info[0] >= 3
-if is_not_python2:
 
-    def _sys2bytes(p):
-        if p is None:
-            return p
-        return p.encode('utf-8')
-
-    def _bytes2sys(p):
-        if p is None:
-            return p
-        return p.decode('utf-8')
-
-
-else:
-
-    def _sys2bytes(p):
+def _sys2bytes(p):
+    if p is None:
         return p
+    return p.encode('utf-8')
 
-    _bytes2sys = _sys2bytes
+
+def _bytes2sys(p):
+    if p is None:
+        return p
+    return p.decode('utf-8')
 
 
 def check(name, desc):
@@ -168,8 +159,6 @@ def has_baz():
 
 @check("bzr", "Breezy library and executable version >= 3.1")
 def has_bzr():
-    if not is_not_python2:
-        return False
     try:
         # Test the Breezy python lib
         import breezy
@@ -198,8 +187,24 @@ def has_rhg():
 
 
 @check("pyoxidizer", "running with pyoxidizer build as 'hg'")
-def has_rhg():
+def has_pyoxidizer():
     return 'PYOXIDIZED_INSTALLED_AS_HG' in os.environ
+
+
+@check(
+    "pyoxidizer-in-memory",
+    "running with pyoxidizer build as 'hg' with embedded resources",
+)
+def has_pyoxidizer_mem():
+    return 'PYOXIDIZED_IN_MEMORY_RSRC' in os.environ
+
+
+@check(
+    "pyoxidizer-in-filesystem",
+    "running with pyoxidizer build as 'hg' with external resources",
+)
+def has_pyoxidizer_fs():
+    return 'PYOXIDIZED_FILESYSTEM_RSRC' in os.environ
 
 
 @check("cvs", "cvs client/server")
@@ -264,7 +269,10 @@ def has_executablebit():
 
 @check("suidbit", "setuid and setgid bit")
 def has_suidbit():
-    if getattr(os, "statvfs", None) is None or getattr(os, "ST_NOSUID") is None:
+    if (
+        getattr(os, "statvfs", None) is None
+        or getattr(os, "ST_NOSUID", None) is None
+    ):
         return False
     return bool(os.statvfs('.').f_flag & os.ST_NOSUID)
 
@@ -314,7 +322,7 @@ def has_cacheable_fs():
     fd, path = tempfile.mkstemp(dir='.', prefix=tempprefix)
     os.close(fd)
     try:
-        return util.cachestat(path).cacheable()
+        return util.cachestat(_sys2bytes(path)).cacheable()
     finally:
         os.remove(path)
 
@@ -404,34 +412,8 @@ def getgitversion():
     return (int(m.group(1)), int(m.group(2)))
 
 
-@check("dulwich", "Dulwich Python library")
-def has_dulwich():
-    try:
-        from dulwich import client
-
-        client.ZERO_SHA  # silence unused import
-        return True
-    except ImportError:
-        return False
-
-@checkvers(
-    "dulwich", "Dulwich >= %s", [
-        '%d.%d.%d' % vers
-        for vers in (
-            (0, 20, 37),
-            (0, 20, 44),
-            (0, 21, 0),
-        )
-    ]
-)
-def has_dulwich_range(v):
-    import dulwich
-
-    return dulwich.__version__ >= tuple(map(int, v.split('.')))
-
-
 @check("pygit2", "pygit2 Python library")
-def has_git():
+def has_pygit2():
     try:
         import pygit2
 
@@ -635,13 +617,7 @@ def has_pyflakes():
 
 @check("pylint", "Pylint python linter")
 def has_pylint():
-    try:
-        import pylint
-
-        pylint.version  # silence unused import warning
-        return True
-    except ImportError:
-        return False
+    return matchoutput("pylint --help", br"[Uu]sage:[ ]+pylint", True)
 
 
 @check("clang-format", "clang-format C code formatter (>= 11)")
@@ -674,20 +650,22 @@ def has_pygments():
         return False
 
 
-@check("pygments25", "Pygments version >= 2.5")
-def pygments25():
+def getpygmentsversion():
     try:
         import pygments
 
         v = pygments.__version__
+
+        parts = v.split(".")
+        return (int(parts[0]), int(parts[1]))
     except ImportError:
-        return False
+        return (0, 0)
 
-    parts = v.split(".")
-    major = int(parts[0])
-    minor = int(parts[1])
 
-    return (major, minor) >= (2, 5)
+@checkvers("pygments", "Pygments version >= %s", (2.5, 2.11, 2.14))
+def has_pygments_range(v):
+    major, minor = v.split('.')[0:2]
+    return getpygmentsversion() >= (int(major), int(minor))
 
 
 @check("outer-repo", "outer repo")
@@ -763,7 +741,7 @@ def has_test_repo():
 
 
 @check("network-io", "whether tests are allowed to access 3rd party services")
-def has_test_repo():
+def has_network_io():
     t = os.environ.get("HGTESTS_ALLOW_NETIO")
     return t == "1"
 
@@ -888,7 +866,7 @@ def has_demandimport():
     return (not has_chg()) and os.environ.get('HGDEMANDIMPORT') != 'disable'
 
 
-# Add "py27", "py35", ... as possible feature checks. Note that there's no
+# Add "py36", "py37", ... as possible feature checks. Note that there's no
 # punctuation here.
 @checkvers("py", "Python >= %s", (3.6, 3.7, 3.8, 3.9, 3.10, 3.11))
 def has_python_range(v):
@@ -908,7 +886,7 @@ def has_python3exe():
     py = 'python3'
     if os.name == 'nt':
         py = 'py -3'
-    return matchoutput('%s -V' % py, br'^Python 3.(5|6|7|8|9)')
+    return matchoutput('%s -V' % py, br'^Python 3.(6|7|8|9|10|11)')
 
 
 @check("pure", "running with pure Python code")
@@ -1090,8 +1068,8 @@ def has_repofncache():
 @check('dirstate-v2', 'using the v2 format of .hg/dirstate')
 def has_dirstate_v2():
     # Keep this logic in sync with `newreporequirements()` in `mercurial/localrepo.py`
-    return has_rust() and matchoutput(
-        'hg config format.exp-rc-dirstate-v2', b'(?i)1|yes|true|on|always'
+    return matchoutput(
+        'hg config format.use-dirstate-v2', b'(?i)1|yes|true|on|always'
     )
 
 
@@ -1131,15 +1109,13 @@ def has_emacs():
     return matchoutput('emacs --version', b'GNU Emacs 2(4.4|4.5|5|6|7|8|9)')
 
 
-@check('black', 'the black formatter for python (>= 22.3)')
+@check('black', 'the black formatter for python (>= 20.8b1)')
 def has_black():
-    try:
-        import black
-        version = black.__version__
-    except ImportError:
-        version = None
+    blackcmd = 'black --version'
+    version_regex = b'black, (?:version )?([0-9a-b.]+)'
+    version = matchoutput(blackcmd, version_regex)
     sv = distutils.version.StrictVersion
-    return version and sv(version) >= sv('22.3')
+    return version and sv(_bytes2sys(version.group(1))) >= sv('20.8b1')
 
 
 @check('pytype', 'the pytype type checker')
@@ -1150,11 +1126,11 @@ def has_pytype():
     return version and sv(_bytes2sys(version.group(0))) >= sv('2019.10.17')
 
 
-@check("rustfmt", "rustfmt tool at version nightly-2020-10-04")
+@check("rustfmt", "rustfmt tool at version nightly-2021-11-02")
 def has_rustfmt():
     # We use Nightly's rustfmt due to current unstable config options.
     return matchoutput(
-        '`rustup which --toolchain nightly-2020-10-04 rustfmt` --version',
+        '`rustup which --toolchain nightly-2021-11-02 rustfmt` --version',
         b'rustfmt',
     )
 
@@ -1180,12 +1156,6 @@ def has_bash():
     return matchoutput("bash -c 'echo hi'", b'^hi$')
 
 
-@check("unicodefs", "Unicode-only file system")
-def has_unicode_filesystem():
-    try:
-        with tempfile.NamedTemporaryFile(
-            prefix="bøf".encode("latin-1"), dir=b"."
-        ):
-            return False
-    except Exception:
-        return True
+@check("bigendian", "big-endian CPU")
+def has_bigendian():
+    return sys.byteorder == 'big'

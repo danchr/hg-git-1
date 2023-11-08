@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-from __future__ import absolute_import
-import errno
 import os
 import signal
 import sys
@@ -94,9 +92,8 @@ else:
                 os.kill(pid, 0)
             logfn('# Daemon process %d is stuck - really killing it' % pid)
             os.kill(pid, signal.SIGKILL)
-        except OSError as err:
-            if err.errno != errno.ESRCH:
-                raise
+        except ProcessLookupError:
+            pass
 
 
 def killdaemons(pidfile, tryhard=True, remove=False, logfn=None):
