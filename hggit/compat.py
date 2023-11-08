@@ -20,3 +20,11 @@ except AttributeError:
 
     def peel_sha(store, sha):
         return store[sha], store.peel_sha(sha)
+
+
+# changed in Mercurial 6.4
+def get_push_location(path):
+    if hasattr(path, 'is_push_variant'):
+        return path.get_push_variant().loc
+    else:
+        return path.pushloc or path.loc

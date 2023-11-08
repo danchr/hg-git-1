@@ -2214,8 +2214,8 @@ class GitHandler(object):
                 # ignore aliases
                 if hasattr(path, 'raw_url') and path.raw_url.scheme == b'path':
                     continue
-                if push and not hasattr(path, 'is_push_variant'):
-                    loc = push and path.pushloc or path.loc
+                if push:
+                    loc = compat.get_push_location(path)
                 else:
                     loc = path.loc
                 if loc == remote:
