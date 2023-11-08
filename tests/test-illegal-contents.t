@@ -147,7 +147,7 @@ you can't check out.
   warning: path 'nested/.hg/store/requires' is within a nested repository, which Mercurial cannot check out. (?)
   updating to bookmark master
   abort: path 'nested/.hg/00changelog.i' is inside nested repo 'nested'
-  [255]
+  [10]
   $ rm -rf hg
   $ hg clone git hg
   importing 1 git commits

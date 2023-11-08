@@ -7,7 +7,7 @@ line added to load commonly used test logic:
 
   $ hg clone http://localhost:$HGPORT/ copy
   abort: * (glob)
-  [255]
+  [100]
   $ test -d copy
   [1]
 
@@ -87,7 +87,7 @@ trying clone -r
   $ cd ..
   $ hg clone -r doesnotexist static-http://localhost:$HGPORT/remote local0
   abort: unknown revision 'doesnotexist'!? (re)
-  [255]
+  [10]
   $ hg clone -r 0 static-http://localhost:$HGPORT/remote local0
   adding changesets
   adding manifests

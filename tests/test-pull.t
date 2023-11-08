@@ -69,14 +69,14 @@ pull something that doesn't exist
   $ hg -R hgrepo pull -r kaflaflibob
   pulling from $TESTTMP/gitrepo
   abort: unknown revision 'kaflaflibob'!? (re)
-  [255]
+  [10]
 
 pull an ambiguous reference
   $ GIT_DIR=gitrepo/.git git branch t_alpha t_alpha
   $ hg -R hgrepo pull -r t_alpha
   pulling from $TESTTMP/gitrepo
   abort: ambiguous reference t_alpha: refs/heads/t_alpha, refs/tags/t_alpha!? (re)
-  [255]
+  [10]
   $ GIT_DIR=gitrepo/.git git branch -qD t_alpha
 
 pull a branch
