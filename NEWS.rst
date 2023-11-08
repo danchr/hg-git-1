@@ -1,7 +1,15 @@
-hg-git 1.1b1 (unreleased)
+hg-git 1.0.4 (unreleased)
 =========================
 
-Upcoming feature release.
+This is a minor release, focusing on bugs and compatibility.
+
+* TBD
+
+hg-git 1.1b1 (2023-11-08)
+=========================
+
+This is a preview of an upcoming feature release that contains changes
+to user-facing behaviour.
 
 Changes to behaviour:
 
@@ -42,7 +50,7 @@ Enhancements:
 This release requires Mercurial 6.1, or later, Dulwich 0.20.11 or
 later, and Python 3.8 or later.
 
-hg-git 1.0.3 (unreleased)
+hg-git 1.0.3 (2023-11-07)
 =========================
 
 This is a minor release, focusing on bugs and compatibility.
