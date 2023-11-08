@@ -185,6 +185,10 @@ NB: the triple slashes are intentional, due to windows
   date:        Mon Jan 01 00:00:15 2007 +0000
   summary:     add dir1/beta
   
+  $ hg tags -R hgrepo-test | grep ^default/
+  default/master                     4:ba0476ff1899
+  default/beta                       1:47580592d3d6
+  default/not-master                 0:ff7a2f2d8d70
 
 Push a fast-forward to a currently checked out branch, which sometimes
 fails:
@@ -197,6 +201,12 @@ fails:
   searching for changes
   warning: failed to update HEAD; unable to set b'HEAD' to b'7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03' (?)
   updating reference refs/heads/not-master
+That should have updated the tag:
+  $ hg tags | grep ^default/
+  default/not-master                 5:ba0476ff1899 (no-hg64 !)
+  default/master                     5:ba0476ff1899
+  default/beta                       1:47580592d3d6
+  default/not-master                 0:ff7a2f2d8d70 (hg64 !)
   $ cd ..
 
 Push empty Hg repo to empty Git repo (issue #58)
@@ -232,6 +242,9 @@ The remote repo is empty and the local one doesn't have any bookmarks/tags
 That should not create any bookmarks
   $ hg bookmarks
   no bookmarks set
+And no tags for the remotes either:
+  $ hg tags
+  tip                                0:8aded40be5af
 
 test for ssh vulnerability
 
