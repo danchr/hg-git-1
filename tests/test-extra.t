@@ -52,8 +52,8 @@ Add a commit with multiple extra fields
   o  0 aa9eb6424386df2b0638fe6f480c3767fdd0e6fd a
      branch=default hg-git-rename-source=git
   
-Make sure legacy extra (in commit message, after '--HG--') doesn't break
-  $ hg push -r b1 --config git.debugextrainmessage=1
+
+  $ hg push -r b1
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
@@ -106,19 +106,17 @@ Test some nutty filenames
   $ cd ../gitrepo
   $ git cat-file commit b1
   tree 1b773a2eb70f29397356f8069c285394835ff85a
-  parent 202f271eb3dcb7b767ce2af6cdad4114df62ff3f
+  parent 54776dace5849bdf273fb26737a48ef64804909d
   author test <none@none> 1167609613 +0000
   committer test <none@none> 1167609613 +0000
+  HG:extra aaaaaaa:dataaaa
+  HG:extra zzzzzzz:datazzz
   
   
-  
-  --HG--
-  extra : aaaaaaa : dataaaa
-  extra : zzzzzzz : datazzz
 
   $ git cat-file commit b2
   tree 34ad62c6d6ad9464bfe62db5b3d2fa16aaa9fa9e
-  parent 66fe706f6f4f08f0020323e6c49548d41bb00ff6
+  parent 15beadd92324c9b88060a4ec4ffb350f988d7075
   author test <none@none> 1167609614 +0000
   committer test <none@none> 1167609614 +0000
   HG:rename c:c2
@@ -131,7 +129,7 @@ Test some nutty filenames
 #if no-windows
   $ git cat-file commit b3
   tree e63df52695f9b06e54b37e7ef60d0c43994de620
-  parent 6a66c937dea689a8bb2aa053bd91667fe4a7bfe8
+  parent 5cafe2555a0666fcf661a3943277a9812a694a98
   author test <none@none> 1167609616 +0000
   committer test <none@none> 1167609616 +0000
   HG:rename c2%20%3D%3E%20c3:c3%20%3D%3E%20c4
@@ -169,7 +167,7 @@ lets you do that, though.
 
   $ git cat-file commit master
   tree 1b773a2eb70f29397356f8069c285394835ff85a
-  parent 66fe706f6f4f08f0020323e6c49548d41bb00ff6
+  parent 15beadd92324c9b88060a4ec4ffb350f988d7075
   author test <test@example.org> 0 +0000
   committer test <test@example.org> 0 +0000
   zzz:zzz data:zzz
@@ -183,20 +181,20 @@ lets you do that, though.
   $ hg clone -qU gitrepo hgrepo2
   $ cd hgrepo2
   $ hg log -G -r :5 -T "{rev} {node} {desc|firstline}\n{join(extras, ' ')}\n\n"
-  o  5 524e82e66b589f8b56bdd0679ad457a162ba16cd
+  o  5 58f855ae26f4930ce857e648d3dd949901cce817
   |  bbbbbbb=databbb branch=default yyyyyyy=datayyy
   |
-  | o  4 741081daa02c9023c8c5117771f59ef2308a575c extra commit
+  | o  4 90acc8c23fcfaeb0930c03c849923a696fd9013c extra commit
   |/   GIT0-zzz%3Azzz=data%3Azzz GIT1-aaa%3Aaaa=data%3Aaaa branch=default hgaaa=dataaaa hgzzz=datazzz
   |
-  o  3 73fa4063c4b0f386fd6b59da693617dedb340b02
+  o  3 f01651cfcc9337fbd9700d5018ca637a2911ed28
   |  aaaaaaa=dataaaa branch=default zzzzzzz=datazzz
   |
-  o  2 98337758089f6efd29f48bcaf00d14184ed0771b b
+  o  2 03f4cf3c429050e2204fb2bda3a0f93329bdf4fd b
   |  branch=default rebase_source=4c7da7adf18b785726a7421ef0d585bb5762990d
   |
-  o  1 92a46c8588a7cd504c369259ef631b2c14ef4e91 c
-  |  branch=default hg-git-rename-source=git
+  o  1 a735dc0cd7cc0ccdbc16cfa4326b19c707c360f4 c
+  |  branch=default
   |
   o  0 aa9eb6424386df2b0638fe6f480c3767fdd0e6fd a
      branch=default hg-git-rename-source=git

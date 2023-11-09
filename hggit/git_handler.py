@@ -925,8 +925,6 @@ class GitHandler(object):
 
         # HG EXTRA INFORMATION
 
-        # test only -- do not document this!
-        extra_in_message = self.ui.configbool(b'git', b'debugextrainmessage')
         extra_message = b''
         git_extra = []
         if ctx.branch() != b'default':
@@ -959,16 +957,11 @@ class GitHandler(object):
 
             if renames:
                 for oldfile, newfile in renames:
-                    if extra_in_message:
-                        extra_message += (
-                            b"rename : " + oldfile + b" => " + newfile + b"\n"
-                        )
-                    else:
-                        spec = b'%s:%s' % (
-                            hgutil.urlreq.quote(oldfile),
-                            hgutil.urlreq.quote(newfile),
-                        )
-                        git_extra.append((b'HG:rename', spec))
+                    spec = b'%s:%s' % (
+                        hgutil.urlreq.quote(oldfile),
+                        hgutil.urlreq.quote(newfile),
+                    )
+                    git_extra.append((b'HG:rename', spec))
 
         # hg extra items always go at the end
         for key, value in sorted(extra.items()):
@@ -983,27 +976,17 @@ class GitHandler(object):
             ):
                 continue
             else:
-                if extra_in_message:
-                    extra_message += (
-                        b"extra : "
-                        + key
-                        + b" : "
-                        + hgutil.urlreq.quote(value)
-                        + b"\n"
-                    )
-                else:
-                    spec = b'%s:%s' % (
-                        hgutil.urlreq.quote(key),
-                        hgutil.urlreq.quote(value),
-                    )
-                    git_extra.append((b'HG:extra', spec))
+                spec = b'%s:%s' % (
+                    hgutil.urlreq.quote(key),
+                    hgutil.urlreq.quote(value),
+                )
+                git_extra.append((b'HG:extra', spec))
 
         if extra_message:
             message += b"\n--HG--\n" + extra_message
 
         if (
             extra.get(b'hg-git-rename-source', None) != b'git'
-            and not extra_in_message
             and not git_extra
             and extra_message == b''
         ):
