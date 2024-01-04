@@ -318,10 +318,6 @@ Test how pulling an explicit branch with an annotated tag:
   default/master                     3:0eb1ab0073a8 git-remote
   alpha                              0:ff7a2f2d8d70 git
   $ GIT_DIR=hgrepo-2/.hg/git git fetch --quiet repo.git
-  fatal: bad object refs/tags/beta
-  error: repo.git did not send all necessary objects
-  
-  [1]
   $ rm -rf hgrepo-2
 
   $ hg clone -r master repo.git hgrepo-2

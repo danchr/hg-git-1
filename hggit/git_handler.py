@@ -2004,9 +2004,14 @@ class GitHandler(object):
         all_remote_nodeids = []
 
         for ref_name, sha in refs.items():
-            if ref_name.endswith(ANNOTATED_TAG_SUFFIX):
+            if (
+                ref_name.endswith(ANNOTATED_TAG_SUFFIX)
+                or sha not in self.git.object_store
+            ):
                 # the sha points to a peeled tag; we should either
-                # pick it up through the tag itself, or ignore it
+                # pick it up through the tag itself, or ignore it --
+                # relatedly, we can sometimes pull the commit an
+                # annotated tag points to, without the tag itself
                 continue
 
             hgsha = self.map_hg_get(sha, deref=True)
