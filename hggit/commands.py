@@ -98,7 +98,10 @@ def git_cleanup(ui, repo):
     for line in gh.vfs(gh.map_file):
         gitsha, hgsha = line.strip().split(b' ', 1)
         if hgsha in repo:
+            ui.debug(b'keeping GIT:%s -> HG:%s\n' % (gitsha, hgsha))
             new_map.append(b'%s %s\n' % (gitsha, hgsha))
+        else:
+            ui.note(b'dropping GIT:%s -> HG:%s\n' % (gitsha, hgsha))
     with repo.githandler.store_repo.wlock():
         f = gh.vfs(gh.map_file, b'wb')
         f.writelines(new_map)
