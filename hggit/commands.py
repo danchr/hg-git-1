@@ -105,6 +105,14 @@ def git_cleanup(ui, repo):
     with repo.githandler.store_repo.wlock():
         f = gh.vfs(gh.map_file, b'wb')
         f.writelines(new_map)
+
+    for ref, gitsha in gh.git.refs.as_dict().items():
+        if gitsha in gh.git:
+            ui.debug(b'keeping %s -> GIT:%s\n' % (ref, gitsha))
+        else:
+            ui.note(b'dropping %s -> GIT:%s\n' % (ref, gitsha))
+            del gh.git.refs[ref]
+
     ui.status(_(b'git commit map cleaned\n'))
 
 

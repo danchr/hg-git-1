@@ -12,6 +12,7 @@ Enhancements:
 * Add limited and experimental support for including hg-git metadata
   in Mercurial bundles and when pulling or pushing from remote
   Mercurial repositories, see below. (#156)
+* ``hg git-cleanup`` now also removes broken Git refs.
 
 Transferring ``hg-git`` metadata
 --------------------------------
