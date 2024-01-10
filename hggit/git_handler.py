@@ -506,13 +506,8 @@ class GitHandler(object):
         remote_names = self.remote_names(remote, True)
         remote_desc = remote_names[0] if remote_names else b''
 
-        if not isinstance(new_refs, dict):
-            # dulwich 0.20.6 changed the API and deprectated treating
-            # the result as a dictionary
-            ref_status = new_refs.ref_status
-            new_refs = new_refs.refs
-        else:
-            ref_status = {}
+        ref_status = new_refs.ref_status
+        new_refs = new_refs.refs
 
         for ref, new_sha in sorted(new_refs.items()):
             old_sha = old_refs.get(ref)
@@ -1695,9 +1690,6 @@ class GitHandler(object):
                     raise error.Abort(
                         b'HTTP proxy requires authentication',
                     )
-                # dulwich 0.19
-                elif 'unexpected http resp 401' in e.args[0]:
-                    self._http_auth_realm = 'Git'
                 else:
                     raise
 
@@ -2327,16 +2319,12 @@ class GitHandler(object):
                     )
 
             str_uri = uri.decode('utf-8')
-            # not available in dulwich 0.19
-            if hasattr(client, 'get_credentials_from_store'):
-                urlobj = urlutil.url(uri)
-                auth = client.get_credentials_from_store(
-                    urlobj.scheme,
-                    urlobj.host,
-                    urlobj.user,
-                )
-            else:
-                auth = None
+            urlobj = urlutil.url(uri)
+            auth = client.get_credentials_from_store(
+                urlobj.scheme,
+                urlobj.host,
+                urlobj.user,
+            )
 
             if self._http_auth_realm:
                 # since we've tried an unauthenticated request, and
