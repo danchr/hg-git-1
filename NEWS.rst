@@ -1,3 +1,14 @@
+hg-git 1.1.0 (2024-01-13)
+=========================
+
+This is a feature release that contains changes all changes from
+1.1.0b1 and 1.0.4, as well as the following minor change:
+
+* Remove some compatibility for now-unsupported versions of Dulwich.
+
+This release requires Mercurial 6.1, or later, Dulwich 0.20.11 or
+later and Python 3.8 or later.
+
 hg-git 1.0.4 (2024-01-13)
 =========================
 
