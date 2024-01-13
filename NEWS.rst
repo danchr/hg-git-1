@@ -6,8 +6,8 @@ This is a minor release, focusing on bugs and compatibility.
 * Address regression with Mercurial 6.4 and later where remote tags
   weren't updated on push.
 
-hg-git 1.1b1 (2023-11-08)
-=========================
+hg-git 1.1.0b1 (2023-11-08)
+===========================
 
 This is a preview of an upcoming feature release that contains changes
 to user-facing behaviour.
@@ -49,7 +49,7 @@ Enhancements:
 * Git subrepositories will now be pushed as Git submodules.
 
 This release requires Mercurial 6.1, or later, Dulwich 0.20.11 or
-later, and Python 3.8 or later.
+later and Python 3.8 or later.
 
 hg-git 1.0.3 (2023-11-07)
 =========================
