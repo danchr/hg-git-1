@@ -107,6 +107,9 @@ Development:
   extends: .base
   stage: compat
   rules: &upcoming-rules
+    # allow opting out of upcoming releases on legacy branches
+    - if: '$CI_SKIP_UPCOMING'
+      when: never
     # disallow failures for scheduled builds, so we get a nice
     # notification
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
