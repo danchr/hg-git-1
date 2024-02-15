@@ -27,6 +27,7 @@ CONFIG_DEFAULTS = {
         b'similarity': 0,
         b'pull-prune-remote-branches': True,
         b'pull-prune-bookmarks': True,
+        b'blame.ignoreRevsFile': None,
     },
     b'hggit': {
         b'fetchbuffer': 100,

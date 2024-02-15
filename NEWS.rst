@@ -7,6 +7,8 @@ to user-facing behaviour.
 
 Enhancements:
 
+* Add support for a ``git.blame.ignoreRevsFile`` configuration
+  setting, that works similarly to the setting for ``git blame``.
 * Add limited and experimental support for including hg-git metadata
   in Mercurial bundles and when pulling or pushing from remote
   Mercurial repositories, see below. (#156)
