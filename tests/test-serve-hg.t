@@ -72,5 +72,6 @@ Furthermore, make sure that we pass all arguments when pushing:
   remote: adding changesets
   remote: adding manifests
   remote: adding file changes
+  remote: HG_USERVAR_FOO=BAR
   remote: added 1 changesets with 1 changes to 1 files
   $ cd ..

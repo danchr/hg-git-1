@@ -240,7 +240,7 @@ def exchangepush(
             revs,
             newbranch,
             bookmarks=bookmarks,
-            opargs=None,
+            opargs=opargs,
             **kwargs,
         )
 
