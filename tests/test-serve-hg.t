@@ -15,6 +15,15 @@ Load commonly used test logic
   adding foo.d/bAr.hg.d/BaR
   adding foo.d/baR.d.hg/bAR
   adding foo.d/foo
+  $ cat >> .hg/hgrc <<EOF
+  > [push]
+  > pushvars.server = true
+  > [web]
+  > allow-push = *
+  > push_ssl = no
+  > [hooks]
+  > pretxnchangegroup = env | grep HG_USERVAR_ || true
+  > EOF
   $ hg serve -p $HGPORT -d --pid-file=../hg1.pid -E ../error.log
   $ hg --config server.uncompressed=False serve -p $HGPORT1 -d --pid-file=../hg2.pid
 
@@ -51,3 +60,18 @@ And it shouldn't create a Git repository needlessly:
 
   $ ls copy/.hg | grep git
   [1]
+
+Furthermore, make sure that we pass all arguments when pushing:
+
+  $ cd copy
+  $ echo baz > baz
+  $ fn_hg_commit -A -m baz
+  $ hg push --pushvars FOO=BAR
+  pushing to http://localhost:$HGPORT/
+  searching for changes
+  remote: adding changesets
+  remote: adding manifests
+  remote: adding file changes
+  remote: HG_USERVAR_FOO=BAR
+  remote: added 1 changesets with 1 changes to 1 files
+  $ cd ..
