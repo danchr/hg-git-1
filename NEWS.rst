@@ -1,3 +1,39 @@
+hg-git 1.2.0b1 (unreleased)
+===========================
+
+
+This is a preview of an upcoming feature release that contains changes
+to user-facing behaviour.
+
+Enhancements:
+
+* Add support for a ``git.blame.ignoreRevsFile`` configuration
+  setting, that works similarly to the setting for ``git blame``.
+* Add limited and experimental support for including hg-git metadata
+  in Mercurial bundles and when pulling or pushing from remote
+  Mercurial repositories, see below. (#156)
+
+Transferring ``hg-git`` metadata
+--------------------------------
+
+As noted, this is experimental, and can be enabled using the following
+configuration settings::
+
+  [experimental]
+  hg-git-bundle = yes
+  hg-git-serve = yes
+
+With these set, pulling or pushing any commit already pushed (or
+converted) to Git will also update the mapping remotely, avoiding the
+need for converting these changes once more. In addition, Git tags are
+also transferred. However, this support is limited, and there is no
+synchronisation of later changes. There is no support for reinstating
+or synchronising lost or old state, and no support for transferring
+tags to old changesets.
+
+The first option enables embedding the metadata using ``hg bundle``
+and the second option enables the support with served repositories.
+
 hg-git 1.1.1 (unreleased)
 =========================
 

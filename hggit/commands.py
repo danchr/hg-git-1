@@ -7,6 +7,8 @@
 # of the GNU General Public License, incorporated herein by reference.
 
 # global modules
+import os
+
 from dulwich import porcelain
 
 from mercurial.node import hex, nullhex
@@ -176,3 +178,29 @@ def tag(orig, ui, repo, *names, **opts):
             )
 
         repo.githandler.add_tag(target, *names)
+
+
+@eh.wrapcommand(b'annotate')
+def annotate(orig, ui, repo, *pats, **opts):
+    skiprevs = opts.get(b'skip', [])
+    ignorerevsfile = ui.configpath(b'git', b'blame.ignoreRevsFile')
+
+    if repo.githandler and ignorerevsfile and os.path.isfile(ignorerevsfile):
+        with open(ignorerevsfile, 'rb') as fp:
+            buf = fp.read()
+
+        for line in buf.splitlines():
+            git_sha = line.strip().split(b'#', 1)[0]
+
+            if not git_sha:
+                continue
+
+            hg_sha = repo.githandler.map_hg_get(git_sha)
+
+            if hg_sha is not None:
+                ui.debug(b'skipping %s -> %s\n' % (git_sha[:12], hg_sha[:12]))
+                skiprevs.append(hg_sha)
+
+        opts['skip'] = skiprevs
+
+    return orig(ui, repo, *pats, **opts)

@@ -33,6 +33,7 @@ from mercurial import (
     url,
     util as hgutil,
     scmutil,
+    tags as tagsmod,
 )
 
 from . import _ssh
@@ -211,6 +212,9 @@ class GitHandler(object):
         # ready to prompt the user, if necessary
         self._http_auth_realm = None
 
+    def __bool__(self):
+        return bool(self._map_git or self._map_hg)
+
     @property
     def vfs(self):
         return self.store_repo.vfs
@@ -317,30 +321,41 @@ class GitHandler(object):
         self._map_git_real = map_git_real
         self._map_hg_real = map_hg_real
 
-    def save_map(self, map_file):
-        self.ui.debug(_(b"saving git map to %s\n") % self.vfs.join(map_file))
+    def save_map(self):
+        self.ui.debug(
+            _(b"saving git map to %s\n") % self.vfs.join(self.map_file),
+        )
 
         with self.repo.lock():
-            map_hg = self._map_hg
-            with self.vfs(map_file, b'wb+', atomictemp=True) as buf:
-                bwrite = buf.write
-                for hgsha, gitsha in map_hg.items():
-                    bwrite(b"%s %s\n" % (gitsha, hgsha))
+            with self.vfs(self.map_file, b'wb+', atomictemp=True) as fp:
+                self._write_map_to(fp)
+
+    def _write_map_to(self, fp):
+        bwrite = fp.write
+        for hgsha, gitsha in self._map_hg.items():
+            bwrite(b"%s %s\n" % (gitsha, hgsha))
 
     def load_tags(self):
         self.tags = {}
         if os.path.exists(self.vfs.join(self.tags_file)):
-            for line in self.vfs(self.tags_file):
-                sha, name = line.strip().split(b' ', 1)
-                if sha in self.repo.unfiltered():
-                    self.tags[name] = sha
+            with self.vfs(self.tags_file) as fp:
+                self._read_tags_from(fp)
+
+    def _read_tags_from(self, fp):
+        for line in fp:
+            sha, name = line.strip().split(b' ', 1)
+            if sha in self.repo.unfiltered():
+                self.tags[name] = sha
 
     def save_tags(self):
         with self.repo.lock():
             with self.vfs(self.tags_file, b'w+', atomictemp=True) as fp:
-                for name, sha in sorted(self.tags.items()):
-                    if not self.repo.tagtype(name) == b'global':
-                        fp.write(b"%s %s\n" % (sha, name))
+                self._write_tags_to(fp)
+
+    def _write_tags_to(self, fp):
+        for name, sha in sorted(self.tags.items()):
+            if not self.repo.tagtype(name) == b'global':
+                fp.write(b"%s %s\n" % (sha, name))
 
     def load_remote_refs(self):
         self._remote_refs = {}
@@ -451,7 +466,7 @@ class GitHandler(object):
             self.export_hg_tags()
             return self.update_references()
         finally:
-            self.save_map(self.map_file)
+            self.save_map()
 
     def get_refs(self, remote):
         exportable = self.export_commits()
@@ -688,7 +703,7 @@ class GitHandler(object):
                 progress.increment(item=short(ctx.node()))
                 self.export_hg_commit(ctx.node(), exporter)
                 if mapsavefreq and i % mapsavefreq == 0:
-                    self.save_map(self.map_file)
+                    self.save_map()
 
     # convert this commit into git objects
     # go through the manifest, convert all blobs/trees we don't have
@@ -743,15 +758,11 @@ class GitHandler(object):
         for parent in self.get_git_parents(ctx):
             hgsha = hex(parent.node())
             git_sha = self.map_git_get(hgsha)
-            if git_sha:
+            if git_sha is not None:
                 if git_sha not in self.git.object_store:
-                    raise error.Abort(
-                        _(
-                            b'Parent SHA-1 not present in Git'
-                            b'repo: %s' % git_sha
-                        )
+                    raise error.ProgrammingError(
+                        b'%s is not present in the local git cache' % git_sha
                     )
-
                 commit.parents.append(git_sha)
 
         commit.message, extra = self.get_git_message_and_extra(ctx)
@@ -769,8 +780,8 @@ class GitHandler(object):
         tree_sha = exporter.root_tree_sha
 
         if tree_sha not in self.git.object_store:
-            raise error.Abort(
-                _(b'Tree SHA-1 not present in Git repo: %s' % tree_sha)
+            raise error.ProgrammingError(
+                b'%s is not present in the local git cache' % tree_sha
             )
 
         commit.tree = tree_sha
@@ -1011,7 +1022,7 @@ class GitHandler(object):
         """
         tr = self.repo.transaction(desc)
 
-        tr.addfinalize(b'hg-git-save', lambda tr: self.save_map(self.map_file))
+        tr.addfinalize(b'hg-git-save', lambda tr: self.save_map())
         scmutil.registersummarycallback(self.repo, tr, b'pull')
 
         return tr
@@ -1576,12 +1587,7 @@ class GitHandler(object):
                         )
                     else:
                         new_refs[ref] = nullhex
-                elif (
-                    not util.ref_exists(ref, self.git.refs)
-                    and ref not in new_refs
-                ):
-                    self.ui.warn(b"warning: cannot update '%s'\n" % ref)
-                elif ref not in refs:
+                elif ref not in refs and util.ref_exists(ref, self.git.refs):
                     if ref not in self.git.refs:
                         self.ui.note(
                             b'note: cannot update %s\n' % (ref),
@@ -1592,6 +1598,8 @@ class GitHandler(object):
                             new_refs[ref] = gitobj.id
                         else:
                             new_refs[ref] = self.map_git_get(ctx.hex())
+                elif ref not in new_refs:
+                    new_refs[ref] = self.map_git_get(rev)
                 elif new_refs[ref] in self._map_git:
                     rctx = unfiltered[self.map_hg_get(new_refs[ref])]
                     if rctx.ancestor(ctx) == rctx or force:
@@ -1723,6 +1731,8 @@ class GitHandler(object):
     def update_references(self):
         exportable = self.get_exportable()
 
+        new_refs = {}
+
         # Create a local Git branch name for each
         # Mercurial bookmark.
         for hg_sha, refs in exportable.items():
@@ -1731,64 +1741,62 @@ class GitHandler(object):
                 # prior to 0.20.22, dulwich couldn't handle refs
                 # pointing to missing objects, so don't add them
                 if git_sha and git_sha in self.git:
-                    util.set_refs(self.ui, self.git, {git_ref: git_sha})
+                    new_refs[git_ref] = git_sha
+
+        compat.add_packed_refs(self.git.refs, new_refs)
 
         return exportable
 
     def export_hg_tags(self):
         new_refs = {}
 
-        for tag, sha in self.repo.tags().items():
-            if self.repo.tagtype(tag) in (b'global', b'git'):
-                tag = tag.replace(b' ', b'_')
-                target = self.map_git_get(hex(sha))
+        for tag, (sha, hist) in tagsmod.findglobaltags(
+            self.ui, self.repo
+        ).items():
+            tag = tag.replace(b' ', b'_')
+            target = self.map_git_get(hex(sha))
 
-                if target is None:
+            if target is None:
+                self.repo.ui.warn(
+                    b"warning: not exporting tag '%s' "
+                    b"due to missing git "
+                    b"revision\n" % tag
+                )
+                continue
+
+            tag_refname = LOCAL_TAG_PREFIX + tag
+
+            if not check_ref_format(tag_refname):
+                self.repo.ui.warn(
+                    b"warning: not exporting tag '%s' "
+                    b"due to invalid name\n" % tag
+                )
+                continue
+
+            # check whether the tag already exists and is
+            # annotated
+            if util.ref_exists(tag_refname, self.git.refs):
+                reftarget = self.git.refs[tag_refname]
+                try:
+                    gitobj = self.git.get_object(reftarget)
+                except KeyError:
+                    self.ui.note(b'note: failed to peel tag %s' % (tag_refname))
+                    gitobj = None
+
+                if isinstance(gitobj, Tag):
                     self.repo.ui.warn(
-                        b"warning: not exporting tag '%s' "
-                        b"due to missing git "
-                        b"revision\n" % tag
+                        b"warning: not overwriting annotated "
+                        b"tag '%s'\n" % tag
                     )
-                    continue
 
-                tag_refname = LOCAL_TAG_PREFIX + tag
+                    # and never overwrite annotated tags,
+                    # otherwise it'd happen on every pull
+                    target = reftarget
 
-                if not check_ref_format(tag_refname):
-                    self.repo.ui.warn(
-                        b"warning: not exporting tag '%s' "
-                        b"due to invalid name\n" % tag
-                    )
-                    continue
+            new_refs[tag_refname] = target
+            self.tags[tag] = hex(sha)
 
-                # check whether the tag already exists and is
-                # annotated
-                if util.ref_exists(tag_refname, self.git.refs):
-                    reftarget = self.git.refs[tag_refname]
-                    try:
-                        peeledtarget = self.git.get_peeled(tag_refname)
-                    except KeyError:
-                        self.ui.note(
-                            b'note: failed to peel tag %s' % (tag_refname)
-                        )
-                        peeledtarget = None
-
-                    if peeledtarget != reftarget:
-                        # warn the user if they tried changing the tag
-                        if target != peeledtarget:
-                            self.repo.ui.warn(
-                                b"warning: not overwriting annotated "
-                                b"tag '%s'\n" % tag
-                            )
-
-                        # and never overwrite annotated tags,
-                        # otherwise it'd happen on every pull
-                        target = reftarget
-
-                new_refs[tag_refname] = target
-                self.tags[tag] = hex(sha)
-
-        if new_refs:
-            util.set_refs(self.ui, self.git, new_refs)
+        compat.add_packed_refs(self.git.refs, new_refs)
 
     def get_filtered_bookmarks(self):
         bms = self.repo._bookmarks
@@ -1976,6 +1984,8 @@ class GitHandler(object):
     def _update_remote_branches_for(self, remote_name, refs):
         remote_refs = self.remote_refs
 
+        new_refs = {}
+
         if self.ui.configbool(b'git', b'pull-prune-remote-branches'):
             # since we re-write all refs for this remote each time,
             # prune all entries matching this remote from our refs
@@ -1988,7 +1998,7 @@ class GitHandler(object):
                         LOCAL_BRANCH_PREFIX + t[len(remote_name) + 1 :]
                         not in refs
                     ):
-                        del self.git.refs[REMOTE_BRANCH_PREFIX + t]
+                        new_refs[REMOTE_BRANCH_PREFIX + t] = None
 
         all_remote_nodeids = []
 
@@ -2012,12 +2022,14 @@ class GitHandler(object):
                 # TODO(durin42): what is this doing?
                 new_ref = REMOTE_BRANCH_PREFIX + remote_head
 
-                util.set_refs(self.ui, self.git, {new_ref: sha})
+                new_refs[new_ref] = sha
             elif ref_name.startswith(LOCAL_TAG_PREFIX):
-                util.set_refs(self.ui, self.git, {ref_name: sha})
+                new_refs[ref_name] = sha
 
             if hgsha:
                 all_remote_nodeids.append(bin(hgsha))
+
+        compat.add_packed_refs(self.git.refs, new_refs)
 
         if all_remote_nodeids:
             with self.repo.lock(), self.repo.transaction(

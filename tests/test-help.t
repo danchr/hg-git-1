@@ -155,6 +155,10 @@ Load commonly used test logic
         that a delete/add pair will be imported as a rename if more than 90% of
         the file has stayed the same. The default is "0" (disabled).
   
+      "blame.ignoreRevsFile"
+        Specify a file that lists Git commits to ignore when invoking 'hg
+        annotate'.
+  
       "hggit"
       -------
   

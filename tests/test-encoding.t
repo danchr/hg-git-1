@@ -202,8 +202,8 @@ are utf-8, but this allows us to check two things:
 1) that tags safely roundtrip regardless of local encoding
 2) we can't store such tags on UTF-8 only file systems
 
-The first case isn't actually the case at the moment, but can we store
-them? The second case allows us to check issue #397 on macOS and
+The first case is handled by always reading the tags from the
+repository. The second case allows us to check issue #397 on macOS and
 Linux, i.e. refs we cannot store. That's much easier to run into on
 Windows, e.g. with double quotes, but we don't have CI coverage for
 that platform.
@@ -230,42 +230,40 @@ that platform.
 #if unicodefs
   $ hg push
   pushing to $TESTTMP/repo.git
-  warning: not exporting tag 'uni-t?g' due to invalid name
-  warning: not exporting tag 'lat-t?g' due to invalid name
+  searching for changes
+  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: error: cannot lock ref 'refs/tags/lat-t\xe4g': * (glob) (esc)
+  adding reference refs/tags/ascii-tag
+  warning: failed to update refs/tags/lat-t\xe4g; failed to update ref (esc)
+  adding reference refs/tags/uni-t\xc3\xa4g (esc)
+  $ HGENCODING=latin-1 hg push
+  pushing to $TESTTMP/repo.git
+  searching for changes
+  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: error: cannot lock ref 'refs/tags/lat-t\xe4g': * (glob) (esc)
+  warning: failed to update refs/tags/lat-t\xe4g; failed to update ref (esc)
+  $ HGENCODING=utf-8 hg push
+  pushing to $TESTTMP/repo.git
+  searching for changes
+  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: error: cannot lock ref 'refs/tags/lat-t\xe4g': * (glob) (esc)
+  warning: failed to update refs/tags/lat-t\xe4g; failed to update ref (esc)
+#else
+  $ hg push
+  pushing to $TESTTMP/repo.git
   searching for changes
   remote: found 0 deltas to reuse (dulwich0210 !)
   adding reference refs/tags/ascii-tag
+  adding reference refs/tags/lat-t\xe4g (esc)
+  adding reference refs/tags/uni-t\xc3\xa4g (esc)
   $ HGENCODING=latin-1 hg push
   pushing to $TESTTMP/repo.git
-  warning: failed to save ref refs/tags/lat-t\xe4g (esc)
-  warning: failed to save ref refs/tags/uni-t\xe4g (esc)
   searching for changes
   no changes found (ignoring 1 changesets without bookmarks or tags)
   [1]
   $ HGENCODING=utf-8 hg push
   pushing to $TESTTMP/repo.git
   searching for changes
-  remote: found 0 deltas to reuse (dulwich0210 !)
-  adding reference refs/tags/lat-t\xc3\xa4g (esc)
-  adding reference refs/tags/uni-t\xc3\xa4g (esc)
-#else
-  $ hg push
-  pushing to $TESTTMP/repo.git
-  warning: not exporting tag 'uni-t?g' due to invalid name
-  warning: not exporting tag 'lat-t?g' due to invalid name
-  searching for changes
-  remote: found 0 deltas to reuse (dulwich0210 !)
-  adding reference refs/tags/ascii-tag
-  $ HGENCODING=latin-1 hg push
-  pushing to $TESTTMP/repo.git
-  searching for changes
-  remote: found 0 deltas to reuse (dulwich0210 !)
-  adding reference refs/tags/lat-t\xe4g (esc)
-  adding reference refs/tags/uni-t\xe4g (esc)
-  $ HGENCODING=utf-8 hg push
-  pushing to $TESTTMP/repo.git
-  searching for changes
-  remote: found 0 deltas to reuse (dulwich0210 !)
-  adding reference refs/tags/lat-t\xc3\xa4g (esc)
-  adding reference refs/tags/uni-t\xc3\xa4g (esc)
+  no changes found (ignoring 1 changesets without bookmarks or tags)
+  [1]
 #endif
