@@ -4,6 +4,7 @@ hg-git 1.1.1 (unreleased)
 This is a minor release, focusing on bugs and compatibility.
 
 * Fix `--publish` when topics extension is enabled.
+* Mark Mercurial 6.7 as supported.
 
 Thanks to @av6 for contributing changes to the release!
 
