@@ -1085,7 +1085,8 @@ class GitHandler(object):
             # get at least one chunk
             for offset in range(0, max(total, 1), chunksize):
                 with self.get_transaction(b"gimport"):
-                    oldtiprev = self.repo.changelog.tiprev()
+                    cl = self.repo.unfiltered().changelog
+                    oldtiprev = cl.tiprev()
 
                     for commit in commits[offset : offset + chunksize]:
                         progress.increment(item=commit.short)
@@ -1095,15 +1096,15 @@ class GitHandler(object):
                             commit.phase,
                         )
 
-                    lastrev = self.repo.changelog.tiprev()
+                    lastrev = cl.tiprev()
 
                     self.import_tags(refs)
                     self.update_hg_bookmarks(remote_names, refs)
                     self.update_remote_branches(remote_names, refs)
 
                     if oldtiprev != lastrev:
-                        first = self.repo.changelog.node(oldtiprev + 1)
-                        last = self.repo.changelog.node(lastrev)
+                        first = cl.node(oldtiprev + 1)
+                        last = cl.node(lastrev)
 
                         self.repo.hook(
                             b"changegroup",

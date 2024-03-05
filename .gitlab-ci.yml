@@ -254,7 +254,9 @@ Wheels:
   variables:
     CI_CLEVER_CLOUD_FLAVOR: XS
   stage: archives
-  rules:
+  variables:
+    SETUPTOOLS_SCM_PRETEND_VERSION: "${CI_COMMIT_TAG}"
+  rules: &wheel-rules
     # run on tags
     - if: $CI_COMMIT_TAG
     # run on protected references
@@ -262,25 +264,41 @@ Wheels:
     # and when explicitly requested
     - if: '$CI_BUILD_ARCHIVES == "1"'
   script:
-    - |
-      cat > ~/.pypirc <<EOF
-      [distutils]
-      index-servers =
-        gitlab
-
-      [gitlab]
-      repository = ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi
-      username = gitlab-ci-token
-      password = ${CI_JOB_TOKEN}
-      EOF
-    - pip install mercurial twine build
-    - >-
-      test -n "${CI_COMMIT_TAG}" &&
-      export SETUPTOOLS_SCM_PRETEND_VERSION="${CI_COMMIT_TAG}"
-    - pyproject-build
-    - >-
-      twine upload --disable-progress-bar --verbose --skip-existing
-      --repository gitlab dist/*
+    - pip install mercurial build
+    - python -m build
   artifacts:
     paths:
-      - wheelhouse
+      - dist
+
+Upload:
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:alpine
+  timeout: 5m
+  variables:
+    CI_CLEVER_CLOUD_FLAVOR: XS
+    TWINE_NON_INTERACTIVE: 1
+    TWINE_USERNAME: 'gitlab-ci-token'
+    TWINE_PASSWORD: '${CI_JOB_TOKEN}'
+    TWINE_REPOSITORY_URL: '${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi'
+  stage: .post
+  rules: *wheel-rules
+  script:
+    - pip install twine
+    - twine upload --disable-progress-bar --verbose --skip-existing dist/*
+
+Release:
+  image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:alpine
+  timeout: 5m
+  variables:
+    CI_CLEVER_CLOUD_FLAVOR: XS
+    TWINE_NON_INTERACTIVE: 1
+    TWINE_USERNAME: '__token__'
+    TWINE_PASSWORD: '$PYPI_TOKEN'
+    TWINE_REPOSITORY_URL: '$PYPI_REPOSITORY'
+  stage: .post
+  rules:
+    # run on tags
+    - if: '$CI_COMMIT_TAG && $PYPI_TOKEN && $PYPI_REPOSITORY'
+      when: manual
+  script:
+    - pip install twine
+    - twine upload --disable-progress-bar --verbose dist/*
