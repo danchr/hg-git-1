@@ -9,6 +9,15 @@ This is a minor release, focusing on bugs and compatibility.
 
 Thanks to @av6 for contributing changes to the release!
 
+hg-git 1.0.5 (2024-03-06)
+=========================
+
+This is a minor release, focusing on bugs and compatibility.
+
+* Fix ``--publish`` when topics extension is enabled.
+
+Thanks to @av6 for contributing changes to the release!
+
 hg-git 1.1.0 (2024-01-13)
 =========================
 
