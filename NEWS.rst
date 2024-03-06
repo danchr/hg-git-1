@@ -1,13 +1,11 @@
-hg-git 1.1.1 (unreleased)
+hg-git 1.1.1 (2024-03-06)
 =========================
 
-This is a minor release, focusing on bugs and compatibility.
+This is a minor release, focusing on bugs and compatibility. It
+includes all changes from 1.0.5 as well as the following:
 
-* Fix ``--publish`` when topics extension is enabled.
 * Fix pulling after marking the ``tip`` as obsolete.
 * Mark Mercurial 6.7 as supported.
-
-Thanks to @av6 for contributing changes to the release!
 
 hg-git 1.0.5 (2024-03-06)
 =========================
