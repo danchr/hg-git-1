@@ -349,3 +349,23 @@ Check that pulling will update phases only:
   4:0eb1ab0073a8 draft beta default/master gamma
   2:61175962e488 draft detached X
   $ cd ..
+
+Check that we pull new tags to existing commits:
+  $ cd gitrepo
+  $ git tag
+  alpha
+  beta
+  detached
+  gamma
+  $ fn_git_tag extra-simple-tag
+  $ fn_git_tag -m annotated extra-annotated-tag
+  $ git push --tags
+  To $TESTTMP/repo.git
+   * [new tag]         extra-annotated-tag -> extra-annotated-tag
+   * [new tag]         extra-simple-tag -> extra-simple-tag
+  $ cd ../hgrepo
+  $ hg pull -r master
+  pulling from $TESTTMP/repo.git
+  no changes found
+  $ hg tags -v | grep extra
+  extra-simple-tag                   1:7fe02317c63d git
