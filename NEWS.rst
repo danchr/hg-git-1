@@ -13,6 +13,10 @@ Enhancements:
   in Mercurial bundles and when pulling or pushing from remote
   Mercurial repositories, see below. (#156)
 * ``hg git-cleanup`` now also removes broken Git refs.
+* Always pull any annotated tags pointing to any known commits,
+  equivalent to passing the ``--tags`` option in Git. Previously, such
+  tags would only be pulled when either not using ``--rev`` or
+  similar, or when listing the tag explicitly.
 
 Transferring ``hg-git`` metadata
 --------------------------------

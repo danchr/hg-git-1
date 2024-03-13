@@ -311,11 +311,13 @@ Test how pulling an explicit branch with an annotated tag:
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg log -r 'ancestors(master) and tagged()' -T shorttags -R hgrepo-2
   0:ff7a2f2d8d70 draft alpha
+  1:7fe02317c63d draft beta
   3:0eb1ab0073a8 draft default/master gamma tip
   $ hg tags -v -R hgrepo-2
   tip                                3:0eb1ab0073a8
   gamma                              3:0eb1ab0073a8 git
   default/master                     3:0eb1ab0073a8 git-remote
+  beta                               1:7fe02317c63d git
   alpha                              0:ff7a2f2d8d70 git
   $ GIT_DIR=hgrepo-2/.hg/git git fetch --quiet repo.git
   $ rm -rf hgrepo-2
@@ -327,6 +329,7 @@ Test how pulling an explicit branch with an annotated tag:
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg log -r 'tagged()' -T shorttags -R hgrepo-2
   0:ff7a2f2d8d70 draft alpha
+  1:7fe02317c63d draft beta
   3:0eb1ab0073a8 draft default/master gamma tip
 This used to die:
   $ hg -R hgrepo-2 gexport
@@ -369,3 +372,4 @@ Check that we pull new tags to existing commits:
   no changes found
   $ hg tags -v | grep extra
   extra-simple-tag                   1:7fe02317c63d git
+  extra-annotated-tag                1:7fe02317c63d git

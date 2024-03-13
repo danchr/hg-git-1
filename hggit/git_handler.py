@@ -1634,6 +1634,15 @@ class GitHandler(object):
             if refs is None:
                 return None
             filteredrefs = git2hg.filter_refs(refs, heads)
+
+            # equivalent to the `--tags` option to `git pull`; always
+            # pull tags pointing to known revisions, including
+            # annotated tags
+            for ref, sha in refs.items():
+                if ref.endswith(ANNOTATED_TAG_SUFFIX) and sha in self._map_git:
+                    actual_ref = ref[: -len(ANNOTATED_TAG_SUFFIX)]
+                    filteredrefs.setdefault(actual_ref, refs[actual_ref])
+
             return [x for x in filteredrefs.values() if x not in self.git]
 
         progress = GitProgress(self.ui)
@@ -2290,6 +2299,11 @@ class GitHandler(object):
         >>> print(client.host)
         git@fqdn.com
         """
+
+        kwargs = dict(
+            include_tags=True,
+        )
+
         # pass hg's ui.ssh config to dulwich
         if not issubclass(client.get_ssh_vendor, _ssh.SSHVendor):
             client.get_ssh_vendor = _ssh.generate_ssh_vendor(self.ui)
@@ -2316,7 +2330,7 @@ class GitHandler(object):
             if port:
                 client.port = port
 
-            return transport(pycompat.strurl(host), port=port), path
+            return transport(pycompat.strurl(host), port=port, **kwargs), path
 
         if uri.startswith(b'git+http://') or uri.startswith(b'git+https://'):
             uri = uri[4:]
@@ -2372,12 +2386,15 @@ class GitHandler(object):
                     config=config,
                     username=username,
                     password=password,
+                    **kwargs,
                 ),
                 uri,
             )
 
         if uri.startswith(b'file://'):
+            # the local Git client doesn't support include_tags, and
+            # report_activity doesn't make sense, so just drop it
             return client.LocalGitClient(), urlutil.url(uri).path
 
         # if its not git or git+ssh, try a local url..
-        return client.SubprocessGitClient(), uri
+        return client.SubprocessGitClient(**kwargs), uri
