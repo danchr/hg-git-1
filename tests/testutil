@@ -28,18 +28,6 @@ echo "hggit=$(echo $(dirname $TESTDIR))/hggit" >> $HGRCPATH
 echo '[subrepos]' >> $HGRCPATH
 echo 'git:allowed = yes' >> $HGRCPATH
 
-if "$TESTDIR/hghave" no-hg57 > /dev/null 2>&1
-then
-    # Mercurial 5.7 folded the strip extension into core as a debug
-    # command; emulate that.
-    cat >> $HGRCPATH <<EOF
-[extensions]
-strip =
-[alias]
-debugstrip = strip
-EOF
-fi
-
 # silence warning from recent git
 cat >> $TESTTMP/.gitconfig <<EOF
 [init]

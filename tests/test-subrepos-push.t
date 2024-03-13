@@ -43,7 +43,7 @@ Load commonly used test logic
   no changes found
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 4 commits with 2 trees and 2 blobs
   adding reference refs/heads/master
   $ cat .hgsub

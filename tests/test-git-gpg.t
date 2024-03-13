@@ -65,7 +65,7 @@ Hg clone it
   pushing to ../gitrepo2
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 0 blobs
   adding reference refs/heads/signed
   $ cd ..

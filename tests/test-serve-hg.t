@@ -33,8 +33,7 @@ Load commonly used test logic
   $ hg clone gitrepo hgrepo
   importing 2 git commits
   new changesets f488b65fa424:c61c38c3d614 (2 drafts)
-  updating to branch default (no-hg57 !)
-  updating to bookmark master (hg57 !)
+  updating to bookmark master
   4 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
   $ cat >> .hg/hgrc <<EOF

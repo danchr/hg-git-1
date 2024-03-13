@@ -233,10 +233,6 @@ Load commonly used test logic
         Possible values are "keep", "skip" or "abort". Prior to 1.0, the default
         was "abort".
 
-Broken in Python 3.11 due to a deprecation warning triggered by Mercurial
-itself, at least up to 6.3
-
-#if no-py311
   $ hg help config.hggit | head -10
       "hggit"
       -------
@@ -248,4 +244,3 @@ itself, at least up to 6.3
         Use this option to enable resuming long-running pulls and pushes. Set
         this to a number greater than 0 to allow resuming after converting that
         many commits. This can help when the conversion encounters an error
-#endif

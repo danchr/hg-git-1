@@ -121,7 +121,7 @@ The warning message changed in Git 1.8.0
   pushing to ../repo.git
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 4 commits with 4 trees and 4 blobs
   adding reference refs/heads/master
 
@@ -231,7 +231,7 @@ that platform.
   $ hg push
   pushing to $TESTTMP/repo.git
   searching for changes
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   remote: error: cannot lock ref 'refs/tags/lat-t\xe4g': * (glob) (esc)
   adding reference refs/tags/ascii-tag
   warning: failed to update refs/tags/lat-t\xe4g; failed to update ref (esc)
@@ -239,20 +239,20 @@ that platform.
   $ HGENCODING=latin-1 hg push
   pushing to $TESTTMP/repo.git
   searching for changes
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   remote: error: cannot lock ref 'refs/tags/lat-t\xe4g': * (glob) (esc)
   warning: failed to update refs/tags/lat-t\xe4g; failed to update ref (esc)
   $ HGENCODING=utf-8 hg push
   pushing to $TESTTMP/repo.git
   searching for changes
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   remote: error: cannot lock ref 'refs/tags/lat-t\xe4g': * (glob) (esc)
   warning: failed to update refs/tags/lat-t\xe4g; failed to update ref (esc)
 #else
   $ hg push
   pushing to $TESTTMP/repo.git
   searching for changes
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   adding reference refs/tags/ascii-tag
   adding reference refs/tags/lat-t\xe4g (esc)
   adding reference refs/tags/uni-t\xc3\xa4g (esc)

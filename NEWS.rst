@@ -18,6 +18,9 @@ Enhancements:
   tags would only be pulled when either not using ``--rev`` or
   similar, or when listing the tag explicitly.
 
+This release requires Mercurial 6.6, or later, Dulwich 0.21.6 or later
+and Python 3.8 or later.
+
 Transferring ``hg-git`` metadata
 --------------------------------
 

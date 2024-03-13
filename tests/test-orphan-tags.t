@@ -97,13 +97,13 @@ them (#358)
   finding unexported changesets
   saving git map to $TESTTMP/hgrepo/.hg/git-mapfile
   searching for changes
-  remote: counting objects: 5, done. (dulwich0210 !)
+  remote: counting objects: 5, done.
   1 commits found
   list of commits:
   e12852326ef72772e9696b008ad6546b5266ff13
   adding objects
-  remote: counting objects: 5, done. (dulwich0210 !)
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: counting objects: 5, done.
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 0 blobs
   unchanged reference default::refs/heads/master => GIT:996e5084
   adding reference default::refs/tags/the_tag => GIT:e4338156

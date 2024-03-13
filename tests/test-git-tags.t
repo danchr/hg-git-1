@@ -132,7 +132,7 @@ Create a git tag from hg
   pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
   adding reference refs/tags/alpha
@@ -170,7 +170,7 @@ Verify that amending commits known to remotes doesn't break anything
   pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
 
@@ -237,7 +237,7 @@ Create a git tag from hg, but pointing to a new commit:
   pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
   adding reference refs/tags/gamma
@@ -273,7 +273,7 @@ Try to overwrite an annotated tag:
   warning: not overwriting annotated tag 'beta'
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   adding reference refs/heads/not-master
   $ hg tags

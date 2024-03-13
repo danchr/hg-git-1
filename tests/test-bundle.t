@@ -38,8 +38,7 @@ Clone it!
   $ hg clone gitrepo hgrepo
   importing 3 git commits
   new changesets ff7a2f2d8d70:ca33a262eb46 (3 drafts)
-  updating to branch default (no-hg57 !)
-  updating to bookmark master (hg57 !)
+  updating to bookmark master
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ cd hgrepo
 
@@ -210,8 +209,7 @@ Pull, 'em, and create a partial bundle:
   $ hg clone gitrepo hgrepo
   importing 4 git commits
   new changesets ff7a2f2d8d70:d87bf3ef6a53 (4 drafts)
-  updating to branch default (no-hg57 !)
-  updating to bookmark otherbranch (hg57 !)
+  updating to bookmark otherbranch
   2 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg -R hgrepo bundle --base 'p1(tip)' -r tip bundle-w-git-2.hg
   1 changesets found

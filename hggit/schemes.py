@@ -78,11 +78,8 @@ class RepoFactory:
         # detect git ssh urls (which mercurial thinks is a file-like path)
         if isgitdir(p) or util.isgitsshuri(p) or p.endswith(b'.git'):
             fn = gitrepo.instance
-        elif hasattr(self.__orig, 'instance'):
-            fn = self.__orig.instance
         else:
-            # prior to Mercurial 6.4
-            fn = self.__orig
+            fn = self.__orig.instance
 
         return fn(ui, path, *args, **kwargs)
 
@@ -150,45 +147,11 @@ def hasscheme(orig, path):
 
 @eh.extsetup
 def extsetup(ui):
-    # added in Mercurial 6.4
-    if hasattr(hg, 'repo_schemes') and hasattr(hg, 'peer_schemes'):
-        peer_schemes = hg.peer_schemes
-
-        hg.peer_schemes[b'https'] = RepoFactory(hg.peer_schemes[b'https'])
-        hg.peer_schemes[b'http'] = RepoFactory(hg.peer_schemes[b'http'])
-        hg.repo_schemes[b'file'] = RepoFactory(hg.repo_schemes[b'file'])
-
-    else:
-        peer_schemes = hg.schemes
-
-        _oldlocal = hg.schemes[b'file']
-
-        def _local(path):
-            p = urlutil.url(path).localpath()
-            if isgitdir(p):
-                return gitrepo
-            # detect git ssh urls (which mercurial thinks is a file-like path)
-            if util.isgitsshuri(p):
-                return gitrepo
-            return _oldlocal(path)
-
-        def _httpgitwrapper(orig):
-            # we should probably test the connection but for now, we just keep it
-            # simple and check for a url ending in '.git'
-            def httpgitscheme(uri):
-                if uri.endswith(b'.git'):
-                    return gitrepo
-
-                # the http(s) scheme just returns the _peerlookup
-                return orig
-
-            return httpgitscheme
-
-        hg.schemes[b'https'] = _httpgitwrapper(hg.schemes[b'https'])
-        hg.schemes[b'http'] = _httpgitwrapper(hg.schemes[b'http'])
-        hg.schemes[b'file'] = _local
+    hg.peer_schemes[b'https'] = RepoFactory(hg.peer_schemes[b'https'])
+    hg.peer_schemes[b'http'] = RepoFactory(hg.peer_schemes[b'http'])
+    hg.repo_schemes[b'file'] = RepoFactory(hg.repo_schemes[b'file'])
 
     # support for `hg clone git://github.com/defunkt/facebox.git`
     # also hg clone git+ssh://git@github.com/schacon/simplegit.git
     for _scheme in util.gitschemes:
-        peer_schemes[_scheme] = gitrepo
+        hg.peer_schemes[_scheme] = gitrepo

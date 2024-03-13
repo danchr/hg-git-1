@@ -17,6 +17,7 @@ from dulwich.repo import Repo, check_ref_format
 from dulwich import client
 from dulwich import config as dul_config
 from dulwich import diff_tree
+from dulwich import object_store
 
 from mercurial.i18n import _
 from mercurial.node import hex, bin, nullid, nullhex, short
@@ -37,7 +38,6 @@ from mercurial import (
 )
 
 from . import _ssh
-from . import compat
 from . import git2hg
 from . import hg2git
 from . import util
@@ -290,7 +290,7 @@ class GitHandler(object):
     def map_hg_get(self, gitsha, deref=False):
         if deref:
             try:
-                unpeeled, peeled = compat.peel_sha(
+                unpeeled, peeled = object_store.peel_sha(
                     self.git.object_store, gitsha
                 )
                 gitsha = peeled.id
@@ -1479,7 +1479,7 @@ class GitHandler(object):
             commits = []
 
             with util.abort_push_on_keyerror():
-                for sha, name in compat.MissingObjectFinder(
+                for sha, name in object_store.MissingObjectFinder(
                     self.git.object_store,
                     have,
                     want,
@@ -1753,7 +1753,7 @@ class GitHandler(object):
                 if git_sha and git_sha in self.git:
                     new_refs[git_ref] = git_sha
 
-        compat.add_packed_refs(self.git.refs, new_refs)
+        self.git.refs.add_packed_refs(new_refs)
 
         return exportable
 
@@ -1806,7 +1806,7 @@ class GitHandler(object):
             new_refs[tag_refname] = target
             self.tags[tag] = hex(sha)
 
-        compat.add_packed_refs(self.git.refs, new_refs)
+        self.git.refs.add_packed_refs(new_refs)
 
     def get_filtered_bookmarks(self):
         bms = self.repo._bookmarks
@@ -2044,7 +2044,7 @@ class GitHandler(object):
             if hgsha:
                 all_remote_nodeids.append(bin(hgsha))
 
-        compat.add_packed_refs(self.git.refs, new_refs)
+        self.git.refs.add_packed_refs(new_refs)
 
         if all_remote_nodeids:
             with self.repo.lock(), self.repo.transaction(
@@ -2234,7 +2234,7 @@ class GitHandler(object):
                 if hasattr(path, 'raw_url') and path.raw_url.scheme == b'path':
                     continue
                 if push:
-                    loc = compat.get_push_location(path)
+                    loc = path.get_push_variant().loc
                 else:
                     loc = path.loc
                 if loc == remote:

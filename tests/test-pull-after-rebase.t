@@ -66,7 +66,7 @@ Clone it and rebase the branch
   pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/branch
   $ cd ..
