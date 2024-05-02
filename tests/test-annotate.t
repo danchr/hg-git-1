@@ -86,3 +86,12 @@ annotate multiple files
   0:8d4731bd0f4a 88f28c06a1ed: a
   2:beb139b96eec 19388575d02e: b
   1:a9a255d66663 debec50a14cc: a
+
+  $ cd ..
+  $ hg -R repo annotate repo/a \
+  > --debug \
+  > --config git.blame.ignoreRevsFile=.git-blame-ignore-revs
+  skipping debec50a14cc -> a9a255d66663
+  0: a
+  2: b
+  0* a
