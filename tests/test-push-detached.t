@@ -59,6 +59,7 @@ symref, should publish it.
   finding unexported changesets
   exporting 1 changesets
   converting revision 47580592d3d6492421a1e6cebc5c2d701a2e858b
+  packing 3 loose objects...
   searching for changes
   remote: counting objects: 5, done.
   1 commits found

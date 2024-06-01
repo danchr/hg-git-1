@@ -38,6 +38,7 @@ from mercurial import (
 )
 
 from . import _ssh
+from . import gc
 from . import git2hg
 from . import hg2git
 from . import util
@@ -697,12 +698,21 @@ class GitHandler(object):
         )
 
         mapsavefreq = self.ui.configint(b'hggit', b'mapsavefrequency')
-        with self.repo.ui.makeprogress(b'exporting', total=total) as progress:
+
+        progress = self.repo.ui.makeprogress(b'exporting', total=total)
+        packer = gc.GCPacker(self.ui, self.git.object_store)
+
+        with progress, packer:
             for i, ctx in enumerate(export, 1):
                 progress.increment(item=short(ctx.node()))
+
                 self.export_hg_commit(ctx.node(), exporter)
+
                 if mapsavefreq and i % mapsavefreq == 0:
                     self.save_map()
+                    packer.pack()
+
+            packer.pack(synchronous=True)
 
     # convert this commit into git objects
     # go through the manifest, convert all blobs/trees we don't have

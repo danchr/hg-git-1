@@ -17,6 +17,10 @@ Enhancements:
   equivalent to passing the ``--tags`` option in Git. Previously, such
   tags would only be pulled when either not using ``--rev`` or
   similar, or when listing the tag explicitly.
+* Transparently compress the objects when pushing (or exporting) to
+  Git. This is done in background threads, and by default uses up to
+  either four of them or the system CPU count, whichever is lower. The
+  ``hggit.threads`` configuration option allows adjusting the default.
 
 This release requires Mercurial 6.6, or later, Dulwich 0.21.6 or later
 and Python 3.8 or later.

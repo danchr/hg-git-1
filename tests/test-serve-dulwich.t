@@ -83,6 +83,9 @@ Similarly, make sure that we detect repositories ending with .git
   \r (no-eol) (esc)
   exporting 1/1 daf1ae153bf8         [=====================>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
+  \r (no-eol) (esc)
+  checking for reusable deltas 0 [ <=>                      ]\r (no-eol) (esc)
+                                                              \r (no-eol) (esc)
   pushing to git+http://localhost:$HGPORT/gitrepo
   searching for changes
   adding objects

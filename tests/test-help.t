@@ -192,6 +192,14 @@ Load commonly used test logic
         pathological case, but other storied repositories such as CPython do
         work well, even if the initial clone requires a some patience.
   
+      "threads"
+  
+        During a push to Git, hg-git will pack loose objects at regular
+        intervals whenever it saves its map. As this is a rather expensive
+        operation, it's done in separate threads.
+  
+        Defaults to the system CPU count or 4, whichever is lower.
+  
       "usephases"
         When converting Git revisions to Mercurial, place them in the 'public'
         phase as appropriate. Namely, revisions that are reachable from the
