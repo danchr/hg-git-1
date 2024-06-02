@@ -57,3 +57,4 @@ Make sure that clone over the old git protocol doesn't break
   HG:c4d188f6e13d GIT:b23744d34f97
   $ hg tags -v -R copy
   tip                                1:221dd250e933
+  default/master                     1:221dd250e933 git-remote

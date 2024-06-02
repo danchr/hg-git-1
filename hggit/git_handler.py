@@ -2219,6 +2219,9 @@ class GitHandler(object):
         )
 
     def remote_names(self, remote, push):
+        if self.is_clone:
+            return [b'default']
+
         if not isinstance(remote, bytes):
             return [remote.name] if remote.name is not None else []
 

@@ -52,6 +52,7 @@ Make sure that clone over unauthenticated HTTP doesn't break
   HG:c4d188f6e13d GIT:b23744d34f97
   $ hg tags -v -R hgrepo
   tip                                1:221dd250e933
+  default/master                     1:221dd250e933 git-remote
 
 Similarly, make sure that we detect repositories ending with .git
 
@@ -64,6 +65,7 @@ Similarly, make sure that we detect repositories ending with .git
   new changesets c4d188f6e13d:221dd250e933 (2 drafts)
   $ hg tags -v -R hgrepo
   tip                                1:221dd250e933
+  default/master                     1:221dd250e933 git-remote
 
   $ cd hgrepo
   $ hg up master
