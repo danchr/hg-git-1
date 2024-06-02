@@ -2223,24 +2223,35 @@ class GitHandler(object):
             return [b'default']
 
         if not isinstance(remote, bytes):
-            return [remote.name] if remote.name is not None else []
+            if remote.name is not None:
+                return [remote.name]
+
+            url = remote.url
+        else:
+            url = urlutil.url(remote)
+
+            # we actually get the unexpand path; triggered by
+            # test-branch-bookmark-suffix.t
+            if url.islocal() and not url.isabs():
+                url = urlutil.url(os.path.normpath(self.repo.wvfs.join(remote)))
 
         names = set()
-        url = urlutil.url(remote)
 
         if url.islocal() and not url.isabs():
             remote = os.path.abspath(url.localpath())
 
         for name, paths in self.ui.paths.items():
+            if name is None:
+                continue
+
             for path in paths:
                 # ignore aliases
                 if hasattr(path, 'raw_url') and path.raw_url.scheme == b'path':
                     continue
                 if push:
-                    loc = path.get_push_variant().loc
-                else:
-                    loc = path.loc
-                if loc == remote:
+                    path = path.get_push_variant()
+
+                if bytes(path.url) == bytes(url):
                     names.add(name)
 
         return list(names)
