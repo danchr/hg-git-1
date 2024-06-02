@@ -172,6 +172,12 @@ and activate the corresponding bookmark
      beta                      4:47d12948785d
      gamma                     2:ca33a262eb46
    * master                    0:ff7a2f2d8d70
+  $ hg -R hgrepo-2 tags -v
+  tip                                4:47d12948785d
+  default/beta                       4:47d12948785d git-remote
+  default/gamma                      2:ca33a262eb46 git-remote
+  default/master                     0:ff7a2f2d8d70 git-remote
+  alpha                              0:ff7a2f2d8d70 git
   $ rm -rf hgrepo-2
 
 test cloning fully detached HEAD; we don't convert the
