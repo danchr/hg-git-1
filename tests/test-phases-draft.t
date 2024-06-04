@@ -19,7 +19,29 @@ cloning without hggit.usephases does not publish local changesets
   $ cd hgrepo
   $ hg phase -r master
   0: draft
+
+pulling advances the draft phase, though
+
+  $ hg phase -fs 0
+  $ hg pull
+  pulling from $TESTTMP/gitrepo
+  no changes found
+  $ hg phase tip
+  0: draft
+
+even if we don't have a name?
+
+  $ hg phase -fs 0
+  $ mv .hg/hgrc .hg/hgrc.bak
+  $ hg pull ../gitrepo
+  pulling from ../gitrepo
+  no changes found
+  $ hg phase tip
+  0: secret
+  $ hg phase -d tip
+  $ mv .hg/hgrc.bak .hg/hgrc
   $ cd ..
+
 
 pulling without hggit.usephases does not publish local changesets
   $ cd gitrepo
