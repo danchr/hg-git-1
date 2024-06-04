@@ -55,6 +55,9 @@ clone a tag
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add alpha
   
+  $ git --git-dir hgrepo-a/.hg/git for-each-ref
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/remotes/default/master
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/tags/alpha
 Make sure this is still draft since we didn't pull remote's HEAD
   $ hg -R hgrepo-a phase -r alpha
   0: draft
@@ -85,6 +88,10 @@ clone a branch
      date:        Mon Jan 01 00:00:10 2007 +0000
      summary:     add alpha
   
+  $ git --git-dir hgrepo-b/.hg/git for-each-ref
+  9497a4ee62e16ee641860d7677cdb2589ea15554 commit	refs/remotes/default/beta
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/remotes/default/master
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/tags/alpha
 
 Make sure that a deleted .hgsubstate does not confuse hg-git
 
@@ -105,6 +112,10 @@ Make sure that a deleted .hgsubstate does not confuse hg-git
    * beta                      3:47d12948785d
      master                    0:ff7a2f2d8d70
   $ hg --cwd hgrepo-c status
+  $ git --git-dir hgrepo-c/.hg/git for-each-ref
+  b5329119ed77cb37a31fe523621d684eb55779a4 commit	refs/remotes/default/beta
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/remotes/default/master
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/tags/alpha
 
 test shared repositories
 
@@ -147,6 +158,11 @@ test cloning HEAD
   new changesets ff7a2f2d8d70:47d12948785d (5 drafts)
   updating to bookmark master
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
+  $ git --git-dir hgrepo-2/.hg/git for-each-ref
+  b5329119ed77cb37a31fe523621d684eb55779a4 commit	refs/remotes/default/beta
+  d338971a96e20113bb980a5dc4355ba77eed3714 commit	refs/remotes/default/gamma
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/remotes/default/master
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/tags/alpha
   $ rm -rf hgrepo-2
 
 clone empty repo
@@ -178,6 +194,11 @@ and activate the corresponding bookmark
   default/gamma                      2:ca33a262eb46 git-remote
   default/master                     0:ff7a2f2d8d70 git-remote
   alpha                              0:ff7a2f2d8d70 git
+  $ git --git-dir hgrepo-2/.hg/git for-each-ref
+  b5329119ed77cb37a31fe523621d684eb55779a4 commit	refs/remotes/default/beta
+  d338971a96e20113bb980a5dc4355ba77eed3714 commit	refs/remotes/default/gamma
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/remotes/default/master
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/tags/alpha
   $ rm -rf hgrepo-2
 
 test cloning fully detached HEAD; we don't convert the
@@ -203,6 +224,11 @@ anything special
      master                    0:ff7a2f2d8d70
   $ hg -R hgrepo-2 id --tags
   default/beta tip
+  $ git --git-dir hgrepo-2/.hg/git for-each-ref
+  b5329119ed77cb37a31fe523621d684eb55779a4 commit	refs/remotes/default/beta
+  d338971a96e20113bb980a5dc4355ba77eed3714 commit	refs/remotes/default/gamma
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/remotes/default/master
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/tags/alpha
   $ rm -rf hgrepo-2
 
 test that cloning a regular mercurial repository does not introduce

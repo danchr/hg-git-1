@@ -3,6 +3,11 @@
 Load commonly used test logic
   $ . "$TESTDIR/testutil"
 
+  $ cat >> $HGRCPATH <<EOF
+  > [templates]
+  > p = {rev}|{phase}|{bookmarks}|{tags}\n
+  > EOF
+
 #if secret
 The phases setting should not affect hg-git
   $ cat >> $HGRCPATH <<EOF
@@ -28,6 +33,75 @@ set up a git repo with some commits, branches and a tag
   $ fn_git_commit -m 'add delta'
   $ cd ..
 
+pull without a name
+  $ hg init hgrepo
+  $ cd hgrepo
+  $ hg pull ../gitrepo
+  pulling from ../gitrepo
+  importing 3 git commits
+  adding bookmark beta
+  adding bookmark delta
+  adding bookmark master
+  new changesets ff7a2f2d8d70:678ebee93e38 (3 drafts)
+  (run 'hg heads' to see heads, 'hg merge' to merge)
+  $ git --git-dir .hg/git for-each-ref
+  $ hg log -Tp
+  2|draft|delta|tip
+  1|draft|beta|
+  0|draft|master|t_alpha
+  $ cd ..
+  $ rm -rf hgrepo
+
+pull with an implied name
+  $ hg init hgrepo
+  $ cd hgrepo
+  $ echo "[paths]" >> .hg/hgrc
+  $ echo "default=$TESTTMP/gitrepo" >> .hg/hgrc
+  $ hg pull ../gitrepo
+  pulling from ../gitrepo
+  importing 3 git commits
+  adding bookmark beta
+  adding bookmark delta
+  adding bookmark master
+  new changesets ff7a2f2d8d70:678ebee93e38 (3 drafts)
+  (run 'hg heads' to see heads, 'hg merge' to merge)
+  $ git --git-dir .hg/git for-each-ref
+  9497a4ee62e16ee641860d7677cdb2589ea15554 commit	refs/remotes/default/beta
+  8cbeb817785fe2676ab0eda570534702b6b6f9cf commit	refs/remotes/default/delta
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/remotes/default/master
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/tags/t_alpha
+  $ hg log -Tp
+  2|draft|delta|default/delta tip
+  1|draft|beta|default/beta
+  0|draft|master|default/master t_alpha
+  $ cd ..
+  $ rm -rf hgrepo
+
+pull with an explicit name
+  $ hg init hgrepo
+  $ cd hgrepo
+  $ echo "[paths]" >> .hg/hgrc
+  $ echo "default=$TESTTMP/gitrepo" >> .hg/hgrc
+  $ hg pull
+  pulling from $TESTTMP/gitrepo
+  importing 3 git commits
+  adding bookmark beta
+  adding bookmark delta
+  adding bookmark master
+  new changesets ff7a2f2d8d70:678ebee93e38 (3 drafts)
+  (run 'hg heads' to see heads, 'hg merge' to merge)
+  $ git --git-dir .hg/git for-each-ref
+  9497a4ee62e16ee641860d7677cdb2589ea15554 commit	refs/remotes/default/beta
+  8cbeb817785fe2676ab0eda570534702b6b6f9cf commit	refs/remotes/default/delta
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/remotes/default/master
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/tags/t_alpha
+  $ hg log -Tp
+  2|draft|delta|default/delta tip
+  1|draft|beta|default/beta
+  0|draft|master|default/master t_alpha
+  $ cd ..
+  $ rm -rf hgrepo
+
 pull a tag
   $ hg init hgrepo
   $ echo "[paths]" >> hgrepo/.hg/hgrc
@@ -40,17 +114,9 @@ pull a tag
   (run 'hg update' to get a working copy)
   $ hg -R hgrepo update t_alpha
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
-  $ hg -R hgrepo log --graph --template=phases
-  @  changeset:   0:ff7a2f2d8d70
-     bookmark:    master
-     tag:         default/master
-     tag:         t_alpha
-     tag:         tip
-     phase:       draft
-     user:        test <test@example.org>
-     date:        Mon Jan 01 00:00:10 2007 +0000
-     summary:     add alpha
-  
+  $ hg log -Tp -R hgrepo
+  0|draft|master|default/master t_alpha tip
+
 no-op pull
   $ hg -R hgrepo pull -r t_alpha
   pulling from $TESTTMP/gitrepo
