@@ -183,7 +183,6 @@ def has_gitrepo(repo):
 
 class GitHandler(object):
     map_file = b'git-mapfile'
-    remote_refs_file = b'git-remote-refs'
     tags_file = b'git-tags'
 
     def __init__(self, dest_repo, ui):

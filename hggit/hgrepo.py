@@ -20,7 +20,6 @@ def reposetup(ui, repo):
     if hasattr(repo, '_wlockfreeprefix'):
         repo._wlockfreeprefix |= {
             GitHandler.map_file,
-            GitHandler.remote_refs_file,
             GitHandler.tags_file,
         }
 
