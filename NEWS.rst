@@ -6,7 +6,7 @@ This is a minor release, focusing on bugs and compatibility.
 * Always advance ``draft`` phase, even if pulling from an explicit URL
   that isn't a named path.
 * Always save Git tags into the local, cached Git repository.
-
+* Add support for Dulwich 0.22.
 
 hg-git 1.1.1 (2024-03-06)
 =========================
