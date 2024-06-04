@@ -104,9 +104,9 @@ Error checking on tag creation
 Create a git tag from hg
 
   $ hg tag --git alpha --debug -r 0
-  adding git tag alpha
   finding unexported changesets
   saving git map to $TESTTMP/hgrepo/.hg/git-mapfile
+  adding git tag alpha
   $ hg log --graph
   @  changeset:   1:7fe02317c63d
   |  bookmark:    master
@@ -228,11 +228,11 @@ Create a git tag from hg, but pointing to a new commit:
 
   $ hg tag --git gamma --debug -r tip
   invalid branch cache (visible): tip differs (?)
-  adding git tag gamma
   finding unexported changesets
   exporting 1 changesets
   converting revision 0eb1ab0073a885a498d4ae3dc5cf0c26e750fa3d
   saving git map to $TESTTMP/hgrepo/.hg/git-mapfile
+  adding git tag gamma
   $ hg push
   pushing to $TESTTMP/repo.git
   searching for changes

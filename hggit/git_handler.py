@@ -1849,6 +1849,7 @@ class GitHandler(object):
         if not refs:
             return
         repotags = self.repo.tags()
+        new_refs = {}
         for k in refs:
             if k.endswith(ANNOTATED_TAG_SUFFIX) or not k.startswith(
                 LOCAL_TAG_PREFIX
@@ -1862,10 +1863,14 @@ class GitHandler(object):
             if refs[k] not in self.git.object_store:
                 continue
 
+            new_refs[k] = refs[k]
+
             if ref_name not in repotags:
                 sha = self.map_hg_get(refs[k], deref=True)
                 if sha is not None and sha is not None:
                     self.tags[ref_name] = sha
+
+        self.git.refs.add_packed_refs(new_refs)
 
         self.save_tags()
 
@@ -1878,15 +1883,28 @@ class GitHandler(object):
             if scmutil.isrevsymbol(self.repo, tag):
                 raise error.Abort(b"the name '%s' already exists" % tag)
 
-            if check_ref_format(LOCAL_TAG_PREFIX + tag):
-                self.ui.debug(b'adding git tag %s\n' % tag)
-                self.tags[tag] = target
-            else:
+            if not check_ref_format(LOCAL_TAG_PREFIX + tag):
                 raise error.Abort(
                     b"the name '%s' is not a valid git " b"tag" % tag
                 )
 
         self.export_commits()
+
+        gittarget = self.map_git_get(target)
+
+        if not gittarget:
+            raise error.Abort(
+                b"warning: cannot create tag '%s' due to missing git "
+                b"revision\n" % tag
+            )
+
+        self.ui.debug(b'adding git tag %s\n' % tag)
+
+        self.git.refs.add_packed_refs(
+            {LOCAL_TAG_PREFIX + tag: gittarget for tag in tags}
+        )
+        self.tags.update({tag: target for tag in tags})
+
         self.save_tags()
 
     def _get_ref_nodes(self, remote_names, refs):
@@ -2038,8 +2056,6 @@ class GitHandler(object):
                 new_ref = REMOTE_BRANCH_PREFIX + remote_head
 
                 new_refs[new_ref] = sha
-            elif ref_name.startswith(LOCAL_TAG_PREFIX):
-                new_refs[ref_name] = sha
 
         self.git.refs.add_packed_refs(new_refs)
 

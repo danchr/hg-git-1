@@ -45,6 +45,7 @@ pull without a name
   new changesets ff7a2f2d8d70:678ebee93e38 (3 drafts)
   (run 'hg heads' to see heads, 'hg merge' to merge)
   $ git --git-dir .hg/git for-each-ref
+  7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/tags/t_alpha
   $ hg log -Tp
   2|draft|delta|tip
   1|draft|beta|
