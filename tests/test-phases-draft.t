@@ -37,8 +37,7 @@ even if we don't have a name?
   pulling from ../gitrepo
   no changes found
   $ hg phase tip
-  0: secret
-  $ hg phase -d tip
+  0: draft
   $ mv .hg/hgrc.bak .hg/hgrc
   $ cd ..
 

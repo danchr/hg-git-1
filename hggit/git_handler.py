@@ -2012,8 +2012,6 @@ class GitHandler(object):
                     ):
                         new_refs[REMOTE_BRANCH_PREFIX + t] = None
 
-        all_remote_nodeids = []
-
         for ref_name, sha in refs.items():
             if (
                 ref_name.endswith(ANNOTATED_TAG_SUFFIX)
@@ -2035,39 +2033,40 @@ class GitHandler(object):
                 head = ref_name[len(LOCAL_BRANCH_PREFIX) :]
                 remote_head = b'/'.join((remote_name, head))
 
+                # actually update the remote ref
                 remote_refs[remote_head] = bin(hgsha)
-                # TODO(durin42): what is this doing?
                 new_ref = REMOTE_BRANCH_PREFIX + remote_head
 
                 new_refs[new_ref] = sha
             elif ref_name.startswith(LOCAL_TAG_PREFIX):
                 new_refs[ref_name] = sha
 
-            if hgsha:
-                all_remote_nodeids.append(bin(hgsha))
-
         self.git.refs.add_packed_refs(new_refs)
-
-        if all_remote_nodeids:
-            with self.repo.lock(), self.repo.transaction(
-                b"hg-git-phases"
-            ) as tr:
-                # sanity check: ensure that all corresponding commits
-                # are at least draft; this can happen on no-op pulls
-                # where the commit already exists, but is secret
-                phases.advanceboundary(
-                    self.repo,
-                    tr,
-                    phases.draft,
-                    all_remote_nodeids,
-                )
 
     def update_remote_branches(self, remote_names, refs):
         for remote_name in remote_names:
             self._update_remote_branches_for(remote_name, refs)
 
-        # ensure that we update phases on push and no-op pulls
         with self.repo.lock(), self.repo.transaction(b"hg-git-phases") as tr:
+            all_remote_nodeids = set()
+
+            for ref_name, sha in refs.items():
+                hgsha = self.map_hg_get(sha)
+
+                if hgsha:
+                    all_remote_nodeids.add(bin(hgsha))
+
+            # sanity check: ensure that all corresponding commits
+            # are at least draft; this can happen on no-op pulls
+            # where the commit already exists, but is secret
+            phases.advanceboundary(
+                self.repo,
+                tr,
+                phases.draft,
+                all_remote_nodeids,
+            )
+
+            # ensure that we update phases on push and no-op pulls
             nodeids_to_publish = set()
 
             for sha in git2hg.get_public(self.ui, refs, remote_names):
