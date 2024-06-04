@@ -1842,6 +1842,9 @@ class GitHandler(object):
                     continue
                 if ref_name.endswith(ANNOTATED_TAG_SUFFIX):
                     continue
+
+                util.set_refs(self.ui, self.git, {k: refs[k]})
+
                 if ref_name not in repotags:
                     sha = self.map_hg_get(refs[k], deref=True)
                     if sha is not None and sha is not None:
@@ -2011,8 +2014,6 @@ class GitHandler(object):
                 new_ref = REMOTE_BRANCH_PREFIX + remote_head
 
                 util.set_refs(self.ui, self.git, {new_ref: sha})
-            elif ref_name.startswith(LOCAL_TAG_PREFIX):
-                util.set_refs(self.ui, self.git, {ref_name: sha})
 
     def update_remote_branches(self, remote_names, refs):
         for remote_name in remote_names:
