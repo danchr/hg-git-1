@@ -1850,19 +1850,22 @@ class GitHandler(object):
             return
         repotags = self.repo.tags()
         for k in refs:
-            if k.startswith(LOCAL_TAG_PREFIX):
-                ref_name = k[len(LOCAL_TAG_PREFIX) :]
+            if k.endswith(ANNOTATED_TAG_SUFFIX) or not k.startswith(
+                LOCAL_TAG_PREFIX
+            ):
+                continue
 
-                # refs contains all the refs in the server, not just
-                # the ones we are pulling
-                if refs[k] not in self.git.object_store:
-                    continue
-                if ref_name.endswith(ANNOTATED_TAG_SUFFIX):
-                    continue
-                if ref_name not in repotags:
-                    sha = self.map_hg_get(refs[k], deref=True)
-                    if sha is not None and sha is not None:
-                        self.tags[ref_name] = sha
+            ref_name = k[len(LOCAL_TAG_PREFIX) :]
+
+            # refs contains all the refs in the server, not just
+            # the ones we are pulling
+            if refs[k] not in self.git.object_store:
+                continue
+
+            if ref_name not in repotags:
+                sha = self.map_hg_get(refs[k], deref=True)
+                if sha is not None and sha is not None:
+                    self.tags[ref_name] = sha
 
         self.save_tags()
 
