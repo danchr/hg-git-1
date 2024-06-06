@@ -422,16 +422,8 @@ def has_dulwich():
     except ImportError:
         return False
 
-@checkvers(
-    "dulwich", "Dulwich >= %s", [
-        '%d.%d.%d' % vers
-        for vers in (
-            (0, 20, 37),
-            (0, 20, 44),
-            (0, 21, 0),
-        )
-    ]
-)
+
+@checkvers("dulwich", "Dulwich >= %s", ['%d.%d.%d' % vers for vers in ()])
 def has_dulwich_range(v):
     import dulwich
 
@@ -1146,6 +1138,7 @@ def has_emacs():
 def has_black():
     try:
         import black
+
         version = black.__version__
     except ImportError:
         version = None
@@ -1200,6 +1193,8 @@ def has_unicode_filesystem():
             return False
     except Exception:
         return True
+
+
 @check("bigendian", "big-endian CPU")
 def has_bigendian():
     return sys.byteorder == 'big'

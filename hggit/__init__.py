@@ -156,6 +156,7 @@ from mercurial import (
     pycompat,
 )
 
+from . import bundle
 from . import commands
 from . import config
 from . import debugcommands
@@ -172,8 +173,8 @@ demandimport.IGNORES |= {
     b'collections',
 }
 
-testedwith = b'6.1 6.2 6.3 6.4 6.5 6.6 6.7'
-minimumhgversion = b'6.1'
+testedwith = b'6.6 6.7'
+minimumhgversion = b'6.6'
 buglink = b'https://foss.heptapod.net/mercurial/hg-git/issues'
 
 eh = exthelper.exthelper()
@@ -189,6 +190,7 @@ reposetup = eh.finalreposetup
 uipopulate = eh.finaluipopulate
 
 for _mod in (
+    bundle,
     commands,
     config,
     debugcommands,

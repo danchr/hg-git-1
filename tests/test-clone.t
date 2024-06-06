@@ -188,6 +188,12 @@ and activate the corresponding bookmark
      beta                      4:47d12948785d
      gamma                     2:ca33a262eb46
    * master                    0:ff7a2f2d8d70
+  $ hg -R hgrepo-2 tags -v
+  tip                                4:47d12948785d
+  default/beta                       4:47d12948785d git-remote
+  default/gamma                      2:ca33a262eb46 git-remote
+  default/master                     0:ff7a2f2d8d70 git-remote
+  alpha                              0:ff7a2f2d8d70 git
   $ git --git-dir hgrepo-2/.hg/git for-each-ref
   b5329119ed77cb37a31fe523621d684eb55779a4 commit	refs/remotes/default/beta
   d338971a96e20113bb980a5dc4355ba77eed3714 commit	refs/remotes/default/gamma
@@ -224,3 +230,26 @@ anything special
   7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/remotes/default/master
   7eeab2ea75ec1ac0ff3d500b5b6f8a3447dd7c03 commit	refs/tags/alpha
   $ rm -rf hgrepo-2
+
+test that cloning a regular mercurial repository does not introduce
+git state
+
+  $ hg init hgrepo-base
+  $ cd hgrepo-base
+  $ touch flaf
+  $ fn_hg_commit -A -m flaf
+  $ cd ..
+  $ hg clone -U hgrepo-base hgrepo-copy
+  requesting all changes (secret !)
+  $ ls hgrepo-copy/.hg | grep git
+  [1]
+  $ hg clone -U --pull hgrepo-base hgrepo-pull
+  requesting all changes
+  adding changesets (draft !)
+  adding manifests (draft !)
+  adding file changes (draft !)
+  added 1 changesets with 1 changes to 1 files (draft !)
+  new changesets 76c919376257 (draft !)
+  $ ls hgrepo-pull | grep git
+  [1]
+  $ rm -r hgrepo-base hgrepo-copy hgrepo-pull

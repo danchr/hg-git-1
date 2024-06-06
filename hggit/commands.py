@@ -7,6 +7,8 @@
 # of the GNU General Public License, incorporated herein by reference.
 
 # global modules
+import os
+
 from dulwich import porcelain
 
 from mercurial.node import hex, nullhex
@@ -96,10 +98,21 @@ def git_cleanup(ui, repo):
     for line in gh.vfs(gh.map_file):
         gitsha, hgsha = line.strip().split(b' ', 1)
         if hgsha in repo:
+            ui.debug(b'keeping GIT:%s -> HG:%s\n' % (gitsha, hgsha))
             new_map.append(b'%s %s\n' % (gitsha, hgsha))
+        else:
+            ui.note(b'dropping GIT:%s -> HG:%s\n' % (gitsha, hgsha))
     with repo.githandler.store_repo.wlock():
         f = gh.vfs(gh.map_file, b'wb')
         f.writelines(new_map)
+
+    for ref, gitsha in gh.git.refs.as_dict().items():
+        if gitsha in gh.git:
+            ui.debug(b'keeping %s -> GIT:%s\n' % (ref, gitsha))
+        else:
+            ui.note(b'dropping %s -> GIT:%s\n' % (ref, gitsha))
+            del gh.git.refs[ref]
+
     ui.status(_(b'git commit map cleaned\n'))
 
 
@@ -176,3 +189,32 @@ def tag(orig, ui, repo, *names, **opts):
             )
 
         repo.githandler.add_tag(target, *names)
+
+
+@eh.wrapcommand(b'annotate')
+def annotate(orig, ui, repo, *pats, **opts):
+    skiprevs = opts.get(b'skip', [])
+    ignorerevscfg = ui.config(b'git', b'blame.ignoreRevsFile')
+
+    if ignorerevscfg and repo.githandler:
+        ignorerevsfile = repo.wjoin(ignorerevscfg)
+
+        if os.path.isfile(ignorerevsfile):
+            with open(ignorerevsfile, 'rb') as fp:
+                for line in fp:
+                    git_sha = line.strip().split(b'#', 1)[0]
+
+                    if not git_sha:
+                        continue
+
+                    hg_sha = repo.githandler.map_hg_get(git_sha)
+
+                    if hg_sha is not None:
+                        ui.debug(
+                            b'skipping %s -> %s\n' % (git_sha[:12], hg_sha[:12])
+                        )
+                        skiprevs.append(hg_sha)
+
+            opts['skip'] = skiprevs
+
+    return orig(ui, repo, *pats, **opts)

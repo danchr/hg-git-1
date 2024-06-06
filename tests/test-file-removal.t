@@ -170,7 +170,7 @@ make sure that only beta is in the manifest
   pushing to ../repo.git
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 9 commits with 8 trees and 5 blobs
   adding reference refs/heads/master
 

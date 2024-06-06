@@ -104,9 +104,9 @@ Error checking on tag creation
 Create a git tag from hg
 
   $ hg tag --git alpha --debug -r 0
-  adding git tag alpha
   finding unexported changesets
   saving git map to $TESTTMP/hgrepo/.hg/git-mapfile
+  adding git tag alpha
   $ hg log --graph
   @  changeset:   1:7fe02317c63d
   |  bookmark:    master
@@ -132,7 +132,7 @@ Create a git tag from hg
   pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
   adding reference refs/tags/alpha
@@ -170,7 +170,7 @@ Verify that amending commits known to remotes doesn't break anything
   pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
 
@@ -228,16 +228,16 @@ Create a git tag from hg, but pointing to a new commit:
 
   $ hg tag --git gamma --debug -r tip
   invalid branch cache (visible): tip differs (?)
-  adding git tag gamma
   finding unexported changesets
   exporting 1 changesets
   converting revision 0eb1ab0073a885a498d4ae3dc5cf0c26e750fa3d
   saving git map to $TESTTMP/hgrepo/.hg/git-mapfile
+  adding git tag gamma
   $ hg push
   pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
   adding reference refs/tags/gamma
@@ -273,7 +273,7 @@ Try to overwrite an annotated tag:
   warning: not overwriting annotated tag 'beta'
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   adding reference refs/heads/not-master
   $ hg tags
@@ -311,7 +311,15 @@ Test how pulling an explicit branch with an annotated tag:
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg log -r 'ancestors(master) and tagged()' -T shorttags -R hgrepo-2
   0:ff7a2f2d8d70 draft alpha
+  1:7fe02317c63d draft beta
   3:0eb1ab0073a8 draft default/master gamma tip
+  $ hg tags -v -R hgrepo-2
+  tip                                3:0eb1ab0073a8
+  gamma                              3:0eb1ab0073a8 git
+  default/master                     3:0eb1ab0073a8 git-remote
+  beta                               1:7fe02317c63d git
+  alpha                              0:ff7a2f2d8d70 git
+  $ GIT_DIR=hgrepo-2/.hg/git git fetch --quiet repo.git
   $ rm -rf hgrepo-2
 
   $ hg clone -r master repo.git hgrepo-2
@@ -321,6 +329,7 @@ Test how pulling an explicit branch with an annotated tag:
   3 files updated, 0 files merged, 0 files removed, 0 files unresolved
   $ hg log -r 'tagged()' -T shorttags -R hgrepo-2
   0:ff7a2f2d8d70 draft alpha
+  1:7fe02317c63d draft beta
   3:0eb1ab0073a8 draft default/master gamma tip
 This used to die:
   $ hg -R hgrepo-2 gexport
@@ -343,3 +352,24 @@ Check that pulling will update phases only:
   4:0eb1ab0073a8 draft beta default/master gamma
   2:61175962e488 draft detached X
   $ cd ..
+
+Check that we pull new tags to existing commits:
+  $ cd gitrepo
+  $ git tag
+  alpha
+  beta
+  detached
+  gamma
+  $ fn_git_tag extra-simple-tag
+  $ fn_git_tag -m annotated extra-annotated-tag
+  $ git push --tags
+  To $TESTTMP/repo.git
+   * [new tag]         extra-annotated-tag -> extra-annotated-tag
+   * [new tag]         extra-simple-tag -> extra-simple-tag
+  $ cd ../hgrepo
+  $ hg pull -r master
+  pulling from $TESTTMP/repo.git
+  no changes found
+  $ hg tags -v | grep extra
+  extra-simple-tag                   1:7fe02317c63d git
+  extra-annotated-tag                1:7fe02317c63d git

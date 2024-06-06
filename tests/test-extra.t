@@ -57,7 +57,7 @@ Make sure legacy extra (in commit message, after '--HG--') doesn't break
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 3 commits with 3 trees and 0 blobs
   adding reference refs/heads/b1
 
@@ -98,7 +98,7 @@ Test some nutty filenames
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 3 commits with 3 trees and 0 blobs
   adding reference refs/heads/b2
   adding reference refs/heads/b3

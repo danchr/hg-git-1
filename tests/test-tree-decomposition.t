@@ -43,7 +43,7 @@ Load commonly used test logic
   pushing to ../repo.git
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 3 commits with 6 trees and 3 blobs
   adding reference refs/heads/master
   $ cd ..

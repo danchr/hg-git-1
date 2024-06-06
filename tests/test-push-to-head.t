@@ -28,7 +28,7 @@ The output is confusing, and this even more-so:
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   remote: error: refusing to update checked out branch: refs/heads/master
   remote: error: By default, updating the current branch in a non-bare repository
   remote: is denied, because it will make the index and work tree inconsistent
@@ -50,7 +50,7 @@ The output is confusing, and this even more-so:
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   remote: error: refusing to update checked out branch: refs/heads/master
   remote: error: By default, updating the current branch in a non-bare repository
   remote: is denied, because it will make the index and work tree inconsistent

@@ -11,6 +11,10 @@ from . import util
 eh = exthelper.exthelper()
 
 CONFIG_DEFAULTS = {
+    b'experimental': {
+        b'hg-git-bundle': False,
+        b'hg-git-serve': False,
+    },
     b'git': {
         b'authors': None,
         b'branch_bookmark_suffix': None,
@@ -23,6 +27,7 @@ CONFIG_DEFAULTS = {
         b'similarity': 0,
         b'pull-prune-remote-branches': True,
         b'pull-prune-bookmarks': True,
+        b'blame.ignoreRevsFile': None,
     },
     b'hggit': {
         b'fetchbuffer': 100,

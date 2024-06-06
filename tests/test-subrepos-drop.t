@@ -39,7 +39,7 @@ What happens if we push that to Git?
   warning: ignoring modifications to '.gitmodules' file; please use '.hgsub' instead
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 2 commits with 1 trees and 1 blobs
   adding reference refs/heads/master
 
@@ -52,7 +52,7 @@ But we don't get a warning if we don't touch .gitmodules:
   pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 0 blobs
   updating reference refs/heads/master
   $ cd ..

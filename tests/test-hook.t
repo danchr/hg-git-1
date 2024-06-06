@@ -51,7 +51,7 @@ Test pushing a single commit:
   | outgoing.node=cc0ffa47c67ebcb08dc50f69afaecb5d622cc777
   | outgoing.git_node=681fb452693218a33986174228560272a6fad87a
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   adding reference refs/heads/master
 
@@ -109,7 +109,7 @@ Hooks on push?
   | prechangegroup.git=True
   | prechangegroup.url=$TESTTMP/repo.git
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 2 commits with 2 trees and 2 blobs
   updating reference refs/heads/master
 

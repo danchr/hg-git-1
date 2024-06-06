@@ -60,11 +60,11 @@ symref, should publish it.
   exporting 1 changesets
   converting revision 47580592d3d6492421a1e6cebc5c2d701a2e858b
   searching for changes
-  remote: counting objects: 5, done. (dulwich0210 !)
+  remote: counting objects: 5, done.
   1 commits found
   adding objects
-  remote: counting objects: 5, done. (dulwich0210 !)
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: counting objects: 5, done.
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   updating reference default::refs/heads/master => GIT:0f378ab6
   publishing remote HEAD

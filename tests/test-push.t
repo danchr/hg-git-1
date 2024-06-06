@@ -33,7 +33,7 @@ Load commonly used test logic
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   adding reference refs/heads/beta
 
@@ -111,7 +111,7 @@ this should also fail
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
 
@@ -134,7 +134,7 @@ hg-git issue103 -- directories can lose information at hg-git export time
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 2 trees and 0 blobs
   updating reference refs/heads/master
 
@@ -145,7 +145,7 @@ hg-git issue103 -- directories can lose information at hg-git export time
   pushing to $TESTTMP/gitrepo
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 2 trees and 0 blobs
   updating reference refs/heads/master
   $ hg log -r master
@@ -226,7 +226,7 @@ specified:
   pushing to file:///$TESTTMP/gitrepo
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/also-not-master
 

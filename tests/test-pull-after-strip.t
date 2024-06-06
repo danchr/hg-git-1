@@ -85,3 +85,12 @@ pull works after 'hg git-cleanup'
   
 
   $ cd ..
+
+Check that we also remove bad refs:
+
+  $ cd hgrepo
+  $ echo e93b671cb24bff41779187edff99178e2597c2 > .hg/git/refs/tags/bad-tag
+  $ hg git-cleanup
+  git commit map cleaned
+  $ test -e .hg/git/refs/tags/bad-tag
+  [1]

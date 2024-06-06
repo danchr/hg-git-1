@@ -79,7 +79,7 @@ hg status shall NOT report .hgsub and .hgsubstate as untracked - either ignored 
   pushing to $TESTTMP/repo.git
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 2 trees and 1 blobs
   updating reference refs/heads/master
   $ cd ..
@@ -159,7 +159,7 @@ pull shall bring .hgsub entry which was added to the git repo
   no changes made to subrepo hgsub since last push to $TESTTMP/hgsub
   searching for changes
   adding objects
-  remote: found 0 deltas to reuse (dulwich0210 !)
+  remote: found 0 deltas to reuse
   added 1 commits with 1 trees and 1 blobs
   updating reference refs/heads/master
   $ cd ..
