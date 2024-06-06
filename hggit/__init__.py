@@ -158,6 +158,7 @@ from mercurial import (
 
 from . import bundle
 from . import commands
+from . import compat
 from . import config
 from . import debugcommands
 from . import gitdirstate
@@ -192,6 +193,7 @@ uipopulate = eh.finaluipopulate
 for _mod in (
     bundle,
     commands,
+    compat,
     config,
     debugcommands,
     gitdirstate,
