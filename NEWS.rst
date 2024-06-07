@@ -46,7 +46,7 @@ tags to old changesets.
 The first option enables embedding the metadata using ``hg bundle``
 and the second option enables the support with served repositories.
 
-hg-git 1.1.2 (unreleased)
+hg-git 1.1.2 (2024-06-06)
 =========================
 
 This is a minor release, focusing on bugs and compatibility.
