@@ -98,7 +98,7 @@ And finally, pull the new commit:
   remote: warning: unable to access '/root/.config/git/attributes': Permission denied
   importing 1 git commits
   adding bookmark master
-  new changesets fa22339f4ab8 (1 drafts)
+  new changesets fa22339f4ab8
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
 Straight HTTP doesn't work:
@@ -119,7 +119,7 @@ But we can specify authentication in the configuration:
   remote: warning: unable to access '/root/.config/git/attributes': Permission denied
   importing 1 git commits
   adding bookmark master
-  new changesets fa22339f4ab8 (1 drafts)
+  new changesets fa22339f4ab8
   1 files updated, 0 files merged, 0 files removed, 0 files unresolved
 
 Try using git credentials:

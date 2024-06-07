@@ -32,7 +32,7 @@ CONFIG_DEFAULTS = {
     b'hggit': {
         b'fetchbuffer': 100,
         b'mapsavefrequency': 1000,
-        b'usephases': False,
+        b'usephases': None,
         b'retries': 3,
         b'invalidpaths': b'skip',
         b'threads': -1,
@@ -49,10 +49,19 @@ publishoption = collections.namedtuple(
 )
 
 
-def get_publishing_option(ui):
+def get_publishing_option(ui, remote_names):
     refs = set(ui.configlist(b'git', b'public'))
 
-    return publishoption(ui.configbool(b'hggit', b'usephases'), not refs, refs)
+    use_phases = ui.configbool(b'hggit', b'usephases', None)
+
+    if use_phases is None:
+        use_phases = any(
+            not p.url.islocal() for n in remote_names for p in ui.paths.get(n)
+        )
+
+    publish_defaults = not refs
+
+    return publishoption(use_phases, publish_defaults, refs)
 
 
 @eh.extsetup

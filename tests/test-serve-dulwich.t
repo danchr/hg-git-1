@@ -46,7 +46,7 @@ Make sure that clone over unauthenticated HTTP doesn't break
   importing commits 2/2 3af9773036a9         [=============>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
   importing 2 git commits
-  new changesets c4d188f6e13d:221dd250e933 (2 drafts)
+  new changesets c4d188f6e13d:221dd250e933
   $ hg log -T 'HG:{node|short} GIT:{gitnode|short}\n' -R hgrepo
   HG:221dd250e933 GIT:3af9773036a9
   HG:c4d188f6e13d GIT:b23744d34f97
@@ -62,7 +62,7 @@ Similarly, make sure that we detect repositories ending with .git
   importing commits 2/2 3af9773036a9         [=============>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
   importing 2 git commits
-  new changesets c4d188f6e13d:221dd250e933 (2 drafts)
+  new changesets c4d188f6e13d:221dd250e933
   $ hg tags -v -R hgrepo
   tip                                1:221dd250e933
   default/master                     1:221dd250e933 git-remote
@@ -95,3 +95,22 @@ Similarly, make sure that we detect repositories ending with .git
   $ hg log -T 'HG:{node|short} GIT:{gitnode|short} {tags}\n' -r .
   HG:daf1ae153bf8 GIT:ab88565d0614 default/master tip
   $ cd ..
+
+Verify that we can suppress publishing using a path option:
+
+  $ hg clone --config paths.default:hg-git.publish=no -U git+http://localhost:$HGPORT/gitrepo hgrepo-public
+  \r (no-eol) (esc)
+  importing commits 1/3 b23744d34f97         [===>          ]\r (no-eol) (esc)
+  importing commits 2/3 3af9773036a9         [========>     ]\r (no-eol) (esc)
+  importing commits 3/3 ab88565d0614         [=============>]\r (no-eol) (esc)
+                                                              \r (no-eol) (esc)
+  importing 3 git commits
+  new changesets c4d188f6e13d:daf1ae153bf8 (3 drafts)
+  $ hg clone --config git.public=no -U git+http://localhost:$HGPORT/gitrepo hgrepo-public2
+  \r (no-eol) (esc)
+  importing commits 1/3 b23744d34f97         [===>          ]\r (no-eol) (esc)
+  importing commits 2/3 3af9773036a9         [========>     ]\r (no-eol) (esc)
+  importing commits 3/3 ab88565d0614         [=============>]\r (no-eol) (esc)
+                                                              \r (no-eol) (esc)
+  importing 3 git commits
+  new changesets c4d188f6e13d:daf1ae153bf8 (3 drafts)

@@ -4,6 +4,11 @@ hg-git 1.2.0b1 (unreleased)
 This is a preview of an upcoming feature release that contains changes
 to user-facing behaviour.
 
+Changes to behaviour:
+
+* Change the defaults for ``hggit.usephases``; similar to Mercurial,
+  remote repositories now default to publishing.
+
 Enhancements:
 
 * Add support for a ``git.blame.ignoreRevsFile`` configuration

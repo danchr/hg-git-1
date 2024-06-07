@@ -20,7 +20,7 @@ from . import config
 
 
 def get_public(ui, refs, remote_names):
-    cfg = config.get_publishing_option(ui)
+    cfg = config.get_publishing_option(ui, remote_names)
 
     paths = list(
         itertools.chain.from_iterable(
@@ -51,11 +51,6 @@ def get_public(ui, refs, remote_names):
         return {}
 
     to_publish = set()
-
-    use_phases, publish_defaults, refs_to_publish = cfg
-
-    if not use_phases:
-        return {}
 
     for remote_name in remote_names:
         refs_to_publish |= {

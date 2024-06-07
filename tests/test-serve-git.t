@@ -51,7 +51,7 @@ Make sure that clone over the old git protocol doesn't break
   importing commits 2/2 3af9773036a9         [=============>]\r (no-eol) (esc)
                                                               \r (no-eol) (esc)
   importing 2 git commits
-  new changesets c4d188f6e13d:221dd250e933 (2 drafts)
+  new changesets c4d188f6e13d:221dd250e933
   $ hg log -T 'HG:{node|short} GIT:{gitnode|short}\n' -R copy
   HG:221dd250e933 GIT:3af9773036a9
   HG:c4d188f6e13d GIT:b23744d34f97
