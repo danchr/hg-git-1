@@ -158,7 +158,6 @@ from mercurial import (
 
 from . import bundle
 from . import commands
-from . import compat
 from . import config
 from . import debugcommands
 from . import gitdirstate
@@ -174,7 +173,7 @@ demandimport.IGNORES |= {
     b'collections',
 }
 
-testedwith = b'6.6 6.7'
+testedwith = b'6.6 6.7 6.8'
 minimumhgversion = b'6.6'
 buglink = b'https://foss.heptapod.net/mercurial/hg-git/issues'
 
@@ -193,7 +192,6 @@ uipopulate = eh.finaluipopulate
 for _mod in (
     bundle,
     commands,
-    compat,
     config,
     debugcommands,
     gitdirstate,

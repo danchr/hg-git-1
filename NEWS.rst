@@ -1,7 +1,6 @@
 hg-git 1.2.0b1 (unreleased)
 ===========================
 
-
 This is a preview of an upcoming feature release that contains changes
 to user-facing behaviour.
 
@@ -45,6 +44,15 @@ tags to old changesets.
 
 The first option enables embedding the metadata using ``hg bundle``
 and the second option enables the support with served repositories.
+
+hg-git 1.1.3 (2024-06-25)
+=========================
+
+This is a minor release, focusing on bugs and compatibility.
+
+* Mark Dulwich 0.22.0 and 0.22.1 as unsupported.  The compatibility
+  hack didn't work in practice.
+* Mark Mercurial 6.8 as tested and supported.
 
 hg-git 1.1.2 (2024-06-06)
 =========================
