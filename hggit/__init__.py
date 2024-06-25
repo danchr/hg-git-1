@@ -172,7 +172,7 @@ demandimport.IGNORES |= {
     b'collections',
 }
 
-testedwith = b'6.1 6.2 6.3 6.4 6.5 6.6 6.7'
+testedwith = b'6.1 6.2 6.3 6.4 6.5 6.6 6.7 6.8'
 minimumhgversion = b'6.1'
 buglink = b'https://foss.heptapod.net/mercurial/hg-git/issues'
 

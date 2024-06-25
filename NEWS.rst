@@ -5,6 +5,7 @@ This is a minor release, focusing on bugs and compatibility.
 
 * Mark Dulwich 0.22.0 and 0.22.1 as unsupported.  The compatibility
   hack didn't work in practice.
+* Mark Mercurial 6.8 as tested and supported.
 
 hg-git 1.1.2 (2024-06-06)
 =========================
