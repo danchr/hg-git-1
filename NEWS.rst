@@ -1,4 +1,4 @@
-hg-git 1.1.3 (unreleased)
+hg-git 1.1.3 (2024-06-25)
 =========================
 
 This is a minor release, focusing on bugs and compatibility.
