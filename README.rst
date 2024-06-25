@@ -2,12 +2,15 @@ Hg-Git Mercurial Plugin
 =======================
 
 Homepage:
-  https://hg-git.github.io/
+  https://wiki.mercurial-scm.org/HgGit
 Repository:
   https://foss.heptapod.net/mercurial/hg-git
-Mailing list:
+Old homepage, no longer maintained:
+  https://hg-git.github.io/
+Discussion:
   `hg-git@googlegroups.com <mailto:hg-git@googlegroups.com>`_ (`Google
-  Group <https://groups.google.com/g/hg-git>`_)
+  Group <https://groups.google.com/g/hg-git>`_) and
+  `#hg-git:matrix.org <https://matrix.to/#/#hg-git:matrix.org>`_
 
 This is the Hg-Git plugin for Mercurial, adding the ability to push and
 pull to/from a Git server repository from Hg. This means you can
