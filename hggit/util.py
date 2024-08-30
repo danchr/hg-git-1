@@ -261,14 +261,16 @@ else:
     def add_pack(object_store: PackBasedObjectStore):
         """Simple context manager for adding a file to a pack"""
         if hasattr(object_store, "find_missing_objects"):
-            with tempfile.NamedTemporaryFile(
-                prefix='hg-git-fetch-',
-                suffix='.pack',
-                dir=object_store.pack_dir,
-                delete=False,
-            ) as f:
-                delete = True
-                try:
+            name = None
+            try:
+                with tempfile.NamedTemporaryFile(
+                    prefix='hg-git-fetch-',
+                    suffix='.pack',
+                    dir=object_store.pack_dir,
+                    delete=False,
+                ) as f:
+                    name = f.name
+
                     yield f
 
                     f.flush()
@@ -277,13 +279,13 @@ else:
                         if not os.listdir(object_store.pack_dir):
                             # we're in an initial clone
                             object_store.move_in_pack(f.name)
-                            delete = False
+                            name = None
                         else:
                             f.seek(0)
                             object_store.add_thin_pack(f.read, None)
-                finally:
-                    if delete:
-                        os.remove(f.name)
+            finally:
+                if name:
+                    os.remove(name)
 
 
 def makebatchable(fn):
