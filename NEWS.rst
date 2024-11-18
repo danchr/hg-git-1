@@ -1,4 +1,4 @@
-hg-git 1.2.0b1 (unreleased)
+hg-git 1.2.0b1 (2024-11-18)
 ===========================
 
 This is a preview of an upcoming feature release that contains changes
