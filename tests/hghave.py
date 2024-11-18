@@ -438,6 +438,19 @@ def has_dulwich_range(v):
     return dulwich.__version__ >= tuple(map(int, v.split('.')))
 
 
+@check("dulwich-rust", "Dulwich Python library using Rust bindings")
+def has_dulwich_rust():
+    try:
+        from dulwich import objects, __version__
+
+        return (
+            __version__ > (0, 22, 0)
+            and objects._parse_tree_py is not objects.parse_tree
+        )
+    except ImportError:
+        return False
+
+
 @check("pygit2", "pygit2 Python library")
 def has_pygit2():
     try:

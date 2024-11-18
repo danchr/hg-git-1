@@ -414,10 +414,14 @@ Regenerate the Git metadata and compare the hashes
   $ hg gexport
   $ cd .hg/git
   $ git log master --pretty=oneline
-  8a00d0fb75377c51c9a46e92ff154c919007f0e2 delta/epsilon
-  dd7d4f1adb942a8d349dce585019f6949184bc64 gamma2
-  3f1cdaf8b603816fcda02bd29e75198ae4cb13db remove submodule and rename back
-  2a4abf1178a999e2054158ceb0c7768079665d03 rename and add submodule
+  f3f6592447685566af9447c03ae262aa5432511d delta/epsilon (dulwich-rust !)
+  c51ce14ec367c5ea72bf428dee3f8576f2fe1bb0 gamma2 (dulwich-rust !)
+  df749cae534e3c7a0ad664cd0f214dd36e0ac259 remove submodule and rename back (dulwich-rust !)
+  8f9ec605ad0cc2532202f73cef8e35d3241797ee rename and add submodule (dulwich-rust !)
+  8a00d0fb75377c51c9a46e92ff154c919007f0e2 delta/epsilon (no-dulwich-rust !)
+  dd7d4f1adb942a8d349dce585019f6949184bc64 gamma2 (no-dulwich-rust !)
+  3f1cdaf8b603816fcda02bd29e75198ae4cb13db remove submodule and rename back (no-dulwich-rust !)
+  2a4abf1178a999e2054158ceb0c7768079665d03 rename and add submodule (no-dulwich-rust !)
   88c416e8d5e0e9dd1187d45ebafaa46111764196 beta renamed back
   027d2a6e050705bf6f7e226e7e97f02ce5ae3200 beta renamed
   dc70e620634887e70ac5dd108bcc7ebd99c60ec3 move submodule
