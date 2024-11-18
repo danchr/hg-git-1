@@ -1119,7 +1119,7 @@ class GitHandler(object):
             hg_renames,
             hg_branch,
             extra,
-        ) = git2hg.extract_hg_metadata(commit.message, commit._extra)
+        ) = git2hg.extract_hg_metadata(commit.message or b'', commit._extra)
         if hg_renames is None:
             detect_renames = True
             # We have to store this unconditionally, even if there are no
