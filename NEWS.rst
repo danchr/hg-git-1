@@ -5,6 +5,7 @@ This is a minor release, focusing on bugs and compatibility.
 
 * Mark Dulwich 0.22.0 as fully supported; the differences are assumed
   intentional for now.
+* Mark Mercurial 6.9 as tested and supported.
 
 hg-git 1.1.3 (2024-06-25)
 =========================
