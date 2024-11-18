@@ -24,9 +24,9 @@ class py3docchecker(doctest.OutputChecker):
             r'''^mercurial\.\w+\.(\w+): (['"])(.*?)\2''',
             r'\1: \3',
             got2,
-            re.MULTILINE,
+            flags=re.MULTILINE,
         )
-        got2 = re.sub(r'^mercurial\.\w+\.(\w+): ', r'\1: ', got2, re.MULTILINE)
+        got2 = re.sub(r'^mercurial\.\w+\.(\w+): ', r'\1: ', got2, flags=re.MULTILINE)
         return any(
             doctest.OutputChecker.check_output(self, w, g, optionflags)
             for w, g in [(want, got), (want2, got2)]

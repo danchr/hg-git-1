@@ -50,6 +50,16 @@ tags to old changesets.
 The first option enables embedding the metadata using ``hg bundle``
 and the second option enables the support with served repositories.
 
+hg-git 1.1.4 (2024-11-18)
+=========================
+
+This is a minor release, focusing on bugs and compatibility.
+
+* Mark Dulwich 0.22.0 as fully supported; the differences are assumed
+  intentional for now.
+* Mark Mercurial 6.9 as tested and supported.
+* Fix tests with Python 3.13.
+
 hg-git 1.1.3 (2024-06-25)
 =========================
 
