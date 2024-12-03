@@ -38,7 +38,7 @@ Latest:
     matrix:
       - &latest-versions
         PYTHON:
-          - "3.8"
+          - "3.9"
           - "3.13"
         HG:
           - "6.9"
