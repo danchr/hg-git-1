@@ -1,4 +1,4 @@
-hg-git 1.2.0 (unreleased)
+hg-git 1.2.0 (2025-02-08)
 =========================
 
 This is a feature release that contains changes all changes from
