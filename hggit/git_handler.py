@@ -2025,7 +2025,7 @@ class GitHandler(object):
             for ref_name, sha in refs.items():
                 hgsha = self.map_hg_get(sha)
 
-                if hgsha:
+                if hgsha and hgsha in self.repo.unfiltered():
                     all_remote_nodeids.add(bin(hgsha))
 
             # sanity check: ensure that all corresponding commits
