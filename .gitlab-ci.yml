@@ -113,35 +113,6 @@ Alpine:
         - "3.15"
         - "3.16"
 
-# Test that the tests pass against the current branches
-Development:
-  extends: .base
-  stage: compat
-  rules: &upcoming-rules
-    # allow opting out of upcoming releases on legacy branches
-    - if: '$CI_SKIP_UPCOMING'
-      when: never
-    # disallow failures for scheduled builds, so we get a nice
-    # notification
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
-      allow_failure: false
-    # but we don't want to prevent merging unrelated work, so allow
-    # failures for normal builds -- all of this is to avoid a detached
-    # build for merge requests
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-      allow_failure: true
-    - if: '$CI_PIPELINE_SOURCE == "web"'
-      when: manual
-      allow_failure: true
-  parallel:
-    matrix:
-      - &development-versions
-        PYTHON:
-          - "3.12"
-        HG:
-          - "stable"
-          - "default"
-
 Coverage:
   stage: .post
   image: ${CI_DEPENDENCY_PROXY_GROUP_IMAGE_PREFIX}/python:alpine
@@ -200,7 +171,6 @@ CI images:
     matrix:
       - *latest-versions
       - *supported-versions
-      - *development-versions
 
 # Builds the image used by tests/test-networking.t
 Git service image:
