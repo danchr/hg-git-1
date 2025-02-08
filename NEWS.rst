@@ -1,3 +1,14 @@
+hg-git 1.2.0 (2025-02-08)
+=========================
+
+This is a feature release that contains changes all changes from
+1.2.0b1, as well as the following change:
+
+* Drop support for Python 3.8.
+
+This release requires Mercurial 6.6, or later, Dulwich 0.21.6 or later
+and Python 3.9 or later.
+
 hg-git 1.2.0b1 (2024-11-18)
 ===========================
 
