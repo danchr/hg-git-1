@@ -1,3 +1,20 @@
+hg-git 1.2.1 (unreleased)
+=========================
+
+This is a minor release, focusing on bugs and compatibility.
+
+* Fix an error on pull with commits missing on Mercurial side. We'd
+  try to advance phase boundaries for them, which failed.
+
+hg-git 1.1.5 (unreleased)
+=========================
+
+This is a minor release, focusing on bugs and compatibility.
+
+* Fix an error on pull with commits missing on Mercurial side. We'd
+  try to advance phase boundaries for them, which failed.
+* Stop testing upcoming releases in CI on old stable branches.
+
 hg-git 1.2.0 (2025-02-08)
 =========================
 
